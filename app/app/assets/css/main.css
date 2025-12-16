@@ -1,0 +1,20 @@
+/**
+ * Puppet Master CSS Entry Point
+ * 
+ * @layer order determines cascade priority (later = higher priority)
+ * This is our CSS architecture - pure CSS, no Tailwind!
+ */
+
+/* Layer order declaration */
+@layer reset, colors, typography, layout, skeleton, ui, utilities;
+
+/* Import layers in order */
+@import './reset.css' layer(reset);
+@import './colors/index.css' layer(colors);
+@import './common/index.css' layer(utilities);
+@import './typography/index.css' layer(typography);
+@import './layout/index.css' layer(layout);
+@import './animations/index.css';
+@import './skeleton/index.css' layer(skeleton);
+@import './ui/index.css' layer(ui);
+

@@ -1,0 +1,174 @@
+/**
+ * 2025 Holy Grail Responsive System
+ *
+ * PHILOSOPHY:
+ * 1. FLUID FIRST - Use clamp() for typography/spacing (no breakpoints!)
+ * 2. INTRINSIC LAYOUTS - Use auto-fit/minmax grids (self-adapting!)
+ * 3. CONTAINER QUERIES - Components own their responsive behavior
+ * 4. MEDIA QUERIES - Only for page-level layout (header/nav visibility)
+ *
+ * BREAKPOINT STRATEGY (when needed):
+ * - Mobile: < 640px (phones)
+ * - Tablet: 640px - 1024px (tablets, small laptops)
+ * - Desktop: > 1024px (laptops, desktops)
+ *
+ * We use WIDTH-based queries (not orientation) because:
+ * - A narrow desktop window is still "landscape" but needs mobile layout
+ * - A wide tablet in portrait might have room for desktop nav
+ */
+
+/* ══════════════════════════════════════════════════════════
+ * CSS CUSTOM PROPERTIES FOR BREAKPOINTS
+ * These are for documentation - CSS can't use vars in media queries
+ * ══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Breakpoint reference (can't use in media queries, just for docs) */
+  --bp-mobile: 640px;
+  --bp-tablet: 1024px;
+
+  /* Responsive spacing that adapts automatically */
+  --space-responsive: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --space-section: clamp(2rem, 1rem + 4vw, 4rem);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * MOBILE FIRST - Default styles (< 640px)
+ * ══════════════════════════════════════════════════════════ */
+
+/* Navigation: hidden by default (mobile), shown on desktop */
+.header-nav {
+  display: none !important;
+}
+
+/* Mobile menu button: shown by default, hidden on desktop */
+.mobile-menu-btn {
+  display: flex !important;
+}
+
+/* Desktop-only elements: hidden on mobile */
+.desktop-only {
+  display: none !important;
+}
+
+/* Mobile-only elements: shown on mobile */
+.mobile-only {
+  display: block !important;
+}
+
+/* Mobile spacer for balanced header layout */
+.mobile-spacer {
+  width: 44px; /* Same as hamburger button */
+}
+
+/* ══════════════════════════════════════════════════════════
+ * TABLET AND UP (≥ 640px)
+ * ══════════════════════════════════════════════════════════ */
+
+@media (min-width: 640px) {
+  .hide-tablet-up { display: none !important; }
+  .show-tablet-up { display: block !important; }
+  .flex-tablet-up { display: flex !important; }
+
+  /* Allow 2-column grids on tablets */
+  .grid-tablet-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * DESKTOP (≥ 1024px)
+ * ══════════════════════════════════════════════════════════ */
+
+@media (min-width: 1024px) {
+  /* Show desktop navigation */
+  .header-nav {
+    display: flex !important;
+  }
+
+  /* Hide mobile menu button */
+  .mobile-menu-btn {
+    display: none !important;
+  }
+
+  /* Desktop-only elements: shown on desktop */
+  .desktop-only {
+    display: flex !important;
+  }
+
+  /* Mobile-only elements: hidden on desktop */
+  .mobile-only {
+    display: none !important;
+  }
+
+  /* Utility classes */
+  .hide-desktop { display: none !important; }
+  .show-desktop { display: block !important; }
+  .flex-desktop { display: flex !important; }
+
+  /* Allow multi-column grids */
+  .grid-desktop-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-desktop-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * LARGE DESKTOP (≥ 1280px)
+ * ══════════════════════════════════════════════════════════ */
+
+@media (min-width: 1280px) {
+  .hide-lg { display: none !important; }
+  .show-lg { display: block !important; }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * ORIENTATION UTILITIES (for specific use cases)
+ * Use these sparingly - width-based is usually better
+ * ══════════════════════════════════════════════════════════ */
+
+@media (orientation: portrait) {
+  .hide-portrait { display: none !important; }
+  .stack-portrait { flex-direction: column !important; }
+}
+
+@media (orientation: landscape) {
+  .hide-landscape { display: none !important; }
+  .stack-landscape { flex-direction: column !important; }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * CONTAINER QUERY RESPONSIVE UTILITIES
+ * Components can use these when wrapped in .cq container
+ * ══════════════════════════════════════════════════════════ */
+
+/* Small container (< 300px) */
+@container (max-width: 299px) {
+  .cq-stack { flex-direction: column; }
+  .cq-hide-sm { display: none; }
+}
+
+/* Medium container (300px - 500px) */
+@container (min-width: 300px) and (max-width: 499px) {
+  .cq-show-md { display: block; }
+  .cq-flex-md { display: flex; }
+}
+
+/* Large container (≥ 500px) */
+@container (min-width: 500px) {
+  .cq-show-lg { display: block; }
+  .cq-flex-lg { display: flex; }
+  .cq-grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Extra large container (≥ 700px) */
+@container (min-width: 700px) {
+  .cq-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PRINT STYLES
+ * ══════════════════════════════════════════════════════════ */
+
+@media print {
+  .no-print { display: none !important; }
+  .header-nav { display: flex !important; }
+  .mobile-menu-btn { display: none !important; }
+}
+

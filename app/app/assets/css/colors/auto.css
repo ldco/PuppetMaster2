@@ -1,0 +1,136 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * AUTO-CALCULATED COLORS
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * All colors derived from the 4 primitives using:
+ * - light-dark() for mode switching
+ * - color-mix() for tints/shades
+ * - oklch() for semantic colors (success, warning, error)
+ *
+ * Prefix system:
+ * l- = layout colors (backgrounds, borders)
+ * i- = interactive states (hover, active, focus)
+ * t- = text colors
+ * d- = data/semantic colors (success, warning, error, info)
+ *
+ * ⚠️  IMPORTANT: color-mix() COLOR SPACE MATTERS!
+ * ───────────────────────────────────────────────────────────────────────────
+ * - Use 'srgb' for brand/accent colors to preserve the original hue
+ * - OKLCH can shift red → pink, blue → purple unexpectedly
+ * - Use 'oklch' only for neutral colors (black/white mixing)
+ * - Use 'oklch' for semantic colors defined with oklch()
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ══════════════════════════════════════════════════════════
+   * LAYOUT COLORS (l-)
+   * ══════════════════════════════════════════════════════════ */
+  
+  /* Backgrounds */
+  --l-bg: light-dark(var(--p-white), var(--p-black));
+  --l-bg-elevated: light-dark(
+    color-mix(in oklch, var(--p-white), var(--p-black) 3%),
+    color-mix(in oklch, var(--p-black), var(--p-white) 5%)
+  );
+  --l-bg-sunken: light-dark(
+    color-mix(in oklch, var(--p-white), var(--p-black) 6%),
+    color-mix(in oklch, var(--p-black), var(--p-white) 2%)
+  );
+  
+  /* Borders */
+  --l-border: light-dark(
+    color-mix(in oklch, var(--p-black), transparent 88%),
+    color-mix(in oklch, var(--p-white), transparent 85%)
+  );
+  --l-border-strong: light-dark(
+    color-mix(in oklch, var(--p-black), transparent 75%),
+    color-mix(in oklch, var(--p-white), transparent 70%)
+  );
+  
+  /* ══════════════════════════════════════════════════════════
+   * TEXT COLORS (t-)
+   * ══════════════════════════════════════════════════════════ */
+  
+  --t-primary: light-dark(var(--p-black), var(--p-white));
+  --t-secondary: light-dark(
+    color-mix(in oklch, var(--p-black), transparent 35%),
+    color-mix(in oklch, var(--p-white), transparent 35%)
+  );
+  --t-muted: light-dark(
+    color-mix(in oklch, var(--p-black), transparent 55%),
+    color-mix(in oklch, var(--p-white), transparent 55%)
+  );
+  --t-on-brand: var(--p-white);
+  --t-on-accent: var(--p-white);
+  
+  /* ══════════════════════════════════════════════════════════
+   * INTERACTIVE COLORS (i-)
+   * ══════════════════════════════════════════════════════════
+   *
+   * NOTE: Using 'srgb' instead of 'oklch' for brand/accent mixing
+   * to preserve the original hue. OKLCH can shift red → pink!
+   * ══════════════════════════════════════════════════════════ */
+
+  /* Brand - use srgb to preserve hue (oklch shifts red to pink!) */
+  --i-brand: var(--p-brand);
+  --i-brand-hover: color-mix(in srgb, var(--p-brand), white 15%);
+  --i-brand-active: color-mix(in srgb, var(--p-brand), black 10%);
+  --i-brand-subtle: light-dark(
+    color-mix(in srgb, var(--p-brand), transparent 90%),
+    color-mix(in srgb, var(--p-brand), transparent 85%)
+  );
+
+  /* Accent - use srgb to preserve hue */
+  --i-accent: var(--p-accent);
+  --i-accent-hover: color-mix(in srgb, var(--p-accent), white 15%);
+  --i-accent-active: color-mix(in srgb, var(--p-accent), black 10%);
+
+  /* Focus ring */
+  --i-focus-ring: color-mix(in srgb, var(--p-brand), transparent 50%);
+  
+  /* ══════════════════════════════════════════════════════════
+   * DATA/SEMANTIC COLORS (d-)
+   * Uses OKLCH to derive from brand hue for harmony
+   * ══════════════════════════════════════════════════════════ */
+  
+  /* Success - green (hue 145) */
+  --d-success: oklch(65% 0.2 145);
+  --d-success-bg: light-dark(
+    oklch(95% 0.05 145),
+    oklch(25% 0.05 145)
+  );
+  
+  /* Warning - yellow/orange (hue 85) */
+  --d-warning: oklch(75% 0.15 85);
+  --d-warning-bg: light-dark(
+    oklch(95% 0.05 85),
+    oklch(25% 0.05 85)
+  );
+  
+  /* Error - red (hue 25) */
+  --d-error: oklch(60% 0.22 25);
+  --d-error-bg: light-dark(
+    oklch(95% 0.05 25),
+    oklch(25% 0.05 25)
+  );
+  
+  /* Info - blue (hue 250) */
+  --d-info: oklch(60% 0.18 250);
+  --d-info-bg: light-dark(
+    oklch(95% 0.05 250),
+    oklch(25% 0.05 250)
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+ * APPLY BASE COLORS TO BODY
+ * ══════════════════════════════════════════════════════════ */
+
+body {
+  background-color: var(--l-bg);
+  color: var(--t-primary);
+}
+

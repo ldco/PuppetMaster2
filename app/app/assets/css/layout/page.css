@@ -1,0 +1,114 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * PAGE LAYOUT - FUNDAMENTAL PAGE STRUCTURE
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * The base Holy Grail layout for all pages: Header → Main → Footer
+ * This is the FOUNDATION that all layouts build upon.
+ *
+ * ┌─────────────────────────────────────────┐
+ * │               HEADER (auto)             │
+ * ├─────────────────────────────────────────┤
+ * │                                         │
+ * │               MAIN (1fr)                │
+ * │           (grows to fill)               │
+ * │                                         │
+ * ├─────────────────────────────────────────┤
+ * │               FOOTER (auto)             │
+ * └─────────────────────────────────────────┘
+ *
+ * Quick Reference:
+ * ───────────────────────────────────────────────────────────────────────────
+ * CLASS             | PURPOSE
+ * ───────────────────────────────────────────────────────────────────────────
+ * .layout           | Holy Grail grid container
+ * .layout-blank     | Minimal layout (no header/footer)
+ * .layout-admin     | Admin panel with sidebar
+ * .main             | Main content area (container query host)
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+/* ==========================================================================
+   DEFAULT LAYOUT - Holy Grail (Header/Main/Footer)
+   ========================================================================== */
+
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+}
+
+.main {
+  /* Container query host for responsive child components */
+  container-type: inline-size;
+}
+
+
+/* ==========================================================================
+   BLANK LAYOUT - Minimal (just content)
+   ========================================================================== */
+
+.layout-blank {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 100dvh;
+}
+
+.layout-blank .main {
+  container-type: inline-size;
+}
+
+
+/* ==========================================================================
+   ADMIN LAYOUT - Narrow Icon Sidebar + Content
+   ========================================================================== */
+
+.layout-admin {
+  display: grid;
+  grid-template-columns: var(--admin-sidebar-width, 60px) 1fr;
+  min-height: 100dvh;
+}
+
+.layout-admin .admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: var(--admin-sidebar-width, 60px);
+  background: var(--l-bg-elevated);
+  border-inline-end: 1px solid var(--l-border);
+  overflow: visible; /* Allow tooltips to overflow */
+  position: relative;
+  z-index: var(--z-sticky);
+}
+
+.layout-admin .admin-main {
+  container-type: inline-size;
+  overflow-y: auto;
+}
+
+/* Mobile: sidebar becomes bottom bar or drawer */
+@media (width < 768px) {
+  .layout-admin {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .layout-admin .admin-sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: var(--z-drawer);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: min(80vw, 280px);
+    overflow-y: auto;
+  }
+
+  [dir="rtl"] .layout-admin .admin-sidebar {
+    transform: translateX(100%);
+  }
+
+  .layout-admin .admin-sidebar.is-open {
+    transform: translateX(0);
+  }
+}
+

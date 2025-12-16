@@ -1,0 +1,267 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * FOOTER STYLES
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Quick Reference for Developers:
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * FOOTER WIDTH (inner content):
+ *   --footer-max-width   Default: 100% (full-width)
+ *
+ *   To constrain footer content:
+ *   :root { --footer-max-width: var(--content-default); }  // Use container width
+ *   :root { --footer-max-width: 1200px; }                  // Custom width
+ *
+ * FOOTER PADDING (vertical space):
+ *   --footer-padding     Default: var(--space-6) (minimal footer)
+ *
+ *   For rich footers with lots of content, add class .footer-rich
+ *   or override: :root { --footer-padding: var(--space-12); }
+ *
+ * CSS Classes:
+ *   .footer              Base footer
+ *   .footer-rich         Variant with more padding (for links, social, etc.)
+ *   .footer-full         Variant for edge-to-edge footer
+ *   .footer-grid         Auto-fit grid for footer columns
+ *   .footer-grid-branded Specific 2fr 1fr 1fr grid (logo + 2 columns)
+ *   .footer-social       Social links container (centered)
+ *   .footer-bottom       Copyright bar
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ─────────────────────────────────────────────────────────────────────────
+   * FOOTER DIMENSIONS
+   * Change these to customize footer size
+   * ───────────────────────────────────────────────────────────────────────── */
+  --footer-max-width: 100%; /* Full-width by default */
+  --footer-padding: var(--space-6); /* Reasonable default for minimal footers */
+}
+
+.footer {
+  background: var(--l-bg-elevated);
+  border-top: 1px solid var(--l-border);
+  padding-block: var(--footer-padding);
+}
+
+/* Rich footer variant - when you have links, social, newsletter, etc. */
+.footer-rich {
+  --footer-padding: var(--space-12);
+}
+
+.footer-inner {
+  max-width: var(--footer-max-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+/* Full-width footer variant */
+.footer-full .footer-inner {
+  max-width: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * FOOTER MAIN (Logo + Social row)
+ * ══════════════════════════════════════════════════════════ */
+
+.footer-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-lg);
+  margin-bottom: var(--space-8);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+}
+
+.footer-divider {
+  height: 1px;
+  background: var(--l-border);
+  margin-bottom: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .footer-main {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * FOOTER GRID - Use auto-fit pattern for true responsiveness
+ * ══════════════════════════════════════════════════════════ */
+
+.footer-grid {
+  display: grid;
+  /* Auto-fit: adapts to space, no breakpoints! */
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: var(--gap-xl);
+}
+
+/* For when you want specific column ratios (optional) */
+.footer-grid-branded {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap-xl);
+}
+
+@media (min-width: 640px) {
+  .footer-grid-branded {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+.footer-section h4 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--t-secondary);
+  margin-block-end: var(--space-4);
+}
+
+.footer-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.footer-section a {
+  color: var(--t-secondary);
+  transition: color 0.2s ease;
+}
+
+.footer-section a:hover {
+  color: var(--t-primary);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * SOCIAL LINKS
+ * ══════════════════════════════════════════════════════════ */
+
+/* Container for social icons */
+.social-links,
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.footer-social {
+  justify-content: center;
+  margin-block-end: var(--space-4);
+}
+
+/* Individual social icon */
+.social-icon,
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  color: var(--t-secondary);
+  background: var(--l-bg-sunken);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.social-icon:hover,
+.social-link:hover {
+  color: var(--i-brand);
+  background: var(--i-brand-subtle);
+  transform: translateY(-2px);
+}
+
+.social-icon svg,
+.social-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Platform-specific hover colors */
+.social-icon--telegram:hover { color: #0088cc; }
+.social-icon--whatsapp:hover { color: #25d366; }
+.social-icon--instagram:hover { color: #e4405f; }
+.social-icon--linkedin:hover { color: #0077b5; }
+.social-icon--facebook:hover { color: #1877f2; }
+.social-icon--twitter:hover { color: #1da1f2; }
+.social-icon--youtube:hover { color: #ff0000; }
+.social-icon--github:hover { color: var(--t-primary); }
+
+/* ══════════════════════════════════════════════════════════
+ * LEGAL INFO (Copyright + Legal Links)
+ * ══════════════════════════════════════════════════════════ */
+
+.legal-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  font-size: var(--text-sm);
+  color: var(--t-muted);
+}
+
+.legal-info .copyright {
+  margin: 0;
+}
+
+.legal-links {
+  display: flex;
+  gap: var(--gap-md);
+}
+
+.legal-links a {
+  color: var(--t-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.legal-links a:hover {
+  color: var(--t-primary);
+}
+
+@media (max-width: 640px) {
+  .legal-info {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * FOOTER BOTTOM (Copyright)
+ * ══════════════════════════════════════════════════════════ */
+
+.footer-bottom {
+  padding-block-start: var(--space-4);
+  border-top: 1px solid var(--l-border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap-md);
+  font-size: var(--text-sm);
+  color: var(--t-muted);
+}
+
+/* Use tablet breakpoint consistent with system */
+@media (min-width: 640px) {
+  .footer-bottom {
+    justify-content: space-between;
+  }
+}
+
+.footer-legal {
+  font-size: var(--text-xs);
+  color: var(--t-muted);
+}
+

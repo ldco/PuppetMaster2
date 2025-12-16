@@ -1,0 +1,229 @@
+/**
+ * Navigation Styles
+ */
+
+.nav-link {
+  position: relative;
+  color: var(--t-secondary);
+  font-weight: var(--font-medium);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--t-primary);
+  background: var(--i-brand-subtle);
+}
+
+/* Active state - supports both .active and Vue router classes */
+.nav-link.active,
+.nav-link.router-link-active,
+.nav-link.router-link-exact-active {
+  color: var(--i-brand);
+}
+
+.nav-link.active::after,
+.nav-link.router-link-active::after,
+.nav-link.router-link-exact-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: var(--space-3);
+  right: var(--space-3);
+  height: 2px;
+  background: var(--i-brand);
+  border-radius: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * NAV LINKS CONTAINER
+ * ═══════════════════════════════════════════════════════════ */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+}
+
+/* Vertical layout for mobile menu and sidebar */
+.nav-links--vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Vertical nav link - no underline, full width highlight */
+.nav-links--vertical .nav-link.router-link-active::after,
+.nav-links--vertical .nav-link.router-link-exact-active::after {
+  display: none;
+}
+
+.nav-links--vertical .nav-link.router-link-active,
+.nav-links--vertical .nav-link.router-link-exact-active {
+  background: var(--i-brand-subtle);
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * SIDEBAR NAV (for admin panel)
+ * Narrow icon-only sidebar with hover tooltips
+ * ═══════════════════════════════════════════════════════════ */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2);
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--l-border);
+}
+
+.sidebar-header .logo-img {
+  width: 36px;
+  height: 36px;
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-top: 1px solid var(--l-border);
+  margin-top: auto;
+}
+
+/* Icon-only nav links with tooltip */
+.sidebar-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+  color: var(--t-secondary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-nav-link:hover {
+  background: var(--i-brand-subtle);
+  color: var(--t-primary);
+}
+
+.sidebar-nav-link.router-link-exact-active {
+  background: var(--i-brand);
+  color: var(--i-brand-text);
+}
+
+.sidebar-nav-link svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* Tooltip that slides out on hover */
+.sidebar-nav-link .sidebar-tooltip {
+  position: absolute;
+  inset-inline-start: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  padding: var(--space-2) var(--space-3);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--t-primary);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: var(--z-tooltip);
+  margin-inline-start: var(--space-2);
+}
+
+.sidebar-nav-link:hover .sidebar-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* RTL support for tooltip */
+[dir="rtl"] .sidebar-nav-link .sidebar-tooltip {
+  transform: translateY(-50%) translateX(8px);
+}
+
+[dir="rtl"] .sidebar-nav-link:hover .sidebar-tooltip {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Icon-only button for footer actions */
+.sidebar-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+  color: var(--t-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  position: relative;
+}
+
+.sidebar-icon-btn:hover {
+  background: var(--i-brand-subtle);
+  color: var(--t-primary);
+}
+
+.sidebar-icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-icon-btn .sidebar-tooltip {
+  position: absolute;
+  inset-inline-start: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  padding: var(--space-2) var(--space-3);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--t-primary);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: var(--z-tooltip);
+  margin-inline-start: var(--space-2);
+}
+
+.sidebar-icon-btn:hover .sidebar-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+[dir="rtl"] .sidebar-icon-btn .sidebar-tooltip {
+  transform: translateY(-50%) translateX(8px);
+}
+
+[dir="rtl"] .sidebar-icon-btn:hover .sidebar-tooltip {
+  transform: translateY(-50%) translateX(0);
+}
+

@@ -1,0 +1,120 @@
+/**
+ * Button Styles
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-xs);
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary button */
+.btn-primary {
+  background: var(--i-brand);
+  color: var(--t-on-brand);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--i-brand-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--i-brand-active);
+}
+
+/* Secondary button */
+.btn-secondary {
+  background: var(--l-bg-elevated);
+  color: var(--t-primary);
+  border: 1px solid var(--l-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--l-bg-sunken);
+  border-color: var(--l-border-strong);
+}
+
+/* Ghost button */
+.btn-ghost {
+  background: transparent;
+  color: var(--t-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--l-bg-sunken);
+}
+
+/* Accent button */
+.btn-accent {
+  background: var(--i-accent);
+  color: var(--t-on-accent);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--i-accent-hover);
+}
+
+/* Outline button */
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--i-brand);
+  color: var(--i-brand);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--i-brand);
+  color: var(--t-on-brand);
+}
+
+/* Full width button */
+.btn-full {
+  width: 100%;
+}
+
+/* Sizes */
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.btn-lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-lg);
+}
+
+/* Icon button */
+.btn-icon {
+  padding: var(--space-2);
+  width: 40px;
+  height: 40px;
+}
+
+.btn-icon.btn-sm {
+  width: 32px;
+  height: 32px;
+  padding: var(--space-1);
+}
+
+.btn-icon.btn-lg {
+  width: 48px;
+  height: 48px;
+  padding: var(--space-3);
+}
+

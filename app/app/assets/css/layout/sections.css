@@ -1,0 +1,218 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SECTION STYLES - FULLSCREEN SECTIONS FOR ONE-PAGER
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Base styles for fullscreen sections used in one-page layouts.
+ *
+ * Quick Reference:
+ * ───────────────────────────────────────────────────────────────────────────
+ * CLASS             | PURPOSE
+ * ───────────────────────────────────────────────────────────────────────────
+ * .section          | Base fullscreen section (min-height: 100dvh, centered)
+ * .section-hero     | Hero/first section (accounts for header height)
+ * .section-auto     | Section with auto height (content-based)
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │ DX: VERTICAL ALIGNMENT                                                  │
+ * ├─────────────────────────────────────────────────────────────────────────┤
+ * │                                                                         │
+ * │  All sections use flexbox for VERTICAL CENTERING by default.            │
+ * │  Content is centered within the available viewport height.              │
+ * │                                                                         │
+ * │  To adjust alignment per-section:                                       │
+ * │    .section-align-start { justify-content: flex-start; }                │
+ * │    .section-align-end   { justify-content: flex-end; }                  │
+ * │                                                                         │
+ * └─────────────────────────────────────────────────────────────────────────┘
+ *
+ * NOTE: scroll-padding-top is set on html in reset.css to account for
+ * sticky header when navigating to anchor links (#about, #contact, etc.)
+ */
+
+/* ==========================================================================
+   BASE SECTION - Fullscreen & vertically centered
+   ==========================================================================
+
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ DX: SECTION VERTICAL ALIGNMENT                                          │
+   ├─────────────────────────────────────────────────────────────────────────┤
+   │ Sections are 100dvh tall with content vertically centered.              │
+   │ NO extra padding for header - the scroll-padding on <html> handles      │
+   │ anchor navigation offset.                                               │
+   │                                                                         │
+   │ If content appears too high/low, adjust:                                │
+   │   --space-8 (padding)                                                   │
+   │   Or use .section-align-start / .section-align-end utilities            │
+   └─────────────────────────────────────────────────────────────────────────┘
+   */
+
+.section {
+  min-height: 100dvh;
+
+  /* Flexbox for vertical centering */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* Symmetric padding - no header offset needed (scroll-padding handles it) */
+  padding-block: var(--space-8);
+}
+
+/* The container inside section gets the content width constraint */
+.section > .container {
+  width: 100%;
+}
+
+
+/* ==========================================================================
+   HERO SECTION - First visible section
+   ========================================================================== */
+
+/**
+ * Hero is visible on page load (before any scroll).
+ * We add top padding equal to header height so content doesn't start
+ * hidden behind the sticky header.
+ */
+.section-hero {
+  padding-block-start: calc(var(--header-height, 64px) + var(--space-8));
+}
+
+
+/* ==========================================================================
+   AUTO HEIGHT SECTION - Content-based height
+   ========================================================================== */
+
+.section-auto {
+  min-height: auto;
+  justify-content: flex-start; /* Don't center, let content flow naturally */
+  padding-block: var(--space-16);
+}
+
+
+/* ==========================================================================
+   VERTICAL ALIGNMENT UTILITIES
+   ========================================================================== */
+
+.section-align-start {
+  justify-content: flex-start;
+}
+
+.section-align-end {
+  justify-content: flex-end;
+}
+
+
+/* ==========================================================================
+   SECTION BACKGROUNDS - Alternating patterns
+   ========================================================================== */
+
+/* Elevated background (slightly different from main bg) */
+.section:nth-of-type(even) {
+  background: var(--l-bg-elevated);
+}
+
+/* Or use explicit classes for control */
+.section-bg-elevated {
+  background: var(--l-bg-elevated);
+}
+
+.section-bg-sunken {
+  background: var(--l-bg-sunken);
+}
+
+.section-bg-brand {
+  background: var(--i-brand);
+  color: var(--p-white);
+}
+
+
+/* ==========================================================================
+   HERO SECTION LAYOUT
+   ========================================================================== */
+
+.section-hero--center {
+  text-align: center;
+  align-items: center;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-md);
+  justify-content: center;
+}
+
+
+/* ==========================================================================
+   SECTION GRIDS - Common layout patterns
+   ========================================================================== */
+
+/* Two-column grid (image + text) */
+.section-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap-xl);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .section-grid-2col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Reverse the order (image on right) */
+  .section-grid-2col--reversed > :first-child {
+    order: 2;
+  }
+}
+
+/* Auto-fit grid (for cards, portfolio items, services) */
+.section-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--gap-lg);
+}
+
+/* Larger min-width for portfolio items */
+.section-grid-auto--lg {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+
+/* ==========================================================================
+   SECTION CONTENT PATTERNS
+   ========================================================================== */
+
+/* Aspect ratio image container */
+.section-image {
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.section-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Image placeholder (uses Tabler icon or custom content) */
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--l-bg-sunken);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t-muted);
+}
+
+/* SVG icon inside placeholder */
+.image-placeholder svg {
+  width: 64px;
+  height: 64px;
+}
+

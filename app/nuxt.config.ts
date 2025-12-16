@@ -1,0 +1,89 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+import config from './app/puppet-master.config'
+import Icons from 'unplugin-icons/vite'
+import svgLoader from 'vite-svg-loader'
+
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+
+  // CSS entry point - our custom CSS system
+  css: ['~/assets/css/main.css'],
+
+  // App head configuration
+  app: {
+    head: {
+      // Google Fonts - Montserrat (matches logo design)
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap'
+        }
+      ]
+    }
+  },
+
+  // Modules
+  modules: [
+    '@nuxtjs/color-mode',
+    '@nuxtjs/i18n',
+    '@pinia/nuxt'
+  ],
+
+  // Color mode configuration
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
+    classSuffix: '',
+    storageKey: 'pm-color-mode'
+  },
+
+  // i18n configuration
+  // NOTE: Translations come from DATABASE via API, not per-locale files!
+  // A single loader.ts handles ALL locales - no manual file creation needed
+  // Fallbacks in fallbacks.ts provide minimal bootstrap translations
+  i18n: {
+    // Locales from config - ALL use the same loader.ts file
+    locales: config.locales.map(l => ({ ...l, file: 'loader.ts' })),
+    lazy: true,
+    langDir: '.', // loader.ts is in i18n/ directory
+    defaultLocale: config.defaultLocale,
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'pm-i18n-redirected'
+    },
+    // Bundle options
+    bundle: {
+      fullInstall: true,
+      dropMessageCompiler: false
+    },
+    // Compilation options
+    compilation: {
+      strictMessage: false
+    },
+    // Vue I18n options
+    vueI18n: './i18n/i18n.config.ts'
+  },
+
+  // Vite configuration
+  vite: {
+    plugins: [
+      Icons({
+        compiler: 'vue3',
+        autoInstall: true
+      }),
+      svgLoader()
+    ]
+  },
+
+  // Runtime config
+  runtimeConfig: {
+    databaseUrl: process.env.DATABASE_URL || './data/sqlite.db',
+    public: {
+      features: config.features
+    }
+  }
+})

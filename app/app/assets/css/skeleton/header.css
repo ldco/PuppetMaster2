@@ -1,0 +1,286 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * HEADER STYLES
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Quick Reference for Developers:
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * HEADER WIDTH (inner content):
+ *   --header-max-width    Default: 100% (full-width)
+ *
+ *   To constrain header content:
+ *   :root { --header-max-width: var(--content-default); }  // Use container width
+ *   :root { --header-max-width: 1400px; }                  // Custom width
+ *   Or use class: .header-full .header-inner { max-width: none; }
+ *
+ * HEADER HEIGHT:
+ *   --header-height       Default: clamp(56px, 8vh, 72px) - fluid height
+ *
+ *   To change:
+ *   :root { --header-height: 80px; }  // Fixed height
+ *   :root { --header-height: clamp(60px, 10vh, 100px); }  // Custom fluid
+ *
+ * INTERACTIVE HEADER (scroll-based):
+ *   Controlled via puppet-master.config.ts:
+ *   - features.interactiveHeader: true/false
+ *   - features.hideHeaderOnScroll: true/false
+ *
+ *   CSS Variables for scrolled state:
+ *   --header-scrolled-height   Height when scrolled
+ *   --header-scrolled-bg       Background (uses glassmorphism by default)
+ *   --header-scrolled-shadow   Box shadow when scrolled
+ *   --header-scrolled-backdrop Backdrop blur effect
+ *   --header-transition        Transition timing
+ *
+ * CSS Classes:
+ *   .header              Base header
+ *   .header--scrolled    Applied when page is scrolled (via useScrollHeader)
+ *   .header--hidden      Applied when scrolling down (if hideHeaderOnScroll)
+ *   .header--visible     Applied when scrolling up after hidden
+ *   .header-full         Variant for edge-to-edge header
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ─────────────────────────────────────────────────────────────────────────
+   * HEADER DIMENSIONS
+   * Change these to customize header size
+   * ───────────────────────────────────────────────────────────────────────── */
+  --header-height: clamp(56px, 8vh, 72px);
+  --header-max-width: 100%; /* Full-width by default - most modern sites use full-width headers */
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--l-bg);
+  border-block-end: 1px solid var(--l-border);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding-inline: var(--container-padding);
+  max-width: var(--header-max-width);
+  margin-inline: auto;
+}
+
+/* Full-width header variant (edge-to-edge) */
+.header-full .header-inner {
+  max-width: none;
+}
+
+/* ==========================================================================
+   LOGO STYLES - Used by Logo.vue atom
+   ==========================================================================
+
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ DX: CUSTOMIZE LOGO SIZE                                                 │
+   ├─────────────────────────────────────────────────────────────────────────┤
+   │                                                                         │
+   │  DESKTOP LOGO:                                                          │
+   │    --logo-desktop-height: 40px;        // Fixed height                  │
+   │    --logo-desktop-max-width: 200px;    // Maximum width                 │
+   │                                                                         │
+   │  MOBILE LOGO:                                                           │
+   │    --logo-mobile-height: 36px;         // Fixed height                  │
+   │    --logo-mobile-max-width: 160px;     // Maximum width                 │
+   │                                                                         │
+   │  SCROLLED STATE (when page is scrolled):                                │
+   │    --logo-scrolled-height: 28px;       // Smaller when scrolled         │
+   │                                                                         │
+   │  Example - Make logo bigger on mobile:                                  │
+   │    :root { --logo-mobile-height: 44px; }                                │
+   │                                                                         │
+   └─────────────────────────────────────────────────────────────────────────┘
+   */
+
+:root {
+  /* Logo dimensions - adjust these to change logo size */
+  --logo-desktop-height: 40px;
+  --logo-desktop-max-width: 200px;
+  --logo-mobile-height: 36px;
+  --logo-mobile-max-width: 160px;
+  --logo-scrolled-height: 28px;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: var(--logo-desktop-height);
+  max-width: var(--logo-desktop-max-width);
+  width: auto;
+  object-fit: contain;
+}
+
+/* Header-specific logo container */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header-logo img,
+.header-logo svg,
+.header-logo .logo {
+  height: var(--logo-desktop-height);
+  max-width: var(--logo-desktop-max-width);
+  width: auto;
+  object-fit: contain;
+  transition: height var(--header-transition, 0.3s ease);
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * MOBILE HEADER LAYOUT
+ *
+ * Mobile: Logo centered absolutely (hamburger left, spacer right)
+ * Desktop: Logo in normal flow (left position)
+ *
+ * DX: To change mobile logo size, adjust --logo-mobile-height
+ *     in :root above (default: 36px)
+ * ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 1023px) {
+  .header-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .header-logo img,
+  .header-logo svg,
+  .header-logo .logo {
+    height: var(--logo-mobile-height);
+    max-width: var(--logo-mobile-max-width);
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-logo {
+    position: static;
+    transform: none;
+  }
+}
+
+/* Nav visibility controlled in responsive.css (hidden mobile, shown desktop) */
+/* DO NOT set display here - let responsive.css control it! */
+.header-nav {
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Login button - only visible in site-app mode */
+.header-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--c-brand);
+  color: var(--l-bg);
+  font-weight: 500;
+  font-size: var(--font-sm);
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header-login-btn:hover {
+  background: color-mix(in oklch, var(--c-brand) 85%, black);
+  transform: translateY(-1px);
+}
+
+.header-login-btn svg {
+  width: 1.125em;
+  height: 1.125em;
+}
+
+/* Hide text on mobile, show icon only */
+@media (width < 640px) {
+  .header-login-btn span {
+    display: none;
+  }
+
+  .header-login-btn {
+    padding: var(--space-2);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * INTERACTIVE HEADER - Scroll-based style changes
+ *
+ * Toggle via puppet-master.config.ts:
+ *   features.interactiveHeader: true/false
+ *   features.hideHeaderOnScroll: true/false
+ *
+ * Customize these variables for your design:
+ * ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Scrolled state styles */
+  --header-scrolled-height: clamp(48px, 6vh, 56px);
+  --header-scrolled-bg: color-mix(in oklch, var(--l-bg) 95%, transparent);
+  --header-scrolled-shadow: 0 2px 8px oklch(0% 0 0 / 0.1);
+  --header-scrolled-backdrop: blur(12px);
+
+  /* Transition timing */
+  --header-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base header transition */
+.header {
+  transition:
+    height var(--header-transition),
+    background var(--header-transition),
+    box-shadow var(--header-transition),
+    transform var(--header-transition);
+}
+
+.header-inner {
+  transition: height var(--header-transition);
+}
+
+/* Scrolled state - smaller, glass effect */
+.header.header--scrolled {
+  background: var(--header-scrolled-bg);
+  box-shadow: var(--header-scrolled-shadow);
+  backdrop-filter: var(--header-scrolled-backdrop);
+  -webkit-backdrop-filter: var(--header-scrolled-backdrop);
+}
+
+.header.header--scrolled .header-inner {
+  height: var(--header-scrolled-height);
+}
+
+/* Scrolled logo is smaller */
+.header.header--scrolled .header-logo img,
+.header.header--scrolled .header-logo svg,
+.header.header--scrolled .header-logo .logo {
+  height: var(--logo-scrolled-height);
+}
+
+/* Hidden state (when scrolling down) */
+.header.header--hidden {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Visible state (when scrolling up, after being hidden) */
+.header.header--visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
