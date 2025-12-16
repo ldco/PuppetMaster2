@@ -4,7 +4,7 @@
  * SQLite schema using Drizzle ORM.
  * Tables: users, sessions, settings, portfolio_items, contact_submissions, translations
  */
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // USERS & AUTH
@@ -100,7 +100,9 @@ export const translations = sqliteTable('translations', {
   key: text('key').notNull(), // 'nav.home', 'common.submit'
   value: text('value').notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
-})
+}, (table) => [
+  unique().on(table.locale, table.key)
+])
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPE EXPORTS

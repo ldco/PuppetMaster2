@@ -138,6 +138,20 @@
   align-items: center;
 }
 
+/* Hero logo container */
+.hero-logo {
+  display: flex;
+  justify-content: center;
+  margin-block-end: var(--space-6);
+}
+
+/* Hero logo image - big and prominent */
+.hero-logo-img {
+  width: clamp(150px, 30vw, 280px);
+  height: auto;
+  object-fit: contain;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;

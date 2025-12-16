@@ -22,7 +22,6 @@ useHead({
   <div>
     <!-- Hero Section -->
     <SectionsSectionHero
-      :title="t('hero.title')"
       :subtitle="t('hero.subtitle')"
       :primary-cta="t('hero.primaryCta')"
       primary-link="#services"

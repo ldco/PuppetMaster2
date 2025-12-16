@@ -1,15 +1,13 @@
 <script setup lang="ts">
 /**
  * Hero Section
- * 
- * Main landing section with headline, subtext, and CTAs.
+ *
+ * Main landing section with big logo, subtext, and CTAs.
  */
 
-const { t } = useI18n()
+const { shortLogo } = useLogo()
 
 defineProps<{
-  /** Main headline */
-  title?: string
   /** Supporting text */
   subtitle?: string
   /** Primary CTA text */
@@ -27,13 +25,15 @@ defineProps<{
   <!--
     Uses global classes from:
     - layout/sections.css (.section, .section-hero, .section-hero--center, .hero-actions)
-    - typography/base.css (.hero-title, .hero-subtitle, .text-gradient)
+    - typography/base.css (.hero-subtitle)
   -->
   <section id="home" class="section section-hero section-hero--center">
     <div class="container">
-      <h1 class="hero-title">
-        <slot name="title">{{ title ?? 'Welcome to Puppet Master' }}</slot>
-      </h1>
+      <div class="hero-logo">
+        <slot name="logo">
+          <img :src="shortLogo" alt="Logo" class="hero-logo-img" />
+        </slot>
+      </div>
       <p class="hero-subtitle">
         <slot name="subtitle">
           {{ subtitle ?? 'A studio toolkit for creating stable, secure landing pages and portfolio sites.' }}

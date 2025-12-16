@@ -39,63 +39,71 @@ function hashPassword(password: string): string {
 async function seed() {
   console.log('🌱 Seeding database...\n')
 
-  // Check if admin user already exists
+  // Check if admin user already exists - if not, create one
   const existingAdmin = db.select().from(schema.users).get()
-  if (existingAdmin) {
-    console.log('⚠️  Database already seeded. Skipping.\n')
-    sqlite.close()
-    return
+  if (!existingAdmin) {
+    const adminEmail = 'admin@example.com'
+    const adminPassword = 'admin123' // Change in production!
+
+    console.log('👤 Creating admin user...')
+    db.insert(schema.users).values({
+      email: adminEmail,
+      passwordHash: hashPassword(adminPassword),
+      name: 'Admin',
+      role: 'admin'
+    }).run()
+    console.log(`   Email: ${adminEmail}`)
+    console.log(`   Password: ${adminPassword}\n`)
+  } else {
+    console.log('👤 Admin user exists, skipping.\n')
   }
 
-  // Create admin user
-  const adminEmail = 'admin@example.com'
-  const adminPassword = 'admin123' // Change in production!
-
-  console.log('👤 Creating admin user...')
-  db.insert(schema.users).values({
-    email: adminEmail,
-    passwordHash: hashPassword(adminPassword),
-    name: 'Admin',
-    role: 'admin'
-  }).run()
-  console.log(`   Email: ${adminEmail}`)
-  console.log(`   Password: ${adminPassword}\n`)
-
-  // Create settings from config schema (empty values - to be filled via Admin Panel)
-  console.log('⚙️  Creating settings from config schema...')
+  // Create settings from config schema - ONLY if they don't exist
+  // Uses raw SQL with INSERT OR IGNORE to preserve existing values
+  console.log('⚙️  Syncing settings from config schema...')
+  let settingsAdded = 0
   for (const setting of config.settings) {
-    db.insert(schema.settings).values({
-      key: setting.key,
-      value: '',  // Empty - values are entered via Admin Panel
-      type: setting.type,
-      group: setting.group
-    }).run()
-    console.log(`   ${setting.key} (${setting.type}) → Admin Panel`)
-  }
+    const result = sqlite.prepare(`
+      INSERT OR IGNORE INTO settings (key, value, type, "group")
+      VALUES (?, '', ?, ?)
+    `).run(setting.key, setting.type, setting.group)
 
-  // Seed translations (ALL website text comes from DB!)
-  console.log('\n🌍 Seeding translations...')
+    if (result.changes > 0) {
+      console.log(`   + ${setting.key} (new)`)
+      settingsAdded++
+    }
+  }
+  console.log(`   ${settingsAdded} new settings added, existing values preserved.\n`)
+
+  // Seed translations - ONLY insert missing keys, never overwrite!
+  // Uses raw SQL with INSERT OR IGNORE
+  console.log('🌍 Syncing translations...')
   const translations = getSeedData()
-  let translationCount = 0
+  let translationsAdded = 0
 
+  const now = Date.now()
   for (const t of translations) {
-    db.insert(schema.translations).values({
-      locale: t.locale,
-      key: t.key,
-      value: t.value
-    }).run()
-    translationCount++
+    const result = sqlite.prepare(`
+      INSERT OR IGNORE INTO translations (locale, key, value, updated_at)
+      VALUES (?, ?, ?, ?)
+    `).run(t.locale, t.key, t.value, now)
+
+    if (result.changes > 0) {
+      translationsAdded++
+    }
   }
-  console.log(`   Added ${translationCount} translations`)
+
+  console.log(`   ${translationsAdded} new translations added`)
+  console.log(`   ${translations.length - translationsAdded} existing translations preserved`)
 
   // Count per locale
   const locales = [...new Set(translations.map(t => t.locale))]
   for (const locale of locales) {
     const count = translations.filter(t => t.locale === locale).length
-    console.log(`   ${locale}: ${count} keys`)
+    console.log(`   ${locale}: ${count} keys in seed`)
   }
 
-  console.log('\n✅ Database seeded successfully!\n')
+  console.log('\n✅ Database sync complete! Existing values preserved.\n')
   sqlite.close()
 }
 
