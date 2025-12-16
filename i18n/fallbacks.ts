@@ -99,7 +99,15 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       system: 'System'
     },
     footer: {
-      rights: 'All rights reserved'
+      rights: 'All rights reserved',
+      navigation: 'Navigation',
+      contact: 'Contact',
+      privacy: 'Privacy Policy',
+      terms: 'Terms of Service',
+      madeWith: 'Made with',
+      puppetMaster: 'Puppet Master',
+      ctaDefault: 'Get in Touch',
+      backToTop: 'Back to top'
     },
     // Website sections - all editable via Admin Panel
     seo: {
@@ -128,7 +136,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       nameLabel: 'Name',
       namePlaceholder: 'Your name',
       emailLabel: 'Email',
-      emailPlaceholder: 'email{"@"}example.com',
+      emailPlaceholder: "email{'@'}example.com",
       messageLabel: 'Message',
       messagePlaceholder: 'How can we help?',
       sendButton: 'Send Message',
@@ -220,7 +228,15 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       system: 'Системная'
     },
     footer: {
-      rights: 'Все права защищены'
+      rights: 'Все права защищены',
+      navigation: 'Навигация',
+      contact: 'Контакты',
+      privacy: 'Политика конфиденциальности',
+      terms: 'Условия использования',
+      madeWith: 'Сделано с',
+      puppetMaster: 'Puppet Master',
+      ctaDefault: 'Связаться',
+      backToTop: 'Наверх'
     },
     seo: {
       homeTitle: 'Puppet Master - CSS инструментарий для студий',
@@ -248,7 +264,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       nameLabel: 'Имя',
       namePlaceholder: 'Ваше имя',
       emailLabel: 'Email',
-      emailPlaceholder: 'email{"@"}example.com',
+      emailPlaceholder: "email{'@'}example.com",
       messageLabel: 'Сообщение',
       messagePlaceholder: 'Чем мы можем помочь?',
       sendButton: 'Отправить',
@@ -340,7 +356,15 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       system: 'כברירת המחדל של המערכת'
     },
     footer: {
-      rights: 'כל הזכויות שמורות'
+      rights: 'כל הזכויות שמורות',
+      navigation: 'ניווט',
+      contact: 'יצירת קשר',
+      privacy: 'מדיניות פרטיות',
+      terms: 'תנאי שימוש',
+      madeWith: 'נבנה עם',
+      puppetMaster: 'Puppet Master',
+      ctaDefault: 'צרו קשר',
+      backToTop: 'חזרה למעלה'
     },
     seo: {
       homeTitle: 'דף הבית',
@@ -368,7 +392,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       nameLabel: 'שם',
       namePlaceholder: 'הכנס שם',
       emailLabel: 'דוא"ל',
-      emailPlaceholder: 'example{"@"}email.com',
+      emailPlaceholder: "example{'@'}email.com",
       messageLabel: 'הודעה',
       messagePlaceholder: 'השאר את ההודעה שלך כאן...',
       sendButton: 'שלח הודעה',

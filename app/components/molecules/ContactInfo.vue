@@ -125,53 +125,5 @@ const contactItems = computed(() => {
   </div>
 </template>
 
-<style scoped>
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
 
-.contact-info--horizontal .contact-info-list {
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.contact-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.contact-info-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.contact-info-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: var(--brand);
-  flex-shrink: 0;
-}
-
-.contact-info-value {
-  color: var(--text-primary);
-}
-
-a.contact-info-value:hover {
-  color: var(--brand);
-}
-
-.contact-info-map {
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.contact-info-map iframe {
-  display: block;
-}
-</style>
 

@@ -6,11 +6,11 @@
  * - Reads icon names from config
  * - Gets values from useSiteSettings()
  * - Only renders platforms that have URLs in database
+ * - Supports both Tabler icons and custom icons
  */
 import config from '~/puppet-master.config'
 
-// Import all social brand icons (Tabler)
-// Icons are mapped by config icon name (e.g., 'brand-telegram')
+// Tabler brand icons
 import IconBrandTelegram from '~icons/tabler/brand-telegram'
 import IconBrandInstagram from '~icons/tabler/brand-instagram'
 import IconBrandWhatsapp from '~icons/tabler/brand-whatsapp'
@@ -19,17 +19,47 @@ import IconBrandYoutube from '~icons/tabler/brand-youtube'
 import IconBrandLinkedin from '~icons/tabler/brand-linkedin'
 import IconBrandX from '~icons/tabler/brand-x'
 import IconBrandGithub from '~icons/tabler/brand-github'
+import IconBrandGitlab from '~icons/tabler/brand-gitlab'
+import IconBrandVk from '~icons/tabler/brand-vk'
+import IconBrandTiktok from '~icons/tabler/brand-tiktok'
+import IconBrandPinterest from '~icons/tabler/brand-pinterest'
+import IconBrandDribbble from '~icons/tabler/brand-dribbble'
+import IconBrandBehance from '~icons/tabler/brand-behance'
+import IconBrandDiscord from '~icons/tabler/brand-discord'
+import IconBrandMedium from '~icons/tabler/brand-medium'
+import IconBrandThreads from '~icons/tabler/brand-threads'
+import IconBrandTwitch from '~icons/tabler/brand-twitch'
+
+// Custom icons (for brands not in Tabler)
+import IconMax from '~/assets/icons/custom/IconMax.vue'
 
 // Icon map: config icon name → component
 const iconMap: Record<string, Component> = {
+  // Messaging
   'brand-telegram': IconBrandTelegram,
-  'brand-instagram': IconBrandInstagram,
   'brand-whatsapp': IconBrandWhatsapp,
+  'brand-discord': IconBrandDiscord,
+  // Social
+  'brand-instagram': IconBrandInstagram,
   'brand-facebook': IconBrandFacebook,
-  'brand-youtube': IconBrandYoutube,
-  'brand-linkedin': IconBrandLinkedin,
   'brand-x': IconBrandX,
-  'brand-github': IconBrandGithub
+  'brand-threads': IconBrandThreads,
+  'brand-tiktok': IconBrandTiktok,
+  'brand-pinterest': IconBrandPinterest,
+  'brand-vk': IconBrandVk,
+  // Video
+  'brand-youtube': IconBrandYoutube,
+  'brand-twitch': IconBrandTwitch,
+  // Professional
+  'brand-linkedin': IconBrandLinkedin,
+  'brand-medium': IconBrandMedium,
+  // Dev/Design
+  'brand-github': IconBrandGithub,
+  'brand-gitlab': IconBrandGitlab,
+  'brand-dribbble': IconBrandDribbble,
+  'brand-behance': IconBrandBehance,
+  // Custom
+  'custom-max': IconMax
 }
 
 // Build platform → icon mapping from config
@@ -92,49 +122,4 @@ function getIcon(platform: string): Component | undefined {
     </a>
   </nav>
 </template>
-
-<style scoped>
-.social-nav {
-  display: flex;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.social-nav--vertical {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.social-nav-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--text-secondary);
-  transition: color var(--transition-fast);
-}
-
-.social-nav-link:hover {
-  color: var(--brand);
-}
-
-.social-nav-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.social-nav-label {
-  text-transform: capitalize;
-  font-size: var(--text-sm);
-}
-
-/* Platform-specific hover colors (optional enhancement) */
-.social-nav-link--telegram:hover { color: #0088cc; }
-.social-nav-link--instagram:hover { color: #e4405f; }
-.social-nav-link--whatsapp:hover { color: #25d366; }
-.social-nav-link--facebook:hover { color: #1877f2; }
-.social-nav-link--youtube:hover { color: #ff0000; }
-.social-nav-link--linkedin:hover { color: #0a66c2; }
-.social-nav-link--twitter:hover { color: #000000; }
-.social-nav-link--github:hover { color: #333333; }
-</style>
 

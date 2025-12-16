@@ -3,9 +3,18 @@
  *
  * Submits a contact form.
  * Public endpoint with rate limiting and validation.
+ *
+ * Side effects:
+ * - Saves to database
+ * - Sends confirmation email to user (if SMTP configured)
+ * - Sends Telegram notification to admin (if bot configured)
  */
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
+import { sendContactConfirmation } from '../../utils/email'
+import { notifyNewContact } from '../../utils/telegram'
+import config from '~~/app/puppet-master.config'
 
 // Validation schema
 const contactSchema = z.object({
@@ -80,6 +89,41 @@ export default defineEventHandler(async (event) => {
     })
     .returning()
     .get()
+
+  // Send notifications (don't await - fire and forget, don't block response)
+  // Only if enabled in config
+
+  // Email confirmation to user
+  if (config.features.contactEmailConfirmation) {
+    // Get site name from settings for email (legal.companyName → seo.title → fallback)
+    const companyNameSetting = db
+      .select()
+      .from(schema.settings)
+      .where(eq(schema.settings.key, 'legal.companyName'))
+      .get()
+    const seoTitleSetting = db
+      .select()
+      .from(schema.settings)
+      .where(eq(schema.settings.key, 'seo.title'))
+      .get()
+    const siteName = companyNameSetting?.value || seoTitleSetting?.value || 'Puppet Master'
+
+    sendContactConfirmation(data.email, data.name, siteName).catch((e) => {
+      console.error('[Contact] Email notification failed:', e)
+    })
+  }
+
+  // Telegram notification to admin
+  if (config.features.contactTelegramNotify) {
+    notifyNewContact({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      message: data.message
+    }).catch((e) => {
+      console.error('[Contact] Telegram notification failed:', e)
+    })
+  }
 
   return {
     success: true,

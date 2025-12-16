@@ -49,6 +49,18 @@ const config = {
     // Admin features (only apply when mode has admin)
     adminVerticalNav: true,     // true = icon sidebar, false = horizontal nav
     // TODO: App-style bottom nav for mobile (mark for later)
+
+    // Contact form notifications
+    // ⚠️ Requires .env configuration - see .env.example
+    contactEmailConfirmation: false,   // Send confirmation email to user (requires SMTP_* in .env)
+    contactTelegramNotify: false,      // Send Telegram notification to admin (requires TELEGRAM_* in .env)
+
+    // Footer features
+    footerNav: true,              // Show footer navigation links (from sections)
+    footerCta: true,              // Show CTA button in footer
+    footerLegalLinks: true,       // Show legal links (Privacy, Terms)
+    footerMadeWith: true,         // Show "Made with Puppet Master" branding
+    backToTop: true,              // Show back-to-top button on scroll
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -104,7 +116,6 @@ const config = {
     // If Hebrew logo doesn't exist, use English (not Russian)
     langFallback: {
       he: 'en',  // Hebrew → English
-      ar: 'en',  // Arabic → English (if added later)
       // Add more fallbacks as needed
     },
 
@@ -153,10 +164,6 @@ const config = {
   //
   // ═══════════════════════════════════════════════════════════════════════════
   settings: [
-    // Site Identity (used programmatically, no icons needed)
-    { key: 'site.name', type: 'string', group: 'site', label: 'Site Name' },
-    { key: 'site.tagline', type: 'string', group: 'site', label: 'Tagline' },
-
     // Contact Information (displayed via <ContactInfo /> component)
     // Icons are Tabler icon names: https://tabler.io/icons
     { key: 'contact.email', type: 'email', group: 'contact', label: 'Email', icon: 'mail' },
@@ -165,15 +172,32 @@ const config = {
     { key: 'contact.location', type: 'string', group: 'contact', label: 'Location', icon: 'map-pin' },
 
     // Social Links (displayed via <SocialNav /> component)
-    // Icons are Tabler brand icons: https://tabler.io/icons (search "brand")
+    // Icons: Tabler brand icons (https://tabler.io/icons) or custom-* for custom icons
+    // ─── Messaging ───
     { key: 'social.telegram', type: 'url', group: 'social', label: 'Telegram', icon: 'brand-telegram' },
-    { key: 'social.instagram', type: 'url', group: 'social', label: 'Instagram', icon: 'brand-instagram' },
     { key: 'social.whatsapp', type: 'url', group: 'social', label: 'WhatsApp', icon: 'brand-whatsapp' },
+    { key: 'social.viber', type: 'url', group: 'social', label: 'Viber', icon: 'brand-viber' },
+    { key: 'social.discord', type: 'url', group: 'social', label: 'Discord', icon: 'brand-discord' },
+    { key: 'social.max', type: 'url', group: 'social', label: 'MAX Messenger', icon: 'custom-max' },
+    // ─── Social Networks ───
+    { key: 'social.instagram', type: 'url', group: 'social', label: 'Instagram', icon: 'brand-instagram' },
     { key: 'social.facebook', type: 'url', group: 'social', label: 'Facebook', icon: 'brand-facebook' },
-    { key: 'social.youtube', type: 'url', group: 'social', label: 'YouTube', icon: 'brand-youtube' },
-    { key: 'social.linkedin', type: 'url', group: 'social', label: 'LinkedIn', icon: 'brand-linkedin' },
     { key: 'social.twitter', type: 'url', group: 'social', label: 'Twitter/X', icon: 'brand-x' },
+    { key: 'social.threads', type: 'url', group: 'social', label: 'Threads', icon: 'brand-threads' },
+    { key: 'social.tiktok', type: 'url', group: 'social', label: 'TikTok', icon: 'brand-tiktok' },
+    { key: 'social.pinterest', type: 'url', group: 'social', label: 'Pinterest', icon: 'brand-pinterest' },
+    { key: 'social.vk', type: 'url', group: 'social', label: 'VK (ВКонтакте)', icon: 'brand-vk' },
+    // ─── Video ───
+    { key: 'social.youtube', type: 'url', group: 'social', label: 'YouTube', icon: 'brand-youtube' },
+    { key: 'social.twitch', type: 'url', group: 'social', label: 'Twitch', icon: 'brand-twitch' },
+    // ─── Professional ───
+    { key: 'social.linkedin', type: 'url', group: 'social', label: 'LinkedIn', icon: 'brand-linkedin' },
+    { key: 'social.medium', type: 'url', group: 'social', label: 'Medium', icon: 'brand-medium' },
+    // ─── Dev/Design ───
     { key: 'social.github', type: 'url', group: 'social', label: 'GitHub', icon: 'brand-github' },
+    { key: 'social.gitlab', type: 'url', group: 'social', label: 'GitLab', icon: 'brand-gitlab' },
+    { key: 'social.dribbble', type: 'url', group: 'social', label: 'Dribbble', icon: 'brand-dribbble' },
+    { key: 'social.behance', type: 'url', group: 'social', label: 'Behance', icon: 'brand-behance' },
 
     // Legal/Juridical Info (displayed in footer small print)
     // Russian: ИНН, ОГРН, Юридический адрес
@@ -183,18 +207,36 @@ const config = {
     { key: 'legal.address', type: 'string', group: 'legal', label: 'Legal Address' },
     { key: 'legal.email', type: 'email', group: 'legal', label: 'Legal Email' },
 
-    // SEO (used by useHead, no icons needed)
+    // Footer Settings (CTA and legal links)
+    { key: 'footer.ctaText', type: 'string', group: 'footer', label: 'CTA Button Text' },
+    { key: 'footer.ctaUrl', type: 'url', group: 'footer', label: 'CTA Button URL' },
+    { key: 'footer.privacyUrl', type: 'url', group: 'footer', label: 'Privacy Policy URL' },
+    { key: 'footer.termsUrl', type: 'url', group: 'footer', label: 'Terms of Service URL' },
+
+    // SEO & Meta
     { key: 'seo.title', type: 'string', group: 'seo', label: 'Default Page Title' },
-    { key: 'seo.description', type: 'text', group: 'seo', label: 'Meta Description' }
+    { key: 'seo.description', type: 'text', group: 'seo', label: 'Meta Description' },
+    { key: 'seo.keywords', type: 'string', group: 'seo', label: 'Meta Keywords (comma-separated)' },
+
+    // Analytics (IDs only - scripts injected by plugins)
+    { key: 'analytics.googleId', type: 'string', group: 'analytics', label: 'Google Analytics ID (G-XXXXXXXX)' },
+    { key: 'analytics.yandexId', type: 'string', group: 'analytics', label: 'Yandex Metrica ID' },
+    { key: 'analytics.facebookPixel', type: 'string', group: 'analytics', label: 'Facebook Pixel ID' },
+
+    // Verification codes (for webmaster tools)
+    { key: 'verification.google', type: 'string', group: 'verification', label: 'Google Search Console' },
+    { key: 'verification.yandex', type: 'string', group: 'verification', label: 'Yandex Webmaster' }
   ] as const,
 
   // Setting groups (for admin UI organization)
   settingGroups: [
-    { key: 'site', label: 'Site Identity', icon: 'building' },
     { key: 'contact', label: 'Contact Info', icon: 'address-book' },
     { key: 'social', label: 'Social Links', icon: 'share' },
     { key: 'legal', label: 'Legal Info', icon: 'file-certificate' },
-    { key: 'seo', label: 'SEO Settings', icon: 'search' }
+    { key: 'footer', label: 'Footer', icon: 'layout-bottombar' },
+    { key: 'seo', label: 'SEO & Meta', icon: 'search' },
+    { key: 'analytics', label: 'Analytics', icon: 'chart-bar' },
+    { key: 'verification', label: 'Verification', icon: 'certificate' }
   ] as const,
 
   // ═══════════════════════════════════════════════════════════════════════════

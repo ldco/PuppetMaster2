@@ -3,19 +3,18 @@
  * LegalInfo Molecule
  *
  * Config-driven copyright and legal/juridical info.
- * - Company name from settings (for copyright)
- * - Legal details: ИНН, ОГРН, Address, Email (shown in small print)
- * - Only shows items that have values in database
+ * All on one line: © 2025 Company. All rights reserved · ИНН: xxx · ОГРН: xxx · ...
+ * Only shows items that have values in database.
  */
 
 const { t } = useI18n()
 const { settings } = useSiteSettings()
 const currentYear = new Date().getFullYear()
 
-// Company name for copyright (fallback to site name or 'Puppet Master')
+// Company name for copyright (fallback to 'Puppet Master')
 const companyName = computed(() => {
   return settings.value?.legal.companyName
-    || settings.value?.site.name
+    || settings.value?.seo.title
     || 'Puppet Master'
 })
 
@@ -36,41 +35,13 @@ const legalDetails = computed(() => {
 </script>
 
 <template>
-  <!-- Uses global classes from skeleton/footer.css (.legal-info, .copyright, .legal-links) -->
-  <div class="legal-info">
-    <!-- Copyright -->
-    <p class="copyright">
-      © {{ currentYear }} {{ companyName }}. {{ t('footer.rights') }}
-    </p>
-
-    <!-- Legal/Juridical details (small print) -->
-    <p v-if="legalDetails.length > 0" class="legal-details">
-      <span v-for="(item, index) in legalDetails" :key="item.label" class="legal-item">
-        {{ item.label }}: {{ item.value }}<span v-if="index < legalDetails.length - 1" class="legal-sep"> · </span>
-      </span>
-    </p>
-
-    <!-- Legal links slot (Privacy Policy, Terms, etc.) -->
-    <nav class="legal-links">
-      <slot />
-    </nav>
+  <!-- All on ONE line: copyright + legal details -->
+  <div class="legal-row">
+    <span>© {{ currentYear }} {{ companyName }}. {{ t('footer.rights') }}</span>
+    <template v-for="item in legalDetails" :key="item.label">
+      <span class="legal-sep">·</span>
+      <span>{{ item.label }}: {{ item.value }}</span>
+    </template>
   </div>
 </template>
-
-<style scoped>
-.legal-details {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  margin-top: var(--space-2);
-}
-
-.legal-item {
-  white-space: nowrap;
-}
-
-.legal-sep {
-  color: var(--text-tertiary);
-  opacity: 0.5;
-}
-</style>
 

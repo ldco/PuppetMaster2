@@ -27,10 +27,12 @@ const form = reactive({
 
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
+const errorMessage = ref('')
 
 async function handleSubmit() {
   isSubmitting.value = true
   submitStatus.value = 'idle'
+  errorMessage.value = ''
 
   try {
     await $fetch('/api/contact/submit', {
@@ -45,8 +47,18 @@ async function handleSubmit() {
     form.name = ''
     form.email = ''
     form.message = ''
-  } catch {
+  } catch (e: any) {
     submitStatus.value = 'error'
+    // Extract field errors from validation response
+    const fieldErrors = e.data?.data?.fieldErrors
+    if (fieldErrors) {
+      const errors = Object.entries(fieldErrors)
+        .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(', ')}`)
+        .join('; ')
+      errorMessage.value = errors
+    } else {
+      errorMessage.value = e.data?.message || t('contact.errorMessage')
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -99,6 +111,7 @@ async function handleSubmit() {
               v-model="form.message"
               class="input"
               rows="5"
+              minlength="10"
               :placeholder="t('contact.messagePlaceholder')"
               required
             ></textarea>
@@ -118,14 +131,13 @@ async function handleSubmit() {
             ✓ {{ t('contact.successMessage') }}
           </p>
           <p v-if="submitStatus === 'error'" class="form-error">
-            ✕ {{ t('contact.errorMessage') }}
+            ✕ {{ errorMessage || t('contact.errorMessage') }}
           </p>
         </form>
 
         <!-- Contact Info sidebar - config-driven via settings -->
         <aside v-if="showInfo" class="contact-sidebar">
           <MoleculesContactInfo :show-map="showMap" />
-          <MoleculesSocialNav vertical class="contact-social" />
         </aside>
       </div>
     </div>

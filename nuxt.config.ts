@@ -81,7 +81,20 @@ export default defineNuxtConfig({
 
   // Runtime config
   runtimeConfig: {
+    // Database
     databaseUrl: process.env.DATABASE_URL || './data/sqlite.db',
+
+    // Email (SMTP)
+    smtpHost: process.env.SMTP_HOST || '',
+    smtpPort: process.env.SMTP_PORT || '465',
+    smtpUser: process.env.SMTP_USER || '',
+    smtpPass: process.env.SMTP_PASS || '',
+    smtpFrom: process.env.SMTP_FROM || '',
+
+    // Telegram Bot
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
+
     public: {
       features: config.features
     }

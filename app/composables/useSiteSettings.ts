@@ -8,24 +8,37 @@
  */
 
 export interface SiteSettings {
-  site: {
-    name: string | null
-    tagline: string | null
-  }
   contact: {
     email: string | null
     phone: string | null
     location: string | null  // empty=hidden, address text, or "lat,lng" for map
   }
   social: {
+    // Messaging
     telegram: string | null
-    instagram: string | null
     whatsapp: string | null
+    viber: string | null
+    discord: string | null
+    max: string | null
+    // Social networks
+    instagram: string | null
     facebook: string | null
     twitter: string | null
-    linkedin: string | null
+    threads: string | null
+    tiktok: string | null
+    pinterest: string | null
+    vk: string | null
+    // Video
     youtube: string | null
+    twitch: string | null
+    // Professional
+    linkedin: string | null
+    medium: string | null
+    // Dev/Design
     github: string | null
+    gitlab: string | null
+    dribbble: string | null
+    behance: string | null
   }
   legal: {
     companyName: string | null  // For copyright: © 2024 {companyName}
@@ -34,31 +47,60 @@ export interface SiteSettings {
     address: string | null      // Legal address
     email: string | null        // Legal email
   }
+  footer: {
+    ctaText: string | null      // CTA button text
+    ctaUrl: string | null       // CTA button URL
+    privacyUrl: string | null   // Privacy policy URL
+    termsUrl: string | null     // Terms of service URL
+  }
   seo: {
-    title: string | null
-    description: string | null
+    title: string | null        // Page title (also used as site name fallback)
+    description: string | null  // SEO description
+    keywords: string | null     // Meta keywords
+  }
+  analytics: {
+    googleId: string | null     // Google Analytics ID (G-XXXXXXXX)
+    yandexId: string | null     // Yandex Metrica ID
+    facebookPixel: string | null // Facebook Pixel ID
+  }
+  verification: {
+    google: string | null       // Google Search Console
+    yandex: string | null       // Yandex Webmaster
   }
 }
 
 const defaultSettings: SiteSettings = {
-  site: {
-    name: 'Puppet Master',
-    tagline: 'Studio Toolkit'
-  },
   contact: {
     email: null,
     phone: null,
     location: null
   },
   social: {
+    // Messaging
     telegram: null,
-    instagram: null,
     whatsapp: null,
+    viber: null,
+    discord: null,
+    max: null,
+    // Social networks
+    instagram: null,
     facebook: null,
     twitter: null,
-    linkedin: null,
+    threads: null,
+    tiktok: null,
+    pinterest: null,
+    vk: null,
+    // Video
     youtube: null,
-    github: null
+    twitch: null,
+    // Professional
+    linkedin: null,
+    medium: null,
+    // Dev/Design
+    github: null,
+    gitlab: null,
+    dribbble: null,
+    behance: null
   },
   legal: {
     companyName: null,
@@ -67,9 +109,25 @@ const defaultSettings: SiteSettings = {
     address: null,
     email: null
   },
+  footer: {
+    ctaText: null,
+    ctaUrl: null,
+    privacyUrl: null,
+    termsUrl: null
+  },
   seo: {
     title: null,
-    description: null
+    description: null,
+    keywords: null
+  },
+  analytics: {
+    googleId: null,
+    yandexId: null,
+    facebookPixel: null
+  },
+  verification: {
+    google: null,
+    yandex: null
   }
 }
 
@@ -81,10 +139,6 @@ export function useSiteSettings() {
     transform: (raw: Record<string, Record<string, string | null>>) => {
       // Merge API response with defaults
       return {
-        site: {
-          ...defaultSettings.site,
-          ...raw.site
-        },
         contact: {
           ...defaultSettings.contact,
           ...raw.contact
@@ -97,17 +151,31 @@ export function useSiteSettings() {
           ...defaultSettings.legal,
           ...raw.legal
         },
+        footer: {
+          ...defaultSettings.footer,
+          ...raw.footer
+        },
         seo: {
           ...defaultSettings.seo,
           ...raw.seo
+        },
+        analytics: {
+          ...defaultSettings.analytics,
+          ...raw.analytics
+        },
+        verification: {
+          ...defaultSettings.verification,
+          ...raw.verification
         }
       }
     }
   })
 
   // Computed helpers for common use cases
-  const siteName = computed(() => data.value?.site.name || defaultSettings.site.name)
-  const siteTagline = computed(() => data.value?.site.tagline || defaultSettings.site.tagline)
+  // Site name: legal.companyName → seo.title → 'Puppet Master'
+  const siteName = computed(() =>
+    data.value?.legal.companyName || data.value?.seo.title || 'Puppet Master'
+  )
   const contactEmail = computed(() => data.value?.contact.email)
   const contactPhone = computed(() => data.value?.contact.phone)
 
@@ -132,7 +200,6 @@ export function useSiteSettings() {
 
     // Helpers
     siteName,
-    siteTagline,
     contactEmail,
     contactPhone,
     socialLinks,
