@@ -1,15 +1,16 @@
 /**
  * Admin Translations API - GET
  *
- * Returns all translations grouped by locale for admin management.
+ * Returns CONTENT translations grouped by locale for admin management.
+ * System translations (nav, auth, admin, etc.) are hidden from client.
  * Requires authentication.
  */
 import { useDatabase, schema } from '../../database/client'
 import { asc } from 'drizzle-orm'
+import { isSystemKey } from '../../../i18n/system'
 
 export default defineEventHandler(async (event) => {
   // Auth is handled by middleware for /api/admin/* routes
-  // No need to check here - middleware already validated session
 
   const db = useDatabase()
 
@@ -20,12 +21,15 @@ export default defineEventHandler(async (event) => {
     .orderBy(asc(schema.translations.locale), asc(schema.translations.key))
     .all()
 
-  console.log('[translations.get] Found', rows.length, 'translations')
-
-  // Group by locale
+  // Group by locale, filtering out system keys
   const grouped: Record<string, Array<{ id: number; key: string; value: string }>> = {}
 
   for (const row of rows) {
+    // Skip system translations - client cannot edit these
+    if (isSystemKey(row.key)) {
+      continue
+    }
+
     if (!grouped[row.locale]) {
       grouped[row.locale] = []
     }
@@ -35,6 +39,8 @@ export default defineEventHandler(async (event) => {
       value: row.value
     })
   }
+
+  console.log('[translations.get] Found', Object.values(grouped).flat().length, 'content translations')
 
   return {
     locales: ['en', 'ru', 'he'], // Supported locales

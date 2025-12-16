@@ -1,11 +1,12 @@
 /**
  * Database Seed Script
  *
- * Creates initial admin user, default settings, and translations.
+ * Creates initial admin user, default settings, and CONTENT translations.
  * Run with: npm run db:seed
  *
  * IMPORTANT: Settings are defined in puppet-master.config.ts
- * IMPORTANT: All translations come from DB only - no fallbacks!
+ * IMPORTANT: Only CONTENT translations go to database!
+ *            System translations (nav, auth, admin, etc.) come from i18n/system.ts
  */
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
@@ -13,7 +14,7 @@ import { scryptSync, randomBytes } from 'crypto'
 import * as schema from './schema'
 import { mkdirSync, existsSync } from 'fs'
 import { dirname } from 'path'
-import { getSeedData } from '../../i18n/fallbacks'
+import { getContentSeedData } from '../../i18n/content'
 import config from '../../app/puppet-master.config'
 
 const DB_PATH = process.env.DATABASE_URL || './data/sqlite.db'
@@ -75,10 +76,10 @@ async function seed() {
   }
   console.log(`   ${settingsAdded} new settings added, existing values preserved.\n`)
 
-  // Seed translations - ONLY insert missing keys, never overwrite!
-  // Uses raw SQL with INSERT OR IGNORE
-  console.log('🌍 Syncing translations...')
-  const translations = getSeedData()
+  // Seed CONTENT translations only - system translations come from i18n/system.ts
+  // Uses raw SQL with INSERT OR IGNORE to preserve existing values
+  console.log('🌍 Syncing CONTENT translations (client-editable)...')
+  const translations = getContentSeedData()
   let translationsAdded = 0
 
   const now = Date.now()

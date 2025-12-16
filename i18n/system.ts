@@ -1,18 +1,27 @@
 /**
- * Seed Translations Data
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SYSTEM TRANSLATIONS - Developer Controlled (NOT editable in Admin Panel)
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * This file contains the DEFAULT translations for a fresh install.
- * Run `npm run db:seed` to populate the database with these values.
+ * These translations are:
+ *   ✓ Version controlled in git
+ *   ✓ Shared across all Puppet Master sites
+ *   ✓ Cannot be broken by client
+ *   ✗ NOT visible in Admin Panel
  *
- * NO FALLBACKS - all text comes from database only!
- * If translation is missing, the key shows (making problem obvious).
+ * Categories:
+ *   - common.*    → Shared UI (loading, save, cancel)
+ *   - nav.*       → Navigation labels
+ *   - auth.*      → Login/logout
+ *   - admin.*     → Admin panel UI
+ *   - theme.*     → Theme switcher
+ *   - footer.ui.* → Footer system text (rights, navigation, madeWith)
+ *   - validation.* → Form validation messages
  *
- * Structure:
- * - Each locale has its own complete set of translations
- * - These are inserted into the `translations` table on seed
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-export const seedTranslations: Record<string, Record<string, any>> = {
+export const systemTranslations: Record<string, Record<string, any>> = {
   en: {
     common: {
       loading: 'Loading...',
@@ -50,7 +59,6 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       title: 'Admin',
       dashboard: 'Dashboard',
       settings: 'Settings',
-      // Dashboard
       welcome: 'Welcome, {name}',
       dashboardSubtitle: 'Manage your website content',
       portfolioItems: 'Portfolio Items',
@@ -60,19 +68,16 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       managePortfolio: 'Manage Portfolio',
       viewMessages: 'View Messages',
       siteSettings: 'Site Settings',
-      // Portfolio
       portfolio: 'Portfolio',
       addItem: 'Add Item',
       editItem: 'Edit',
       deleteItem: 'Delete',
       noItems: 'No items yet. Add your first portfolio item!',
       confirmDelete: 'Are you sure you want to delete this item?',
-      // Contacts
       contacts: 'Contact Messages',
       noMessages: 'No messages yet.',
       markRead: 'Mark as read',
       markUnread: 'Mark as unread',
-      // Settings
       settingsSite: 'Site Information',
       siteName: 'Site Name',
       siteTagline: 'Tagline',
@@ -85,9 +90,8 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       seoTitle: 'Meta Title',
       seoDescription: 'Meta Description',
       settingsSaved: 'Settings saved successfully!',
-      // Translations
       translations: 'Translations',
-      translationsSubtitle: 'Manage all text content across languages',
+      translationsSubtitle: 'Manage site content text',
       addTranslation: 'Add Translation',
       translationKey: 'Key',
       translationValue: 'Value',
@@ -99,6 +103,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       system: 'System'
     },
     footer: {
+      // UI labels (system)
       rights: 'All rights reserved',
       navigation: 'Navigation',
       contact: 'Contact',
@@ -106,47 +111,16 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       terms: 'Terms of Service',
       madeWith: 'Made with',
       puppetMaster: 'Puppet Master',
-      ctaDefault: 'Get in Touch',
       backToTop: 'Back to top'
     },
-    // Website sections - all editable via Admin Panel
-    seo: {
-      homeTitle: 'Puppet Master - Pure CSS Studio Toolkit',
-      homeDescription: 'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
-    },
-    hero: {
-      title: 'Puppet Master',
-      subtitle: 'A studio toolkit for creating stable, secure landing pages and portfolio sites. Built with pure CSS - no Tailwind!',
-      primaryCta: 'Get Started',
-      secondaryCta: 'View Work'
-    },
-    about: {
-      title: 'About the Project',
-      paragraph1: 'Puppet Master is an opinionated studio toolkit designed for agencies and freelancers who need to quickly deploy professional landing pages and portfolio sites.',
-      paragraph2: 'Built on Nuxt 4 with a pure CSS system (no Tailwind!), it features automatic dark mode, multi-language support with RTL, and a simple SQLite database for content management.'
-    },
-    portfolio: {
-      title: 'Recent Work'
-    },
-    services: {
-      title: 'Features'
-    },
-    contact: {
-      title: 'Get in Touch',
-      nameLabel: 'Name',
-      namePlaceholder: 'Your name',
-      emailLabel: 'Email',
-      emailPlaceholder: "email{'@'}example.com",
-      messageLabel: 'Message',
-      messagePlaceholder: 'How can we help?',
-      sendButton: 'Send Message',
-      sending: 'Sending...',
-      successMessage: 'Message sent successfully!',
-      errorMessage: 'Something went wrong. Please try again.'
+    validation: {
+      required: 'This field is required',
+      email: 'Please enter a valid email',
+      minLength: 'Must be at least {min} characters',
+      maxLength: 'Must be at most {max} characters'
     }
   },
 
-  // Russian - complete translations
   ru: {
     common: {
       loading: 'Загрузка...',
@@ -216,7 +190,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       seoDescription: 'Мета-описание',
       settingsSaved: 'Настройки сохранены!',
       translations: 'Переводы',
-      translationsSubtitle: 'Управление текстами на всех языках',
+      translationsSubtitle: 'Управление текстами сайта',
       addTranslation: 'Добавить перевод',
       translationKey: 'Ключ',
       translationValue: 'Значение',
@@ -235,46 +209,16 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       terms: 'Условия использования',
       madeWith: 'Сделано с',
       puppetMaster: 'Puppet Master',
-      ctaDefault: 'Связаться',
       backToTop: 'Наверх'
     },
-    seo: {
-      homeTitle: 'Puppet Master - CSS инструментарий для студий',
-      homeDescription: 'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов.'
-    },
-    hero: {
-      title: 'Puppet Master',
-      subtitle: 'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов. Чистый CSS - без Tailwind!',
-      primaryCta: 'Начать',
-      secondaryCta: 'Смотреть работы'
-    },
-    about: {
-      title: 'О проекте',
-      paragraph1: 'Puppet Master — это инструментарий для агентств и фрилансеров, которым нужно быстро разворачивать профессиональные лендинги и портфолио сайты.',
-      paragraph2: 'Построен на Nuxt 4 с чистым CSS (без Tailwind!), включает автоматическую тёмную тему, мультиязычность с RTL и простую SQLite базу данных.'
-    },
-    portfolio: {
-      title: 'Наши работы'
-    },
-    services: {
-      title: 'Возможности'
-    },
-    contact: {
-      title: 'Связаться с нами',
-      nameLabel: 'Имя',
-      namePlaceholder: 'Ваше имя',
-      emailLabel: 'Email',
-      emailPlaceholder: "email{'@'}example.com",
-      messageLabel: 'Сообщение',
-      messagePlaceholder: 'Чем мы можем помочь?',
-      sendButton: 'Отправить',
-      sending: 'Отправка...',
-      successMessage: 'Сообщение отправлено!',
-      errorMessage: 'Что-то пошло не так. Попробуйте ещё раз.'
+    validation: {
+      required: 'Обязательное поле',
+      email: 'Введите корректный email',
+      minLength: 'Минимум {min} символов',
+      maxLength: 'Максимум {max} символов'
     }
   },
 
-  // Hebrew - complete translations
   he: {
     common: {
       loading: 'טוען...',
@@ -344,7 +288,7 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       seoDescription: 'תיאור SEO',
       settingsSaved: 'ההגדרות נשמרו בהצלחה',
       translations: 'תרגומים',
-      translationsSubtitle: 'נהל מפתחות ומחרוזות תרגום',
+      translationsSubtitle: 'נהל תוכן האתר',
       addTranslation: 'הוסף תרגום',
       translationKey: 'מפתח תרגום',
       translationValue: 'ערך תרגום',
@@ -363,63 +307,51 @@ export const seedTranslations: Record<string, Record<string, any>> = {
       terms: 'תנאי שימוש',
       madeWith: 'נבנה עם',
       puppetMaster: 'Puppet Master',
-      ctaDefault: 'צרו קשר',
       backToTop: 'חזרה למעלה'
     },
-    seo: {
-      homeTitle: 'דף הבית',
-      homeDescription: 'ברוך הבא לאתרנו – פתרונות דיגיטליים מותאמים אישית'
-    },
-    hero: {
-      title: 'ברוכים הבאים',
-      subtitle: 'יוצרים חוויות דיגיטליות יוצאות דופן',
-      primaryCta: 'התחילו עכשיו',
-      secondaryCta: 'למדו עוד'
-    },
-    about: {
-      title: 'אודות',
-      paragraph1: 'אנחנו צוות יצירתי ומקצועי המתמחה בפיתוח אתרים, יישומים ופתרונות דיגיטליים מותאמים אישית לצרכים הייחודיים של כל לקוח.',
-      paragraph2: 'מאמינים בשילוב של טכנולוגיה, עיצוב וחדשנות כדי לספק מוצרים איכותיים, תפקודיים ויעילים.'
-    },
-    portfolio: {
-      title: 'תיק העבודות שלנו'
-    },
-    services: {
-      title: 'השירותים שלנו'
-    },
-    contact: {
-      title: 'צרו קשר',
-      nameLabel: 'שם',
-      namePlaceholder: 'הכנס שם',
-      emailLabel: 'דוא"ל',
-      emailPlaceholder: "example{'@'}email.com",
-      messageLabel: 'הודעה',
-      messagePlaceholder: 'השאר את ההודעה שלך כאן...',
-      sendButton: 'שלח הודעה',
-      sending: 'שולח...',
-      successMessage: 'הודעתך נשלחה בהצלחה!',
-      errorMessage: 'אירעה שגיאה בשליחה. נסה שוב מאוחרת.'
+    validation: {
+      required: 'שדה חובה',
+      email: 'הזן כתובת דוא"ל תקינה',
+      minLength: 'לפחות {min} תווים',
+      maxLength: 'לא יותר מ-{max} תווים'
     }
   }
 }
 
+// System prefixes - keys starting with these are NOT editable in Admin Panel
+export const SYSTEM_PREFIXES = [
+  'common.',
+  'nav.',
+  'auth.',
+  'admin.',
+  'theme.',
+  'footer.',
+  'validation.'
+] as const
+
+/**
+ * Check if a translation key is a system key (not client-editable)
+ */
+export function isSystemKey(key: string): boolean {
+  return SYSTEM_PREFIXES.some(prefix => key.startsWith(prefix))
+}
+
 /**
  * Flatten nested object to dot-notation keys
- * e.g., { nav: { home: 'Home' } } → { 'nav.home': 'Home' }
  */
 export function flattenTranslations(
   obj: Record<string, any>,
   prefix = ''
-): Array<{ key: string; value: string }> {
-  const result: Array<{ key: string; value: string }> = []
+): Record<string, string> {
+  const result: Record<string, string> = {}
 
   for (const [key, value] of Object.entries(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key
 
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      result.push(...flattenTranslations(value, fullKey))
+      Object.assign(result, flattenTranslations(value, fullKey))
     } else {
-      result.push({ key: fullKey, value: String(value) })
+      result[fullKey] = String(value)
     }
   }
 
@@ -427,17 +359,10 @@ export function flattenTranslations(
 }
 
 /**
- * Get all seed translations as flat array ready for DB insert
+ * Get flattened system translations for a specific locale
  */
-export function getSeedData(): Array<{ locale: string; key: string; value: string }> {
-  const result: Array<{ locale: string; key: string; value: string }> = []
-
-  for (const [locale, messages] of Object.entries(seedTranslations)) {
-    const flat = flattenTranslations(messages)
-    for (const { key, value } of flat) {
-      result.push({ locale, key, value })
-    }
-  }
-
-  return result
+export function getSystemTranslations(locale: string): Record<string, string> {
+  const messages = systemTranslations[locale] || systemTranslations.en
+  return flattenTranslations(messages)
 }
+

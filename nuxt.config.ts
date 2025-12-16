@@ -33,9 +33,10 @@ export default defineNuxtConfig({
   ],
 
   // Color mode configuration
+  // Uses defaultTheme from puppet-master.config.ts
   colorMode: {
-    preference: 'system',
-    fallback: 'light',
+    preference: config.defaultTheme,
+    fallback: config.defaultTheme === 'system' ? 'light' : config.defaultTheme,
     classSuffix: '',
     storageKey: 'pm-color-mode'
   },
@@ -53,7 +54,8 @@ export default defineNuxtConfig({
     strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'pm-i18n-redirected'
+      cookieKey: 'pm-i18n-redirected',
+      fallbackLocale: config.defaultLocale
     },
     // Bundle options
     bundle: {

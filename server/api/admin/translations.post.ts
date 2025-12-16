@@ -1,11 +1,13 @@
 /**
  * Admin Translations API - POST
  *
- * Create or update a translation.
+ * Create or update a CONTENT translation.
+ * System translations (nav, auth, admin, etc.) cannot be modified.
  * Requires authentication.
  */
 import { useDatabase, schema } from '../../database/client'
 import { eq, and } from 'drizzle-orm'
+import { isSystemKey } from '../../../i18n/system'
 
 export default defineEventHandler(async (event) => {
   // Check authentication
@@ -19,6 +21,11 @@ export default defineEventHandler(async (event) => {
 
   if (!locale || !key || value === undefined) {
     throw createError({ statusCode: 400, message: 'locale, key, and value are required' })
+  }
+
+  // Prevent editing system translations
+  if (isSystemKey(key)) {
+    throw createError({ statusCode: 403, message: 'System translations cannot be modified' })
   }
 
   const db = useDatabase()

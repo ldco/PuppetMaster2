@@ -74,16 +74,35 @@ const config = {
     { id: 'contact', inNav: true }
   ] as const,
 
-  // Available locales (when multiLangs: true)
-  // RTL is auto-detected from locale code (he, ar, fa, ur) - no need to specify
-  // Translations come from DATABASE, not JSON files!
-  // JSON files are only fallback defaults for initial setup
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LANGUAGE & THEME DEFAULTS
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Language detection priority:
+  //   1. User's saved preference (cookie from previous visit)
+  //   2. Browser language (if matches one of available locales)
+  //   3. defaultLocale (fallback when browser lang not supported)
+  //
+  // Theme detection priority:
+  //   1. User's saved preference (cookie from previous visit)
+  //   2. defaultTheme setting below
+  //   3. System preference (only when defaultTheme is 'system')
+  //
+  // RTL is auto-detected from locale code (he, ar, fa, ur)
+  // Translations come from DATABASE - run `npm run db:seed` for initial data
+  // ═══════════════════════════════════════════════════════════════════════════
   locales: [
     { code: 'en', iso: 'en-US', name: 'English' },
     { code: 'ru', iso: 'ru-RU', name: 'Русский' },
     { code: 'he', iso: 'he-IL', name: 'עברית' }
   ],
   defaultLocale: 'en',
+
+  // Default theme: 'system' | 'light' | 'dark'
+  // - 'system': Respect user's OS preference (recommended for most sites)
+  // - 'light': Force light mode by default (e.g., clean corporate site)
+  // - 'dark': Force dark mode by default (e.g., gaming/photography portfolio)
+  defaultTheme: 'system' as 'system' | 'light' | 'dark',
 
   // ═══════════════════════════════════════════════════════════════════════════
   // LOGO CONFIGURATION
