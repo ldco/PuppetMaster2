@@ -1,0 +1,110 @@
+/**
+ * Modal Component
+ *
+ * Dialog overlays for confirmations, forms, content.
+ * Includes backdrop, header, body, footer sections.
+ */
+
+:root {
+  /* Modal size presets - easy to customize */
+  --modal-width-sm: min(400px, calc(100vw - 2rem));
+  --modal-width-md: min(500px, calc(100vw - 2rem));
+  --modal-width-lg: min(700px, calc(100vw - 2rem));
+  --modal-width-xl: min(900px, calc(100vw - 2rem));
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 50%);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.modal {
+  z-index: var(--z-modal);
+  background: var(--l-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px oklch(0% 0 0 / 20%);
+  width: var(--modal-width-md);
+  max-height: calc(100dvh - var(--space-8));
+  overflow: auto;
+}
+
+/* Size variants */
+.modal-sm { width: var(--modal-width-sm); }
+.modal-lg { width: var(--modal-width-lg); }
+.modal-xl { width: var(--modal-width-xl); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--l-border);
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin: 0;
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--t-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--l-bg-sunken);
+  color: var(--t-primary);
+}
+
+.modal-body {
+  padding: var(--space-6);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--l-border);
+}
+
+/* Modal animations */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-enter-active .modal,
+.modal-leave-active .modal {
+  transition: transform 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .modal {
+  transform: scale(0.95) translateY(-10px);
+}
+
+.modal-leave-to .modal {
+  transform: scale(0.95) translateY(10px);
+}
+

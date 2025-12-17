@@ -95,7 +95,18 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       addTranslation: 'Add Translation',
       translationKey: 'Key',
       translationValue: 'Value',
-      noTranslations: 'No translations yet.'
+      noTranslations: 'No translations yet.',
+      // Users management
+      users: 'Users',
+      addUser: 'Add User',
+      editUser: 'Edit User',
+      name: 'Name',
+      email: 'Email',
+      password: 'Password',
+      role: 'Role',
+      created: 'Created',
+      actions: 'Actions',
+      leaveBlankToKeep: 'Leave blank to keep current'
     },
     theme: {
       light: 'Light',
@@ -194,7 +205,18 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       addTranslation: 'Добавить перевод',
       translationKey: 'Ключ',
       translationValue: 'Значение',
-      noTranslations: 'Пока нет переводов.'
+      noTranslations: 'Пока нет переводов.',
+      // Users management
+      users: 'Пользователи',
+      addUser: 'Добавить пользователя',
+      editUser: 'Редактировать пользователя',
+      name: 'Имя',
+      email: 'Email',
+      password: 'Пароль',
+      role: 'Роль',
+      created: 'Создан',
+      actions: 'Действия',
+      leaveBlankToKeep: 'Оставьте пустым для сохранения текущего'
     },
     theme: {
       light: 'Светлая',
@@ -292,7 +314,18 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       addTranslation: 'הוסף תרגום',
       translationKey: 'מפתח תרגום',
       translationValue: 'ערך תרגום',
-      noTranslations: 'אין תרגומים'
+      noTranslations: 'אין תרגומים',
+      // Users management
+      users: 'משתמשים',
+      addUser: 'הוסף משתמש',
+      editUser: 'ערוך משתמש',
+      name: 'שם',
+      email: 'דוא"ל',
+      password: 'סיסמה',
+      role: 'תפקיד',
+      created: 'נוצר',
+      actions: 'פעולות',
+      leaveBlankToKeep: 'השאר ריק לשמירת הנוכחי'
     },
     theme: {
       light: 'בהיר',

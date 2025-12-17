@@ -14,8 +14,8 @@ const updateSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional().nullable(),
   content: z.string().optional().nullable(),
-  imageUrl: z.string().url().optional().nullable(),
-  thumbnailUrl: z.string().url().optional().nullable(),
+  imageUrl: z.string().optional().nullable(), // Can be relative path like /uploads/xxx.webp
+  thumbnailUrl: z.string().optional().nullable(),
   category: z.string().max(50).optional().nullable(),
   tags: z.array(z.string()).optional(),
   order: z.number().int().optional(),

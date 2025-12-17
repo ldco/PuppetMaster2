@@ -64,6 +64,50 @@ const config = {
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // STORAGE - File uploads configuration (images & videos)
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Provider options:
+  //   - 'local': Files stored in public/uploads/ (good for small/medium sites)
+  //   - 's3': Files stored in S3-compatible bucket (AWS S3, Cloudflare R2, MinIO)
+  //
+  // For S3, set these environment variables in .env:
+  //   S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY, S3_REGION, S3_PUBLIC_URL
+  //
+  // Video processing uses FFmpeg to compress and optimize for web playback.
+  // ═══════════════════════════════════════════════════════════════════════════
+  storage: {
+    provider: 'local' as 'local' | 's3',
+
+    // Image settings
+    image: {
+      maxSizeMB: 10,                    // Max upload size
+      maxWidth: 1920,                   // Resize to max width
+      maxHeight: 1080,                  // Resize to max height
+      quality: 85,                      // WebP quality (1-100)
+      thumbnailWidth: 400,              // Thumbnail width
+      thumbnailHeight: 300,             // Thumbnail height
+      thumbnailQuality: 75,             // Thumbnail WebP quality
+    },
+
+    // Video settings
+    video: {
+      enabled: true,                    // Allow video uploads
+      maxSizeMB: 100,                   // Max upload size
+      maxDurationSeconds: 300,          // Max 5 minutes
+      allowedTypes: ['mp4', 'webm', 'mov', 'avi'],
+      outputFormat: 'mp4' as 'mp4' | 'webm',
+      // FFmpeg compression settings
+      compression: {
+        videoBitrate: '2M',             // Target video bitrate
+        audioBitrate: '128k',           // Target audio bitrate
+        maxWidth: 1920,                 // Scale down if larger
+        fps: 30,                        // Target frame rate
+      }
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // SECTIONS - Source of truth for navigation and routing
   // ═══════════════════════════════════════════════════════════════════════════
   sections: [

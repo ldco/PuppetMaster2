@@ -30,12 +30,9 @@ function handleChange(event: Event) {
   </select>
 </template>
 
-<style scoped>
-.lang-switcher {
-  width: auto;
-  padding: var(--space-1) var(--space-2);
-  padding-right: var(--space-8);
-  font-size: var(--text-sm);
-}
-</style>
+<!--
+  Uses global CSS classes from ui/content/index.css:
+  - .input (base)
+  - .lang-switcher
+-->
 

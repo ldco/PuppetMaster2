@@ -49,56 +49,9 @@ onUnmounted(() => {
   </Transition>
 </template>
 
-<style scoped>
-.back-to-top {
-  position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  z-index: var(--z-sticky);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-
-  background: var(--l-bg-elevated);
-  color: var(--t-secondary);
-  border: 1px solid var(--l-border);
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-lg);
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.back-to-top:hover {
-  background: var(--i-brand);
-  color: var(--t-on-brand);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-}
-
-.back-to-top:active {
-  transform: translateY(0);
-}
-
-/* Transition animations */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-</style>
+<!--
+  Uses global CSS classes from ui/content/index.css:
+  - .back-to-top
+  - .fade-slide-* animations
+-->
 

@@ -55,7 +55,7 @@
 .header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-fixed);
   background: var(--l-bg);
   border-block-end: 1px solid var(--l-border);
 }

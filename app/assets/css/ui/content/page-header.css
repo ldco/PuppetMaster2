@@ -1,0 +1,83 @@
+/**
+ * Page Header Component
+ *
+ * Header bar for pages with title and actions.
+ * Use at the top of any page/section.
+ */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  margin: 0;
+}
+
+.page-title-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--i-brand);
+}
+
+.page-subtitle {
+  font-size: var(--text-base);
+  color: var(--t-secondary);
+  margin-top: var(--space-1);
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Smaller variant */
+.page-header--sm .page-title {
+  font-size: var(--text-xl);
+}
+
+.page-header--sm .page-title-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Section header (sub-sections within a page) */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  margin: 0;
+}
+
+/* Loading and empty states */
+.page-loading,
+.page-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--t-muted);
+}
+
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+

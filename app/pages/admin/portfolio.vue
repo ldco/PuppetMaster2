@@ -141,7 +141,8 @@ async function saveItem() {
     showModal.value = false
     await refresh()
   } catch (e: any) {
-    error.value = e.data?.message || 'Failed to save'
+    console.error('Portfolio save error:', e)
+    error.value = e.data?.statusMessage || e.data?.message || e.message || 'Failed to save'
   } finally {
     saving.value = false
     uploading.value = false
@@ -279,128 +280,9 @@ async function deleteItem(item: PortfolioItem) {
   </div>
 </template>
 
-<style scoped>
-/* Page-specific styles - .page-header, .page-title, .loading-state, .empty-state, .form-grid are global */
-
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-4);
-}
-
-.portfolio-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.portfolio-item-image {
-  position: relative;
-  aspect-ratio: 16/10;
-  overflow: hidden;
-  background: var(--l-bg-sunken);
-}
-
-.portfolio-item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.portfolio-item-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--l-bg-sunken);
-}
-
-.status-badge {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-}
-
-.portfolio-item-info {
-  padding: var(--space-3);
-  flex: 1;
-}
-
-.portfolio-item-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  margin: 0;
-}
-
-.portfolio-item-category {
-  font-size: var(--text-sm);
-  color: var(--t-muted);
-  margin: var(--space-1) 0 0;
-}
-
-.portfolio-item-actions {
-  display: flex;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  border-top: 1px solid var(--l-border);
-}
-
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-  z-index: var(--z-modal);
-}
-
-.modal {
-  background: var(--l-bg-elevated);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--l-border);
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: var(--text-lg);
-}
-
-.modal-body {
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--l-border);
-  margin-top: var(--space-2);
-}
-
-.image-upload {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.image-preview {
-  max-width: 200px;
-  max-height: 150px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-}
-
-</style>
+<!--
+  Uses global CSS classes:
+  - admin/index.css: .portfolio-grid, .portfolio-item, .portfolio-item-*, .image-upload, .image-preview
+  - ui/overlays/index.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
+-->
 

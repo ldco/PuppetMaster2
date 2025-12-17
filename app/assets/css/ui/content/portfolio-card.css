@@ -1,0 +1,83 @@
+/**
+ * Portfolio Card Component
+ *
+ * Interactive image cards for galleries and portfolios.
+ * Hover effects, clickable, with category/title/description.
+ */
+
+.portfolio-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--l-bg-elevated);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Disable transforms when lightbox is open to prevent z-index issues */
+body.lightbox-open .portfolio-card,
+body.lightbox-open .portfolio-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.portfolio-card--clickable {
+  cursor: pointer;
+}
+
+.portfolio-card-image {
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+
+.portfolio-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.portfolio-card:hover .portfolio-card-image img {
+  transform: scale(1.05);
+}
+
+.portfolio-card-info {
+  padding: var(--space-4);
+}
+
+.portfolio-card-category {
+  font-size: var(--text-sm);
+  color: var(--i-brand);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.portfolio-card-title {
+  font-size: var(--text-lg);
+  margin-top: var(--space-1);
+}
+
+.portfolio-card-description {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+  margin-top: var(--space-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Placeholder for missing image */
+.portfolio-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--l-bg-sunken);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t-muted);
+}
+

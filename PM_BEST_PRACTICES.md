@@ -90,10 +90,24 @@ Use `@layer` for cascade control:
 
 ## Translations
 
-All translations come from DATABASE only - no fallbacks in code.
-- If translation missing → key shows (making problem obvious)
-- Run `npm run db:seed` to populate translations
-- Edit via Admin Panel or directly in `i18n/fallbacks.ts` and re-seed
+Two sources of truth:
+
+| Type | Source | Editable by Client |
+|------|--------|-------------------|
+| **SYSTEM** | `i18n/system.ts` | ❌ Never |
+| **CONTENT** | Database | ✅ Via Admin Panel |
+
+**System translations** (developer-only):
+- Prefixes: `common.*`, `nav.*`, `auth.*`, `admin.*`, `theme.*`, `footer.*`, `validation.*`
+- Version controlled in git
+- NOT visible in Admin Panel
+
+**Content translations** (client-editable):
+- Prefixes: `hero.*`, `about.*`, `portfolio.*`, `services.*`, `contact.*`, `seo.*`, `cta.*`
+- Defaults in `i18n/content.ts` → seeded to database
+- Client edits via Admin Panel
+
+See `docs/USAGE.md` for full workflow.
 
 ---
 

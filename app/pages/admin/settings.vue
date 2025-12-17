@@ -128,29 +128,8 @@ async function saveSettings() {
   </div>
 </template>
 
-<style scoped>
-/* Page-specific layout only */
-.admin-settings {
-  max-width: 900px;
-}
-
-.section-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
-  margin: 0;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.form-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  justify-content: flex-end;
-}
-</style>
+<!--
+  Uses global CSS classes from admin/index.css:
+  - .admin-settings, .section-title, .settings-form, .form-actions
+-->
 

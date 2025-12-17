@@ -40,23 +40,50 @@ function hashPassword(password: string): string {
 async function seed() {
   console.log('🌱 Seeding database...\n')
 
-  // Check if admin user already exists - if not, create one
-  const existingAdmin = db.select().from(schema.users).get()
-  if (!existingAdmin) {
-    const adminEmail = 'admin@example.com'
-    const adminPassword = 'admin123' // Change in production!
+  // Check if users already exist
+  const existingUsers = db.select().from(schema.users).all()
 
-    console.log('👤 Creating admin user...')
+  if (existingUsers.length === 0) {
+    console.log('👤 Creating example users...\n')
+
+    // Master user (developer)
     db.insert(schema.users).values({
-      email: adminEmail,
-      passwordHash: hashPassword(adminPassword),
-      name: 'Admin',
+      email: 'master@example.com',
+      passwordHash: hashPassword('master123'),
+      name: 'Developer',
+      role: 'master'
+    }).run()
+    console.log('   ✓ master@example.com / master123 (Master - full access)')
+
+    // Admin user (client)
+    db.insert(schema.users).values({
+      email: 'admin@example.com',
+      passwordHash: hashPassword('admin123'),
+      name: 'Client Owner',
       role: 'admin'
     }).run()
-    console.log(`   Email: ${adminEmail}`)
-    console.log(`   Password: ${adminPassword}\n`)
+    console.log('   ✓ admin@example.com / admin123 (Admin - client access)')
+
+    // Editor users (client employees)
+    db.insert(schema.users).values({
+      email: 'editor@example.com',
+      passwordHash: hashPassword('editor123'),
+      name: 'Content Editor',
+      role: 'editor'
+    }).run()
+    console.log('   ✓ editor@example.com / editor123 (Editor - content only)')
+
+    db.insert(schema.users).values({
+      email: 'john@example.com',
+      passwordHash: hashPassword('john123'),
+      name: 'John Doe',
+      role: 'editor'
+    }).run()
+    console.log('   ✓ john@example.com / john123 (Editor - content only)')
+
+    console.log('')
   } else {
-    console.log('👤 Admin user exists, skipping.\n')
+    console.log(`👤 ${existingUsers.length} users exist, skipping user creation.\n`)
   }
 
   // Create settings from config schema - ONLY if they don't exist

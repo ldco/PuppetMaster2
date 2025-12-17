@@ -1,8 +1,11 @@
 /**
  * Puppet Master CSS Entry Point
- * 
+ *
  * @layer order determines cascade priority (later = higher priority)
  * This is our CSS architecture - pure CSS, no Tailwind!
+ *
+ * ONE unified CSS system - no separate admin styles!
+ * All components are reusable across site, admin, and app modes.
  */
 
 /* Layer order declaration */

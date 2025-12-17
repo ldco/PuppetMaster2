@@ -8,7 +8,7 @@
   position: fixed;
   inset: 0;
   background: oklch(0% 0 0 / 50%);
-  z-index: 200;
+  z-index: var(--z-drawer-backdrop);
 }
 
 .mobile-nav {
@@ -17,7 +17,7 @@
   inset-inline-start: 0;       /* LEFT in LTR, RIGHT in RTL - same side as hamburger! */
   width: min(280px, 85vw);     /* Modern min() instead of width + max-width */
   background: var(--l-bg);
-  z-index: 201;
+  z-index: var(--z-drawer);
   display: flex;
   flex-direction: column;
   /* Shadow on opposite side of drawer */
@@ -180,5 +180,53 @@
 .slide-right-enter-to,
 .slide-right-leave-from {
   inset-inline-end: 0;
+}
+
+/* ==========================================================================
+   MOBILE NAV OVERLAY (MobileNav.vue organism)
+   ========================================================================== */
+
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: color-mix(in srgb, var(--p-black), transparent 50%);
+}
+
+.mobile-nav-panel {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: min(320px, 85vw);
+  background: var(--l-bg);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Generic fade/slide for MobileNav overlay */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(-100%);
+}
+
+[dir="rtl"] .slide-enter-from,
+[dir="rtl"] .slide-leave-to {
+  transform: translateX(100%);
 }
 

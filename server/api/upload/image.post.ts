@@ -2,20 +2,13 @@
  * POST /api/upload/image
  *
  * Uploads and processes an image using Sharp.
- * - Resizes to max 1920x1080 (preserving aspect ratio)
- * - Converts to WebP format
- * - Generates thumbnail (400x300)
+ * Uses storage adapter (local or S3) based on config.
  *
  * Requires admin authentication.
  * Returns URLs for the processed image and thumbnail.
  */
-import sharp from 'sharp'
-import { randomUUID } from 'crypto'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-
-// Max file size: 10MB
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+import config from '../../../app/puppet-master.config'
+import { useFileStorage } from '../../utils/storage'
 
 // Allowed MIME types
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
@@ -58,60 +51,28 @@ export default defineEventHandler(async (event) => {
   }
 
   // Validate file size
-  if (file.data.length > MAX_FILE_SIZE) {
+  const maxSize = config.storage.image.maxSizeMB * 1024 * 1024
+  if (file.data.length > maxSize) {
     throw createError({
       statusCode: 400,
-      statusMessage: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`
+      statusMessage: `File too large. Maximum size: ${config.storage.image.maxSizeMB}MB`
     })
   }
 
-  // Generate unique ID for the file
-  const id = randomUUID()
-  const uploadDir = './public/uploads'
-
-  // Ensure upload directory exists
-  if (!existsSync(uploadDir)) {
-    await mkdir(uploadDir, { recursive: true })
-  }
-
   try {
-    // Process main image: resize + convert to WebP
-    const mainImage = await sharp(file.data)
-      .resize(1920, 1080, {
-        fit: 'inside',
-        withoutEnlargement: true
-      })
-      .webp({ quality: 85 })
-      .toBuffer()
-
-    // Generate thumbnail
-    const thumbnail = await sharp(file.data)
-      .resize(400, 300, {
-        fit: 'cover',
-        position: 'center'
-      })
-      .webp({ quality: 75 })
-      .toBuffer()
-
-    // Save files
-    await writeFile(`${uploadDir}/${id}.webp`, mainImage)
-    await writeFile(`${uploadDir}/${id}-thumb.webp`, thumbnail)
-
-    // Get image metadata
-    const metadata = await sharp(file.data).metadata()
+    const storage = useFileStorage()
+    const result = await storage.upload(file.data, {
+      type: 'image',
+      originalName: file.filename,
+      mimeType
+    })
 
     return {
       success: true,
-      id,
-      url: `/uploads/${id}.webp`,
-      thumbnailUrl: `/uploads/${id}-thumb.webp`,
-      originalName: file.filename,
-      width: metadata.width,
-      height: metadata.height,
-      format: metadata.format
+      ...result
     }
   } catch (error) {
-    console.error('Image processing error:', error)
+    console.error('Image upload error:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to process image'

@@ -1,15 +1,19 @@
 /**
  * Auth Middleware
  *
- * Two functions:
- * 1. Populates event.context.session for ALL /api/* routes (if logged in)
+ * Functions:
+ * 1. Populates event.context.session and event.context.user for ALL /api/* routes (if logged in)
  * 2. ENFORCES auth for /api/admin/* routes (throws 401 if not logged in)
+ * 3. ENFORCES role-based access for specific routes:
+ *    - /api/admin/users/* requires admin+ role
  *
  * This allows endpoints to optionally check auth (event.context.session)
  * while admin routes are always protected.
  */
 import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../database/client'
+import { type UserRole } from '../database/schema'
+import { hasRole } from '../utils/roles'
 
 export default defineEventHandler(async (event) => {
   const path = getRequestURL(event).pathname
@@ -85,5 +89,16 @@ export default defineEventHandler(async (event) => {
   // Attach session and user to event context for use in handlers
   event.context.session = { userId: user.id }
   event.context.user = user
+
+  // Role-based route protection
+  // Users management requires admin+ role
+  if (path.startsWith('/api/admin/users')) {
+    if (!hasRole(user.role as UserRole, 'admin')) {
+      throw createError({
+        statusCode: 403,
+        message: 'Admin access required to manage users'
+      })
+    }
+  }
 })
 

@@ -33,8 +33,9 @@ const emit = defineEmits<{
   </button>
 </template>
 
-<style scoped>
-/* Hamburger styles are in ui/hamburger.css */
-/* This component just adds the animation trigger */
-</style>
+<!--
+  Uses global CSS classes from ui/hamburger.css:
+  - .hamburger, .hamburger--squeeze, .is-active
+  - .hamburger-box, .hamburger-inner
+-->
 

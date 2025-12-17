@@ -1,0 +1,134 @@
+/**
+ * Update User API Endpoint
+ *
+ * PUT /api/admin/users/:id
+ * Body: { email?: string, password?: string, name?: string, role?: UserRole }
+ * Returns: { success: true, user: User }
+ *
+ * Requires: admin+ role (enforced by middleware)
+ */
+import { z } from 'zod'
+import { eq } from 'drizzle-orm'
+import { useDatabase, schema } from '../../../database/client'
+import { USER_ROLES, type UserRole } from '../../../database/schema'
+import { hashPassword } from '../../../utils/password'
+import { canManageUser, getAssignableRoles } from '../../../utils/roles'
+
+const updateUserSchema = z.object({
+  email: z.string().email('Invalid email address').optional(),
+  password: z.string().min(8, 'Password must be at least 8 characters').optional(),
+  name: z.string().optional().nullable(),
+  role: z.enum(USER_ROLES).optional()
+})
+
+export default defineEventHandler(async (event) => {
+  const id = getRouterParam(event, 'id')
+  if (!id || !/^\d+$/.test(id)) {
+    throw createError({
+      statusCode: 400,
+      message: 'Valid user ID required'
+    })
+  }
+
+  const userId = parseInt(id)
+  const body = await readBody(event)
+  const currentUser = event.context.user
+
+  // Validate input
+  const result = updateUserSchema.safeParse(body)
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      message: result.error.errors[0]?.message || 'Invalid input'
+    })
+  }
+
+  const { email, password, name, role } = result.data
+
+  const db = useDatabase()
+
+  // Get target user
+  const targetUser = db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, userId))
+    .get()
+
+  if (!targetUser) {
+    throw createError({
+      statusCode: 404,
+      message: 'User not found'
+    })
+  }
+
+  // Check if current user can manage target user
+  if (!canManageUser(currentUser?.role as UserRole, targetUser.role as UserRole)) {
+    throw createError({
+      statusCode: 403,
+      message: 'You cannot modify this user'
+    })
+  }
+
+  // If changing role, check if current user can assign the new role
+  if (role && role !== targetUser.role) {
+    const assignableRoles = getAssignableRoles(currentUser?.role as UserRole)
+    if (!assignableRoles.includes(role)) {
+      throw createError({
+        statusCode: 403,
+        message: `You cannot assign the ${role} role`
+      })
+    }
+  }
+
+  // Check email uniqueness if changing
+  if (email && email !== targetUser.email) {
+    const existing = db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.email, email))
+      .get()
+
+    if (existing) {
+      throw createError({
+        statusCode: 409,
+        message: 'A user with this email already exists'
+      })
+    }
+  }
+
+  // Build update object
+  const updates: Record<string, unknown> = {
+    updatedAt: new Date()
+  }
+
+  if (email !== undefined) updates.email = email
+  if (name !== undefined) updates.name = name
+  if (role !== undefined) updates.role = role
+  if (password) updates.passwordHash = hashPassword(password)
+
+  // Update user
+  db.update(schema.users)
+    .set(updates)
+    .where(eq(schema.users.id, userId))
+    .run()
+
+  // Get updated user
+  const updatedUser = db
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      name: schema.users.name,
+      role: schema.users.role,
+      createdAt: schema.users.createdAt,
+      updatedAt: schema.users.updatedAt
+    })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId))
+    .get()
+
+  return {
+    success: true,
+    user: updatedUser
+  }
+})
+

@@ -1,99 +1,10 @@
 /**
- * Overlay Components (Modal, Drawer, Toast, etc.)
+ * Overlay Components
  *
- * Uses modern CSS: oklch colors, logical properties, dvh units
+ * Components that overlay the page content.
  */
 
-:root {
-  /* Modal size presets - easy to customize */
-  --modal-width-sm: min(400px, calc(100vw - 2rem));
-  --modal-width-md: min(500px, calc(100vw - 2rem));
-  --modal-width-lg: min(700px, calc(100vw - 2rem));
-  --modal-width-xl: min(900px, calc(100vw - 2rem));
-}
-
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: oklch(0% 0 0 / 50%);
-  z-index: 300;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-}
-
-.modal {
-  background: var(--l-bg);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 40px oklch(0% 0 0 / 20%);
-  width: var(--modal-width-md);
-  max-height: calc(100dvh - var(--space-8));
-  overflow: auto;
-}
-
-.modal-sm { width: var(--modal-width-sm); }
-.modal-lg { width: var(--modal-width-lg); }
-.modal-xl { width: var(--modal-width-xl); }
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--l-border);
-}
-
-.modal-body {
-  padding: var(--space-6);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--gap-sm);
-  padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--l-border);
-}
-
-/* Toast - using logical properties for automatic RTL */
-.toast-container {
-  position: fixed;
-  inset-block-end: var(--space-4);      /* bottom */
-  inset-inline-end: var(--space-4);      /* right in LTR, left in RTL */
-  z-index: 400;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-sm);
-}
-
-.toast {
-  background: var(--l-bg-elevated);
-  border: 1px solid var(--l-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  box-shadow: 0 4px 12px oklch(0% 0 0 / 15%);
-  display: flex;
-  align-items: center;
-  gap: var(--gap-sm);
-  min-width: min(280px, calc(100vw - 2rem));
-}
-
-/* Use logical border (inline-start = left in LTR, right in RTL) */
-.toast-success {
-  border-inline-start: 3px solid var(--d-success);
-}
-
-.toast-error {
-  border-inline-start: 3px solid var(--d-error);
-}
-
-.toast-warning {
-  border-inline-start: 3px solid var(--d-warning);
-}
-
-.toast-info {
-  border-inline-start: 3px solid var(--d-info);
-}
+@import './modal.css';
+@import './toast.css';
+@import './lightbox.css';
 

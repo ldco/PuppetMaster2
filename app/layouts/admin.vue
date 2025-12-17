@@ -15,6 +15,7 @@ import IconSettings from '~icons/tabler/settings'
 import IconPhoto from '~icons/tabler/photo'
 import IconMail from '~icons/tabler/mail'
 import IconLanguage from '~icons/tabler/language'
+import IconUsers from '~icons/tabler/users'
 import IconLogout from '~icons/tabler/logout'
 import IconMenu from '~icons/tabler/menu-2'
 import IconSun from '~icons/tabler/sun'
@@ -22,18 +23,28 @@ import IconMoon from '~icons/tabler/moon'
 
 const { t, locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
-const { user, logout, isLoading } = useAuth()
+const { user, logout, isLoading, canManageUsers } = useAuth()
 const { shortLogo } = useLogo()
 
 const isMobileSidebarOpen = ref(false)
 
-const adminLinks = [
+// Base admin links
+const baseLinks = [
   { to: '/admin', label: 'admin.dashboard', icon: IconDashboard, exact: true },
   { to: '/admin/settings', label: 'admin.settings', icon: IconSettings },
   { to: '/admin/portfolio', label: 'admin.portfolio', icon: IconPhoto },
   { to: '/admin/contacts', label: 'admin.contacts', icon: IconMail },
   { to: '/admin/translations', label: 'admin.translations', icon: IconLanguage },
 ]
+
+// Conditionally add Users link for admin+ roles
+const adminLinks = computed(() => {
+  const links = [...baseLinks]
+  if (canManageUsers.value) {
+    links.push({ to: '/admin/users', label: 'admin.users', icon: IconUsers })
+  }
+  return links
+})
 
 async function handleLogout() {
   await logout()
@@ -148,27 +159,13 @@ watch(() => route.path, () => {
   - layout/responsive.css: .mobile-only
 -->
 
-<style scoped>
-/* Only layout-specific tweaks */
-
-/* Admin header - simple top bar for mobile */
-.admin-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--l-border);
-  background: var(--l-bg);
-}
-
-.admin-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  margin: 0;
-}
-
-.admin-content {
-  padding: var(--space-6);
-}
-</style>
+<!--
+  Uses global CSS classes:
+  - layout/page.css: .layout-admin, .admin-sidebar, .admin-main
+  - admin/index.css: .admin-header, .admin-title, .admin-content
+  - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn, .sidebar-tooltip
+  - skeleton/mobile-nav.css: .mobile-nav-backdrop
+  - ui/buttons.css: .btn, .btn-icon, .btn-ghost
+  - layout/responsive.css: .mobile-only
+-->
 

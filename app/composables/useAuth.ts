@@ -2,14 +2,28 @@
  * Auth Composable
  *
  * Client-side authentication state management.
- * Provides login, logout, and session checking.
+ * Provides login, logout, session checking, and role-based access control.
  */
+
+/**
+ * User roles hierarchy:
+ * - master: Developer/agency who builds the site (full access)
+ * - admin: Client who owns the site (can manage content + users except master)
+ * - editor: Client's employees (can only edit content)
+ */
+export type UserRole = 'master' | 'admin' | 'editor'
+
+const ROLE_HIERARCHY: Record<UserRole, number> = {
+  editor: 0,
+  admin: 1,
+  master: 2
+}
 
 interface User {
   id: number
   email: string
   name: string | null
-  role: 'admin' | 'editor'
+  role: UserRole
 }
 
 interface LoginCredentials {
@@ -18,17 +32,35 @@ interface LoginCredentials {
   rememberMe?: boolean
 }
 
-interface AuthState {
-  user: User | null
-  isLoading: boolean
-  isAuthenticated: boolean
-}
-
 export function useAuth() {
   const user = useState<User | null>('auth-user', () => null)
   const isLoading = useState<boolean>('auth-loading', () => false)
 
   const isAuthenticated = computed(() => !!user.value)
+
+  // Role-based computed properties
+  const isMaster = computed(() => user.value?.role === 'master')
+  const isAdmin = computed(() => hasRole('admin'))
+  const isEditor = computed(() => hasRole('editor'))
+  const canManageUsers = computed(() => hasRole('admin'))
+
+  /**
+   * Check if current user has at least the minimum required role
+   */
+  function hasRole(minRole: UserRole): boolean {
+    if (!user.value?.role) return false
+    return ROLE_HIERARCHY[user.value.role] >= ROLE_HIERARCHY[minRole]
+  }
+
+  /**
+   * Get roles that current user can assign to others
+   */
+  function getAssignableRoles(): UserRole[] {
+    if (!user.value?.role) return []
+    if (user.value.role === 'master') return ['master', 'admin', 'editor']
+    if (user.value.role === 'admin') return ['admin', 'editor']
+    return []
+  }
 
   /**
    * Check current session on app load
@@ -104,11 +136,19 @@ export function useAuth() {
     isLoading: readonly(isLoading),
     isAuthenticated,
 
+    // Role-based state
+    isMaster,
+    isAdmin,
+    isEditor,
+    canManageUsers,
+
     // Actions
     checkSession,
     login,
     logout,
-    requireAuth
+    requireAuth,
+    hasRole,
+    getAssignableRoles
   }
 }
 

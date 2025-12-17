@@ -1,0 +1,51 @@
+/**
+ * Card Component
+ *
+ * Basic card container with header, body, footer sections.
+ * Use for any boxed content: admin panels, info boxes, etc.
+ */
+
+.card {
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--l-border);
+}
+
+.card-body {
+  padding: var(--space-6);
+}
+
+.card-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--l-border);
+  background: var(--l-bg-sunken);
+}
+
+/* Card with image */
+.card-image {
+  position: relative;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: var(--l-bg-sunken);
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card actions row */
+.card-actions {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--l-border);
+}
+

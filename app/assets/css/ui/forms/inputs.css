@@ -258,3 +258,52 @@ select.input option:hover {
   color: var(--i-brand);
 }
 
+/* ══════════════════════════════════════════════════════════
+ * FORM ACTIONS - Button row for form submissions
+ * ══════════════════════════════════════════════════════════ */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  justify-content: flex-end;
+}
+
+.form-actions--start {
+  justify-content: flex-start;
+}
+
+.form-actions--center {
+  justify-content: center;
+}
+
+.form-actions--between {
+  justify-content: space-between;
+}
+
+/* Form grid for 2-column layouts */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-4);
+}
+
+.form-grid .form-group--full {
+  grid-column: 1 / -1;
+}
+
+/* Image upload preview */
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--l-border);
+}
+

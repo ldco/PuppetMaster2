@@ -64,5 +64,46 @@
   --radius-lg: 0.75rem;   /* 12px - large cards, containers */
   --radius-xl: 1rem;      /* 16px - hero sections, large surfaces */
   --radius-full: 9999px;  /* Full round - pills, avatars, circles */
+
+  /* ══════════════════════════════════════════════════════════
+   * Z-INDEX SCALE
+   * ══════════════════════════════════════════════════════════
+   *
+   * Inspired by Material UI's z-index system.
+   * Each layer is 100 apart to allow for sub-layers if needed.
+   *
+   * USAGE GUIDE:
+   * - z-base:      Default stacking (rarely needed)
+   * - z-dropdown:  Dropdowns, select menus, autocomplete
+   * - z-sticky:    Sticky headers, back-to-top buttons
+   * - z-fixed:     Fixed elements (app bars, FABs)
+   * - z-drawer:    Side drawers, mobile navigation
+   * - z-modal:     Modal dialogs, lightboxes
+   * - z-popover:   Popovers, tooltips that appear over modals
+   * - z-toast:     Toast notifications (always on top)
+   *
+   * ══════════════════════════════════════════════════════════ */
+
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-drawer-backdrop: 400;
+  --z-drawer: 500;
+  --z-modal-backdrop: 600;
+  --z-modal: 700;
+  --z-popover: 800;
+  --z-toast: 900;
+  --z-max: 1000;  /* Emergency escape hatch - avoid using! */
+
+  /* ══════════════════════════════════════════════════════════
+   * SHADOW SCALE
+   * Consistent elevation shadows
+   * ══════════════════════════════════════════════════════════ */
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 5%);
+  --shadow-md: 0 4px 6px oklch(0% 0 0 / 7%), 0 2px 4px oklch(0% 0 0 / 6%);
+  --shadow-lg: 0 10px 15px oklch(0% 0 0 / 10%), 0 4px 6px oklch(0% 0 0 / 5%);
+  --shadow-xl: 0 20px 25px oklch(0% 0 0 / 10%), 0 8px 10px oklch(0% 0 0 / 4%);
 }
 

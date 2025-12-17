@@ -1,0 +1,107 @@
+/**
+ * Data Table Component
+ *
+ * Styled tables for displaying and editing data.
+ * Use for translations, settings, any tabular data.
+ */
+
+.data-table {
+  overflow: hidden;
+}
+
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--l-border);
+}
+
+[dir="rtl"] .data-table th,
+[dir="rtl"] .data-table td {
+  text-align: right;
+}
+
+.data-table th {
+  font-weight: var(--font-medium);
+  color: var(--t-secondary);
+  font-size: var(--text-sm);
+  background: var(--l-bg-sunken);
+}
+
+.data-table tbody tr:hover {
+  background: var(--l-bg-sunken);
+}
+
+/* Column types */
+.data-table .cell--key {
+  width: 35%;
+}
+
+.data-table .cell--key code {
+  font-size: var(--text-sm);
+  background: var(--l-bg-sunken);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xs);
+}
+
+.data-table .cell--value {
+  cursor: pointer;
+}
+
+.data-table .cell--value:hover {
+  background: var(--i-brand-subtle);
+}
+
+.data-table .cell--actions {
+  width: 60px;
+  text-align: right;
+}
+
+[dir="rtl"] .data-table .cell--actions {
+  text-align: left;
+}
+
+/* Editable cell indicator */
+.data-table .cell--editable {
+  position: relative;
+  cursor: pointer;
+}
+
+.data-table .cell--editable:hover::after {
+  content: '✎';
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--t-muted);
+  font-size: var(--text-sm);
+}
+
+[dir="rtl"] .data-table .cell--editable:hover::after {
+  right: auto;
+  left: var(--space-2);
+}
+
+/* Empty state */
+.data-table-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--t-muted);
+}
+
+/* Responsive: horizontal scroll on small screens */
+@media (max-width: 640px) {
+  .data-table {
+    overflow-x: auto;
+  }
+
+  .data-table table {
+    min-width: 500px;
+  }
+}
+

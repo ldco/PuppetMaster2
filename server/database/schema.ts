@@ -11,6 +11,15 @@ import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * User roles hierarchy:
+ * - master: Developer/agency who builds the site (full access)
+ * - admin: Client who owns the site (can manage content + users except master)
+ * - editor: Client's employees (can only edit content)
+ */
+export const USER_ROLES = ['master', 'admin', 'editor'] as const
+export type UserRole = typeof USER_ROLES[number]
+
+/**
  * Admin users
  */
 export const users = sqliteTable('users', {
@@ -18,7 +27,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name'),
-  role: text('role', { enum: ['admin', 'editor'] }).default('admin').notNull(),
+  role: text('role', { enum: ['master', 'admin', 'editor'] }).default('editor').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })

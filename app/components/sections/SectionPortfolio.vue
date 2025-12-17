@@ -1,34 +1,48 @@
 <script setup lang="ts">
 /**
  * Portfolio Section
- * 
+ *
  * Grid of portfolio items/projects.
+ * Fetches published items from API.
+ * Includes fancy lightbox for viewing items.
  */
 
 interface PortfolioItem {
-  id: string
+  id: number
+  slug: string
   title: string
-  category?: string
-  image?: string
-  link?: string
+  description: string | null
+  imageUrl: string | null
+  thumbnailUrl: string | null
+  category: string | null
+  tags: string[]
+  published: boolean
 }
 
 defineProps<{
   /** Section title */
   title?: string
-  /** Portfolio items (will come from DB later) */
-  items?: PortfolioItem[]
 }>()
 
-// Placeholder items for demo
-const demoItems: PortfolioItem[] = [
-  { id: '1', title: 'Project Alpha', category: 'Web Design' },
-  { id: '2', title: 'Project Beta', category: 'Branding' },
-  { id: '3', title: 'Project Gamma', category: 'Development' },
-  { id: '4', title: 'Project Delta', category: 'UI/UX' },
-  { id: '5', title: 'Project Epsilon', category: 'Web Design' },
-  { id: '6', title: 'Project Zeta', category: 'Branding' }
-]
+// Fetch published portfolio items from API
+const { data: items } = await useFetch<PortfolioItem[]>('/api/portfolio')
+
+// Lightbox state
+const lightboxOpen = ref(false)
+const lightboxIndex = ref(0)
+
+function openLightbox(index: number) {
+  lightboxIndex.value = index
+  lightboxOpen.value = true
+}
+
+function closeLightbox() {
+  lightboxOpen.value = false
+}
+
+function navigateLightbox(index: number) {
+  lightboxIndex.value = index
+}
 </script>
 
 <template>
@@ -43,27 +57,51 @@ const demoItems: PortfolioItem[] = [
       <h2 class="section-title section-title--center">
         <slot name="title">{{ title ?? 'Our Work' }}</slot>
       </h2>
-      <div class="section-grid-auto section-grid-auto--lg">
+
+      <!-- Show message if no items -->
+      <p v-if="!items?.length" class="text-center text-secondary">
+        No portfolio items yet.
+      </p>
+
+      <div v-else class="section-grid-auto section-grid-auto--lg">
         <article
-          v-for="item in (items ?? demoItems)"
+          v-for="(item, index) in items"
           :key="item.id"
-          class="portfolio-card"
+          class="portfolio-card portfolio-card--clickable"
+          @click="openLightbox(index)"
         >
           <div class="portfolio-card-image">
-            <slot :name="`image-${item.id}`">
-              <div class="image-placeholder">🎨</div>
-            </slot>
+            <img
+              v-if="item.thumbnailUrl || item.imageUrl"
+              :src="item.thumbnailUrl || item.imageUrl!"
+              :alt="item.title"
+              loading="lazy"
+            />
+            <div v-else class="image-placeholder">🎨</div>
           </div>
           <div class="portfolio-card-info">
             <span v-if="item.category" class="portfolio-card-category">
               {{ item.category }}
             </span>
             <h3 class="portfolio-card-title">{{ item.title }}</h3>
+            <p v-if="item.description" class="portfolio-card-description">
+              {{ item.description }}
+            </p>
           </div>
         </article>
       </div>
     </div>
   </section>
+
+  <!-- Lightbox -->
+  <MoleculesPortfolioLightbox
+    v-if="items?.length"
+    :items="items"
+    :current-index="lightboxIndex"
+    :is-open="lightboxOpen"
+    @close="closeLightbox"
+    @navigate="navigateLightbox"
+  />
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->

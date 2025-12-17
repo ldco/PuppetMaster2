@@ -61,68 +61,10 @@ onMounted(() => {
   </Teleport>
 </template>
 
-<style scoped>
-.mobile-nav-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  background: color-mix(in srgb, var(--p-black), transparent 50%);
-}
-
-.mobile-nav-panel {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  width: min(320px, 85vw);
-  background: var(--l-bg);
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-xl);
-}
-
-.mobile-nav-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--l-border);
-}
-
-.mobile-nav-links {
-  flex: 1;
-  padding: var(--space-4);
-  overflow-y: auto;
-}
-
-.mobile-nav-footer {
-  padding: var(--space-4);
-  border-top: 1px solid var(--l-border);
-}
-
-/* Animations */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(-100%);
-}
-
-[dir="rtl"] .slide-enter-from,
-[dir="rtl"] .slide-leave-to {
-  transform: translateX(100%);
-}
-</style>
+<!--
+  Uses global CSS classes from skeleton/mobile-nav.css:
+  - .mobile-nav-overlay, .mobile-nav-panel, .mobile-nav-header
+  - .mobile-nav-links, .mobile-nav-footer
+  - .fade-*, .slide-* animation classes
+-->
 
