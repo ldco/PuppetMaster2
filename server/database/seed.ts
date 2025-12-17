@@ -131,6 +131,64 @@ async function seed() {
     console.log(`   ${locale}: ${count} keys in seed`)
   }
 
+  // Seed default portfolio items - ONLY if none exist
+  console.log('\n📁 Checking portfolio items...')
+  const existingPortfolio = db.select().from(schema.portfolioItems).all()
+
+  if (existingPortfolio.length === 0) {
+    console.log('   Creating default portfolio items...')
+
+    const portfolioItems = [
+      {
+        slug: 'brand-identity-redesign',
+        title: 'Brand Identity Redesign',
+        description: 'Complete visual identity overhaul for a tech startup, including logo, color palette, and brand guidelines.',
+        category: 'Branding',
+        tags: JSON.stringify(['branding', 'logo', 'identity']),
+        order: 3,
+        published: true,
+        publishedAt: new Date()
+      },
+      {
+        slug: 'e-commerce-platform',
+        title: 'E-Commerce Platform',
+        description: 'Full-stack online store with custom checkout, inventory management, and analytics dashboard.',
+        category: 'Web Development',
+        tags: JSON.stringify(['web', 'ecommerce', 'fullstack']),
+        order: 2,
+        published: true,
+        publishedAt: new Date()
+      },
+      {
+        slug: 'mobile-fitness-app',
+        title: 'Mobile Fitness App',
+        description: 'Cross-platform fitness tracking application with workout plans, progress tracking, and social features.',
+        category: 'Mobile',
+        tags: JSON.stringify(['mobile', 'app', 'fitness']),
+        order: 1,
+        published: true,
+        publishedAt: new Date()
+      },
+      {
+        slug: 'corporate-website',
+        title: 'Corporate Website',
+        description: 'Modern responsive website for a financial services company with CMS integration.',
+        category: 'Web Development',
+        tags: JSON.stringify(['web', 'corporate', 'cms']),
+        order: 0,
+        published: true,
+        publishedAt: new Date()
+      }
+    ]
+
+    for (const item of portfolioItems) {
+      db.insert(schema.portfolioItems).values(item).run()
+      console.log(`   ✓ ${item.title}`)
+    }
+  } else {
+    console.log(`   ${existingPortfolio.length} portfolio items exist, skipping.`)
+  }
+
   console.log('\n✅ Database sync complete! Existing values preserved.\n')
   sqlite.close()
 }

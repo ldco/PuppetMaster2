@@ -1,35 +1,34 @@
 /**
  * Admin Stats API
  *
+ * GET /api/admin/stats
  * Returns dashboard statistics for the admin panel.
- * Requires authentication.
+ * Requires authentication (enforced by middleware for /api/admin/*).
  */
-import { db } from '../../database/client'
-import { portfolioItems, contactSubmissions } from '../../database/schema'
+import { useDatabase, schema } from '../../database/client'
 import { count, eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  // Check authentication
-  const session = getCookie(event, 'auth_session')
-  if (!session) {
-    throw createError({ statusCode: 401, message: 'Unauthorized' })
-  }
+  const db = useDatabase()
 
   // Get portfolio count
-  const [portfolioResult] = await db
+  const portfolioResult = db
     .select({ count: count() })
-    .from(portfolioItems)
+    .from(schema.portfolioItems)
+    .get()
 
   // Get total contact submissions
-  const [contactsResult] = await db
+  const contactsResult = db
     .select({ count: count() })
-    .from(contactSubmissions)
+    .from(schema.contactSubmissions)
+    .get()
 
   // Get unread messages count
-  const [unreadResult] = await db
+  const unreadResult = db
     .select({ count: count() })
-    .from(contactSubmissions)
-    .where(eq(contactSubmissions.read, false))
+    .from(schema.contactSubmissions)
+    .where(eq(schema.contactSubmissions.read, false))
+    .get()
 
   return {
     portfolioItems: portfolioResult?.count ?? 0,

@@ -1,8 +1,8 @@
 # 🎭 Puppet Master - Technical Brief
 
-**Version:** 2.0 (Fresh Start)
-**Date:** 2024-12-14
-**Status:** READY TO BUILD
+**Version:** 2.1
+**Date:** 2024-12-17
+**Status:** IN DEVELOPMENT
 
 ---
 
@@ -2872,3 +2872,263 @@ If a logo variant doesn't exist:
 1. Check `langFallback` config
 2. Fall back to English (`en`)
 3. Ultimate fallback: `horizontal_dark_en.svg`
+
+---
+
+## 21. Role-Based Access Control (RBAC)
+
+### Three-Tier Role System
+
+| Role | Level | Description | Access |
+|------|-------|-------------|--------|
+| **Master** | 2 | Developer/agency who builds the site | Full access to everything |
+| **Admin** | 1 | Client who owns the site | Manages content + users (except master) |
+| **Editor** | 0 | Client's employees | Content only |
+
+### Permission Matrix
+
+| Feature | Master | Admin | Editor |
+|---------|--------|-------|--------|
+| View Dashboard | ✅ | ✅ | ✅ |
+| Edit Settings | ✅ | ✅ | ❌ |
+| Manage Portfolio | ✅ | ✅ | ✅ |
+| View Contacts | ✅ | ✅ | ✅ |
+| Manage Users | ✅ | ✅ (not master) | ❌ |
+| Manage Translations | ✅ | ✅ | ❌ |
+| Health Monitoring | ✅ | ❌ | ❌ |
+
+### Implementation
+
+```typescript
+// server/utils/auth.ts
+export function requireRole(event: H3Event, minRole: 'editor' | 'admin' | 'master') {
+  const session = getSession(event)
+  const roleLevel = { editor: 0, admin: 1, master: 2 }
+
+  if (roleLevel[session.role] < roleLevel[minRole]) {
+    throw createError({ statusCode: 403, message: 'Insufficient permissions' })
+  }
+}
+
+// Usage in API endpoint
+export default defineEventHandler(async (event) => {
+  requireRole(event, 'admin')  // Only admin+ can access
+  // ...
+})
+```
+
+---
+
+## 22. Testing Framework
+
+### Vitest Setup
+
+| Component | Status |
+|-----------|--------|
+| Vitest | ✅ Configured |
+| Test Files | 7 files |
+| Total Tests | 88 tests |
+| Coverage | All passing |
+
+### Test Categories
+
+| Category | Tests | Description |
+|----------|-------|-------------|
+| Auth | 15 | Login, logout, session, password hashing |
+| Settings | 12 | CRUD operations, validation |
+| Portfolio | 18 | CRUD, ordering, publishing |
+| Contacts | 14 | Submissions, read/unread, deletion |
+| Users | 16 | CRUD, role validation, password changes |
+| Translations | 8 | CRUD, locale handling |
+| Utils | 5 | Helper functions |
+
+### Running Tests
+
+```bash
+# Run all tests
+npm run test:run
+
+# Watch mode
+npm run test
+
+# With coverage
+npm run test:coverage
+```
+
+---
+
+## 23. i18n Architecture
+
+### Two-Layer Translation System
+
+| Layer | Source | Purpose |
+|-------|--------|---------|
+| **System Translations** | `i18n/system.ts` | UI strings (nav, buttons, labels) |
+| **Content Translations** | Database | User-editable content |
+
+### System Translations Structure
+
+```typescript
+// i18n/system.ts
+export const systemTranslations: Record<string, Record<string, any>> = {
+  en: {
+    nav: { home: 'Home', about: 'About', ... },
+    common: { save: 'Save', cancel: 'Cancel', ... },
+    admin: { title: 'Admin Panel', ... },
+    auth: { login: 'Login', logout: 'Logout', ... },
+  },
+  ru: { ... },
+  he: { ... }
+}
+
+// CRITICAL: Return nested objects, NOT flattened!
+export function getSystemTranslations(locale: string): Record<string, any> {
+  return systemTranslations[locale] ?? systemTranslations['en'] ?? {}
+}
+```
+
+### Why Nested Objects?
+
+Vue I18n expects nested objects for dot-notation keys:
+
+```typescript
+// ❌ WRONG - Vue I18n can't find 'admin.title'
+{ 'admin.title': 'Admin Panel' }
+
+// ✅ CORRECT - Vue I18n finds t('admin.title')
+{ admin: { title: 'Admin Panel' } }
+```
+
+---
+
+## 24. Hydration Best Practices
+
+### The Golden Rule
+
+> **Never nest block elements inside `<p>` tags when using slots.**
+
+### The Problem
+
+```vue
+<!-- SectionAbout.vue - WRONG -->
+<p class="text-lg">
+  <slot>{{ content }}</slot>
+</p>
+
+<!-- index.vue -->
+<SectionAbout>
+  <p>First paragraph</p>
+  <p>Second paragraph</p>
+</SectionAbout>
+```
+
+This causes hydration mismatch because:
+1. `<p>` inside `<p>` is invalid HTML
+2. Browser auto-closes the outer `<p>` during SSR
+3. Client-side Vue expects the original structure
+4. DOM mismatch = hydration error
+
+### The Solution
+
+```vue
+<!-- SectionAbout.vue - CORRECT -->
+<div class="text-lg text-secondary">
+  <slot>
+    <p>{{ content }}</p>
+  </slot>
+</div>
+```
+
+### Hydration Checklist
+
+| Rule | Description |
+|------|-------------|
+| ✅ Use `<div>` for slot containers | When slot may contain block elements |
+| ✅ Check HTML validity | No `<p>` inside `<p>`, `<a>` inside `<a>`, etc. |
+| ✅ Avoid client-only content in SSR | Use `<ClientOnly>` wrapper if needed |
+| ✅ Match server/client state | Ensure reactive data is consistent |
+
+---
+
+## 25. Storage System
+
+### Dual Storage Strategy
+
+| Mode | Use Case | Configuration |
+|------|----------|---------------|
+| **Local** | Development, small sites | `STORAGE_TYPE=local` |
+| **S3** | Production, scalable | `STORAGE_TYPE=s3` |
+
+### Environment Variables
+
+```env
+# Local storage (default)
+STORAGE_TYPE=local
+UPLOAD_DIR=./uploads
+
+# S3 storage
+STORAGE_TYPE=s3
+S3_BUCKET=my-bucket
+S3_REGION=us-east-1
+S3_ACCESS_KEY=...
+S3_SECRET_KEY=...
+```
+
+### Storage Composable
+
+```typescript
+// server/utils/storage.ts
+export async function uploadFile(file: Buffer, filename: string): Promise<string> {
+  if (process.env.STORAGE_TYPE === 's3') {
+    return uploadToS3(file, filename)
+  }
+  return uploadToLocal(file, filename)
+}
+```
+
+---
+
+## 26. Contact Form & Notifications
+
+### Telegram Integration
+
+Optional Telegram notifications for new contact form submissions:
+
+```typescript
+// puppet-master.config.ts
+features: {
+  contactTelegramNotify: true  // Enable Telegram notifications
+}
+
+// .env
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+### Implementation
+
+```typescript
+// server/api/contact/submit.post.ts
+if (config.features.contactTelegramNotify) {
+  // Fire-and-forget (non-blocking)
+  notifyNewContact(submission).catch(console.error)
+}
+```
+
+### Unread Message Badge
+
+Admin nav shows unread message count:
+
+```typescript
+// composables/useUnreadCount.ts
+export function useUnreadCount() {
+  const count = useState<number>('unreadCount', () => 0)
+
+  async function refresh() {
+    const { data } = await useFetch('/api/admin/contacts/unread')
+    count.value = data.value?.count ?? 0
+  }
+
+  return { count, refresh }
+}
+```

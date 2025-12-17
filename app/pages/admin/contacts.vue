@@ -3,7 +3,7 @@
  * Admin Contacts Page
  *
  * View and manage contact form submissions.
- * Uses existing CSS: .card, .badge, .btn
+ * Uses global CSS: .card, .badge, .btn, .flex, .grid utilities
  */
 import IconTrash from '~icons/tabler/trash'
 import IconMail from '~icons/tabler/mail'
@@ -16,6 +16,9 @@ definePageMeta({
 
 const { t } = useI18n()
 
+// Shared unread count for nav badge
+const { decrementUnread, incrementUnread, fetchUnreadCount } = useUnreadCount()
+
 interface ContactSubmission {
   id: number
   name: string
@@ -24,7 +27,7 @@ interface ContactSubmission {
   subject: string | null
   message: string
   read: boolean
-  createdAt: Date
+  createdAt: number
 }
 
 // Fetch contacts - pass cookies for SSR auth
@@ -34,19 +37,28 @@ const { data, pending, refresh } = await useFetch<{ items: ContactSubmission[]; 
 })
 
 const items = computed(() => data.value?.items || [])
-const unreadCount = computed(() => data.value?.unreadCount || 0)
+const localUnreadCount = computed(() => data.value?.unreadCount || 0)
 
 // Selected message for detail view
 const selectedMessage = ref<ContactSubmission | null>(null)
 
 async function toggleRead(item: ContactSubmission) {
+  const wasUnread = !item.read
   try {
     await $fetch(`/api/admin/contacts/${item.id}`, {
       method: 'PUT',
       body: { read: !item.read }
     })
+    // Update nav badge immediately (optimistic)
+    if (wasUnread) {
+      decrementUnread()
+    } else {
+      incrementUnread()
+    }
     await refresh()
   } catch (e: any) {
+    // Revert on error
+    fetchUnreadCount()
     alert(e.data?.message || 'Failed to update')
   }
 }
@@ -55,14 +67,20 @@ const deleting = ref<number | null>(null)
 
 async function deleteMessage(item: ContactSubmission) {
   if (!confirm(t('admin.confirmDelete'))) return
+  const wasUnread = !item.read
   deleting.value = item.id
   try {
     await $fetch(`/api/admin/contacts/${item.id}`, { method: 'DELETE' })
+    // Update nav badge if deleted message was unread
+    if (wasUnread) {
+      decrementUnread()
+    }
     if (selectedMessage.value?.id === item.id) {
       selectedMessage.value = null
     }
     await refresh()
   } catch (e: any) {
+    fetchUnreadCount() // Revert on error
     alert(e.data?.message || 'Failed to delete')
   } finally {
     deleting.value = null
@@ -77,8 +95,8 @@ function selectMessage(item: ContactSubmission) {
   }
 }
 
-function formatDate(date: Date | string) {
-  return new Date(date).toLocaleDateString(undefined, {
+function formatDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -89,79 +107,88 @@ function formatDate(date: Date | string) {
 </script>
 
 <template>
-  <div class="admin-contacts">
-    <div class="page-header">
-      <h1 class="page-title">
+  <div class="admin-page">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
         {{ t('admin.contacts') }}
-        <span v-if="unreadCount" class="badge badge-primary">{{ unreadCount }}</span>
+        <span v-if="localUnreadCount" class="badge badge-primary">{{ localUnreadCount }}</span>
       </h1>
     </div>
 
     <!-- Loading -->
-    <div v-if="pending" class="loading-state">{{ t('common.loading') }}</div>
-
-    <!-- Empty state -->
-    <div v-else-if="!items.length" class="empty-state">
-      <p>{{ t('admin.noMessages') }}</p>
+    <div v-if="pending" class="card card-body text-center">
+      <p class="text-secondary">{{ t('common.loading') }}</p>
     </div>
 
-    <!-- Messages list and detail -->
-    <div v-else class="contacts-layout">
+    <!-- Empty state -->
+    <div v-else-if="!items.length" class="card card-body text-center">
+      <IconMail class="icon-xl text-secondary mx-auto mb-4" />
+      <p class="text-secondary">{{ t('admin.noMessages') }}</p>
+    </div>
+
+    <!-- Messages grid: list + detail -->
+    <div v-else class="grid gap-4" style="grid-template-columns: minmax(280px, 1fr) 2fr;">
       <!-- Messages list -->
-      <div class="messages-list card">
-        <div
+      <div class="card flex flex-col" style="max-height: 70vh; overflow-y: auto;">
+        <button
           v-for="item in items"
           :key="item.id"
-          class="message-item"
-          :class="{ 'is-unread': !item.read, 'is-selected': selectedMessage?.id === item.id }"
+          type="button"
+          class="card-body flex flex-col gap-1 text-start border-b cursor-pointer"
+          :class="{
+            'bg-brand-subtle': selectedMessage?.id === item.id,
+            'font-bold': !item.read
+          }"
           @click="selectMessage(item)"
         >
-          <div class="message-item-header">
-            <span class="message-sender">{{ item.name }}</span>
-            <span class="message-date">{{ formatDate(item.createdAt) }}</span>
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-medium truncate">{{ item.name }}</span>
+            <span class="text-xs text-secondary whitespace-nowrap">{{ formatDate(item.createdAt) }}</span>
           </div>
-          <div class="message-subject">{{ item.subject || '(No subject)' }}</div>
-          <div class="message-preview">{{ item.message.slice(0, 80) }}{{ item.message.length > 80 ? '...' : '' }}</div>
-        </div>
+          <div class="text-sm truncate">{{ item.subject || t('admin.noSubject') }}</div>
+          <div class="text-sm text-secondary truncate">{{ item.message.slice(0, 60) }}{{ item.message.length > 60 ? '...' : '' }}</div>
+        </button>
       </div>
 
       <!-- Message detail -->
-      <div class="message-detail card">
+      <div class="card">
         <template v-if="selectedMessage">
-          <div class="card-header">
-            <div class="message-detail-header">
-              <h2>{{ selectedMessage.subject || '(No subject)' }}</h2>
-              <div class="message-detail-actions">
-                <button
-                  class="btn btn-icon btn-ghost"
-                  @click="toggleRead(selectedMessage)"
-                  :title="selectedMessage.read ? t('admin.markUnread') : t('admin.markRead')"
-                >
-                  <IconMailOpened v-if="selectedMessage.read" />
-                  <IconMail v-else />
-                </button>
-                <button
-                  class="btn btn-icon btn-ghost btn-danger"
-                  @click="deleteMessage(selectedMessage)"
-                  :disabled="deleting === selectedMessage.id"
-                  :title="t('common.delete')"
-                >
-                  <IconTrash />
-                </button>
-              </div>
+          <div class="card-header flex items-center justify-between">
+            <h2 class="text-lg font-bold">{{ selectedMessage.subject || t('admin.noSubject') }}</h2>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="btn btn-icon btn-ghost"
+                @click="toggleRead(selectedMessage)"
+                :title="selectedMessage.read ? t('admin.markUnread') : t('admin.markRead')"
+              >
+                <IconMailOpened v-if="selectedMessage.read" />
+                <IconMail v-else />
+              </button>
+              <button
+                type="button"
+                class="btn btn-icon btn-ghost text-danger"
+                @click="deleteMessage(selectedMessage)"
+                :disabled="deleting === selectedMessage.id"
+                :title="t('common.delete')"
+              >
+                <IconTrash />
+              </button>
             </div>
           </div>
-          <div class="card-body">
-            <div class="message-meta">
-              <p><strong>From:</strong> {{ selectedMessage.name }} &lt;{{ selectedMessage.email }}&gt;</p>
-              <p v-if="selectedMessage.phone"><strong>Phone:</strong> {{ selectedMessage.phone }}</p>
-              <p><strong>Date:</strong> {{ formatDate(selectedMessage.createdAt) }}</p>
+          <div class="card-body flex flex-col gap-4">
+            <div class="flex flex-col gap-1 text-sm text-secondary">
+              <p><strong>{{ t('admin.from') }}:</strong> {{ selectedMessage.name }} &lt;{{ selectedMessage.email }}&gt;</p>
+              <p v-if="selectedMessage.phone"><strong>{{ t('admin.phone') }}:</strong> {{ selectedMessage.phone }}</p>
+              <p><strong>{{ t('admin.date') }}:</strong> {{ formatDate(selectedMessage.createdAt) }}</p>
             </div>
-            <div class="message-body">{{ selectedMessage.message }}</div>
+            <div class="whitespace-pre-wrap">{{ selectedMessage.message }}</div>
           </div>
         </template>
-        <div v-else class="empty-detail">
-          <p>Select a message to view</p>
+        <div v-else class="card-body text-center text-secondary">
+          <IconMail class="icon-xl mx-auto mb-4 opacity-50" />
+          <p>{{ t('admin.selectMessage') }}</p>
         </div>
       </div>
     </div>
@@ -169,9 +196,9 @@ function formatDate(date: Date | string) {
 </template>
 
 <!--
-  Uses global CSS classes from admin/index.css:
-  - .contacts-layout, .messages-list, .message-item, .message-item-header
-  - .message-sender, .message-date, .message-subject, .message-preview
-  - .message-detail, .message-detail-header, .message-detail-actions
-  - .message-meta, .message-body, .empty-detail
+  Uses global CSS classes:
+  - ui/content: .card, .card-body, .card-header, .badge
+  - ui/buttons: .btn, .btn-icon, .btn-ghost
+  - common/utilities: .flex, .grid, .gap-*, .items-center, .justify-between
+  - typography: .text-*, .font-*, .truncate
 -->

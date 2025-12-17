@@ -10,7 +10,7 @@ const { locale, locales, setLocale } = useI18n()
 
 function handleChange(event: Event) {
   const target = event.target as HTMLSelectElement
-  setLocale(target.value)
+  setLocale(target.value as 'en' | 'ru' | 'he')
 }
 </script>
 

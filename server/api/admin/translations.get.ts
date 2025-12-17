@@ -30,10 +30,8 @@ export default defineEventHandler(async (event) => {
       continue
     }
 
-    if (!grouped[row.locale]) {
-      grouped[row.locale] = []
-    }
-    grouped[row.locale].push({
+    const localeGroup = grouped[row.locale] ??= []
+    localeGroup.push({
       id: row.id,
       key: row.key,
       value: row.value

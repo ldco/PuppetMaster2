@@ -10,7 +10,6 @@
  * Auth is handled by middleware (app/middleware/auth.ts)
  */
 import config from '~/puppet-master.config'
-import IconDashboard from '~icons/tabler/dashboard'
 import IconSettings from '~icons/tabler/settings'
 import IconPhoto from '~icons/tabler/photo'
 import IconMail from '~icons/tabler/mail'
@@ -28,12 +27,24 @@ const { shortLogo } = useLogo()
 
 const isMobileSidebarOpen = ref(false)
 
+// Unread messages count - shared state
+const { unreadCount, fetchUnreadCount } = useUnreadCount()
+
+// Fetch immediately and refresh periodically
+fetchUnreadCount()
+let interval: ReturnType<typeof setInterval> | null = null
+onMounted(() => {
+  interval = setInterval(fetchUnreadCount, 30000) // 30 seconds
+})
+onUnmounted(() => {
+  if (interval) clearInterval(interval)
+})
+
 // Base admin links
 const baseLinks = [
-  { to: '/admin', label: 'admin.dashboard', icon: IconDashboard, exact: true },
   { to: '/admin/settings', label: 'admin.settings', icon: IconSettings },
   { to: '/admin/portfolio', label: 'admin.portfolio', icon: IconPhoto },
-  { to: '/admin/contacts', label: 'admin.contacts', icon: IconMail },
+  { to: '/admin/contacts', label: 'admin.contacts', icon: IconMail, badge: true },
   { to: '/admin/translations', label: 'admin.translations', icon: IconLanguage },
 ]
 
@@ -86,9 +97,13 @@ watch(() => route.path, () => {
           :key="link.to"
           :to="link.to"
           class="sidebar-nav-link"
-          :exact="link.exact"
         >
-          <component :is="link.icon" />
+          <span class="relative">
+            <component :is="link.icon" />
+            <span v-if="link.badge && unreadCount > 0" class="badge-dot">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          </span>
           <span class="sidebar-tooltip">{{ t(link.label) }}</span>
         </NuxtLink>
       </nav>
@@ -156,16 +171,7 @@ watch(() => route.path, () => {
   - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn, .sidebar-tooltip
   - skeleton/mobile-nav.css: .mobile-nav-backdrop
   - ui/buttons.css: .btn, .btn-icon, .btn-ghost
-  - layout/responsive.css: .mobile-only
--->
-
-<!--
-  Uses global CSS classes:
-  - layout/page.css: .layout-admin, .admin-sidebar, .admin-main
-  - admin/index.css: .admin-header, .admin-title, .admin-content
-  - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn, .sidebar-tooltip
-  - skeleton/mobile-nav.css: .mobile-nav-backdrop
-  - ui/buttons.css: .btn, .btn-icon, .btn-ghost
+  - ui/content/badges.css: .badge-dot
   - layout/responsive.css: .mobile-only
 -->
 

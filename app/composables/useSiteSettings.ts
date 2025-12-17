@@ -133,41 +133,42 @@ const defaultSettings: SiteSettings = {
 
 export function useSiteSettings() {
   // Use Nuxt's data fetching with caching
-  const { data, pending, error, refresh } = useFetch<SiteSettings>('/api/settings', {
+  const { data, pending, error, refresh } = useFetch('/api/settings', {
     key: 'site-settings',
-    default: () => defaultSettings,
-    transform: (raw: Record<string, Record<string, string | null>>) => {
+    default: () => defaultSettings as SiteSettings,
+    transform: (raw): SiteSettings => {
       // Merge API response with defaults
+      const rawData = raw as Record<string, Record<string, string | null>>
       return {
         contact: {
           ...defaultSettings.contact,
-          ...raw.contact
+          ...rawData.contact
         },
         social: {
           ...defaultSettings.social,
-          ...raw.social
+          ...rawData.social
         },
         legal: {
           ...defaultSettings.legal,
-          ...raw.legal
+          ...rawData.legal
         },
         footer: {
           ...defaultSettings.footer,
-          ...raw.footer
+          ...rawData.footer
         },
         seo: {
           ...defaultSettings.seo,
-          ...raw.seo
+          ...rawData.seo
         },
         analytics: {
           ...defaultSettings.analytics,
-          ...raw.analytics
+          ...rawData.analytics
         },
         verification: {
           ...defaultSettings.verification,
-          ...raw.verification
+          ...rawData.verification
         }
-      }
+      } as SiteSettings
     }
   })
 

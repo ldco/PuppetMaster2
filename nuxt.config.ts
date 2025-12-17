@@ -48,7 +48,6 @@ export default defineNuxtConfig({
   i18n: {
     // Locales from config - ALL use the same loader.ts file
     locales: config.locales.map(l => ({ ...l, file: 'loader.ts' })),
-    lazy: true,
     langDir: '.', // loader.ts is in i18n/ directory
     defaultLocale: config.defaultLocale,
     strategy: 'prefix_except_default',

@@ -38,7 +38,7 @@ const coordinates = computed(() => {
   if (!isCoordinates.value) return null
   const loc = settings.value?.contact.location
   if (!loc) return null
-  const [lat, lng] = loc.split(',').map(s => parseFloat(s.trim()))
+  const [lat, lng] = loc.split(',').map((s: string) => parseFloat(s.trim()))
   return { lat, lng }
 })
 

@@ -18,7 +18,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { mobileLogo } = useLogo()
+const { shortLogo } = useLogo()
 
 const email = ref('')
 const password = ref('')
@@ -40,7 +40,7 @@ async function handleSubmit() {
     <div class="auth-card">
       <!-- Logo - using circle variant for auth pages -->
       <div class="auth-logo">
-        <img :src="mobileLogo" alt="Logo" class="auth-logo-img">
+        <img :src="shortLogo" alt="Logo" class="auth-logo-img">
       </div>
 
       <!-- Title -->

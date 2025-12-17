@@ -47,6 +47,12 @@ async function handleSubmit() {
     form.name = ''
     form.email = ''
     form.message = ''
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      if (submitStatus.value === 'success') {
+        submitStatus.value = 'idle'
+      }
+    }, 5000)
   } catch (e: any) {
     submitStatus.value = 'error'
     // Extract field errors from validation response
@@ -117,15 +123,13 @@ async function handleSubmit() {
             ></textarea>
           </div>
 
-          <AtomsCtaButton
+          <button
             type="submit"
-            variant="primary"
-            size="lg"
-            full-width
+            class="btn btn-primary btn-lg btn-full"
             :disabled="isSubmitting"
           >
             {{ isSubmitting ? t('contact.sending') : t('contact.sendButton') }}
-          </AtomsCtaButton>
+          </button>
 
           <p v-if="submitStatus === 'success'" class="form-success">
             ✓ {{ t('contact.successMessage') }}

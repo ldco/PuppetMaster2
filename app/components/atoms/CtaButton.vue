@@ -18,6 +18,8 @@ const props = defineProps<{
   disabled?: boolean
   /** Full width */
   fullWidth?: boolean
+  /** Button type (for form submission) */
+  type?: 'button' | 'submit' | 'reset'
 }>()
 
 const emit = defineEmits<{

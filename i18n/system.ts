@@ -76,6 +76,11 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       confirmDelete: 'Are you sure you want to delete this item?',
       contacts: 'Contact Messages',
       noMessages: 'No messages yet.',
+      noSubject: '(No subject)',
+      selectMessage: 'Select a message to view',
+      from: 'From',
+      phone: 'Phone',
+      date: 'Date',
       markRead: 'Mark as read',
       markUnread: 'Mark as unread',
       settingsSite: 'Site Information',
@@ -186,6 +191,11 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       confirmDelete: 'Вы уверены, что хотите удалить?',
       contacts: 'Сообщения',
       noMessages: 'Пока нет сообщений.',
+      noSubject: '(Без темы)',
+      selectMessage: 'Выберите сообщение',
+      from: 'От',
+      phone: 'Телефон',
+      date: 'Дата',
       markRead: 'Отметить как прочитанное',
       markUnread: 'Отметить как непрочитанное',
       settingsSite: 'Информация о сайте',
@@ -295,6 +305,11 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       confirmDelete: 'האם למחוק פריט זה?',
       contacts: 'יצירת קשר',
       noMessages: 'אין הודעות',
+      noSubject: '(ללא נושא)',
+      selectMessage: 'בחר הודעה לצפייה',
+      from: 'מאת',
+      phone: 'טלפון',
+      date: 'תאריך',
       markRead: 'סמן כנקרא',
       markUnread: 'סמן כלא נקרא',
       settingsSite: 'הגדרות כלליות',
@@ -394,8 +409,16 @@ export function flattenTranslations(
 /**
  * Get flattened system translations for a specific locale
  */
-export function getSystemTranslations(locale: string): Record<string, string> {
-  const messages = systemTranslations[locale] || systemTranslations.en
+export function getSystemTranslationsFlat(locale: string): Record<string, string> {
+  const messages = systemTranslations[locale] ?? systemTranslations['en']!
   return flattenTranslations(messages)
+}
+
+/**
+ * Get nested system translations for a specific locale
+ * Used by i18n loader - Vue I18n expects nested objects
+ */
+export function getSystemTranslations(locale: string): Record<string, any> {
+  return systemTranslations[locale] ?? systemTranslations['en'] ?? {}
 }
 

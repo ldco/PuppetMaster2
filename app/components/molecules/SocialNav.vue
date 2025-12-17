@@ -69,7 +69,9 @@ const platformIcons = computed(() => {
     if (setting.group === 'social' && setting.icon) {
       // Extract platform name from key: 'social.telegram' → 'telegram'
       const platform = setting.key.split('.')[1]
-      map[platform] = setting.icon
+      if (platform) {
+        map[platform] = setting.icon
+      }
     }
   }
   return map

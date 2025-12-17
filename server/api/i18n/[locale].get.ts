@@ -32,13 +32,15 @@ export default defineEventHandler(async (event) => {
     let current = result
 
     for (let i = 0; i < keys.length - 1; i++) {
-      if (!current[keys[i]]) {
-        current[keys[i]] = {}
+      const key = keys[i]!
+      if (!current[key]) {
+        current[key] = {}
       }
-      current = current[keys[i]]
+      current = current[key]
     }
 
-    current[keys[keys.length - 1]] = row.value
+    const lastKey = keys[keys.length - 1]!
+    current[lastKey] = row.value
   }
 
   return result

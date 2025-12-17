@@ -34,11 +34,11 @@ defineProps<{
           <h2 class="section-title">
             <slot name="title">{{ title ?? 'About Us' }}</slot>
           </h2>
-          <p class="text-lg text-secondary">
+          <div class="text-lg text-secondary">
             <slot>
-              {{ content ?? 'Tell your story here. What makes you unique? What drives you?' }}
+              <p>{{ content ?? 'Tell your story here. What makes you unique? What drives you?' }}</p>
             </slot>
-          </p>
+          </div>
         </div>
         <div class="section-image">
           <slot name="image">

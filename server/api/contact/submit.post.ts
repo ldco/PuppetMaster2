@@ -14,6 +14,7 @@ import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
 import { sendContactConfirmation } from '../../utils/email'
 import { notifyNewContact } from '../../utils/telegram'
+import { contactRateLimiter } from '../../utils/rateLimit'
 import config from '~~/app/puppet-master.config'
 
 // Validation schema
@@ -25,28 +26,6 @@ const contactSchema = z.object({
   message: z.string().min(10).max(5000)
 })
 
-// Simple in-memory rate limiting (per IP, 5 submissions per hour)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT = 5
-const RATE_WINDOW = 60 * 60 * 1000 // 1 hour
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-
-  if (!entry || entry.resetAt < now) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW })
-    return true
-  }
-
-  if (entry.count >= RATE_LIMIT) {
-    return false
-  }
-
-  entry.count++
-  return true
-}
-
 export default defineEventHandler(async (event) => {
   // Get client IP for rate limiting
   const ip = getHeader(event, 'x-forwarded-for') ||
@@ -54,7 +33,7 @@ export default defineEventHandler(async (event) => {
              'unknown'
 
   // Check rate limit
-  if (!checkRateLimit(ip)) {
+  if (!contactRateLimiter.checkRateLimit(ip)) {
     throw createError({
       statusCode: 429,
       statusMessage: 'Too many requests. Please try again later.'

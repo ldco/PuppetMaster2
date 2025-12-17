@@ -38,15 +38,16 @@ export default defineEventHandler(async (event) => {
     .limit(1)
     .all()
 
-  if (existing.length > 0) {
+  const existingRow = existing[0]
+  if (existingRow) {
     // Update existing
     db
       .update(schema.translations)
       .set({ value, updatedAt: new Date() })
-      .where(eq(schema.translations.id, existing[0].id))
+      .where(eq(schema.translations.id, existingRow.id))
       .run()
 
-    return { success: true, action: 'updated', id: existing[0].id }
+    return { success: true, action: 'updated', id: existingRow.id }
   } else {
     // Create new
     const result = db
@@ -55,7 +56,8 @@ export default defineEventHandler(async (event) => {
       .returning({ id: schema.translations.id })
       .all()
 
-    return { success: true, action: 'created', id: result[0].id }
+    const newRow = result[0]
+    return { success: true, action: 'created', id: newRow?.id }
   }
 })
 

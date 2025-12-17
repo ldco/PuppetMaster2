@@ -27,7 +27,8 @@ watchEffect(() => {
   if (settings.value) {
     for (const setting of config.settings) {
       const [group, key] = setting.key.split('.')
-      form[setting.key] = settings.value[group]?.[key] || ''
+      const groupData = group ? (settings.value as Record<string, Record<string, string>>)[group] : undefined
+      form[setting.key] = (key && groupData?.[key]) || ''
     }
   }
 })
@@ -36,8 +37,8 @@ watchEffect(() => {
 const settingsByGroup = computed(() => {
   const grouped: Record<string, typeof config.settings[number][]> = {}
   for (const setting of config.settings) {
-    if (!grouped[setting.group]) grouped[setting.group] = []
-    grouped[setting.group].push(setting)
+    const group = grouped[setting.group] ??= []
+    group.push(setting)
   }
   return grouped
 })
