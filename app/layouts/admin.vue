@@ -1,11 +1,16 @@
 <script setup lang="ts">
 /**
- * Admin Layout
+ * Admin Layout - App Visual Mode
  *
- * Narrow icon-only sidebar with hover tooltips.
+ * Responsive navigation following Material Design 3:
+ * - Phone (< 600px): Bottom navigation bar
+ * - Tablet portrait (600-839px): Navigation rail (narrow sidebar)
+ * - Tablet landscape / Desktop (≥ 840px): Full sidebar
+ *
  * Uses existing CSS system:
- * - layout/page.css: .layout-admin grid
+ * - layout/page.css: .layout-admin responsive styles
  * - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn
+ * - skeleton/bottom-nav.css: .bottom-nav, .bottom-nav-item
  *
  * Auth is handled by middleware (app/middleware/auth.ts)
  */
@@ -16,16 +21,13 @@ import IconMail from '~icons/tabler/mail'
 import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
 import IconLogout from '~icons/tabler/logout'
-import IconMenu from '~icons/tabler/menu-2'
 import IconSun from '~icons/tabler/sun'
 import IconMoon from '~icons/tabler/moon'
 
 const { t, locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
-const { user, logout, isLoading, canManageUsers } = useAuth()
+const { logout, isLoading, canManageUsers } = useAuth()
 const { shortLogo } = useLogo()
-
-const isMobileSidebarOpen = ref(false)
 
 // Unread messages count - shared state
 const { unreadCount, fetchUnreadCount } = useUnreadCount()
@@ -72,21 +74,21 @@ function cycleLocale() {
   setLocale(availableLocales[nextIndex])
 }
 
-// Close mobile sidebar on route change
-const route = useRoute()
-watch(() => route.path, () => {
-  isMobileSidebarOpen.value = false
-})
 </script>
 
 <template>
-  <div class="layout-admin" :class="{ 'sidebar-open': isMobileSidebarOpen }">
-    <!-- Narrow icon sidebar (when adminVerticalNav is true) -->
-    <aside v-if="config.features.adminVerticalNav" class="admin-sidebar" :class="{ 'is-open': isMobileSidebarOpen }">
-      <!-- Logo (short/circle version) -->
+  <div class="layout-admin">
+    <!-- Sidebar (visible on tablet+ via CSS, hidden on phones) -->
+    <aside v-if="config.features.appVerticalNav" class="admin-sidebar">
+      <!-- Logo (short/circle version) - ClientOnly to avoid SSR hydration mismatch -->
       <div class="sidebar-header">
         <NuxtLink to="/admin">
-          <img :src="shortLogo" alt="Logo" class="logo-img" />
+          <ClientOnly>
+            <img :src="shortLogo" alt="Logo" class="logo-img" />
+            <template #fallback>
+              <img :src="`${config.logo.basePath}/circle_${config.defaultTheme === 'dark' ? 'light' : 'dark'}_${config.defaultLocale}.svg`" alt="Logo" class="logo-img" />
+            </template>
+          </ClientOnly>
         </NuxtLink>
       </div>
 
@@ -110,12 +112,20 @@ watch(() => route.path, () => {
 
       <!-- Footer actions -->
       <div class="sidebar-footer">
-        <!-- Theme toggle -->
-        <button type="button" class="sidebar-icon-btn" @click="toggleTheme">
-          <IconSun v-if="colorMode.preference === 'dark'" />
-          <IconMoon v-else />
-          <span class="sidebar-tooltip">{{ colorMode.preference === 'dark' ? 'Light mode' : 'Dark mode' }}</span>
-        </button>
+        <!-- Theme toggle - ClientOnly to avoid SSR hydration mismatch -->
+        <ClientOnly>
+          <button type="button" class="sidebar-icon-btn" @click="toggleTheme">
+            <IconSun v-if="colorMode.preference === 'dark'" />
+            <IconMoon v-else />
+            <span class="sidebar-tooltip">{{ colorMode.preference === 'dark' ? 'Light mode' : 'Dark mode' }}</span>
+          </button>
+          <template #fallback>
+            <button type="button" class="sidebar-icon-btn">
+              <IconSun />
+              <span class="sidebar-tooltip">Theme</span>
+            </button>
+          </template>
+        </ClientOnly>
 
         <!-- Language -->
         <button type="button" class="sidebar-icon-btn" @click="cycleLocale">
@@ -136,25 +146,14 @@ watch(() => route.path, () => {
       </div>
     </aside>
 
-    <!-- Mobile sidebar backdrop -->
-    <div
-      v-if="isMobileSidebarOpen"
-      class="mobile-nav-backdrop"
-      @click="isMobileSidebarOpen = false"
-    />
+    <!-- Global UI Components -->
+    <OrganismsConfirmDialog />
+    <OrganismsToastContainer />
 
     <!-- Main Content -->
     <main class="admin-main">
-      <!-- Mobile header with hamburger -->
-      <header v-if="config.features.adminVerticalNav" class="admin-header mobile-only">
-        <button
-          type="button"
-          class="btn btn-icon btn-ghost"
-          @click="isMobileSidebarOpen = !isMobileSidebarOpen"
-          aria-label="Toggle menu"
-        >
-          <IconMenu />
-        </button>
+      <!-- Mobile header (phones only - now just shows title, no hamburger) -->
+      <header v-if="config.features.appVerticalNav" class="admin-header mobile-only">
         <span class="admin-title">{{ t('admin.title') }}</span>
       </header>
 
@@ -162,13 +161,17 @@ watch(() => route.path, () => {
         <slot />
       </div>
     </main>
+
+    <!-- Bottom Navigation (phones only < 600px) -->
+    <MoleculesAppBottomNav v-if="config.features.appVerticalNav" />
   </div>
 </template>
 
 <!--
   Uses global CSS classes:
-  - layout/page.css: .layout-admin, .admin-sidebar, .admin-main
+  - layout/page.css: .layout-admin responsive styles (phone/tablet/desktop)
   - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn, .sidebar-tooltip
+  - skeleton/bottom-nav.css: .bottom-nav, .bottom-nav-item (phone only)
   - skeleton/mobile-nav.css: .mobile-nav-backdrop
   - ui/buttons.css: .btn, .btn-icon, .btn-ghost
   - ui/content/badges.css: .badge-dot

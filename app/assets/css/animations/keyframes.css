@@ -1,13 +1,16 @@
 /**
  * Keyframe Animations
+ *
+ * NOTE: Duration and easing tokens are defined in common/spacing.css
+ * as --transition-fast, --transition-normal, --transition-slow
+ * and --ease-out, --ease-in-out, --ease-bounce
  */
 
 :root {
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
+  /* Legacy aliases for existing animations - use new tokens in new code */
+  --duration-fast: var(--transition-fast);
+  --duration-normal: var(--transition-slow);
   --duration-slow: 500ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 /* Fade in */

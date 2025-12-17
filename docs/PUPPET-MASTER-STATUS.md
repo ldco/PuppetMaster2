@@ -62,17 +62,27 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ## 2. Architecture Summary
 
-### Application Modes (NEW)
+### Application Modes
+
+**Two Visual Modes:**
+- **Website**: Traditional site UX (hamburger menu on mobile, can use onepager OR SPA)
+- **App**: Application UX (bottom nav on mobile, vertical sidebar, always SPA)
+
+**Important:** The website portion uses Website visual mode. The app/admin portion uses App visual mode.
+These are separate experiences - admin is always app-style regardless of application mode.
 
 ```
-┌─────────────────┬─────────┬──────────────┬─────────────────┬─────────────┐
-│ Mode            │ Website │ Login Button │ Admin Access    │ Primary App │
-├─────────────────┼─────────┼──────────────┼─────────────────┼─────────────┤
-│ app-only        │ ❌      │ N/A          │ / → /login      │ Admin       │
-│ site-app        │ ✅      │ ✅ Visible   │ /login route    │ Admin       │
-│ website-admin   │ ✅      │ ❌ Hidden    │ /admin (secret) │ Website     │
-│ website-only    │ ✅      │ ❌ None      │ ❌ No admin     │ Website     │
-└─────────────────┴─────────┴──────────────┴─────────────────┴─────────────┘
+┌─────────────────┬──────────────────────────┬───────────────────────────────┐
+│ Mode            │ Website Portion          │ App/Admin Portion             │
+├─────────────────┼──────────────────────────┼───────────────────────────────┤
+│ app-only        │ ❌ None                  │ App (vertical sidebar, SPA)   │
+│ website-app     │ Website (hamburger, can  │ App (vertical sidebar, SPA)   │
+│                 │ onepager OR SPA)         │ Login button visible          │
+│ website-admin   │ Website (hamburger, can  │ Admin (vertical sidebar, SPA) │
+│                 │ onepager OR SPA)         │ Hidden admin at /admin        │
+│ website-only    │ Website (hamburger, can  │ ❌ None                       │
+│                 │ onepager OR SPA)         │                               │
+└─────────────────┴──────────────────────────┴───────────────────────────────┘
 ```
 
 **Current Mode:** `website-admin` (default)
@@ -458,17 +468,17 @@ components/
 ```typescript
 {
   // Application mode
-  mode: 'app-only' | 'site-app' | 'website-admin' | 'website-only',
-on by the list you created
+  mode: 'app-only' | 'website-app' | 'website-admin' | 'website-only',
+
   // Feature toggles
   features: {
     multiLangs: boolean,        // Multi-language support
     doubleTheme: boolean,       // Light/dark mode
-    onepager: boolean,          // Scroll vs route nav
+    onepager: boolean,          // Website portion: Scroll vs route nav (ignored in app modes)
     interactiveHeader: boolean, // Header scroll effects
     hideHeaderOnScroll: boolean,// Hide header on scroll
-    verticalNav: boolean,       // Icon sidebar for main site
-    adminVerticalNav: boolean,  // Icon sidebar for admin panel
+    verticalNav: boolean,       // Website: Icon sidebar for main site
+    appVerticalNav: boolean,    // App/Admin: Vertical sidebar (true) or horizontal nav (false)
   },
 
   // Sections (source of truth for nav)
@@ -511,12 +521,12 @@ on by the list you created
   // Computed helpers (getters)
   hasWebsite: boolean,      // mode !== 'app-only'
   hasAdmin: boolean,        // mode !== 'website-only'
-  hasLoginButton: boolean,  // mode === 'site-app'
-  isAppPrimary: boolean,    // app-only || site-app
+  hasLoginButton: boolean,  // mode === 'website-app'
+  isAppPrimary: boolean,    // app-only || website-app
   isWebsitePrimary: boolean,// website-admin || website-only
   isMultiLang: boolean,     // multiLangs && locales > 1
   hasThemeToggle: boolean,  // doubleTheme
-  useOnepager: boolean,     // hasWebsite && onepager
+  useOnepager: boolean,     // hasWebsite && onepager (website portion only)
   useInteractiveHeader: boolean // hasWebsite && interactiveHeader
 }
 ```
@@ -680,7 +690,7 @@ defineEmits<{
 
 1. **Test All Application Modes**
    - Test `app-only` mode
-   - Test `site-app` mode
+   - Test `website-app` mode
    - Test `website-admin` mode
    - Test `website-only` mode
 
@@ -765,21 +775,21 @@ cd app && npm run generate
 ```typescript
 const {
   // Mode
-  mode,                    // 'app-only' | 'site-app' | 'website-admin' | 'website-only'
-  hasWebsite,              // boolean
-  hasAdmin,                // boolean
-  hasLoginButton,          // boolean
-  isAppPrimary,            // boolean
-  isWebsitePrimary,        // boolean
+  mode,                    // 'app-only' | 'website-app' | 'website-admin' | 'website-only'
+  hasWebsite,              // boolean - has website portion
+  hasAdmin,                // boolean - has admin/app portion
+  hasLoginButton,          // boolean - mode === 'website-app'
+  isAppPrimary,            // boolean - app-only || website-app
+  isWebsitePrimary,        // boolean - website-admin || website-only
 
   // Features
   features,                // Full features object
   isMultiLang,             // boolean
   hasThemeToggle,          // boolean
-  isOnepager,              // boolean
+  isOnepager,              // boolean - website portion only
   hasInteractiveHeader,    // boolean
   hideHeaderOnScroll,      // boolean
-  adminVerticalNav,        // boolean
+  appVerticalNav,          // boolean - app/admin vertical sidebar
 
   // Data
   locales,                 // Locale[]

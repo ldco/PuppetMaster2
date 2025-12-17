@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--avatar-md);
+  height: var(--avatar-md);
   border-radius: var(--radius-full);
   background: var(--i-brand-subtle);
   color: var(--i-brand);
@@ -28,26 +28,26 @@
 
 /* Sizes */
 .avatar-xs {
-  width: 24px;
-  height: 24px;
+  width: var(--avatar-xs);
+  height: var(--avatar-xs);
   font-size: var(--text-xs);
 }
 
 .avatar-sm {
-  width: 32px;
-  height: 32px;
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
   font-size: var(--text-xs);
 }
 
 .avatar-lg {
-  width: 56px;
-  height: 56px;
+  width: var(--avatar-lg);
+  height: var(--avatar-lg);
   font-size: var(--text-lg);
 }
 
 .avatar-xl {
-  width: 80px;
-  height: 80px;
+  width: var(--avatar-xl);
+  height: var(--avatar-xl);
   font-size: var(--text-2xl);
 }
 
@@ -58,7 +58,7 @@
 
 .avatar-group .avatar {
   border: 2px solid var(--l-bg);
-  margin-inline-start: -8px;
+  margin-inline-start: calc(-1 * var(--space-2));
 }
 
 .avatar-group .avatar:first-child {

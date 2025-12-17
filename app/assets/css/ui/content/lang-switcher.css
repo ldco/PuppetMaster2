@@ -8,12 +8,7 @@
 .lang-switcher {
   width: auto;
   padding: var(--space-1) var(--space-2);
-  padding-right: var(--space-8);
+  padding-inline-end: var(--space-8);
   font-size: var(--text-sm);
-}
-
-[dir="rtl"] .lang-switcher {
-  padding-right: var(--space-2);
-  padding-left: var(--space-8);
 }
 

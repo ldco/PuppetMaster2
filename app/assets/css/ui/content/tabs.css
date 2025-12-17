@@ -8,14 +8,14 @@
 .tabs {
   display: flex;
   gap: var(--space-2);
-  border-bottom: 1px solid var(--l-border);
-  padding-bottom: var(--space-2);
+  border-block-end: 1px solid var(--l-border);
+  padding-block-end: var(--space-2);
 }
 
 .tab {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--gap-xs);
   padding: var(--space-2) var(--space-4);
   border: none;
   background: transparent;
@@ -23,11 +23,26 @@
   font-weight: var(--font-medium);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
 }
 
-.tab:hover {
+.tab:hover:not(:disabled) {
   background: var(--l-bg-sunken);
+}
+
+.tab:active:not(:disabled) {
+  background: color-mix(in oklch, var(--l-bg-sunken), var(--p-black) 5%);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+}
+
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .tab.is-active {
@@ -37,30 +52,23 @@
 
 /* Tabs without border */
 .tabs--borderless {
-  border-bottom: none;
-  padding-bottom: 0;
+  border-block-end: none;
+  padding-block-end: 0;
 }
 
 /* Vertical tabs */
 .tabs--vertical {
   flex-direction: column;
-  border-bottom: none;
-  border-right: 1px solid var(--l-border);
-  padding-bottom: 0;
-  padding-right: var(--space-2);
-}
-
-[dir="rtl"] .tabs--vertical {
-  border-right: none;
-  border-left: 1px solid var(--l-border);
-  padding-right: 0;
-  padding-left: var(--space-2);
+  border-block-end: none;
+  border-inline-end: 1px solid var(--l-border);
+  padding-block-end: 0;
+  padding-inline-end: var(--space-2);
 }
 
 /* Pills variant (no border, rounded pills) */
 .tabs--pills {
-  border-bottom: none;
-  padding-bottom: 0;
+  border-block-end: none;
+  padding-block-end: 0;
   gap: var(--space-1);
 }
 
@@ -70,8 +78,8 @@
 
 /* Tab with icon */
 .tab-icon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   flex-shrink: 0;
 }
 

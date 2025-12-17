@@ -8,12 +8,18 @@
   font-weight: var(--font-medium);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: color var(--transition-normal) ease,
+              background-color var(--transition-normal) ease;
 }
 
 .nav-link:hover {
   color: var(--t-primary);
   background: var(--i-brand-subtle);
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 /* Active state - supports both .active and Vue router classes */
@@ -28,9 +34,8 @@
 .nav-link.router-link-exact-active::after {
   content: '';
   position: absolute;
-  bottom: -1px;
-  left: var(--space-3);
-  right: var(--space-3);
+  inset-block-end: -1px;
+  inset-inline: var(--space-3);
   height: 2px;
   background: var(--i-brand);
   border-radius: 1px;
@@ -81,7 +86,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-3);
-  border-bottom: 1px solid var(--l-border);
+  border-block-end: 1px solid var(--l-border);
 }
 
 .sidebar-header .logo-img {
@@ -94,8 +99,8 @@
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-2);
-  border-top: 1px solid var(--l-border);
-  margin-top: auto;
+  border-block-start: 1px solid var(--l-border);
+  margin-block-start: auto;
 }
 
 /* Icon-only nav links with tooltip */
@@ -109,12 +114,18 @@
   margin: 0 auto;
   border-radius: var(--radius-sm);
   color: var(--t-secondary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
 }
 
 .sidebar-nav-link:hover {
   background: var(--i-brand-subtle);
   color: var(--t-primary);
+}
+
+.sidebar-nav-link:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 .sidebar-nav-link.router-link-exact-active {
@@ -123,8 +134,8 @@
 }
 
 .sidebar-nav-link svg {
-  width: 22px;
-  height: 22px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   flex-shrink: 0;
 }
 
@@ -145,8 +156,10 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-  z-index: var(--z-tooltip);
+  transition: opacity var(--transition-normal) ease,
+              transform var(--transition-normal) ease,
+              visibility var(--transition-normal);
+  z-index: var(--z-popover);
   margin-inline-start: var(--space-2);
 }
 
@@ -178,7 +191,8 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
   position: relative;
 }
 
@@ -187,9 +201,14 @@
   color: var(--t-primary);
 }
 
+.sidebar-icon-btn:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+}
+
 .sidebar-icon-btn svg {
-  width: 20px;
-  height: 20px;
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .sidebar-icon-btn .sidebar-tooltip {
@@ -208,8 +227,10 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-  z-index: var(--z-tooltip);
+  transition: opacity var(--transition-normal) ease,
+              transform var(--transition-normal) ease,
+              visibility var(--transition-normal);
+  z-index: var(--z-popover);
   margin-inline-start: var(--space-2);
 }
 

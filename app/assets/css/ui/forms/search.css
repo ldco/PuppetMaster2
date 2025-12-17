@@ -10,52 +10,39 @@
 
 .search-icon {
   position: absolute;
-  left: var(--space-3);
+  inset-inline-start: var(--space-3);
   top: 50%;
   transform: translateY(-50%);
   color: var(--t-muted);
-  width: 18px;
-  height: 18px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   pointer-events: none;
 }
 
-[dir="rtl"] .search-icon {
-  left: auto;
-  right: var(--space-3);
-}
-
 .search-bar .input {
-  padding-left: var(--space-10);
-}
-
-[dir="rtl"] .search-bar .input {
-  padding-left: var(--space-3);
-  padding-right: var(--space-10);
+  padding-inline-start: var(--space-10);
 }
 
 /* Clear button */
 .search-clear {
   position: absolute;
-  right: var(--space-2);
+  inset-inline-end: var(--space-2);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   border: none;
   background: transparent;
   color: var(--t-muted);
   cursor: pointer;
   border-radius: var(--radius-sm);
   opacity: 0;
-  transition: opacity 0.2s, color 0.2s;
-}
-
-[dir="rtl"] .search-clear {
-  right: auto;
-  left: var(--space-2);
+  transition: opacity var(--transition-normal) ease,
+              color var(--transition-normal) ease,
+              background-color var(--transition-normal) ease;
 }
 
 .search-bar:focus-within .search-clear,
@@ -68,23 +55,23 @@
   background: var(--l-bg-sunken);
 }
 
-/* With clear button, add padding */
-.search-bar--clearable .input {
-  padding-right: var(--space-10);
+.search-clear:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+  opacity: 1;
 }
 
-[dir="rtl"] .search-bar--clearable .input {
-  padding-right: var(--space-10);
-  padding-left: var(--space-10);
+/* With clear button, add padding */
+.search-bar--clearable .input {
+  padding-inline-end: var(--space-10);
 }
 
 /* Search suggestions dropdown */
 .search-suggestions {
   position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: var(--space-1);
+  inset-inline: 0;
+  margin-block-start: var(--space-1);
   background: var(--l-bg-elevated);
   border: 1px solid var(--l-border);
   border-radius: var(--radius-md);
@@ -97,11 +84,16 @@
 .search-suggestion {
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal) ease;
 }
 
 .search-suggestion:hover,
 .search-suggestion.is-focused {
   background: var(--l-bg-sunken);
+}
+
+.search-suggestion:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: -2px;
 }
 

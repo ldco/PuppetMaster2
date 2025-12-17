@@ -15,6 +15,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
+const { toast } = useToast()
 
 // Shared unread count for nav badge
 const { decrementUnread, incrementUnread, fetchUnreadCount } = useUnreadCount()
@@ -59,14 +61,20 @@ async function toggleRead(item: ContactSubmission) {
   } catch (e: any) {
     // Revert on error
     fetchUnreadCount()
-    alert(e.data?.message || 'Failed to update')
+    toast.error(e.data?.message || 'Failed to update')
   }
 }
 
 const deleting = ref<number | null>(null)
 
 async function deleteMessage(item: ContactSubmission) {
-  if (!confirm(t('admin.confirmDelete'))) return
+  const confirmed = await confirm(t('admin.confirmDelete'), {
+    title: t('common.delete'),
+    confirmText: t('common.delete'),
+    variant: 'danger'
+  })
+  if (!confirmed) return
+
   const wasUnread = !item.read
   deleting.value = item.id
   try {
@@ -81,7 +89,7 @@ async function deleteMessage(item: ContactSubmission) {
     await refresh()
   } catch (e: any) {
     fetchUnreadCount() // Revert on error
-    alert(e.data?.message || 'Failed to delete')
+    toast.error(e.data?.message || 'Failed to delete')
   } finally {
     deleting.value = null
   }

@@ -3,12 +3,15 @@
  * Login Page
  *
  * Used in:
- * - site-app mode: Visible at /login
+ * - website-app mode: Visible at /login
  * - app-only mode: Redirected from / to /admin/login (uses admin login instead)
  * - website-admin mode: Hidden, accessible at /admin/login (uses admin login)
  *
- * This page is only used when mode = 'site-app'
+ * This page is only used when mode = 'website-app'
+ *
+ * Uses ClientOnly for logo to avoid SSR hydration mismatch.
  */
+import config from '~/puppet-master.config'
 import IconLogin from '~icons/tabler/login'
 import IconMail from '~icons/tabler/mail'
 import IconLock from '~icons/tabler/lock'
@@ -19,6 +22,12 @@ definePageMeta({
 
 const { t } = useI18n()
 const { shortLogo } = useLogo()
+
+// SSR fallback: use the default theme logo
+const ssrFallbackLogo = computed(() => {
+  const theme = config.defaultTheme === 'dark' ? 'light' : 'dark'
+  return `${config.logo.basePath}/circle_${theme}_${config.defaultLocale}.svg`
+})
 
 const email = ref('')
 const password = ref('')
@@ -38,9 +47,14 @@ async function handleSubmit() {
   <!-- Uses .auth-page, .auth-card, etc. from ui/forms/inputs.css -->
   <div class="auth-page">
     <div class="auth-card">
-      <!-- Logo - using circle variant for auth pages -->
+      <!-- Logo - using circle variant for auth pages - ClientOnly for SSR -->
       <div class="auth-logo">
-        <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+        <ClientOnly>
+          <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+          <template #fallback>
+            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img">
+          </template>
+        </ClientOnly>
       </div>
 
       <!-- Title -->

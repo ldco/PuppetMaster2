@@ -51,11 +51,16 @@ p:last-child {
 a {
   color: var(--i-brand);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition-normal) ease;
 }
 
 a:hover {
   color: var(--i-brand-hover);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 /* Small text */
@@ -89,7 +94,11 @@ small, .text-sm {
   font-size: clamp(2.5rem, 8vw, 4.5rem);
   font-weight: var(--font-black, 900);
   line-height: 1.1;
-  margin-bottom: var(--space-6);
+  margin-block-end: var(--space-6);
+}
+
+/* Optional brand-colored hero title */
+.hero-title--brand {
   color: var(--i-brand);
 }
 
@@ -98,7 +107,7 @@ small, .text-sm {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: var(--font-bold);
   line-height: var(--leading-tight);
-  margin-bottom: var(--space-12);
+  margin-block-end: var(--space-8);
 }
 
 .section-title--center {
@@ -110,13 +119,13 @@ small, .text-sm {
 .section-subtitle {
   font-size: clamp(1.125rem, 2.5vw, 1.5rem);
   color: var(--t-secondary);
-  max-width: 700px;
+  max-inline-size: 700px;
   line-height: 1.6;
 }
 
 .hero-subtitle {
   margin-inline: auto;
-  margin-bottom: var(--space-8);
+  margin-block-end: var(--space-8);
 }
 
 /* Gradient text - for hero titles */

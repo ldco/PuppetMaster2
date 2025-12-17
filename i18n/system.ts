@@ -36,7 +36,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       saving: 'Saving...',
       success: 'Success',
       theme: 'Theme',
-      language: 'Language'
+      language: 'Language',
+      confirm: 'Confirm'
     },
     nav: {
       home: 'Home',
@@ -151,7 +152,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       saving: 'Сохранение...',
       success: 'Успешно',
       theme: 'Тема',
-      language: 'Язык'
+      language: 'Язык',
+      confirm: 'Подтвердить'
     },
     nav: {
       home: 'Главная',
@@ -265,7 +267,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       saving: 'שומר...',
       success: 'הצלחה',
       theme: 'ערכת נושא',
-      language: 'שפה'
+      language: 'שפה',
+      confirm: 'אישור'
     },
     nav: {
       home: 'דף הבית',

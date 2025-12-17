@@ -17,6 +17,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
+const { toast } = useToast()
 const { user: currentUser, canManageUsers, getAssignableRoles, isMaster } = useAuth()
 
 // Redirect if user can't manage users
@@ -120,13 +122,19 @@ async function saveUser() {
 const deleting = ref<number | null>(null)
 
 async function deleteUser(user: User) {
-  if (!confirm(t('admin.confirmDelete'))) return
+  const confirmed = await confirm(t('admin.confirmDelete'), {
+    title: t('common.delete'),
+    confirmText: t('common.delete'),
+    variant: 'danger'
+  })
+  if (!confirmed) return
+
   deleting.value = user.id
   try {
     await $fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
     await refresh()
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to delete user')
+    toast.error(e.data?.message || 'Failed to delete user')
   } finally {
     deleting.value = null
   }

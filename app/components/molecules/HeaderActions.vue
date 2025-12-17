@@ -5,7 +5,7 @@
  * Header action buttons grouped together:
  * - Theme toggle (if doubleTheme enabled)
  * - Language switcher (if multiLangs enabled)
- * - Login button (only in site-app mode)
+ * - Login button (only in website-app mode)
  *
  * Shows only enabled features based on config.
  */
@@ -21,7 +21,7 @@ const { t } = useI18n()
     <AtomsThemeToggle v-if="config.hasThemeToggle" />
     <AtomsLangSwitcher v-if="config.isMultiLang" />
 
-    <!-- Login button - only in site-app mode -->
+    <!-- Login button - only in website-app mode -->
     <NuxtLink
       v-if="config.hasLoginButton"
       to="/login"

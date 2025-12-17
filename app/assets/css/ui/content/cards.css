@@ -13,8 +13,26 @@
 }
 
 .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
   padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--l-border);
+  border-block-end: 1px solid var(--l-border);
+}
+
+/* Reset any heading inside card header - no margins, consistent weight */
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6,
+.card-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin: 0;
+  line-height: var(--leading-normal);
 }
 
 .card-body {
@@ -23,7 +41,7 @@
 
 .card-footer {
   padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--l-border);
+  border-block-start: 1px solid var(--l-border);
   background: var(--l-bg-sunken);
 }
 
@@ -44,8 +62,8 @@
 /* Card actions row */
 .card-actions {
   display: flex;
-  gap: var(--space-1);
+  gap: var(--gap-xs);
   padding: var(--space-2) var(--space-3);
-  border-top: 1px solid var(--l-border);
+  border-block-start: 1px solid var(--l-border);
 }
 

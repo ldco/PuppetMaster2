@@ -17,16 +17,64 @@
  * │               FOOTER (auto)             │
  * └─────────────────────────────────────────┘
  *
+ * VISUAL MODES:
+ * ───────────────────────────────────────────────────────────────────────────
+ * MODE       | CONTENT WIDTH | SPACING  | NAV (Desktop)  | NAV (Mobile)
+ * ───────────────────────────────────────────────────────────────────────────
+ * Website    | 1280px (wide) | Spacious | Horizontal     | Hamburger overlay
+ * App        | 900px (dense) | Compact  | Sidebar        | Bottom tabs
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * APP MODE BREAKPOINTS (Material Design 3):
+ * ───────────────────────────────────────────────────────────────────────────
+ * < 600px   (phone)            → Bottom navigation bar
+ * 600-839px (tablet portrait)  → Navigation rail (narrow sidebar ~80px)
+ * ≥ 840px   (tablet/desktop)   → Full sidebar
+ * ───────────────────────────────────────────────────────────────────────────
+ *
  * Quick Reference:
  * ───────────────────────────────────────────────────────────────────────────
  * CLASS             | PURPOSE
  * ───────────────────────────────────────────────────────────────────────────
- * .layout           | Holy Grail grid container
+ * .layout           | Holy Grail grid container (Website mode)
  * .layout-blank     | Minimal layout (no header/footer)
- * .layout-admin     | Admin panel with sidebar
+ * .layout-admin     | Admin/App panel (App mode: sidebar + bottom nav)
  * .main             | Main content area (container query host)
  * ───────────────────────────────────────────────────────────────────────────
  */
+
+/* ==========================================================================
+   APP MODE BREAKPOINTS (Material Design 3)
+   ========================================================================== */
+
+:root {
+  /* App mode breakpoints - different from website mode! */
+  --bp-app-phone: 600px;    /* Below this: bottom nav */
+  --bp-app-tablet: 840px;   /* Below this: nav rail; above: full sidebar */
+
+  /* App mode dimensions */
+  --app-bottom-nav-height: 56px;    /* Material Design standard */
+  --app-nav-rail-width: 80px;       /* Navigation rail width */
+  --app-sidebar-width: 60px;        /* Full sidebar width (compact) */
+}
+
+/* ==========================================================================
+   VISUAL MODE VARIABLES
+   ========================================================================== */
+
+/* Website mode - wider, more spacious (used by .layout) */
+.layout {
+  --content-max: 1280px;
+  --page-padding: var(--space-6);
+  --section-spacing: var(--space-section);
+}
+
+/* App mode - narrower, denser (used by .layout-admin) */
+.layout-admin {
+  --content-max: 960px;
+  --page-padding: var(--space-4);
+  --section-spacing: var(--space-4);
+}
 
 /* ==========================================================================
    DEFAULT LAYOUT - Holy Grail (Header/Main/Footer)
@@ -64,51 +112,341 @@
    ========================================================================== */
 
 .layout-admin {
-  display: grid;
-  grid-template-columns: var(--admin-sidebar-width, 60px) 1fr;
+  display: block; /* Not grid - sidebar is fixed, main fills viewport */
   min-height: 100dvh;
 }
 
 .layout-admin .admin-sidebar {
+  position: fixed;
+  inset-block: 0; /* top: 0; bottom: 0; */
+  inset-inline-start: 0; /* left in LTR, right in RTL */
   display: flex;
   flex-direction: column;
   width: var(--admin-sidebar-width, 60px);
   background: var(--l-bg-elevated);
   border-inline-end: 1px solid var(--l-border);
   overflow: visible; /* Allow tooltips to overflow */
-  position: relative;
   z-index: var(--z-fixed);
 }
 
 .layout-admin .admin-main {
+  margin-inline-start: var(--admin-sidebar-width, 60px); /* Push content to the right of fixed sidebar */
   container-type: inline-size;
-  overflow-y: auto;
+  min-height: 100dvh;
 }
 
-/* Mobile: sidebar becomes bottom bar or drawer */
-@media (width < 768px) {
-  .layout-admin {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
-  }
+/* Admin content area */
+.admin-content {
+  padding: var(--space-6);
+  max-width: 1200px;
+}
 
+/* Admin mobile header */
+.admin-header {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: var(--space-3) var(--space-4);
+  background: var(--l-bg);
+  border-block-end: 1px solid var(--l-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.admin-title {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-lg);
+}
+
+/* Page header for admin pages */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  margin-block-end: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+/* Subtitle below page title */
+.page-header p {
+  margin: var(--space-1) 0 0;
+  color: var(--t-secondary);
+  font-size: var(--text-sm);
+}
+
+/* Page actions container */
+.page-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  align-items: center;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * ADMIN PAGE CONTAINERS
+ * Generic wrapper for admin pages (optional)
+ * ══════════════════════════════════════════════════════════ */
+
+.admin-page,
+.admin-settings,
+.admin-portfolio,
+.admin-users,
+.admin-translations,
+.admin-contacts {
+  /* These are just semantic wrappers - no special styles needed */
+  /* Keeping them defined prevents "class not found" warnings */
+}
+
+/* ══════════════════════════════════════════════════════════
+ * LOCALE TABS - Language switcher tabs for translations page
+ * ══════════════════════════════════════════════════════════ */
+
+.locale-tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-block-end: var(--space-4);
+  border-block-end: 1px solid var(--l-border);
+  padding-block-end: var(--space-1);
+}
+
+.locale-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  color: var(--t-secondary);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: color var(--transition-normal) ease,
+              background-color var(--transition-normal) ease;
+}
+
+.locale-tab:hover {
+  color: var(--t-primary);
+  background: var(--l-bg-sunken);
+}
+
+.locale-tab:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: -2px;
+}
+
+.locale-tab.is-active {
+  color: var(--i-brand);
+  background: var(--i-brand-subtle);
+  border-block-end: 2px solid var(--i-brand);
+  margin-block-end: -1px;
+}
+
+.locale-tab .badge {
+  font-size: var(--text-xs);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * TRANSLATIONS TABLE - Special table for key-value pairs
+ * ══════════════════════════════════════════════════════════ */
+
+.translations-table {
+  overflow: hidden;
+}
+
+.translations-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.translations-table th,
+.translations-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: start;
+  border-block-end: 1px solid var(--l-border);
+}
+
+.translations-table th {
+  font-weight: var(--font-medium);
+  color: var(--t-secondary);
+  font-size: var(--text-sm);
+  background: var(--l-bg-sunken);
+}
+
+.translations-table tbody tr:hover {
+  background: var(--l-bg-sunken);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * SETTINGS FORM - Form layout for settings page
+ * ══════════════════════════════════════════════════════════ */
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Section title inside cards should not have margin */
+.settings-form .card-header .section-title,
+.card-header .section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PORTFOLIO GRID - Admin portfolio management
+ * ══════════════════════════════════════════════════════════ */
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--gap-lg);
+}
+
+.portfolio-item {
+  position: relative;
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal) ease,
+              transform var(--transition-normal) ease;
+}
+
+.portfolio-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.portfolio-item-image {
+  position: relative;
+  aspect-ratio: 16/10;
+  background: var(--l-bg-sunken);
+  overflow: hidden;
+}
+
+.portfolio-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolio-item-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--t-muted);
+}
+
+.portfolio-item-info {
+  padding: var(--space-4);
+}
+
+.portfolio-item-title {
+  font-weight: var(--font-semibold);
+  margin-block-end: var(--space-1);
+}
+
+.portfolio-item-category {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+}
+
+.portfolio-item-actions {
+  display: flex;
+  gap: var(--gap-xs);
+  padding: var(--space-2) var(--space-4);
+  border-block-start: 1px solid var(--l-border);
+}
+
+/* ==========================================================================
+   APP MODE RESPONSIVE - Material Design 3 Navigation Pattern
+   ==========================================================================
+
+   BREAKPOINTS:
+   - Phone (< 600px): Bottom navigation, sidebar hidden
+   - Tablet portrait (600-839px): Navigation rail (narrow ~80px)
+   - Tablet landscape/Desktop (≥ 840px): Full sidebar (60px)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   PHONE (< 600px) - Bottom Navigation
+   -------------------------------------------------------------------------- */
+@media (width < 600px) {
+  /* Hide sidebar completely on phones - use bottom nav instead */
   .layout-admin .admin-sidebar {
-    position: fixed;
-    inset-block: 0;
-    inset-inline-start: 0;
-    z-index: var(--z-drawer);  /* Uses drawer z-index on mobile */
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    width: min(80vw, 280px);
-    overflow-y: auto;
+    display: none;
   }
 
-  [dir="rtl"] .layout-admin .admin-sidebar {
-    transform: translateX(100%);
+  /* Main content: full width, add padding for bottom nav */
+  .layout-admin .admin-main {
+    margin-inline-start: 0;
+    /* Reserve space for bottom nav + iOS safe area */
+    padding-block-end: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 
-  .layout-admin .admin-sidebar.is-open {
-    transform: translateX(0);
+  .admin-content {
+    padding: var(--space-4);
+  }
+
+  /* Show mobile header on phones */
+  .layout-admin .admin-header {
+    display: flex;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TABLET PORTRAIT (600-839px) - Navigation Rail
+   -------------------------------------------------------------------------- */
+@media (width >= 600px) and (width < 840px) {
+  .layout-admin .admin-sidebar {
+    width: var(--app-nav-rail-width, 80px);
+  }
+
+  .layout-admin .admin-main {
+    margin-inline-start: var(--app-nav-rail-width, 80px);
+    /* Still reserve space for bottom nav if we want both on tablets */
+  }
+
+  .admin-content {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  /* Hide mobile header on tablet */
+  .layout-admin .admin-header.mobile-only {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TABLET LANDSCAPE / DESKTOP (≥ 840px) - Full Sidebar
+   -------------------------------------------------------------------------- */
+@media (width >= 840px) {
+  .layout-admin .admin-sidebar {
+    width: var(--app-sidebar-width, 60px);
+  }
+
+  .layout-admin .admin-main {
+    margin-inline-start: var(--app-sidebar-width, 60px);
+  }
+
+  .admin-content {
+    padding: var(--page-padding, var(--space-6));
+  }
+
+  /* Hide mobile header on desktop */
+  .layout-admin .admin-header.mobile-only {
+    display: none;
   }
 }
 

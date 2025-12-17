@@ -17,6 +17,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
+const { toast } = useToast()
 
 interface PortfolioItem {
   id: number
@@ -152,13 +154,19 @@ async function saveItem() {
 const deleting = ref<number | null>(null)
 
 async function deleteItem(item: PortfolioItem) {
-  if (!confirm(t('admin.confirmDelete'))) return
+  const confirmed = await confirm(t('admin.confirmDelete'), {
+    title: t('common.delete'),
+    confirmText: t('common.delete'),
+    variant: 'danger'
+  })
+  if (!confirmed) return
+
   deleting.value = item.id
   try {
     await $fetch(`/api/portfolio/${item.id}`, { method: 'DELETE' })
     await refresh()
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to delete')
+    toast.error(e.data?.message || 'Failed to delete')
   } finally {
     deleting.value = null
   }

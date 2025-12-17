@@ -7,7 +7,10 @@
  * - website-admin mode: Hidden admin access at /admin/login
  *
  * Reuses the same login form logic, different layout context.
+ *
+ * Uses ClientOnly for logo to avoid SSR hydration mismatch.
  */
+import config from '~/puppet-master.config'
 import IconLogin from '~icons/tabler/login'
 import IconMail from '~icons/tabler/mail'
 import IconLock from '~icons/tabler/lock'
@@ -19,6 +22,12 @@ definePageMeta({
 const { t } = useI18n()
 const { login, isLoading, isAuthenticated } = useAuth()
 const { shortLogo } = useLogo()
+
+// SSR fallback: use the default theme logo
+const ssrFallbackLogo = computed(() => {
+  const theme = config.defaultTheme === 'dark' ? 'light' : 'dark'
+  return `${config.logo.basePath}/circle_${theme}_${config.defaultLocale}.svg`
+})
 
 const email = ref('')
 const password = ref('')
@@ -55,9 +64,14 @@ async function handleSubmit() {
   <!-- Uses .auth-page, .auth-card, etc. from ui/forms/inputs.css -->
   <div class="auth-page">
     <div class="auth-card">
-      <!-- Logo - using circle variant for auth pages -->
+      <!-- Logo - using circle variant for auth pages - ClientOnly for SSR -->
       <div class="auth-logo">
-        <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+        <ClientOnly>
+          <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+          <template #fallback>
+            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img">
+          </template>
+        </ClientOnly>
       </div>
 
       <!-- Title -->

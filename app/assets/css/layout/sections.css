@@ -106,15 +106,25 @@
 
 
 /* ==========================================================================
-   SECTION BACKGROUNDS - Alternating patterns
+   SECTION BACKGROUNDS - Use explicit classes for control
    ========================================================================== */
 
-/* Elevated background (slightly different from main bg) */
-.section:nth-of-type(even) {
+/*
+ * NOTE: We removed the automatic :nth-of-type(even) alternating pattern
+ * because it breaks when sections are conditionally rendered.
+ * Use explicit classes instead:
+ *
+ * <section class="section section-bg-alt">  // Alternating background
+ * <section class="section section-bg-elevated">  // Elevated bg
+ * <section class="section section-bg-sunken">    // Sunken bg
+ * <section class="section section-bg-brand">     // Brand bg
+ */
+
+/* Alias for alternating sections (same as elevated) */
+.section-bg-alt {
   background: var(--l-bg-elevated);
 }
 
-/* Or use explicit classes for control */
 .section-bg-elevated {
   background: var(--l-bg-elevated);
 }
@@ -226,7 +236,7 @@
 
 /* SVG icon inside placeholder */
 .image-placeholder svg {
-  width: 64px;
-  height: 64px;
+  width: calc(var(--icon-2xl) * 2);
+  height: calc(var(--icon-2xl) * 2);
 }
 

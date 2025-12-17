@@ -4,7 +4,7 @@
  * Handles routing based on the configured application mode:
  *
  * - app-only:      Redirect / → /admin/login (no public website)
- * - site-app:      Normal routing, /login available
+ * - website-app:   Normal routing, /login available
  * - website-admin: Normal routing, admin at /admin (hidden)
  * - website-only:  Block /admin/* routes (no admin)
  *
@@ -39,7 +39,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SITE-APP MODE: Website + visible login button
+  // WEBSITE-APP MODE: Website + visible login button
   // ═══════════════════════════════════════════════════════════════════════════
   // No special routing needed - /login page will be available
 

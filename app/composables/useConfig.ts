@@ -28,8 +28,8 @@ export function useConfig() {
     // Mode-derived booleans (for conditional rendering)
     hasWebsite: config.hasWebsite,         // Has public website (all except app-only)
     hasAdmin: config.hasAdmin,             // Has admin panel (all except website-only)
-    hasLoginButton: config.hasLoginButton, // Show login button in header (site-app only)
-    isAppPrimary: config.isAppPrimary,     // Admin is the main app (app-only, site-app)
+    hasLoginButton: config.hasLoginButton, // Show login button in header (website-app only)
+    isAppPrimary: config.isAppPrimary,     // Admin is the main app (app-only, website-app)
     isWebsitePrimary: config.isWebsitePrimary, // Website is the main app (website-admin, website-only)
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -45,7 +45,7 @@ export function useConfig() {
     hideHeaderOnScroll: config.features.hideHeaderOnScroll,
 
     // Admin features
-    adminVerticalNav: config.features.adminVerticalNav,
+    appVerticalNav: config.features.appVerticalNav,
 
     // ═══════════════════════════════════════════════════════════════════════
     // DATA - Locales, colors, sections, logo

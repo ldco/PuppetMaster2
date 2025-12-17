@@ -192,15 +192,21 @@
   border-radius: var(--radius-md);
   background: var(--c-brand);
   color: var(--l-bg);
-  font-weight: 500;
-  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background-color var(--transition-normal) ease,
+              transform var(--transition-normal) ease;
 }
 
 .header-login-btn:hover {
   background: color-mix(in oklch, var(--c-brand) 85%, black);
   transform: translateY(-1px);
+}
+
+.header-login-btn:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 .header-login-btn svg {
@@ -236,8 +242,8 @@
   --header-scrolled-shadow: 0 2px 8px oklch(0% 0 0 / 0.1);
   --header-scrolled-backdrop: blur(12px);
 
-  /* Transition timing */
-  --header-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transition timing - uses global slow transition with custom easing */
+  --header-transition: var(--transition-slow) var(--ease-out);
 }
 
 /* Base header transition */

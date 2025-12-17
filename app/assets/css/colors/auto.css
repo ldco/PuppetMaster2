@@ -86,11 +86,17 @@
   /* Accent - use srgb to preserve hue */
   --i-accent: var(--p-accent);
   --i-accent-hover: color-mix(in srgb, var(--p-accent), white 15%);
-  --i-accent-active: color-mix(in srgb, var(--p-accent), black 10%);
+  --i-accent-active: color-mix(in srgb, var(--p-accent), black 15%);
 
   /* Focus ring */
   --i-focus-ring: color-mix(in srgb, var(--p-brand), transparent 50%);
-  
+
+  /* Error/Danger - for destructive actions (uses oklch for red) */
+  --i-error: oklch(55% 0.22 25);
+  --i-error-hover: oklch(60% 0.22 25);
+  --i-error-active: oklch(50% 0.22 25);
+  --t-on-error: var(--p-white);
+
   /* ══════════════════════════════════════════════════════════
    * DATA/SEMANTIC COLORS (d-)
    * Uses OKLCH to derive from brand hue for harmony

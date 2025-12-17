@@ -10,7 +10,8 @@
   border: 1px solid var(--l-border);
   border-radius: var(--radius-md);
   color: var(--t-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color var(--transition-normal) ease,
+              box-shadow var(--transition-normal) ease;
 }
 
 .input::placeholder {
@@ -54,7 +55,7 @@ select.input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-3) center;
-  padding-right: var(--space-10);
+  padding-inline-end: var(--space-10);
   /* Override browser accent color for options */
   accent-color: var(--i-brand);
 }
@@ -75,15 +76,23 @@ select.input option:hover {
 /* RTL select arrow */
 [dir="rtl"] select.input {
   background-position: left var(--space-3) center;
-  padding-right: var(--space-3);
-  padding-left: var(--space-10);
 }
 
 /* Form group */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-xs);
+  gap: var(--space-1);
+}
+
+/* Spacing between form groups (in normal flow) */
+.form-group + .form-group {
+  margin-block-start: var(--space-4);
+}
+
+/* Reset margin when inside a grid (form-grid handles gap) */
+.form-grid > .form-group + .form-group {
+  margin-block-start: 0;
 }
 
 .form-label {
@@ -106,6 +115,11 @@ select.input option:hover {
 .form-error {
   font-size: var(--text-sm);
   color: var(--d-error);
+}
+
+.form-hint {
+  font-size: var(--text-sm);
+  color: var(--t-muted);
 }
 
 /* Contact form layout */
@@ -165,9 +179,15 @@ select.input option:hover {
 
 .checkbox input,
 .radio input {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   accent-color: var(--i-brand);
+}
+
+.checkbox input:focus-visible,
+.radio input:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -188,11 +208,11 @@ select.input option:hover {
 .auth-card {
   width: 100%;
   max-width: 400px;
-  padding: var(--space-8);
+  padding: var(--space-6);
   background: var(--l-bg-elevated);
   border: 1px solid var(--l-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgb(0 0 0 / 10%));
+  box-shadow: var(--shadow-lg);
 }
 
 .auth-logo {
@@ -251,11 +271,16 @@ select.input option:hover {
   font-size: var(--text-sm);
   color: var(--t-muted);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition-normal) ease;
 }
 
 .auth-link:hover {
   color: var(--i-brand);
+}
+
+.auth-link:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -284,12 +309,22 @@ select.input option:hover {
 /* Form grid for 2-column layouts */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-4);
 }
 
 .form-grid .form-group--full {
   grid-column: 1 / -1;
+}
+
+/* Spacing when form-group follows form-grid */
+.form-grid + .form-group {
+  margin-block-start: var(--space-4);
+}
+
+/* Spacing when form-grid follows form-group */
+.form-group + .form-grid {
+  margin-block-start: var(--space-4);
 }
 
 /* Image upload preview */

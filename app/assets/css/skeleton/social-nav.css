@@ -1,0 +1,118 @@
+/**
+ * Social Navigation Component
+ *
+ * Reusable social media links component.
+ * Used in footer, sidebar, contact pages, etc.
+ */
+
+.social-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  align-items: center;
+}
+
+.social-nav--vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.social-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: var(--t-muted);
+  text-decoration: none;
+  transition: color var(--transition-normal) ease,
+              background-color var(--transition-normal) ease;
+}
+
+.social-nav-link:hover {
+  color: var(--t-primary);
+}
+
+.social-nav-link:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+}
+
+.social-nav-icon {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PLATFORM HOVER COLORS
+ *
+ * Brand colors for each social platform.
+ * Applied on hover for visual feedback.
+ * ══════════════════════════════════════════════════════════ */
+
+.social-nav-link--telegram:hover { color: #0088cc; }
+.social-nav-link--whatsapp:hover { color: #25d366; }
+.social-nav-link--instagram:hover { color: #e4405f; }
+.social-nav-link--facebook:hover { color: #1877f2; }
+.social-nav-link--twitter:hover { color: #1da1f2; }
+.social-nav-link--x:hover { color: #000; }
+.social-nav-link--youtube:hover { color: #ff0000; }
+.social-nav-link--linkedin:hover { color: #0a66c2; }
+.social-nav-link--github:hover { color: #333; }
+.social-nav-link--vk:hover { color: #0077ff; }
+.social-nav-link--tiktok:hover { color: #000; }
+.social-nav-link--pinterest:hover { color: #e60023; }
+.social-nav-link--snapchat:hover { color: #fffc00; }
+.social-nav-link--reddit:hover { color: #ff4500; }
+.social-nav-link--discord:hover { color: #5865f2; }
+.social-nav-link--twitch:hover { color: #9146ff; }
+
+/* ══════════════════════════════════════════════════════════
+ * SIZE VARIANTS
+ * ══════════════════════════════════════════════════════════ */
+
+/* Small variant */
+.social-nav--sm .social-nav-link {
+  width: 28px;
+  height: 28px;
+}
+
+.social-nav--sm .social-nav-icon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* Large variant */
+.social-nav--lg .social-nav-link {
+  width: 44px;
+  height: 44px;
+}
+
+.social-nav--lg .social-nav-icon {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * STYLE VARIANTS
+ * ══════════════════════════════════════════════════════════ */
+
+/* Filled background variant */
+.social-nav--filled .social-nav-link {
+  background: var(--l-bg-sunken);
+}
+
+.social-nav--filled .social-nav-link:hover {
+  background: var(--i-brand-subtle);
+}
+
+/* Bordered variant */
+.social-nav--bordered .social-nav-link {
+  border: 1px solid var(--l-border);
+}
+
+.social-nav--bordered .social-nav-link:hover {
+  border-color: var(--i-brand);
+}
+

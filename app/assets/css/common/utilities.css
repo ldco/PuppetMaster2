@@ -76,23 +76,237 @@
 }
 
 /* Text utilities */
+.text-start { text-align: start; }
 .text-center { text-align: center; }
+.text-end { text-align: end; }
 .text-2xl { font-size: var(--text-2xl); }
+.font-medium { font-weight: var(--font-medium); }
 .font-bold { font-weight: var(--font-bold); }
 .text-brand { color: var(--i-brand); }
+.text-danger { color: var(--d-error); }
+.text-success { color: var(--d-success); }
+
+/* Whitespace */
+.whitespace-nowrap { white-space: nowrap; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+
+/* Opacity */
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+/* Margins */
+.mb-2 { margin-block-end: var(--space-2); }
+.mb-4 { margin-block-end: var(--space-4); }
+.mb-6 { margin-block-end: var(--space-6); }
+.mt-4 { margin-block-start: var(--space-4); }
+.mt-6 { margin-block-start: var(--space-6); }
+.mx-auto { margin-inline: auto; }
+
+/* Borders */
+.border-b { border-block-end: 1px solid var(--l-border); }
+.border-t { border-block-start: 1px solid var(--l-border); }
+
+/* Background colors */
+.bg-brand-subtle { background: var(--i-brand-subtle); }
+
+/* ══════════════════════════════════════════════════════════
+ * FLEXBOX UTILITIES
+ * ══════════════════════════════════════════════════════════ */
+
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+
+/* ══════════════════════════════════════════════════════════
+ * GRID UTILITIES
+ * ══════════════════════════════════════════════════════════ */
+
+.grid { display: grid; }
+
+/* ══════════════════════════════════════════════════════════
+ * ICON SIZE UTILITIES
+ * ══════════════════════════════════════════════════════════ */
+
+.icon-xs { width: var(--icon-xs); height: var(--icon-xs); }
+.icon-sm { width: var(--icon-sm); height: var(--icon-sm); }
+.icon-md { width: var(--icon-md); height: var(--icon-md); }
+.icon-lg { width: var(--icon-lg); height: var(--icon-lg); }
+.icon-xl { width: var(--icon-xl); height: var(--icon-xl); }
+.icon-2xl { width: var(--icon-2xl); height: var(--icon-2xl); }
+
+/* ══════════════════════════════════════════════════════════
+ * TEXT SIZE UTILITIES
+ * ══════════════════════════════════════════════════════════ */
+
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+
+/* ══════════════════════════════════════════════════════════
+ * MISC UTILITIES
+ * ══════════════════════════════════════════════════════════ */
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cursor-pointer { cursor: pointer; }
 
 /* Icon sizing */
 .icon-lg {
-  width: 32px;
-  height: 32px;
+  width: var(--icon-2xl);
+  height: var(--icon-2xl);
 }
 
 /* Hover effects */
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform var(--transition-normal) ease,
+              box-shadow var(--transition-normal) ease;
 }
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * STATE DISPLAYS - Loading, empty, error states
+ * ══════════════════════════════════════════════════════════ */
+
+.loading-state,
+.empty-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  color: var(--t-muted);
+}
+
+.loading-state {
+  gap: var(--space-4);
+}
+
+.empty-state p,
+.error-state p {
+  margin: 0;
+  max-width: 40ch;
+}
+
+.error-state {
+  color: var(--d-error);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * ADMIN GRID LAYOUTS - Common patterns for admin pages
+ * ══════════════════════════════════════════════════════════ */
+
+/* Generic item grid for admin (portfolio, users, etc.) */
+.item-grid,
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Item card in grid */
+.item-card,
+.portfolio-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Item image area */
+.item-image,
+.portfolio-item-image {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--l-bg-sunken);
+  overflow: hidden;
+}
+
+.item-image img,
+.portfolio-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-placeholder,
+.portfolio-item-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t-muted);
+  background: var(--l-bg-sunken);
+}
+
+/* Status badge overlay */
+.status-badge {
+  position: absolute;
+  top: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+/* Item info area */
+.item-info,
+.portfolio-item-info {
+  padding: var(--space-4);
+  flex: 1;
+}
+
+.item-title,
+.portfolio-item-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-1);
+}
+
+.item-meta,
+.portfolio-item-category {
+  font-size: var(--text-sm);
+  color: var(--t-muted);
+  margin: 0;
+}
+
+/* Item actions area */
+.item-actions,
+.portfolio-item-actions {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--l-border);
+  background: var(--l-bg);
 }
 

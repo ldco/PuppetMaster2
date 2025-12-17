@@ -3,67 +3,82 @@
  *
  * Styled tables for displaying and editing data.
  * Use for translations, settings, any tabular data.
+ *
+ * USAGE:
+ *   <div class="card"><table class="data-table">...</table></div>
+ *   OR
+ *   <div class="data-table card"><table>...</table></div>
  */
 
+/* Data table - works on <table> element OR wrapper div */
 .data-table {
-  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
 }
 
+/* When data-table is a wrapper div */
 .data-table table {
   width: 100%;
   border-collapse: collapse;
 }
 
+/* Table cells - handle both patterns */
 .data-table th,
-.data-table td {
+.data-table td,
+.data-table table th,
+.data-table table td {
   padding: var(--space-3) var(--space-4);
-  text-align: left;
-  border-bottom: 1px solid var(--l-border);
+  text-align: start;
+  border-block-end: 1px solid var(--l-border);
 }
 
-[dir="rtl"] .data-table th,
-[dir="rtl"] .data-table td {
-  text-align: right;
-}
-
-.data-table th {
+/* Header cells */
+.data-table th,
+.data-table thead th,
+.data-table table th {
   font-weight: var(--font-medium);
   color: var(--t-secondary);
   font-size: var(--text-sm);
   background: var(--l-bg-sunken);
 }
 
-.data-table tbody tr:hover {
+/* Row hover */
+.data-table tbody tr:hover,
+.data-table table tbody tr:hover {
   background: var(--l-bg-sunken);
 }
 
 /* Column types */
-.data-table .cell--key {
+.data-table .cell--key,
+.data-table .key-cell {
   width: 35%;
 }
 
-.data-table .cell--key code {
+.data-table .cell--key code,
+.data-table .key-cell code {
   font-size: var(--text-sm);
   background: var(--l-bg-sunken);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-xs);
 }
 
-.data-table .cell--value {
+.data-table .cell--value,
+.data-table .value-cell {
   cursor: pointer;
 }
 
-.data-table .cell--value:hover {
+.data-table .cell--value:hover,
+.data-table .value-cell:hover {
   background: var(--i-brand-subtle);
 }
 
-.data-table .cell--actions {
-  width: 60px;
-  text-align: right;
-}
-
-[dir="rtl"] .data-table .cell--actions {
-  text-align: left;
+/* Actions column - right-aligned, fixed width */
+.data-table .cell--actions,
+.data-table .actions-cell,
+.actions-col {
+  width: 100px;
+  text-align: end;
+  white-space: nowrap;
 }
 
 /* Editable cell indicator */
@@ -73,18 +88,14 @@
 }
 
 .data-table .cell--editable:hover::after {
-  content: '✎';
+  /* Unicode pencil character - renders consistently cross-platform */
+  content: '\270E';
   position: absolute;
-  right: var(--space-2);
+  inset-inline-end: var(--space-2);
   top: 50%;
   transform: translateY(-50%);
   color: var(--t-muted);
   font-size: var(--text-sm);
-}
-
-[dir="rtl"] .data-table .cell--editable:hover::after {
-  right: auto;
-  left: var(--space-2);
 }
 
 /* Empty state */

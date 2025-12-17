@@ -13,6 +13,11 @@ export default defineNuxtConfig({
   // App head configuration
   app: {
     head: {
+      // Viewport meta - includes viewport-fit=cover for iOS safe-area-inset support
+      // Required for PWA and proper bottom nav handling with iOS notch/home indicator
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }
+      ],
       // Google Fonts - Montserrat (matches logo design)
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

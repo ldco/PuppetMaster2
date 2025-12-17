@@ -66,7 +66,7 @@ const btnClasses = computed(() => [
   <!-- Button -->
   <button
     v-else
-    type="button"
+    :type="type ?? 'button'"
     :disabled="disabled"
     :class="btnClasses"
     @click="emit('click', $event)"

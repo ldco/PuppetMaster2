@@ -34,22 +34,32 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-4);
-  border-bottom: 1px solid var(--l-border);
+  border-block-end: 1px solid var(--l-border);
 }
 
 .mobile-nav-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;  /* WCAG touch target */
+  height: 44px;
+  border: none;
+  background: transparent;
   border-radius: var(--radius-md);
   color: var(--t-secondary);
-  transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
 }
 
 .mobile-nav-close:hover {
   background: var(--l-bg-sunken);
+  color: var(--t-primary);
+}
+
+.mobile-nav-close:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 .mobile-nav-body {
@@ -70,11 +80,18 @@
   border-radius: var(--radius-md);
   color: var(--t-primary);
   font-weight: var(--font-medium);
-  transition: background-color 0.2s ease;
+  text-decoration: none;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
 }
 
 .mobile-nav-link:hover {
   background: var(--l-bg-sunken);
+}
+
+.mobile-nav-link:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 .mobile-nav-link.active {
@@ -84,7 +101,7 @@
 
 .mobile-nav-footer {
   padding: var(--space-4);
-  border-top: 1px solid var(--l-border);
+  border-block-start: 1px solid var(--l-border);
   display: flex;
   gap: var(--gap-sm);
 }
@@ -141,13 +158,14 @@
 /*
  * Slide from inline-start (LEFT in LTR, RIGHT in RTL)
  * Uses inset-inline-start instead of translate for dropdown compatibility
+ * Note: Using custom cubic-bezier for smooth drawer animation
  */
 .slide-left-enter-active {
-  transition: inset-inline-start 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: inset-inline-start 0.4s var(--ease-bounce);
 }
 
 .slide-left-leave-active {
-  transition: inset-inline-start 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: inset-inline-start var(--transition-slow) var(--ease-out);
 }
 
 .slide-left-enter-from,
@@ -165,11 +183,11 @@
  * For RTL layouts where hamburger is on the right
  */
 .slide-right-enter-active {
-  transition: inset-inline-end 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: inset-inline-end 0.4s var(--ease-bounce);
 }
 
 .slide-right-leave-active {
-  transition: inset-inline-end 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: inset-inline-end var(--transition-slow) var(--ease-out);
 }
 
 .slide-right-enter-from,
@@ -207,7 +225,7 @@
 /* Generic fade/slide for MobileNav overlay */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-slow) ease;
 }
 
 .fade-enter-from,
@@ -217,7 +235,7 @@
 
 .slide-enter-active,
 .slide-leave-active {
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-slow) ease;
 }
 
 .slide-enter-from,

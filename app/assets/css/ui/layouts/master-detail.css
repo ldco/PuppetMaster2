@@ -7,8 +7,8 @@
 
 .master-detail {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: var(--space-4);
+  grid-template-columns: clamp(280px, 30vw, 400px) 1fr;
+  gap: var(--gap-md);
   min-height: 500px;
 }
 
@@ -55,9 +55,9 @@
 .detail-meta {
   font-size: var(--text-sm);
   color: var(--t-secondary);
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--l-border);
+  margin-block-end: var(--space-4);
+  padding-block-end: var(--space-4);
+  border-block-end: 1px solid var(--l-border);
 }
 
 .detail-meta p {
@@ -93,12 +93,12 @@
 
 /* Variant: narrower master panel */
 .master-detail--narrow {
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: clamp(240px, 25vw, 300px) 1fr;
 }
 
 /* Variant: wider master panel */
 .master-detail--wide {
-  grid-template-columns: 500px 1fr;
+  grid-template-columns: clamp(320px, 35vw, 500px) 1fr;
 }
 
 /* Variant: equal split */

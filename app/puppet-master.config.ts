@@ -8,25 +8,36 @@
  * APPLICATION MODE - Primary configuration that affects entire app structure
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * ┌─────────────────┬─────────┬──────────────┬─────────────────┬─────────────┐
- * │ Mode            │ Website │ Login Button │ Admin Access    │ Primary App │
- * ├─────────────────┼─────────┼──────────────┼─────────────────┼─────────────┤
- * │ app-only        │ ❌      │ N/A          │ / → /login      │ Admin       │
- * │ site-app        │ ✅      │ ✅ Visible   │ /login route    │ Admin       │
- * │ website-admin   │ ✅      │ ❌ Hidden    │ /admin (secret) │ Website     │
- * │ website-only    │ ✅      │ ❌ None      │ ❌ No admin     │ Website     │
- * └─────────────────┴─────────┴──────────────┴─────────────────┴─────────────┘
+ * VISUAL MODES (two distinct UX patterns):
+ *   - Website: Traditional site UX (hamburger menu on mobile, can use onepager)
+ *   - App: Application UX (bottom nav on mobile, vertical sidebar, always SPA)
+ *
+ * IMPORTANT: Website portion uses WEBSITE visual mode. App/Admin uses APP visual mode.
+ *            These are separate experiences - admin is always app-style regardless of mode.
+ *
+ * ┌─────────────────┬──────────────────────────┬───────────────────────────────┐
+ * │ Mode            │ Website Portion          │ App/Admin Portion             │
+ * ├─────────────────┼──────────────────────────┼───────────────────────────────┤
+ * │ app-only        │ ❌ None                  │ App (vertical sidebar, SPA)   │
+ * │ website-app     │ Website (hamburger, can  │ App (vertical sidebar, SPA)   │
+ * │                 │ onepager OR SPA)         │ Login button visible          │
+ * │ website-admin   │ Website (hamburger, can  │ Admin (vertical sidebar, SPA) │
+ * │                 │ onepager OR SPA)         │ Hidden admin at /admin        │
+ * │ website-only    │ Website (hamburger, can  │ ❌ None                       │
+ * │                 │ onepager OR SPA)         │                               │
+ * └─────────────────┴──────────────────────────┴───────────────────────────────┘
  *
  * Use Cases:
  *   - app-only:      SaaS dashboard, internal tools, no public landing page
- *   - site-app:      Product with marketing site + user login (e.g., Notion, Figma)
+ *   - website-app:   Product with marketing site + user login (e.g., Notion, Figma)
  *   - website-admin: Portfolio/agency site with hidden CMS (current default)
  *   - website-only:  Static site, no admin needed (pure marketing/portfolio)
  *
- * NOTE: 'onepager' toggle only affects modes with website (not app-only)
+ * NOTE: 'onepager' toggle only affects the WEBSITE portion.
+ *       The App/Admin portions ALWAYS use SPA with route navigation.
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-export type AppMode = 'app-only' | 'site-app' | 'website-admin' | 'website-only'
+export type AppMode = 'app-only' | 'website-app' | 'website-admin' | 'website-only'
 
 const config = {
   // ═══════════════════════════════════════════════════════════════════════════
@@ -41,13 +52,13 @@ const config = {
     // Website features (only apply when mode has website)
     multiLangs: true,           // Multiple languages support
     doubleTheme: true,          // Light/dark mode toggle
-    onepager: true,             // Onepager (scroll nav) vs SPA (route nav)
+    onepager: true,             // Website portion: Onepager (scroll nav) vs SPA (route nav)
     interactiveHeader: true,    // Header style changes on scroll
     hideHeaderOnScroll: false,  // Hide header when scrolling down
     verticalNav: false,         // true = icon sidebar, false = horizontal header
 
     // Admin features (only apply when mode has admin)
-    adminVerticalNav: true,     // true = icon sidebar, false = horizontal nav
+    appVerticalNav: true,       // App mode: true = vertical sidebar, false = horizontal nav
     // TODO: App-style bottom nav for mobile (mark for later)
 
     // Contact form notifications
@@ -316,11 +327,11 @@ const config = {
   },
 
   get hasLoginButton(): boolean {
-    return this.mode === 'site-app'
+    return this.mode === 'website-app'
   },
 
   get isAppPrimary(): boolean {
-    return this.mode === 'app-only' || this.mode === 'site-app'
+    return this.mode === 'app-only' || this.mode === 'website-app'
   },
 
   get isWebsitePrimary(): boolean {
@@ -338,6 +349,7 @@ const config = {
 
   // Combined helpers (mode + features)
   get useOnepager(): boolean {
+    // Onepager applies to the website portion (when it exists)
     return this.hasWebsite && this.features.onepager
   },
 
