@@ -26,8 +26,24 @@ import IconMoon from '~icons/tabler/moon'
 
 const { t, locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
-const { logout, isLoading, canManageUsers } = useAuth()
+const { user, logout, isLoading, canManageUsers } = useAuth()
 const { shortLogo } = useLogo()
+
+// User menu panel state
+const userMenuOpen = ref(false)
+
+function toggleUserMenu() {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+// Get user initials for avatar
+const userInitials = computed(() => {
+  if (!user.value) return '?'
+  if (user.value.name) {
+    return user.value.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+  return user.value.email?.[0]?.toUpperCase() ?? '?'
+})
 
 // Unread messages count - shared state
 const { unreadCount, fetchUnreadCount } = useUnreadCount()
@@ -67,12 +83,36 @@ function toggleTheme() {
   colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'
 }
 
-function cycleLocale() {
-  const availableLocales = locales.value.map((l: any) => l.code)
-  const currentIndex = availableLocales.indexOf(locale.value)
-  const nextIndex = (currentIndex + 1) % availableLocales.length
-  setLocale(availableLocales[nextIndex])
+// Language switcher panel state
+const langPanelOpen = ref(false)
+
+function toggleLangPanel() {
+  langPanelOpen.value = !langPanelOpen.value
 }
+
+function selectLocale(code: 'en' | 'ru' | 'he') {
+  setLocale(code)
+  langPanelOpen.value = false
+}
+
+// Close panels on click outside
+function handleClickOutside(e: MouseEvent) {
+  const target = e.target as HTMLElement
+  if (!target.closest('.sidebar-lang-wrapper')) {
+    langPanelOpen.value = false
+  }
+  if (!target.closest('.sidebar-user-wrapper')) {
+    userMenuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 </script>
 
@@ -112,37 +152,54 @@ function cycleLocale() {
 
       <!-- Footer actions -->
       <div class="sidebar-footer">
-        <!-- Theme toggle - ClientOnly to avoid SSR hydration mismatch -->
+        <!-- Theme toggle - no tooltip needed (sun/moon is self-explanatory) -->
         <ClientOnly>
-          <button type="button" class="sidebar-icon-btn" @click="toggleTheme">
+          <button type="button" class="sidebar-icon-btn" @click="toggleTheme" :aria-label="colorMode.preference === 'dark' ? 'Light mode' : 'Dark mode'">
             <IconSun v-if="colorMode.preference === 'dark'" />
             <IconMoon v-else />
-            <span class="sidebar-tooltip">{{ colorMode.preference === 'dark' ? 'Light mode' : 'Dark mode' }}</span>
           </button>
           <template #fallback>
-            <button type="button" class="sidebar-icon-btn">
+            <button type="button" class="sidebar-icon-btn" aria-label="Theme">
               <IconSun />
-              <span class="sidebar-tooltip">Theme</span>
             </button>
           </template>
         </ClientOnly>
 
-        <!-- Language -->
-        <button type="button" class="sidebar-icon-btn" @click="cycleLocale">
-          <IconLanguage />
-          <span class="sidebar-tooltip">{{ locale.toUpperCase() }}</span>
-        </button>
+        <!-- Language switcher - click to open panel -->
+        <div class="sidebar-lang-wrapper">
+          <button type="button" class="sidebar-lang-btn" @click="toggleLangPanel" :aria-label="t('common.language')">
+            <span class="sidebar-lang-code">{{ locale.toUpperCase() }}</span>
+          </button>
+          <div v-if="langPanelOpen" class="sidebar-lang-panel">
+            <button
+              v-for="loc in locales"
+              :key="loc.code"
+              type="button"
+              class="sidebar-lang-option"
+              :class="{ active: locale === loc.code }"
+              @click="selectLocale(loc.code)"
+            >
+              {{ loc.code.toUpperCase() }}
+            </button>
+          </div>
+        </div>
 
-        <!-- Logout -->
-        <button
-          type="button"
-          class="sidebar-icon-btn"
-          @click="handleLogout"
-          :disabled="isLoading"
-        >
-          <IconLogout />
-          <span class="sidebar-tooltip">{{ t('auth.logout') }}</span>
-        </button>
+        <!-- User avatar with popover menu (at bottom per UX best practice) -->
+        <div class="sidebar-user-wrapper">
+          <button type="button" class="sidebar-user-avatar" @click="toggleUserMenu" :aria-label="t('admin.userMenu')">
+            <span class="avatar-initials">{{ userInitials }}</span>
+          </button>
+          <div v-if="userMenuOpen" class="sidebar-user-menu">
+            <div class="user-menu-info">
+              <span class="user-menu-name">{{ user?.name || user?.email }}</span>
+              <span class="user-menu-role">{{ user?.role }}</span>
+            </div>
+            <button type="button" class="user-menu-logout" @click="handleLogout" :disabled="isLoading">
+              <IconLogout />
+              <span>{{ t('auth.logout') }}</span>
+            </button>
+          </div>
+        </div>
       </div>
     </aside>
 

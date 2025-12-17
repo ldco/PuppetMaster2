@@ -81,9 +81,11 @@ async function saveSettings() {
 
 <template>
   <div class="admin-settings">
-    <h1 class="page-title">{{ t('admin.settings') }}</h1>
+    <div class="page-header">
+      <h1 class="page-title">{{ t('admin.settings') }}</h1>
+    </div>
 
-    <div v-if="pending" class="loading-state">Loading...</div>
+    <div v-if="pending" class="loading-state">{{ t('common.loading') }}</div>
 
     <form v-else @submit.prevent="saveSettings" class="settings-form">
       <!-- Dynamic settings groups from config -->

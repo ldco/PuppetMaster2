@@ -8,6 +8,7 @@
 import IconPlus from '~icons/tabler/plus'
 import IconTrash from '~icons/tabler/trash'
 import IconSearch from '~icons/tabler/search'
+import IconX from '~icons/tabler/x'
 
 definePageMeta({
   layout: 'admin',
@@ -214,6 +215,9 @@ const localeNames: Record<string, string> = {
         <div class="modal">
           <div class="modal-header">
             <h2>{{ editingId ? t('common.edit') : t('admin.addTranslation') }}</h2>
+            <button type="button" class="btn btn-icon btn-ghost" @click="showModal = false">
+              <IconX />
+            </button>
           </div>
           <form @submit.prevent="saveTranslation" class="modal-body">
             <div v-if="saveError" class="form-error">{{ saveError }}</div>

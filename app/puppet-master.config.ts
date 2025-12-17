@@ -8,24 +8,19 @@
  * APPLICATION MODE - Primary configuration that affects entire app structure
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * VISUAL MODES (two distinct UX patterns):
- *   - Website: Traditional site UX (hamburger menu on mobile, can use onepager)
- *   - App: Application UX (bottom nav on mobile, vertical sidebar, always SPA)
+ * Two visual modes exist:
+ *   - Website: Traditional site UX (hamburger menu on mobile)
+ *   - App: Application UX (bottom nav on mobile, vertical header default)
+ *   - Admin: Always uses App visual mode (it's an application interface)
  *
- * IMPORTANT: Website portion uses WEBSITE visual mode. App/Admin uses APP visual mode.
- *            These are separate experiences - admin is always app-style regardless of mode.
- *
- * ┌─────────────────┬──────────────────────────┬───────────────────────────────┐
- * │ Mode            │ Website Portion          │ App/Admin Portion             │
- * ├─────────────────┼──────────────────────────┼───────────────────────────────┤
- * │ app-only        │ ❌ None                  │ App (vertical sidebar, SPA)   │
- * │ website-app     │ Website (hamburger, can  │ App (vertical sidebar, SPA)   │
- * │                 │ onepager OR SPA)         │ Login button visible          │
- * │ website-admin   │ Website (hamburger, can  │ Admin (vertical sidebar, SPA) │
- * │                 │ onepager OR SPA)         │ Hidden admin at /admin        │
- * │ website-only    │ Website (hamburger, can  │ ❌ None                       │
- * │                 │ onepager OR SPA)         │                               │
- * └─────────────────┴──────────────────────────┴───────────────────────────────┘
+ * ┌─────────────────┬─────────┬──────────────┬─────────────────┬─────────────┐
+ * │ Mode            │ Website │ Login Button │ Admin Access    │ Visual Mode │
+ * ├─────────────────┼─────────┼──────────────┼─────────────────┼─────────────┤
+ * │ app-only        │ ❌      │ N/A          │ / → /login      │ App         │
+ * │ website-app     │ ✅      │ ✅ Visible   │ /login route    │ App primary │
+ * │ website-admin   │ ✅      │ ❌ Hidden    │ /admin (secret) │ Website     │
+ * │ website-only    │ ✅      │ ❌ None      │ ❌ No admin     │ Website     │
+ * └─────────────────┴─────────┴──────────────┴─────────────────┴─────────────┘
  *
  * Use Cases:
  *   - app-only:      SaaS dashboard, internal tools, no public landing page
@@ -33,8 +28,8 @@
  *   - website-admin: Portfolio/agency site with hidden CMS (current default)
  *   - website-only:  Static site, no admin needed (pure marketing/portfolio)
  *
- * NOTE: 'onepager' toggle only affects the WEBSITE portion.
- *       The App/Admin portions ALWAYS use SPA with route navigation.
+ * NOTE: 'onepager' toggle only affects the website portion (not app-only mode).
+ *       The app/admin portions always use SPA with route navigation.
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export type AppMode = 'app-only' | 'website-app' | 'website-admin' | 'website-only'
@@ -52,7 +47,7 @@ const config = {
     // Website features (only apply when mode has website)
     multiLangs: true,           // Multiple languages support
     doubleTheme: true,          // Light/dark mode toggle
-    onepager: true,             // Website portion: Onepager (scroll nav) vs SPA (route nav)
+    onepager: true,             // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
     interactiveHeader: true,    // Header style changes on scroll
     hideHeaderOnScroll: false,  // Hide header when scrolling down
     verticalNav: false,         // true = icon sidebar, false = horizontal header

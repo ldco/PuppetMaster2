@@ -81,6 +81,7 @@
 .text-end { text-align: end; }
 .text-2xl { font-size: var(--text-2xl); }
 .font-medium { font-weight: var(--font-medium); }
+.font-semibold { font-weight: var(--font-semibold); }
 .font-bold { font-weight: var(--font-bold); }
 .text-brand { color: var(--i-brand); }
 .text-danger { color: var(--d-error); }
@@ -275,7 +276,7 @@
 /* Status badge overlay */
 .status-badge {
   position: absolute;
-  top: var(--space-2);
+  inset-block-start: var(--space-2);
   inset-inline-end: var(--space-2);
 }
 

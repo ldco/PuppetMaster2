@@ -112,7 +112,19 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       role: 'Role',
       created: 'Created',
       actions: 'Actions',
-      leaveBlankToKeep: 'Leave blank to keep current'
+      leaveBlankToKeep: 'Leave blank to keep current',
+      // Portfolio form fields
+      title: 'Title',
+      slug: 'Slug',
+      category: 'Category',
+      order: 'Order',
+      description: 'Description',
+      tags: 'Tags',
+      tagsHint: 'Comma-separated',
+      image: 'Image',
+      published: 'Published',
+      // User menu
+      userMenu: 'User menu'
     },
     theme: {
       light: 'Light',
@@ -228,7 +240,19 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       role: 'Роль',
       created: 'Создан',
       actions: 'Действия',
-      leaveBlankToKeep: 'Оставьте пустым для сохранения текущего'
+      leaveBlankToKeep: 'Оставьте пустым для сохранения текущего',
+      // Portfolio form fields
+      title: 'Название',
+      slug: 'Слаг',
+      category: 'Категория',
+      order: 'Порядок',
+      description: 'Описание',
+      tags: 'Теги',
+      tagsHint: 'Через запятую',
+      image: 'Изображение',
+      published: 'Опубликовано',
+      // User menu
+      userMenu: 'Меню пользователя'
     },
     theme: {
       light: 'Светлая',
@@ -343,7 +367,19 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       role: 'תפקיד',
       created: 'נוצר',
       actions: 'פעולות',
-      leaveBlankToKeep: 'השאר ריק לשמירת הנוכחי'
+      leaveBlankToKeep: 'השאר ריק לשמירת הנוכחי',
+      // Portfolio form fields
+      title: 'כותרת',
+      slug: 'מזהה',
+      category: 'קטגוריה',
+      order: 'סדר',
+      description: 'תיאור',
+      tags: 'תגיות',
+      tagsHint: 'מופרדות בפסיק',
+      image: 'תמונה',
+      published: 'פורסם',
+      // User menu
+      userMenu: 'תפריט משתמש'
     },
     theme: {
       light: 'בהיר',

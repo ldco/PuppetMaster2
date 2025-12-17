@@ -8,8 +8,7 @@
 import IconPlus from '~icons/tabler/plus'
 import IconEdit from '~icons/tabler/pencil'
 import IconTrash from '~icons/tabler/trash'
-import IconEye from '~icons/tabler/eye'
-import IconEyeOff from '~icons/tabler/eye-off'
+import IconX from '~icons/tabler/x'
 
 definePageMeta({
   layout: 'admin',
@@ -224,13 +223,16 @@ async function deleteItem(item: PortfolioItem) {
         <div class="modal">
           <div class="modal-header">
             <h2>{{ editingItem ? t('common.edit') : t('common.create') }} {{ t('admin.portfolio') }}</h2>
+            <button type="button" class="btn btn-icon btn-ghost" @click="showModal = false">
+              <IconX />
+            </button>
           </div>
           <form @submit.prevent="saveItem" class="modal-body">
             <div v-if="error" class="form-error">{{ error }}</div>
 
             <!-- Image upload -->
             <div class="form-group">
-              <label class="form-label">Image</label>
+              <label class="form-label">{{ t('admin.image') }}</label>
               <div class="image-upload">
                 <img v-if="imagePreview" :src="imagePreview" class="image-preview" />
                 <input type="file" accept="image/*" @change="handleImageSelect" />
@@ -239,37 +241,37 @@ async function deleteItem(item: PortfolioItem) {
 
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">Title</label>
+                <label class="form-label">{{ t('admin.title') }} *</label>
                 <input v-model="form.title" type="text" class="input" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Slug</label>
+                <label class="form-label">{{ t('admin.slug') }} *</label>
                 <input v-model="form.slug" type="text" class="input" required pattern="[a-z0-9-]+" />
               </div>
               <div class="form-group">
-                <label class="form-label">Category</label>
+                <label class="form-label">{{ t('admin.category') }}</label>
                 <input v-model="form.category" type="text" class="input" />
               </div>
               <div class="form-group">
-                <label class="form-label">Order</label>
+                <label class="form-label">{{ t('admin.order') }}</label>
                 <input v-model.number="form.order" type="number" class="input" />
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Description</label>
+              <label class="form-label">{{ t('admin.description') }}</label>
               <textarea v-model="form.description" class="input" rows="3"></textarea>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Tags (comma-separated)</label>
-              <input v-model="form.tags" type="text" class="input" />
+              <label class="form-label">{{ t('admin.tags') }}</label>
+              <input v-model="form.tags" type="text" class="input" :placeholder="t('admin.tagsHint')" />
             </div>
 
             <div class="form-group">
               <label class="checkbox">
                 <input v-model="form.published" type="checkbox" />
-                <span>Published</span>
+                <span>{{ t('admin.published') }}</span>
               </label>
             </div>
 

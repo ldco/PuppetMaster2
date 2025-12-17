@@ -82,6 +82,7 @@
     color-mix(in srgb, var(--p-brand), transparent 90%),
     color-mix(in srgb, var(--p-brand), transparent 85%)
   );
+  --i-brand-text: var(--p-white); /* Text/icons on brand-colored backgrounds */
 
   /* Accent - use srgb to preserve hue */
   --i-accent: var(--p-accent);

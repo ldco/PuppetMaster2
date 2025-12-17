@@ -234,7 +234,7 @@ const roleBadgeClass: Record<string, string> = {
             <div v-if="formError" class="form-error">{{ formError }}</div>
 
             <div class="form-group">
-              <label for="email">{{ t('admin.email') }} *</label>
+              <label for="email" class="form-label">{{ t('admin.email') }} *</label>
               <input
                 id="email"
                 v-model="form.email"
@@ -245,7 +245,7 @@ const roleBadgeClass: Record<string, string> = {
             </div>
 
             <div class="form-group">
-              <label for="password">
+              <label for="password" class="form-label">
                 {{ t('admin.password') }}
                 {{ editingUser ? '' : '*' }}
               </label>
@@ -260,7 +260,7 @@ const roleBadgeClass: Record<string, string> = {
             </div>
 
             <div class="form-group">
-              <label for="name">{{ t('admin.name') }}</label>
+              <label for="name" class="form-label">{{ t('admin.name') }}</label>
               <input
                 id="name"
                 v-model="form.name"
@@ -270,7 +270,7 @@ const roleBadgeClass: Record<string, string> = {
             </div>
 
             <div class="form-group">
-              <label for="role">{{ t('admin.role') }} *</label>
+              <label for="role" class="form-label">{{ t('admin.role') }} *</label>
               <select id="role" v-model="form.role" class="input" required>
                 <option
                   v-for="role in assignableRoles"
@@ -282,8 +282,8 @@ const roleBadgeClass: Record<string, string> = {
               </select>
             </div>
 
-            <div class="form-actions">
-              <button type="button" class="btn btn-ghost" @click="closeModal">
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="closeModal">
                 {{ t('common.cancel') }}
               </button>
               <button type="submit" class="btn btn-primary" :disabled="saving">

@@ -115,24 +115,22 @@ function formatDate(timestamp: number) {
 </script>
 
 <template>
-  <div class="admin-page">
+  <div class="admin-contacts">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold flex items-center gap-2">
+    <div class="page-header">
+      <h1 class="page-title">
         {{ t('admin.contacts') }}
         <span v-if="localUnreadCount" class="badge badge-primary">{{ localUnreadCount }}</span>
       </h1>
     </div>
 
     <!-- Loading -->
-    <div v-if="pending" class="card card-body text-center">
-      <p class="text-secondary">{{ t('common.loading') }}</p>
-    </div>
+    <div v-if="pending" class="loading-state">{{ t('common.loading') }}</div>
 
     <!-- Empty state -->
-    <div v-else-if="!items.length" class="card card-body text-center">
-      <IconMail class="icon-xl text-secondary mx-auto mb-4" />
-      <p class="text-secondary">{{ t('admin.noMessages') }}</p>
+    <div v-else-if="!items.length" class="empty-state">
+      <IconMail class="icon-xl" />
+      <p>{{ t('admin.noMessages') }}</p>
     </div>
 
     <!-- Messages grid: list + detail -->
@@ -162,8 +160,8 @@ function formatDate(timestamp: number) {
       <!-- Message detail -->
       <div class="card">
         <template v-if="selectedMessage">
-          <div class="card-header flex items-center justify-between">
-            <h2 class="text-lg font-bold">{{ selectedMessage.subject || t('admin.noSubject') }}</h2>
+          <div class="card-header">
+            <h2>{{ selectedMessage.subject || t('admin.noSubject') }}</h2>
             <div class="flex gap-2">
               <button
                 type="button"
@@ -174,6 +172,10 @@ function formatDate(timestamp: number) {
                 <IconMailOpened v-if="selectedMessage.read" />
                 <IconMail v-else />
               </button>
+              <!--
+                UX Design Decision: Uses text-danger (always red icon) instead of btn-danger (red on hover).
+                Single-item context = prominent delete is acceptable. For tables/grids with many items, use btn-ghost btn-danger.
+              -->
               <button
                 type="button"
                 class="btn btn-icon btn-ghost text-danger"

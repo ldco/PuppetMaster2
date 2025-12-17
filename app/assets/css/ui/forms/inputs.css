@@ -306,11 +306,11 @@ select.input option:hover {
   justify-content: space-between;
 }
 
-/* Form grid for 2-column layouts */
+/* Form grid for multi-column layouts */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-6) var(--space-4);
 }
 
 .form-grid .form-group--full {
