@@ -6,8 +6,7 @@
 
 .btn {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  place-items: center; /* align-items + justify-content */
   gap: var(--gap-xs);
   padding: var(--space-2) var(--space-4);
   font-weight: var(--font-medium);

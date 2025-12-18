@@ -82,8 +82,7 @@ body.lightbox-open .portfolio-card:hover {
   height: 100%;
   background: var(--l-bg-sunken);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  place-items: center;
   color: var(--t-muted);
 }
 

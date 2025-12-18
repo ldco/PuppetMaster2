@@ -57,15 +57,14 @@
 .bottom-nav-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  place-items: center;
   gap: var(--space-1);
-  
+
   /* Touch target: min 48x48 (Material), Apple recommends 44x44 */
   min-width: 48px;
   min-height: 48px;
   padding: var(--space-1) var(--space-3);
-  
+
   /* Reset button/link styles */
   background: transparent;
   border: none;

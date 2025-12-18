@@ -1276,7 +1276,7 @@ layout/
 
 **Breakpoint System:**
 
-Uses `postcss-custom-media` for reusable breakpoints (single source of truth in `breakpoints.css`):
+Uses `postcss-preset-env` for modern CSS support with automatic fallbacks (breakpoints defined in `breakpoints.css`):
 
 | Name | Value | Target | CSS Usage |
 |------|-------|--------|-----------|
@@ -2271,7 +2271,7 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 
 ### Responsive Breakpoints
 
-Uses `postcss-custom-media` for DRY breakpoints (defined in `layout/breakpoints.css`):
+Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (defined in `layout/breakpoints.css`):
 
 | Breakpoint | Value | Custom Media | Usage |
 |------------|-------|--------------|-------|

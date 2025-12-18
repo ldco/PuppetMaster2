@@ -153,6 +153,11 @@
 .justify-end { justify-content: flex-end; }
 .justify-between { justify-content: space-between; }
 
+/* place-items shorthand (align-items + justify-items for grid, align-items + justify-content for flex) */
+.place-center { place-items: center; }
+.place-start { place-items: start; }
+.place-end { place-items: end; }
+
 .gap-1 { gap: var(--space-1); }
 .gap-2 { gap: var(--space-2); }
 .gap-3 { gap: var(--space-3); }
@@ -164,6 +169,21 @@
  * ══════════════════════════════════════════════════════════ */
 
 .grid { display: grid; }
+
+/* ══════════════════════════════════════════════════════════
+ * INTRINSIC SIZING UTILITIES (fit-content, min-content, max-content)
+ * Modern CSS sizing keywords - 97%+ browser support
+ * ══════════════════════════════════════════════════════════ */
+
+/* fit-content: shrinks to content, respects max-width constraints */
+.w-fit { width: fit-content; }
+.h-fit { height: fit-content; }
+
+/* min-content: shrinks to smallest possible content width */
+.w-min { width: min-content; }
+
+/* max-content: expands to fit content without wrapping */
+.w-max { width: max-content; }
 
 /* ══════════════════════════════════════════════════════════
  * ICON SIZE UTILITIES

@@ -77,9 +77,27 @@ export default defineNuxtConfig({
   },
 
   // PostCSS configuration
+  // postcss-preset-env includes autoprefixer + 50+ plugins for modern CSS fallbacks
   postcss: {
     plugins: {
-      'postcss-custom-media': {}
+      'postcss-preset-env': {
+        // Stage 2 = reasonable stability (default)
+        // Stage 3 = more stable, fewer features
+        stage: 2,
+        // Require 2 browser implementations for extra stability
+        minimumVendorImplementations: 2,
+        // Enable specific features we use
+        features: {
+          'custom-media-queries': true,  // @custom-media support
+          'nesting-rules': true,         // CSS nesting
+          'color-mix': true,             // color-mix() fallbacks
+          'custom-properties': true,     // CSS variables fallback for older browsers
+        },
+        // Autoprefixer options
+        autoprefixer: {
+          flexbox: 'no-2009',  // Don't generate old flexbox syntax
+        },
+      }
     }
   },
 
