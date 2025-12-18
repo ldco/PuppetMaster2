@@ -16,28 +16,20 @@ import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const { canManageUsers } = useAuth()
 const { unreadCount } = useUnreadCount()
 
-// Navigation items matching admin.vue sidebar
-interface NavItem {
-  to: string
-  label: string
-  icon: typeof IconSettings
-  badge?: boolean
-}
-
-const baseItems: NavItem[] = [
-  { to: '/admin/settings', label: 'admin.settings', icon: IconSettings },
-  { to: '/admin/portfolio', label: 'admin.portfolio', icon: IconPhoto },
-  { to: '/admin/contacts', label: 'admin.contacts', icon: IconMail, badge: true },
-  { to: '/admin/translations', label: 'admin.translations', icon: IconLanguage },
-]
-
+// Navigation items matching admin.vue sidebar - use localePath for locale-aware navigation
 const navItems = computed(() => {
-  const items = [...baseItems]
+  const items = [
+    { to: localePath('/admin/settings'), label: 'admin.settings', icon: IconSettings },
+    { to: localePath('/admin/portfolio'), label: 'admin.portfolio', icon: IconPhoto },
+    { to: localePath('/admin/contacts'), label: 'admin.contacts', icon: IconMail, badge: true },
+    { to: localePath('/admin/translations'), label: 'admin.translations', icon: IconLanguage },
+  ]
   if (canManageUsers.value) {
-    items.push({ to: '/admin/users', label: 'admin.users', icon: IconUsers })
+    items.push({ to: localePath('/admin/users'), label: 'admin.users', icon: IconUsers })
   }
   return items
 })

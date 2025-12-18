@@ -137,7 +137,7 @@
 
 /* Admin content area - generous padding for breathing room */
 .admin-content {
-  padding: var(--space-8) var(--space-10);
+  padding: var(--space-10) var(--space-10); /* More top padding for air */
   max-width: 1000px; /* Narrower max for better readability */
   margin-inline: auto; /* Center content horizontally */
 }
@@ -145,14 +145,16 @@
 /* Responsive padding for smaller screens */
 @container (max-width: 768px) {
   .admin-content {
-    padding: var(--space-6);
+    padding: var(--space-8) var(--space-6);
   }
 }
 
 /* Admin mobile header */
 .admin-header {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   gap: var(--gap-sm);
   padding: var(--space-3) var(--space-4);
   background: var(--l-bg);
@@ -165,6 +167,142 @@
 .admin-title {
   font-weight: var(--font-semibold);
   font-size: var(--text-lg);
+}
+
+/* Mobile user avatar and menu */
+.mobile-user-wrapper {
+  position: relative;
+}
+
+.mobile-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--i-brand);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+}
+
+.mobile-user-menu {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + var(--space-2));
+  min-width: 220px;
+  padding: var(--space-3);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-popover);
+}
+
+.mobile-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-block-end: var(--space-3);
+}
+
+.mobile-user-name {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  color: var(--t-primary);
+}
+
+.mobile-user-email {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+  word-break: break-all;
+}
+
+.mobile-user-role {
+  font-size: var(--text-xs);
+  color: var(--t-tertiary);
+  text-transform: capitalize;
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  background: var(--l-border);
+  margin-block: var(--space-2);
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--t-primary);
+  font-size: var(--text-sm);
+  transition: background-color var(--transition-fast) ease;
+}
+
+.mobile-menu-item:hover {
+  background: var(--l-bg-sunken);
+}
+
+.mobile-menu-item svg {
+  width: var(--icon-md, 20px);
+  height: var(--icon-md, 20px);
+  color: var(--t-secondary);
+}
+
+.mobile-menu-logout {
+  color: var(--s-danger);
+}
+
+.mobile-menu-logout svg {
+  color: var(--s-danger);
+}
+
+.mobile-lang-group {
+  padding: var(--space-2);
+}
+
+.mobile-lang-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--t-tertiary);
+  margin-block-end: var(--space-2);
+}
+
+.mobile-lang-options {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mobile-lang-btn {
+  padding: var(--space-1) var(--space-3);
+  background: var(--l-bg-sunken);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--t-secondary);
+  transition: all var(--transition-fast) ease;
+}
+
+.mobile-lang-btn:hover {
+  background: var(--l-bg-elevated);
+  color: var(--t-primary);
+}
+
+.mobile-lang-btn.active {
+  background: var(--i-brand);
+  border-color: var(--i-brand);
+  color: white;
 }
 
 /* Page header for admin pages */
@@ -459,12 +597,17 @@
   }
 
   .admin-content {
-    padding: var(--space-4);
+    padding: var(--space-6) var(--space-4);
   }
 
-  /* Show mobile header on phones */
-  .layout-admin .admin-header {
-    display: flex;
+  /* Show mobile header on phones - override .mobile-only block with flex */
+  .layout-admin .admin-header.mobile-only {
+    display: flex !important;
+  }
+
+  /* Hide page title on phones - mobile header shows it instead */
+  .layout-admin .page-title {
+    display: none;
   }
 }
 
@@ -482,7 +625,7 @@
   }
 
   .admin-content {
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-8) var(--space-5);
   }
 
   /* Hide mobile header on tablet */
@@ -504,7 +647,7 @@
   }
 
   .admin-content {
-    padding: var(--page-padding, var(--space-6));
+    padding: var(--space-10);
   }
 
   /* Hide mobile header on desktop */

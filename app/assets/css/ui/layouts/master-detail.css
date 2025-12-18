@@ -80,7 +80,7 @@
 }
 
 /* Responsive: stack on smaller screens */
-@media (max-width: 900px) {
+@media (--below-desktop) {
   .master-detail {
     grid-template-columns: 1fr;
   }

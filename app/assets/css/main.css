@@ -1,23 +1,46 @@
 /**
- * Puppet Master CSS Entry Point
+ * ═══════════════════════════════════════════════════════════════════════════
+ * PUPPET MASTER CSS ENTRY POINT
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * @layer order determines cascade priority (later = higher priority)
- * This is our CSS architecture - pure CSS, no Tailwind!
+ * Pure CSS architecture - no Tailwind!
+ * ONE unified CSS system - works for site, admin, and app modes.
  *
- * ONE unified CSS system - no separate admin styles!
- * All components are reusable across site, admin, and app modes.
+ * LAYER ARCHITECTURE (Q34 Decision):
+ * ───────────────────────────────────────────────────────────────────────────
+ * | Layer      | Purpose                    | Override Priority |
+ * |------------|----------------------------|--------------------|
+ * | reset      | CSS reset/normalize        | Lowest             |
+ * | primitives | Raw values (colors, fonts) | ↓                  |
+ * | semantic   | Calculated values          | ↓                  |
+ * | components | UI styling                 | ↓                  |
+ * | utilities  | Override helpers           | Highest            |
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * FILE → LAYER MAPPING:
+ * - reset.css           → layer(reset)
+ * - colors/primitives   → layer(primitives)
+ * - typography/vars     → layer(primitives)
+ * - colors/auto         → layer(semantic)
+ * - typography/base     → layer(semantic)
+ * - skeleton/*          → layer(components)
+ * - ui/*                → layer(components)
+ * - layout/responsive   → layer(utilities)
+ * - common/utilities    → layer(utilities)
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-/* Layer order declaration */
-@layer reset, colors, typography, layout, skeleton, ui, utilities;
+/* Layer order declaration - determines cascade priority */
+@layer reset, primitives, semantic, components, utilities;
 
 /* Import layers in order */
 @import './reset.css' layer(reset);
-@import './colors/index.css' layer(colors);
+@import './colors/index.css' layer(primitives);
 @import './common/index.css' layer(utilities);
-@import './typography/index.css' layer(typography);
-@import './layout/index.css' layer(layout);
-@import './animations/index.css';
-@import './skeleton/index.css' layer(skeleton);
-@import './ui/index.css' layer(ui);
+@import './typography/index.css' layer(primitives);
+@import './layout/index.css' layer(components);
+@import './animations/index.css' layer(components);
+@import './skeleton/index.css' layer(components);
+@import './ui/index.css' layer(components);
 

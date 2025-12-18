@@ -1152,15 +1152,15 @@ The CSS architecture uses CSS `@layer` for proper cascade control and clear sepa
 /* Layer order declaration - determines cascade priority */
 @layer reset, primitives, semantic, components, utilities;
 
-/* Imports - order within @layer is automatic */
-@import 'reset.css' layer(reset);
-@import 'colors/index.css';
-@import 'common/index.css';
-@import 'typography/index.css';
-@import 'layout/index.css';
-@import 'animations/index.css';
-@import 'skeleton/index.css';
-@import 'ui/index.css';
+/* Imports with explicit layer assignments */
+@import './reset.css' layer(reset);
+@import './colors/index.css' layer(primitives);
+@import './common/index.css' layer(utilities);
+@import './typography/index.css' layer(primitives);
+@import './layout/index.css' layer(components);
+@import './animations/index.css' layer(components);
+@import './skeleton/index.css' layer(components);
+@import './ui/index.css' layer(components);
 ```
 
 #### Core vs Project Separation
@@ -1274,20 +1274,36 @@ layout/
 3. **CONTAINER QUERIES** - Components own their responsive behavior
 4. **MEDIA QUERIES** - Only for page-level layout (header/nav visibility)
 
-**Breakpoint Strategy (when needed):**
-- Mobile: < 640px (phones)
-- Tablet: 640px - 1023px (tablets, small laptops)
-- Desktop: ≥ 1024px (laptops, desktops)
+**Breakpoint System:**
+
+Uses `postcss-custom-media` for reusable breakpoints (single source of truth in `breakpoints.css`):
+
+| Name | Value | Target | CSS Usage |
+|------|-------|--------|-----------|
+| `--phone` | max-width: 639px | Phones only | `@media (--phone)` |
+| `--tablet` | min-width: 640px | Tablets + up | `@media (--tablet)` |
+| `--desktop` | min-width: 1024px | Desktops + up | `@media (--desktop)` |
+| `--large` | min-width: 1280px | Large screens | `@media (--large)` |
+| `--below-desktop` | max-width: 1023px | Phones + tablets | `@media (--below-desktop)` |
 
 ```css
-/* layout/responsive.css */
+/* layout/breakpoints.css - @custom-media definitions */
+@custom-media --phone (max-width: 639px);
+@custom-media --tablet (min-width: 640px);
+@custom-media --desktop (min-width: 1024px);
+@custom-media --large (min-width: 1280px);
+@custom-media --below-desktop (max-width: 1023px);
+```
+
+```css
+/* layout/responsive.css - usage example */
 
 /* Mobile-first: nav hidden by default */
 .header-nav { display: none !important; }
 .mobile-menu-btn { display: flex !important; }
 
-/* Desktop (≥ 1024px): show nav, hide mobile button */
-@media (min-width: 1024px) {
+/* Desktop: show nav, hide mobile button */
+@media (--desktop) {
   .header-nav { display: flex !important; }
   .mobile-menu-btn { display: none !important; }
 }
@@ -1303,6 +1319,8 @@ layout/
   .stack-portrait { flex-direction: column !important; }
 }
 ```
+
+**Note:** `!important` is intentional for utility classes - they are in the `utilities` layer and need to override component styles.
 
 ### Auto-Fit Grids: The TRUE Holy Grail
 
@@ -2253,12 +2271,15 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 
 ### Responsive Breakpoints
 
-| Breakpoint | Value | Usage |
-|------------|-------|-------|
-| Mobile | `< 640px` | Default styles (mobile-first) |
-| Tablet | `≥ 640px` | `@media (min-width: 640px)` |
-| Desktop | `≥ 1024px` | `@media (min-width: 1024px)` |
-| Large | `≥ 1280px` | `@media (min-width: 1280px)` |
+Uses `postcss-custom-media` for DRY breakpoints (defined in `layout/breakpoints.css`):
+
+| Breakpoint | Value | Custom Media | Usage |
+|------------|-------|--------------|-------|
+| Phone | `< 640px` | `--phone` | `@media (--phone) { ... }` |
+| Tablet | `≥ 640px` | `--tablet` | `@media (--tablet) { ... }` |
+| Desktop | `≥ 1024px` | `--desktop` | `@media (--desktop) { ... }` |
+| Large | `≥ 1280px` | `--large` | `@media (--large) { ... }` |
+| Below Desktop | `< 1024px` | `--below-desktop` | `@media (--below-desktop) { ... }` |
 
 ### Feature Toggles
 

@@ -19,16 +19,20 @@
  */
 import config from '~/puppet-master.config'
 
+const { t } = useI18n()
 const showBackToTop = config.features.backToTop
 </script>
 
 <template>
   <div class="layout">
+    <!-- Skip to content link (WCAG 2.4.1) - first focusable element -->
+    <a href="#main-content" class="skip-link">{{ t('nav.skipToContent') }}</a>
+
     <!-- Header with responsive navigation -->
     <OrganismsTheHeader />
 
     <!-- Main content slot -->
-    <main class="main">
+    <main id="main-content" class="main">
       <slot />
     </main>
 

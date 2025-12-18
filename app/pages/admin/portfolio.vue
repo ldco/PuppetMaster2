@@ -241,7 +241,7 @@ async function deleteItem(item: PortfolioItem) {
 
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">{{ t('admin.title') }} *</label>
+                <label class="form-label">{{ t('admin.itemTitle') }} *</label>
                 <input v-model="form.title" type="text" class="input" required />
               </div>
               <div class="form-group">

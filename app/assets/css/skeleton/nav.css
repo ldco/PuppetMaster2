@@ -34,7 +34,7 @@
 .nav-link.router-link-exact-active::after {
   content: '';
   position: absolute;
-  inset-block-end: -1px;
+  inset-block-end: 2px; /* Inside the link padding, not below it */
   inset-inline: var(--space-3);
   height: 2px;
   background: var(--i-brand);
@@ -89,9 +89,18 @@
   border-block-end: 1px solid var(--l-border);
 }
 
+.sidebar-header a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo with text at bottom - crop to show only icon */
 .sidebar-header .logo-img {
   width: 36px;
   height: 36px;
+  object-fit: cover;
+  object-position: top center; /* Show top part (icon), hide bottom (text) */
 }
 
 .sidebar-footer {
@@ -375,12 +384,11 @@
   text-transform: uppercase;
 }
 
-/* User menu popover */
+/* User menu popover - opens UPWARD since avatar is at bottom of sidebar */
 .sidebar-user-menu {
   position: absolute;
   inset-inline-start: 100%;
-  top: 50%;
-  transform: translateY(-50%);
+  inset-block-end: 0;
   min-width: 180px;
   padding: var(--space-3);
   background: var(--l-bg-elevated);
@@ -388,7 +396,7 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   z-index: var(--z-popover);
-  margin-inline-start: var(--space-2);
+  margin-inline-start: var(--space-4); /* Good spacing from sidebar */
 }
 
 .user-menu-info {
@@ -407,9 +415,15 @@
   word-break: break-word;
 }
 
-.user-menu-role {
+.user-menu-email {
   font-size: var(--text-xs);
   color: var(--t-secondary);
+  word-break: break-all;
+}
+
+.user-menu-role {
+  font-size: var(--text-xs);
+  color: var(--t-tertiary);
   text-transform: capitalize;
 }
 

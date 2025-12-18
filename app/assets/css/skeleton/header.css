@@ -148,7 +148,7 @@
  *     in :root above (default: 36px)
  * ═══════════════════════════════════════════════════════════ */
 
-@media (max-width: 1023px) {
+@media (--below-desktop) {
   .header-logo {
     position: absolute;
     left: 50%;
@@ -163,7 +163,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (--desktop) {
   .header-logo {
     position: static;
     transform: none;
@@ -215,7 +215,7 @@
 }
 
 /* Hide text on mobile, show icon only */
-@media (width < 640px) {
+@media (--phone) {
   .header-login-btn span {
     display: none;
   }

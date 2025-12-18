@@ -47,7 +47,8 @@
 .footer-nav-inline { grid-area: nav; }
 .footer-cta { grid-area: cta; }
 
-@media (max-width: 900px) {
+/* Tablet: 2x2 grid layout */
+@media (--below-desktop) {
   .footer-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
@@ -59,7 +60,8 @@
   .footer-nav-inline { justify-self: end; }
 }
 
-@media (max-width: 640px) {
+/* Phone: single column, centered */
+@media (--phone) {
   .footer-grid {
     grid-template-columns: 1fr;
     grid-template-areas: "logo" "cta" "social" "nav";
@@ -99,7 +101,7 @@
   border-radius: var(--radius-xs);
 }
 
-@media (max-width: 640px) {
+@media (--phone) {
   .footer-nav-inline { justify-content: center; }
 }
 
@@ -188,7 +190,7 @@
   border-radius: var(--radius-xs);
 }
 
-@media (max-width: 640px) {
+@media (--phone) {
   .legal-bar {
     align-items: center;
     text-align: center;

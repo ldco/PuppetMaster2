@@ -3,6 +3,23 @@
  * Classes for <Transition> component
  */
 
+/* ═══════════════════════════════════════════════════════════
+ * REDUCED MOTION SUPPORT (WCAG 2.3.3)
+ *
+ * Respects user's system preference for reduced motion.
+ * Disables all transforms/animations, keeps opacity fades.
+ * ═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Fade transition */
 .fade-enter-active,
 .fade-leave-active {

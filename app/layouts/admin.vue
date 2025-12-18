@@ -24,17 +24,38 @@ import IconLogout from '~icons/tabler/logout'
 import IconSun from '~icons/tabler/sun'
 import IconMoon from '~icons/tabler/moon'
 
+const route = useRoute()
 const { t, locale, locales, setLocale } = useI18n()
+const localePath = useLocalePath()
 const colorMode = useColorMode()
 const { user, logout, isLoading, canManageUsers } = useAuth()
 const { shortLogo } = useLogo()
 
-// User menu panel state
+// User menu panel state (desktop sidebar)
 const userMenuOpen = ref(false)
+// Mobile user menu state
+const mobileUserMenuOpen = ref(false)
 
 function toggleUserMenu() {
   userMenuOpen.value = !userMenuOpen.value
 }
+
+function toggleMobileUserMenu() {
+  mobileUserMenuOpen.value = !mobileUserMenuOpen.value
+}
+
+// Get current page title based on route name (works with any locale prefix)
+const currentPageTitle = computed(() => {
+  const name = route.name?.toString() ?? ''
+  // Route names are like 'admin-settings___en', 'admin-portfolio___ru', etc.
+  if (name.startsWith('admin-settings')) return t('admin.settings')
+  if (name.startsWith('admin-portfolio')) return t('admin.portfolio')
+  if (name.startsWith('admin-contacts')) return t('admin.contacts')
+  if (name.startsWith('admin-translations')) return t('admin.translations')
+  if (name.startsWith('admin-users')) return t('admin.users')
+  if (name.startsWith('admin')) return t('admin.dashboard')
+  return t('admin.title')
+})
 
 // Get user initials for avatar
 const userInitials = computed(() => {
@@ -58,19 +79,16 @@ onUnmounted(() => {
   if (interval) clearInterval(interval)
 })
 
-// Base admin links
-const baseLinks = [
-  { to: '/admin/settings', label: 'admin.settings', icon: IconSettings },
-  { to: '/admin/portfolio', label: 'admin.portfolio', icon: IconPhoto },
-  { to: '/admin/contacts', label: 'admin.contacts', icon: IconMail, badge: true },
-  { to: '/admin/translations', label: 'admin.translations', icon: IconLanguage },
-]
-
-// Conditionally add Users link for admin+ roles
+// Base admin links - use localePath for locale-aware navigation
 const adminLinks = computed(() => {
-  const links = [...baseLinks]
+  const links = [
+    { to: localePath('/admin/settings'), label: 'admin.settings', icon: IconSettings },
+    { to: localePath('/admin/portfolio'), label: 'admin.portfolio', icon: IconPhoto },
+    { to: localePath('/admin/contacts'), label: 'admin.contacts', icon: IconMail, badge: true },
+    { to: localePath('/admin/translations'), label: 'admin.translations', icon: IconLanguage },
+  ]
   if (canManageUsers.value) {
-    links.push({ to: '/admin/users', label: 'admin.users', icon: IconUsers })
+    links.push({ to: localePath('/admin/users'), label: 'admin.users', icon: IconUsers })
   }
   return links
 })
@@ -104,6 +122,9 @@ function handleClickOutside(e: MouseEvent) {
   if (!target.closest('.sidebar-user-wrapper')) {
     userMenuOpen.value = false
   }
+  if (!target.closest('.mobile-user-wrapper')) {
+    mobileUserMenuOpen.value = false
+  }
 }
 
 onMounted(() => {
@@ -122,7 +143,7 @@ onUnmounted(() => {
     <aside v-if="config.features.appVerticalNav" class="admin-sidebar">
       <!-- Logo (short/circle version) - ClientOnly to avoid SSR hydration mismatch -->
       <div class="sidebar-header">
-        <NuxtLink to="/admin">
+        <NuxtLink :to="localePath('/admin')">
           <ClientOnly>
             <img :src="shortLogo" alt="Logo" class="logo-img" />
             <template #fallback>
@@ -191,7 +212,8 @@ onUnmounted(() => {
           </button>
           <div v-if="userMenuOpen" class="sidebar-user-menu">
             <div class="user-menu-info">
-              <span class="user-menu-name">{{ user?.name || user?.email }}</span>
+              <span v-if="user?.name" class="user-menu-name">{{ user.name }}</span>
+              <span class="user-menu-email">{{ user?.email }}</span>
               <span class="user-menu-role">{{ user?.role }}</span>
             </div>
             <button type="button" class="user-menu-logout" @click="handleLogout" :disabled="isLoading">
@@ -209,9 +231,62 @@ onUnmounted(() => {
 
     <!-- Main Content -->
     <main class="admin-main">
-      <!-- Mobile header (phones only - now just shows title, no hamburger) -->
+      <!-- Mobile header (phones only) - shows page title + user avatar -->
       <header v-if="config.features.appVerticalNav" class="admin-header mobile-only">
-        <span class="admin-title">{{ t('admin.title') }}</span>
+        <span class="admin-title">{{ currentPageTitle }}</span>
+
+        <!-- Mobile user avatar with menu -->
+        <div class="mobile-user-wrapper">
+          <button type="button" class="mobile-user-avatar" @click="toggleMobileUserMenu" :aria-label="t('admin.userMenu')">
+            <span class="avatar-initials">{{ userInitials }}</span>
+          </button>
+
+          <!-- Mobile user menu dropdown -->
+          <div v-if="mobileUserMenuOpen" class="mobile-user-menu">
+            <!-- User info -->
+            <div class="mobile-user-info">
+              <span v-if="user?.name" class="mobile-user-name">{{ user.name }}</span>
+              <span class="mobile-user-email">{{ user?.email }}</span>
+              <span class="mobile-user-role">{{ user?.role }}</span>
+            </div>
+
+            <div class="mobile-menu-divider"></div>
+
+            <!-- Theme toggle -->
+            <ClientOnly>
+              <button type="button" class="mobile-menu-item" @click="toggleTheme">
+                <IconSun v-if="colorMode.preference === 'dark'" />
+                <IconMoon v-else />
+                <span>{{ t('common.theme') }}</span>
+              </button>
+            </ClientOnly>
+
+            <!-- Language options -->
+            <div class="mobile-lang-group">
+              <span class="mobile-lang-label">{{ t('common.language') }}</span>
+              <div class="mobile-lang-options">
+                <button
+                  v-for="loc in locales"
+                  :key="loc.code"
+                  type="button"
+                  class="mobile-lang-btn"
+                  :class="{ active: locale === loc.code }"
+                  @click="selectLocale(loc.code)"
+                >
+                  {{ loc.code.toUpperCase() }}
+                </button>
+              </div>
+            </div>
+
+            <div class="mobile-menu-divider"></div>
+
+            <!-- Logout -->
+            <button type="button" class="mobile-menu-item mobile-menu-logout" @click="handleLogout" :disabled="isLoading">
+              <IconLogout />
+              <span>{{ t('auth.logout') }}</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <div class="admin-content">

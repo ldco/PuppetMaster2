@@ -95,7 +95,7 @@
 }
 
 /* ==========================================================================
-   ACTIVE STATE - Material Design 3 Style
+   ACTIVE STATE - Clean color change only
    ========================================================================== */
 
 .bottom-nav-item.router-link-exact-active,
@@ -103,17 +103,16 @@
   color: var(--i-brand);
 }
 
-/* Active indicator pill (Material 3 style) */
-.bottom-nav-item.router-link-exact-active::before,
-.bottom-nav-item.is-active::before {
-  content: '';
-  position: absolute;
-  inset-block-start: 4px;
-  inset-inline: 8px;
-  height: 32px;
-  background: var(--i-brand-subtle);
-  border-radius: var(--radius-full);
-  z-index: -1;
+/* Active icon gets filled style for visual weight */
+.bottom-nav-item.router-link-exact-active svg,
+.bottom-nav-item.is-active svg {
+  stroke-width: 2.5;
+}
+
+/* Active label gets bolder weight */
+.bottom-nav-item.router-link-exact-active .bottom-nav-label,
+.bottom-nav-item.is-active .bottom-nav-label {
+  font-weight: var(--font-semibold);
 }
 
 /* ==========================================================================

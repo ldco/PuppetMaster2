@@ -59,7 +59,9 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'pm-i18n-redirected',
-      fallbackLocale: config.defaultLocale
+      fallbackLocale: config.defaultLocale,
+      alwaysRedirect: true,
+      redirectOn: 'root'
     },
     // Bundle options
     bundle: {
@@ -72,6 +74,13 @@ export default defineNuxtConfig({
     },
     // Vue I18n options
     vueI18n: './i18n/i18n.config.ts'
+  },
+
+  // PostCSS configuration
+  postcss: {
+    plugins: {
+      'postcss-custom-media': {}
+    }
   },
 
   // Vite configuration

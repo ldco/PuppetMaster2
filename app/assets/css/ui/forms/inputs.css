@@ -137,7 +137,7 @@ select.input option:hover {
   margin-inline: auto;
 }
 
-@media (min-width: 768px) {
+@media (--tablet) {
   .contact-grid:has(.contact-info) {
     grid-template-columns: 1fr auto;
     max-width: 1000px;

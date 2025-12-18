@@ -106,7 +106,7 @@
 }
 
 /* Responsive: horizontal scroll on small screens */
-@media (max-width: 640px) {
+@media (--phone) {
   .data-table {
     overflow-x: auto;
   }

@@ -46,7 +46,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       services: 'Services',
       contact: 'Contact',
       openMenu: 'Open menu',
-      closeMenu: 'Close menu'
+      closeMenu: 'Close menu',
+      skipToContent: 'Skip to content'
     },
     auth: {
       login: 'Login',
@@ -114,7 +115,7 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       actions: 'Actions',
       leaveBlankToKeep: 'Leave blank to keep current',
       // Portfolio form fields
-      title: 'Title',
+      itemTitle: 'Title',
       slug: 'Slug',
       category: 'Category',
       order: 'Order',
@@ -174,7 +175,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       services: 'Услуги',
       contact: 'Контакты',
       openMenu: 'Открыть меню',
-      closeMenu: 'Закрыть меню'
+      closeMenu: 'Закрыть меню',
+      skipToContent: 'Перейти к содержимому'
     },
     auth: {
       login: 'Войти',
@@ -242,7 +244,7 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       actions: 'Действия',
       leaveBlankToKeep: 'Оставьте пустым для сохранения текущего',
       // Portfolio form fields
-      title: 'Название',
+      itemTitle: 'Название',
       slug: 'Слаг',
       category: 'Категория',
       order: 'Порядок',
@@ -301,7 +303,8 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       services: 'שירותים',
       contact: 'יצירת קשר',
       openMenu: 'פתח תפריט',
-      closeMenu: 'סגור תפריט'
+      closeMenu: 'סגור תפריט',
+      skipToContent: 'דלג לתוכן'
     },
     auth: {
       login: 'התחברות',
@@ -369,7 +372,7 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       actions: 'פעולות',
       leaveBlankToKeep: 'השאר ריק לשמירת הנוכחי',
       // Portfolio form fields
-      title: 'כותרת',
+      itemTitle: 'כותרת',
       slug: 'מזהה',
       category: 'קטגוריה',
       order: 'סדר',

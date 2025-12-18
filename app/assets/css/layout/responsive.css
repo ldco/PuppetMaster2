@@ -1,5 +1,7 @@
 /**
- * 2025 Holy Grail Responsive System
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 2025 HOLY GRAIL RESPONSIVE SYSTEM
+ * ═══════════════════════════════════════════════════════════════════════════
  *
  * PHILOSOPHY:
  * 1. FLUID FIRST - Use clamp() for typography/spacing (no breakpoints!)
@@ -7,27 +9,24 @@
  * 3. CONTAINER QUERIES - Components own their responsive behavior
  * 4. MEDIA QUERIES - Only for page-level layout (header/nav visibility)
  *
- * BREAKPOINT STRATEGY (when needed):
- * - Mobile: < 640px (phones)
- * - Tablet: 640px - 1024px (tablets, small laptops)
- * - Desktop: > 1024px (laptops, desktops)
+ * BREAKPOINTS (defined in breakpoints.css):
+ * --phone     < 640px   (phones)
+ * --tablet    ≥ 640px   (tablets, small laptops)
+ * --desktop   ≥ 1024px  (laptops, desktops)
+ * --large     ≥ 1280px  (large desktops)
  *
- * We use WIDTH-based queries (not orientation) because:
- * - A narrow desktop window is still "landscape" but needs mobile layout
- * - A wide tablet in portrait might have room for desktop nav
+ * !important USAGE:
+ * Utilities layer (this file) uses !important intentionally to override
+ * component styles. This is the documented pattern for utility classes.
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 /* ══════════════════════════════════════════════════════════
- * CSS CUSTOM PROPERTIES FOR BREAKPOINTS
- * These are for documentation - CSS can't use vars in media queries
+ * RESPONSIVE SPACING (fluid, no breakpoints needed)
  * ══════════════════════════════════════════════════════════ */
 
 :root {
-  /* Breakpoint reference (can't use in media queries, just for docs) */
-  --bp-mobile: 640px;
-  --bp-tablet: 1024px;
-
-  /* Responsive spacing that adapts automatically */
   --space-responsive: clamp(1rem, 0.5rem + 2vw, 2rem);
   --space-section: clamp(2rem, 1rem + 4vw, 4rem);
 }
@@ -65,20 +64,25 @@
  * TABLET AND UP (≥ 640px)
  * ══════════════════════════════════════════════════════════ */
 
-@media (min-width: 640px) {
+@media (--tablet) {
   .hide-tablet-up { display: none !important; }
   .show-tablet-up { display: block !important; }
   .flex-tablet-up { display: flex !important; }
 
   /* Allow 2-column grids on tablets */
   .grid-tablet-2 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Mobile-only elements: hidden on tablet+ (sidebar shows user menu) */
+  .mobile-only {
+    display: none !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
  * DESKTOP (≥ 1024px)
  * ══════════════════════════════════════════════════════════ */
 
-@media (min-width: 1024px) {
+@media (--desktop) {
   /* Show desktop navigation */
   .header-nav {
     display: flex !important;
@@ -113,7 +117,7 @@
  * LARGE DESKTOP (≥ 1280px)
  * ══════════════════════════════════════════════════════════ */
 
-@media (min-width: 1280px) {
+@media (--large) {
   .hide-lg { display: none !important; }
   .show-lg { display: block !important; }
 }
