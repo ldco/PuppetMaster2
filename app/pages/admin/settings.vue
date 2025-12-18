@@ -91,7 +91,7 @@ async function saveSettings() {
       <!-- Dynamic settings groups from config -->
       <section v-for="group in config.settingGroups" :key="group.key" class="card">
         <div class="card-header">
-          <h2 class="section-title">{{ group.label }}</h2>
+          <h2 class="section-title">{{ t(group.label) }}</h2>
         </div>
         <div class="card-body">
           <div class="form-grid">

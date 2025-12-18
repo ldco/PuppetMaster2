@@ -60,7 +60,9 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'pm-i18n-redirected',
       fallbackLocale: config.defaultLocale,
-      alwaysRedirect: true,
+      // alwaysRedirect: false - don't override user's explicit language selection
+      // redirectOn: 'root' - only detect on first visit to root path
+      alwaysRedirect: false,
       redirectOn: 'root'
     },
     // Bundle options

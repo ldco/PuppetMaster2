@@ -40,7 +40,8 @@ const { activeSection } = config.features.onepager
 const navLinks = computed(() => {
   const sections = config.sections as readonly Section[]
 
-  // For one-pager: anchor links
+  // For one-pager: all sections use anchor links
+  // Active state is handled by scrollspy (isActive prop)
   if (config.features.onepager) {
     return sections
       .filter((s: Section) => s.inNav)

@@ -1,9 +1,13 @@
 <script setup lang="ts">
 /**
  * Language Switcher Atom
- * 
+ *
  * Dropdown to switch between available languages.
  * Uses @nuxtjs/i18n under the hood.
+ *
+ * Wrapped in ClientOnly because locale depends on cookies (client-side only).
+ * This prevents SSR/hydration mismatch where server renders 'en' but
+ * client has 'ru' from cookie.
  */
 
 const { locale, locales, setLocale } = useI18n()
@@ -15,19 +19,21 @@ function handleChange(event: Event) {
 </script>
 
 <template>
-  <select
-    class="input lang-switcher"
-    :value="locale"
-    @change="handleChange"
-  >
-    <option 
-      v-for="loc in locales" 
-      :key="loc.code" 
-      :value="loc.code"
+  <ClientOnly>
+    <select
+      class="input lang-switcher"
+      :value="locale"
+      @change="handleChange"
     >
-      {{ loc.name }}
-    </option>
-  </select>
+      <option
+        v-for="loc in locales"
+        :key="loc.code"
+        :value="loc.code"
+      >
+        {{ loc.name }}
+      </option>
+    </select>
+  </ClientOnly>
 </template>
 
 <!--

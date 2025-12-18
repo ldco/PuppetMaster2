@@ -155,3 +155,100 @@
   transform: scale(0.95);
 }
 
+/* ==========================================================================
+   MORE MENU - Overflow items (when > 5 nav items)
+   ========================================================================== */
+
+/* Wrapper for More button - needs position for menu positioning */
+.bottom-nav-more-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Backdrop for closing menu when clicking outside */
+.bottom-nav-more-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 40%);
+  z-index: var(--z-drawer-backdrop);
+}
+
+/* Bottom sheet style menu */
+.bottom-nav-more-menu {
+  position: fixed;
+  inset-inline: 0;
+  /* Position above bottom nav with safe area */
+  bottom: calc(var(--app-bottom-nav-height, 56px) + env(safe-area-inset-bottom, 0px));
+  background: var(--l-bg-elevated);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-drawer);
+  padding: var(--space-2) 0;
+
+  /* Prevent content from going behind rounded corners */
+  overflow: hidden;
+}
+
+/* Individual overflow menu item */
+.bottom-nav-more-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--t-primary);
+  text-decoration: none;
+  transition: background-color var(--transition-fast) ease;
+}
+
+.bottom-nav-more-item:hover,
+.bottom-nav-more-item:focus-visible {
+  background: var(--l-bg-sunken);
+}
+
+.bottom-nav-more-item.router-link-exact-active {
+  color: var(--i-brand);
+  background: var(--l-bg-sunken);
+}
+
+.bottom-nav-more-icon {
+  width: var(--icon-md, 20px);
+  height: var(--icon-md, 20px);
+  flex-shrink: 0;
+}
+
+.bottom-nav-more-label {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+}
+
+/* Badge in overflow menu */
+.bottom-nav-more-item .badge-dot {
+  position: static;
+  margin-inline-start: auto;
+}
+
+/* Small badge dot on More button (indicates badge in overflow) */
+.badge-dot-small {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  font-size: 0;
+  padding: 0;
+}
+
+/* ==========================================================================
+   TRANSITIONS - Slide up for bottom sheet
+   ========================================================================== */
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform var(--transition-normal) var(--ease-out);
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+}
+

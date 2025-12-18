@@ -55,27 +55,11 @@
   transform: translateY(-20px);
 }
 
-/* Slide right (for mobile nav) */
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: transform var(--duration-normal) var(--ease-out);
-}
-
-.slide-right-enter-from,
-.slide-right-leave-to {
-  transform: translateX(100%);
-}
-
-/* Slide left (for RTL mobile nav) */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: transform var(--duration-normal) var(--ease-out);
-}
-
-.slide-left-enter-from,
-.slide-left-leave-to {
-  transform: translateX(-100%);
-}
+/*
+ * NOTE: slide-left and slide-right are defined in mobile-nav.css
+ * with proper RTL support using inset-inline-start/end animation.
+ * Do NOT duplicate them here with translateX - it breaks RTL!
+ */
 
 /* Scale transition (for modals) */
 .scale-enter-active,

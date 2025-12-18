@@ -16,15 +16,26 @@
  *
  * Uses Holy Grail grid from layout/page.css
  * Classes: .layout, .main
+ *
+ * Adds feature classes to layout for CSS targeting:
+ * - .interactive-header: when header shrinks on scroll
+ * - .onepager: when in one-page mode with anchor navigation
  */
 import config from '~/puppet-master.config'
 
 const { t } = useI18n()
 const showBackToTop = config.features.backToTop
+
+// Feature classes for CSS targeting
+const layoutClasses = computed(() => ({
+  'layout': true,
+  'interactive-header': config.features.interactiveHeader,
+  'onepager': config.features.onepager
+}))
 </script>
 
 <template>
-  <div class="layout">
+  <div :class="layoutClasses">
     <!-- Skip to content link (WCAG 2.4.1) - first focusable element -->
     <a href="#main-content" class="skip-link">{{ t('nav.skipToContent') }}</a>
 

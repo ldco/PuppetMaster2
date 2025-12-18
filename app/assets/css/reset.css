@@ -16,9 +16,12 @@ html {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
 
-  /* Anchor link offset - accounts for sticky header */
-  scroll-padding-top: var(--header-height, 64px);
+  /* Smooth scrolling for anchor links */
   scroll-behavior: smooth;
+
+  /* NOTE: We use scroll-margin-top per-section (in sections.css) instead of
+   * scroll-padding-top here. This allows precise control - hero gets 0 offset,
+   * other sections get header-height offset. scroll-padding would add to ALL anchors. */
 }
 
 /* Remove default margin and padding */

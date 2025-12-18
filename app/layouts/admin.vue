@@ -20,6 +20,7 @@ import IconPhoto from '~icons/tabler/photo'
 import IconMail from '~icons/tabler/mail'
 import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
+import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconLogout from '~icons/tabler/logout'
 import IconSun from '~icons/tabler/sun'
 import IconMoon from '~icons/tabler/moon'
@@ -53,6 +54,7 @@ const currentPageTitle = computed(() => {
   if (name.startsWith('admin-contacts')) return t('admin.contacts')
   if (name.startsWith('admin-translations')) return t('admin.translations')
   if (name.startsWith('admin-users')) return t('admin.users')
+  if (name.startsWith('admin-health')) return t('admin.health')
   if (name.startsWith('admin')) return t('admin.dashboard')
   return t('admin.title')
 })
@@ -89,6 +91,8 @@ const adminLinks = computed(() => {
   ]
   if (canManageUsers.value) {
     links.push({ to: localePath('/admin/users'), label: 'admin.users', icon: IconUsers })
+    // Health page - master user only
+    links.push({ to: localePath('/admin/health'), label: 'admin.health', icon: IconHeartbeat })
   }
   return links
 })
@@ -295,7 +299,10 @@ onUnmounted(() => {
     </main>
 
     <!-- Bottom Navigation (phones only < 600px) -->
-    <MoleculesAppBottomNav v-if="config.features.appVerticalNav" />
+    <!-- ClientOnly to avoid hydration mismatch: canManageUsers is false on server, true on client -->
+    <ClientOnly>
+      <MoleculesAppBottomNav v-if="config.features.appVerticalNav" />
+    </ClientOnly>
   </div>
 </template>
 

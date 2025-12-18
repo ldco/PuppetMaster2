@@ -43,10 +43,52 @@ export function useScrollSpy(
   } = options
 
   const activeSection = ref(defaultSection)
+  const route = useRoute()
   let observer: IntersectionObserver | null = null
 
   function setActiveSection(id: string) {
     activeSection.value = id
+  }
+
+  /**
+   * Manually detect which section is currently in view.
+   * Used on mount and after locale changes when observer doesn't fire.
+   */
+  function detectActiveSection() {
+    if (!import.meta.client) return
+
+    console.log('[ScrollSpy] detectActiveSection called')
+    console.log('[ScrollSpy] scrollY:', window.scrollY)
+    console.log('[ScrollSpy] current activeSection:', activeSection.value)
+
+    // If at top of page, use first section
+    if (window.scrollY < 100) {
+      console.log('[ScrollSpy] At top, setting to default:', defaultSection)
+      activeSection.value = defaultSection
+      return
+    }
+
+    // Find which section is currently in the "active zone" (top 20-30% of viewport)
+    const viewportHeight = window.innerHeight
+    const activeZoneTop = viewportHeight * 0.2
+    const activeZoneBottom = viewportHeight * 0.3
+
+    console.log('[ScrollSpy] activeZone:', activeZoneTop, '-', activeZoneBottom)
+
+    for (const id of sectionIds) {
+      const element = document.getElementById(id)
+      if (element) {
+        const rect = element.getBoundingClientRect()
+        console.log(`[ScrollSpy] ${id}: top=${rect.top.toFixed(0)}, bottom=${rect.bottom.toFixed(0)}`)
+        // Section is "active" if its top is in the active zone
+        if (rect.top <= activeZoneBottom && rect.bottom >= activeZoneTop) {
+          console.log('[ScrollSpy] MATCH! Setting active to:', id)
+          activeSection.value = id
+          return
+        }
+      }
+    }
+    console.log('[ScrollSpy] No match found')
   }
 
   onMounted(() => {
@@ -74,11 +116,31 @@ export function useScrollSpy(
       }
     }
 
-    // Set initial active section based on scroll position
-    // If at top, use first section
-    if (window.scrollY < 100) {
-      activeSection.value = defaultSection
-    }
+    // Detect initial active section based on current scroll position
+    // IntersectionObserver only fires on changes, not on initial setup
+    detectActiveSection()
+  })
+
+  // Watch for route changes (locale change triggers route change)
+  // Re-detect active section since component doesn't remount
+  watch(() => route.fullPath, (newPath, oldPath) => {
+    console.log('[ScrollSpy] Route changed:', oldPath, '->', newPath)
+    nextTick(() => {
+      // If route has a hash, use it directly as active section
+      // (smooth scroll hasn't completed yet, so we can't detect from position)
+      if (route.hash) {
+        const targetSection = route.hash.slice(1) // Remove #
+        console.log('[ScrollSpy] Hash found:', targetSection)
+        if (sectionIds.includes(targetSection)) {
+          console.log('[ScrollSpy] Setting active from hash:', targetSection)
+          activeSection.value = targetSection
+          return
+        }
+      }
+      // No hash - detect from scroll position (e.g., at home with no hash)
+      console.log('[ScrollSpy] No hash, detecting from position')
+      detectActiveSection()
+    })
   })
 
   onUnmounted(() => {

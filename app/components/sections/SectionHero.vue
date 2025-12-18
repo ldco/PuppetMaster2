@@ -3,11 +3,7 @@
  * Hero Section
  *
  * Main landing section with big logo, subtext, and CTAs.
- *
- * Uses ClientOnly for logo to avoid SSR hydration mismatch
- * (logo src depends on colorMode which differs between server and client).
  */
-import config from '~/puppet-master.config'
 
 const { shortLogo } = useLogo()
 
@@ -23,12 +19,6 @@ defineProps<{
   /** Secondary CTA link */
   secondaryLink?: string
 }>()
-
-// SSR fallback: use the default theme logo
-const ssrFallbackLogo = computed(() => {
-  const theme = config.defaultTheme === 'dark' ? 'light' : 'dark'
-  return `${config.logo.basePath}/circle_${theme}_${config.defaultLocale}.svg`
-})
 </script>
 
 <template>
@@ -41,12 +31,7 @@ const ssrFallbackLogo = computed(() => {
     <div class="container">
       <div class="hero-logo">
         <slot name="logo">
-          <ClientOnly>
-            <img :src="shortLogo" alt="Logo" class="hero-logo-img" />
-            <template #fallback>
-              <img :src="ssrFallbackLogo" alt="Logo" class="hero-logo-img" />
-            </template>
-          </ClientOnly>
+          <img :src="shortLogo" alt="Logo" class="hero-logo-img" />
         </slot>
       </div>
       <p class="hero-subtitle">
@@ -79,4 +64,3 @@ const ssrFallbackLogo = computed(() => {
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->
-

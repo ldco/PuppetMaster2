@@ -11,6 +11,7 @@
 import config from '~/puppet-master.config'
 
 const { headerLogo } = useLogo()
+const localePath = useLocalePath()
 
 defineProps<{
   /** Link destination (default: home) */
@@ -26,11 +27,14 @@ const ssrFallbackLogo = computed(() => {
   const theme = config.defaultTheme === 'dark' ? 'light' : 'dark'
   return `${config.logo.basePath}/horizontal_${theme}_${config.defaultLocale}.svg`
 })
+
+// Locale-aware home path (keeps current language when clicking logo)
+const homePath = computed(() => localePath('/'))
 </script>
 
 <template>
   <!-- Uses global classes from skeleton/header.css (.logo-link, .logo-img) -->
-  <NuxtLink :to="to ?? '/'" class="logo-link" :class="$props.class">
+  <NuxtLink :to="to ?? homePath" class="logo-link" :class="$props.class">
     <ClientOnly>
       <img
         :src="headerLogo"

@@ -298,14 +298,15 @@ const config = {
   ] as const,
 
   // Setting groups (for admin UI organization)
+  // Labels are i18n keys - use t(group.label) in templates
   settingGroups: [
-    { key: 'contact', label: 'Contact Info', icon: 'address-book' },
-    { key: 'social', label: 'Social Links', icon: 'share' },
-    { key: 'legal', label: 'Legal Info', icon: 'file-certificate' },
-    { key: 'footer', label: 'Footer', icon: 'layout-bottombar' },
-    { key: 'seo', label: 'SEO & Meta', icon: 'search' },
-    { key: 'analytics', label: 'Analytics', icon: 'chart-bar' },
-    { key: 'verification', label: 'Verification', icon: 'certificate' }
+    { key: 'contact', label: 'admin.settingsContact', icon: 'address-book' },
+    { key: 'social', label: 'admin.settingsSocial', icon: 'share' },
+    { key: 'legal', label: 'admin.settingsLegal', icon: 'file-certificate' },
+    { key: 'footer', label: 'admin.settingsFooter', icon: 'layout-bottombar' },
+    { key: 'seo', label: 'admin.settingsSeo', icon: 'search' },
+    { key: 'analytics', label: 'admin.settingsAnalytics', icon: 'chart-bar' },
+    { key: 'verification', label: 'admin.settingsVerification', icon: 'certificate' }
   ] as const,
 
   // ═══════════════════════════════════════════════════════════════════════════
