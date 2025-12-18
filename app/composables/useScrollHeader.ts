@@ -73,17 +73,17 @@ export function useScrollHeader(options: ScrollHeaderOptions = {}): ScrollHeader
 
   function handleScroll() {
     if (!enabled) return
-    
+
     const currentScrollY = window.scrollY
     scrollY.value = currentScrollY
-    
+
     // Determine if scrolled past threshold
     isScrolled.value = currentScrollY > threshold
-    
+
     // Determine scroll direction and hide/show
     if (hideOnScroll) {
       const delta = currentScrollY - lastScrollY.value
-      
+
       if (Math.abs(delta) > scrollDelta) {
         if (delta > 0 && currentScrollY > threshold) {
           // Scrolling down past threshold - hide
@@ -97,9 +97,9 @@ export function useScrollHeader(options: ScrollHeaderOptions = {}): ScrollHeader
         lastScrollY.value = currentScrollY
       }
     }
-    
-    // Always show at top
-    if (currentScrollY <= 0) {
+
+    // Always show full header at top (use small threshold for rounding after smooth scroll)
+    if (currentScrollY <= 5) {
       isHidden.value = false
       isScrolled.value = false
     }

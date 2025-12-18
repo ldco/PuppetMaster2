@@ -49,6 +49,7 @@
    */
 
 .section {
+  /* Full viewport height - header is fixed overlay */
   min-height: 100dvh;
 
   /* Flexbox for vertical centering */
@@ -57,8 +58,11 @@
   justify-content: center;
   align-items: center;
 
-  /* Symmetric padding - no header offset needed (scroll-padding handles it) */
+  /* Symmetric padding */
   padding-block: var(--space-8);
+
+  /* Scroll to screen top - section top aligns with screen top (behind header) */
+  scroll-margin-top: 0;
 }
 
 /* The container inside section gets the content width constraint */
@@ -73,11 +77,11 @@
 
 /**
  * Hero is visible on page load (before any scroll).
- * We add top padding equal to header height so content doesn't start
- * hidden behind the sticky header.
+ * - Full viewport height (header is transparent overlay)
+ * - Padding: accounts for header so content starts below it
  */
 .section-hero {
-  padding-block-start: calc(var(--header-height, 64px) + var(--space-8));
+  padding-block-start: calc(var(--header-height, 72px) + var(--space-8));
 }
 
 

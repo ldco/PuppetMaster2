@@ -53,8 +53,12 @@
 }
 
 .header {
-  position: sticky;
+  /* Fixed positioning - header is overlay, doesn't take space in document flow */
+  /* Sections start at screen top (y=0) and go behind header */
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: var(--z-fixed);
   background: var(--l-bg);
   border-block-end: 1px solid var(--l-border);
