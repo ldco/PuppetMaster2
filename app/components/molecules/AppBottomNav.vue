@@ -21,15 +21,16 @@ const { canManageUsers } = useAuth()
 const { unreadCount } = useUnreadCount()
 
 // Navigation items matching admin.vue sidebar - use localePath for locale-aware navigation
+// Uses short single-word labels (admin.navXxx) for compact bottom nav display
 const navItems = computed(() => {
   const items = [
-    { to: localePath('/admin/settings'), label: 'admin.settings', icon: IconSettings },
-    { to: localePath('/admin/portfolio'), label: 'admin.portfolio', icon: IconPhoto },
-    { to: localePath('/admin/contacts'), label: 'admin.contacts', icon: IconMail, badge: true },
-    { to: localePath('/admin/translations'), label: 'admin.translations', icon: IconLanguage },
+    { to: localePath('/admin/settings'), label: 'admin.navSettings', icon: IconSettings },
+    { to: localePath('/admin/portfolio'), label: 'admin.navPortfolio', icon: IconPhoto },
+    { to: localePath('/admin/contacts'), label: 'admin.navContacts', icon: IconMail, badge: true },
+    { to: localePath('/admin/translations'), label: 'admin.navTranslations', icon: IconLanguage },
   ]
   if (canManageUsers.value) {
-    items.push({ to: localePath('/admin/users'), label: 'admin.users', icon: IconUsers })
+    items.push({ to: localePath('/admin/users'), label: 'admin.navUsers', icon: IconUsers })
   }
   return items
 })

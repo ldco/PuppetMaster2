@@ -202,6 +202,12 @@
   z-index: var(--z-popover);
 }
 
+/* RTL: Menu should extend inward (to the left) not outward (to the right) */
+[dir="rtl"] .mobile-user-menu {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+
 .mobile-user-info {
   display: flex;
   flex-direction: column;
