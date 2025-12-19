@@ -200,10 +200,15 @@ var(--space-2)   /* 0.5rem */
 var(--space-4)   /* 1rem */
 var(--space-8)   /* 2rem */
 
-/* Typography */
-var(--font-sm)   /* 0.875rem */
-var(--font-base) /* 1rem */
-var(--font-lg)   /* 1.125rem */
+/* Typography - Font Family */
+var(--font-sans)   /* Body text (default: Montserrat) */
+var(--font-accent) /* Headings, decorative */
+var(--font-mono)   /* Code, monospace */
+
+/* Typography - Font Size */
+var(--text-sm)   /* 0.875rem */
+var(--text-base) /* 1rem */
+var(--text-lg)   /* 1.125rem */
 
 /* Sizing */
 var(--avatar-sm) /* 32px */

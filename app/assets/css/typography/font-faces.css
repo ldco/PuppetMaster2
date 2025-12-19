@@ -1,0 +1,84 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CUSTOM FONT FACES
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Use this file to self-host fonts for client projects.
+ * Place font files in: assets/css/typography/fonts/
+ *
+ * WHEN TO USE THIS FILE:
+ * - Client has custom brand fonts (not available on Google Fonts)
+ * - Need offline support
+ * - Want faster loading (no external requests)
+ *
+ * WHEN TO USE GOOGLE FONTS INSTEAD:
+ * - Using common fonts (faster CDN)
+ * - Quick prototyping
+ * - Configure in nuxt.config.ts with @nuxtjs/google-fonts
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * EXAMPLE: Self-hosting a custom font
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * 1. Download font files (WOFF2 recommended for web)
+ * 2. Place in: assets/css/typography/fonts/
+ * 3. Add @font-face rules below
+ * 4. Update --font-sans or --font-accent in variables.css
+ *
+ * EXAMPLE @font-face declarations:
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/*
+@font-face {
+  font-family: 'ClientBrandFont';
+  src: url('./fonts/ClientBrandFont-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ClientBrandFont';
+  src: url('./fonts/ClientBrandFont-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ClientBrandFont';
+  src: url('./fonts/ClientBrandFont-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * EXAMPLE: Display/Accent font (for headings)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+@font-face {
+  font-family: 'ClientDisplayFont';
+  src: url('./fonts/ClientDisplayFont-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * After adding fonts, update variables.css:
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * :root {
+ *   --font-sans: 'ClientBrandFont', system-ui, sans-serif;
+ *   --font-accent: 'ClientDisplayFont', serif;
+ * }
+ *
+ * ═══════════════════════════════════════════════════════════════════════════ */
+

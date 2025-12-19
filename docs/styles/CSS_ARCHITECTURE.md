@@ -55,21 +55,24 @@ Puppet Master uses a **pure CSS architecture** with no frameworks (no Tailwind, 
 
 ### Application Modes (4 modes)
 
-| Mode | Website Portion | App/Admin Portion |
-|------|-----------------|-------------------|
-| `app-only` | ❌ None | App (vertical sidebar, SPA) |
-| `website-app` | Website (hamburger, can be onepager OR SPA) | App (visible login button) |
-| `website-admin` | Website (hamburger, can be onepager OR SPA) | Admin (hidden at /admin) |
-| `website-only` | Website (hamburger, can be onepager OR SPA) | ❌ None |
+| Mode | Website Portion | App Portion |
+|------|-----------------|-------------|
+| `app-only` | ❌ None | ✅ App mode (sidebar + bottom nav) |
+| `website-app` | ✅ Website (hamburger) | ✅ App mode (visible login button) |
+| `website-admin` | ✅ Website (hamburger) | ✅ App mode (hidden at `/admin`) |
+| `website-only` | ✅ Website (hamburger) | ❌ None |
 
 ### Visual Modes (2 modes)
 
-| Visual Mode | Used By | Desktop | Mobile |
-|-------------|---------|---------|--------|
-| **Website** | Public site | Horizontal header | Hamburger menu |
-| **App** | Admin panel, App | Vertical sidebar | Bottom nav OR mobile header |
+| Visual Mode | Desktop | Mobile |
+|-------------|---------|--------|
+| **Website** | Horizontal header | Hamburger menu (slide-out drawer) |
+| **App** | Vertical sidebar | Bottom navigation bar |
 
-**Important:** Admin panel is **ALWAYS** app visual mode, regardless of application mode.
+**Key distinction:**
+- **Website mode** = Hamburger menu on mobile (ALWAYS)
+- **App mode** = Bottom nav bar on mobile (ALWAYS)
+- **Admin panel** = App mode (it IS app mode, not a separate visual mode)
 
 ### Website Sub-Modes
 

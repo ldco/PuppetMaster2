@@ -1,7 +1,12 @@
 /**
  * Typography System
+ *
+ * Font loading order:
+ * 1. font-faces.css - @font-face for self-hosted fonts (optional)
+ * 2. variables.css - --font-sans, --font-accent, --font-mono
+ * 3. base.css - Apply fonts to elements
  */
 
+@import './font-faces.css';
 @import './variables.css';
 @import './base.css';
-

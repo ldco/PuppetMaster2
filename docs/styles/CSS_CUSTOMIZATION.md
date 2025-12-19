@@ -60,8 +60,39 @@ All other colors are auto-calculated from these 4 values using `color-mix()` and
 ```css
 /* assets/css/typography/variables.css */
 :root {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Montserrat', sans-serif;
+  /* Body text */
+  --font-sans: 'ClientFont', system-ui, sans-serif;
+  /* Headings, decorative (optional - defaults to --font-sans) */
+  --font-accent: 'ClientDisplayFont', serif;
+}
+```
+
+**Default (PuppetMaster branding):** Montserrat for both `--font-sans` and `--font-accent`.
+
+**For client projects:** Override with client's brand fonts.
+
+### Font Loading Options
+
+**Option 1: Google Fonts** (recommended for common fonts)
+```typescript
+// nuxt.config.ts
+googleFonts: {
+  families: {
+    'Open Sans': [400, 500, 700],
+    'Playfair Display': [700]
+  }
+}
+```
+
+**Option 2: Self-hosted** (for custom brand fonts)
+```css
+/* assets/css/typography/font-faces.css */
+@font-face {
+  font-family: 'ClientFont';
+  src: url('./fonts/ClientFont-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 ```
 
@@ -84,15 +115,17 @@ All other colors are auto-calculated from these 4 values using `color-mix()` and
 | I need to customize... | Edit this file |
 |------------------------|----------------|
 | Brand colors | `colors/primitives.css` |
+| Font family | `typography/variables.css` |
+| Self-hosted fonts | `typography/font-faces.css` |
 | Header | `skeleton/header.css` |
 | Footer | `skeleton/footer.css` |
-| Admin sidebar | `layout/admin-sidebar.css` |
+| App sidebar | `layout/admin-sidebar.css` |
+| App bottom nav | `skeleton/bottom-nav.css` |
 | Buttons | `ui/forms/buttons.css` |
 | Input fields | `ui/forms/inputs.css` |
 | Cards | `ui/content/cards.css` |
 | Tabs | `ui/content/tabs.css` |
 | Modals | `ui/overlays/modal.css` |
-| Typography | `typography/variables.css` |
 | Spacing scale | `common/spacing.css` |
 
 ---

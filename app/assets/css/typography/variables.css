@@ -7,11 +7,19 @@
  * ───────────────────────────────────────────────────────────────────────────
  *
  * FONT FAMILY:
- *   --font-sans     Default: Montserrat (from logo design)
- *   --font-mono     Monospace for code
+ *   --font-sans     Body text (default: Montserrat - PuppetMaster branding)
+ *   --font-accent   Headings, decorative (default: same as --font-sans)
+ *   --font-mono     Code, monospace
  *
- * To change default font:
- *   :root { --font-sans: 'Your Font', sans-serif; }
+ * FOR CLIENT PROJECTS:
+ *   Override in colors/primitives.css or client/overrides.css:
+ *   :root {
+ *     --font-sans: 'Client Font', sans-serif;
+ *     --font-accent: 'Client Display Font', serif;
+ *   }
+ *
+ * SELF-HOSTING FONTS:
+ *   Add @font-face rules to typography/font-faces.css
  *
  * FONT SIZES:
  *   --text-xs to --text-6xl   Static sizes
@@ -23,11 +31,17 @@
 :root {
   /* ─────────────────────────────────────────────────────────────────────────
    * FONT STACKS
-   * Montserrat is the default (matches logo design)
-   * Load via Google Fonts or self-host in typography/fonts/
+   *
+   * DEFAULT (PuppetMaster branding): Montserrat for both sans and accent
+   * CLIENT PROJECTS: Override these variables with client's brand fonts
+   *
+   * Load fonts via:
+   *   1. Google Fonts (in nuxt.config.ts)
+   *   2. Self-hosted (in typography/font-faces.css)
    * ───────────────────────────────────────────────────────────────────────── */
   --font-sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-accent: var(--font-sans);  /* Override for decorative/display fonts */
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
   

@@ -208,12 +208,21 @@ docs: add PM_BEST_PRACTICES.md
 
 ### 4 Application Modes
 
-| Mode | Website | App/Admin |
-|------|---------|-----------|
-| `app-only` | ❌ | ✅ App (vertical sidebar) |
-| `website-app` | ✅ (hamburger) | ✅ App (login button visible) |
-| `website-admin` | ✅ (hamburger) | ✅ Admin (hidden at /admin) |
-| `website-only` | ✅ (hamburger) | ❌ |
+| Mode | Website | App |
+|------|---------|-----|
+| `app-only` | ❌ | ✅ App mode |
+| `website-app` | ✅ Website mode | ✅ App mode (login visible) |
+| `website-admin` | ✅ Website mode | ✅ App mode (hidden at `/admin`) |
+| `website-only` | ✅ Website mode | ❌ |
+
+### Visual Modes
+
+| Mode | Desktop | Mobile |
+|------|---------|--------|
+| **Website** | Horizontal header | Hamburger menu |
+| **App** | Vertical sidebar | Bottom nav bar |
+
+**Key:** Admin panel IS app mode - not a separate thing.
 
 ### Website Sub-Modes
 
@@ -221,8 +230,6 @@ docs: add PM_BEST_PRACTICES.md
 |------|------------|
 | Onepager | Scroll-based anchors (`#about`, `#contact`) |
 | SPA | Route-based (`/about`, `/contact`) |
-
-**Important:** Admin panel is ALWAYS app visual mode (vertical sidebar), regardless of application mode.
 
 ---
 
