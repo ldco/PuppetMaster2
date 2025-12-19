@@ -105,14 +105,83 @@
   color: var(--t-muted);
 }
 
-/* Responsive: horizontal scroll on small screens */
+/* ═══════════════════════════════════════════════════════════
+ * RESPONSIVE: Card Layout on Mobile
+ *
+ * On phone screens, table rows become stacked cards.
+ * Requires data-label attributes on <td> elements:
+ *   <td data-label="Name">John Doe</td>
+ * ═══════════════════════════════════════════════════════════ */
 @media (--phone) {
-  .data-table {
-    overflow-x: auto;
+  /* Hide table header on mobile */
+  .data-table thead,
+  .data-table table thead {
+    display: none;
   }
 
-  .data-table table {
-    min-width: 500px;
+  /* Make table a flex container for cards */
+  .data-table tbody,
+  .data-table table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  /* Each row becomes a card */
+  .data-table tbody tr,
+  .data-table table tbody tr {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--l-bg);
+    border: 1px solid var(--l-border);
+    border-radius: var(--radius-md);
+  }
+
+  .data-table tbody tr:hover,
+  .data-table table tbody tr:hover {
+    background: var(--l-bg); /* Keep same on hover */
+  }
+
+  /* Each cell becomes a row with label */
+  .data-table td,
+  .data-table table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+    border: none;
+  }
+
+  /* Long text (like translation values) should wrap and stay left-aligned */
+  .data-table .cell--value,
+  .data-table table .cell--value {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  /* Label from data-label attribute */
+  .data-table td::before,
+  .data-table table td::before {
+    content: attr(data-label);
+    font-weight: var(--font-medium);
+    color: var(--t-secondary);
+    font-size: var(--text-sm);
+    text-align: start;
+    flex-shrink: 0;
+  }
+
+  /* Actions row - full width buttons */
+  .data-table .actions-col {
+    width: auto;
+    justify-content: flex-end;
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--l-border);
+    margin-block-start: var(--space-1);
   }
 }
 

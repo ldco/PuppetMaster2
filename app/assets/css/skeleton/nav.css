@@ -118,8 +118,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   margin: 0 auto;
   border-radius: var(--radius-sm);
   color: var(--t-secondary);
@@ -192,8 +192,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   margin: 0 auto;
   border-radius: var(--radius-sm);
   color: var(--t-secondary);
@@ -262,8 +262,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   margin: 0 auto;
   border-radius: var(--radius-sm);
   color: var(--t-secondary);

@@ -60,9 +60,9 @@
   display: block;
 }
 
-/* Mobile spacer for balanced header layout */
+/* Mobile spacer for balanced header layout (matches hamburger button) */
 .mobile-spacer {
-  width: 44px; /* Same as hamburger button */
+  width: var(--touch-target);
 }
 
 /* ══════════════════════════════════════════════════════════

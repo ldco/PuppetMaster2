@@ -65,8 +65,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;  /* WCAG touch target, matches lightbox close visually */
-  height: 44px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   border: none;
   background: transparent;
   color: var(--t-muted);

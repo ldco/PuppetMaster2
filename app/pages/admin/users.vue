@@ -189,14 +189,14 @@ const roleBadgeClass: Record<string, string> = {
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.id">
-            <td>{{ user.name || '—' }}</td>
-            <td>{{ user.email }}</td>
-            <td>
+            <td :data-label="t('admin.name')">{{ user.name || '—' }}</td>
+            <td :data-label="t('admin.email')">{{ user.email }}</td>
+            <td :data-label="t('admin.role')">
               <span class="badge" :class="roleBadgeClass[user.role]">
                 {{ roleLabels[user.role] }}
               </span>
             </td>
-            <td>{{ formatDate(user.createdAt) }}</td>
+            <td :data-label="t('admin.created')">{{ formatDate(user.createdAt) }}</td>
             <td class="actions-col">
               <button
                 class="btn btn-icon btn-ghost"

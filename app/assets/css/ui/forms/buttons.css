@@ -195,8 +195,8 @@
 /* Icon button */
 .btn-icon {
   padding: var(--space-2);
-  width: 44px;  /* WCAG 2.5.8 touch target */
-  height: 44px;
+  width: var(--touch-target);
+  height: var(--touch-target);
 }
 
 .btn-icon.btn-sm {

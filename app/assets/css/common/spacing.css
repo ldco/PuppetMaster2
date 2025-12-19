@@ -64,6 +64,15 @@
   --icon-2xl: 32px;
 
   /* ══════════════════════════════════════════════════════════
+   * TOUCH TARGET SIZE
+   * WCAG 2.5.8 minimum for touch/click targets (Apple: 44px, Material: 48px)
+   * Use for icon buttons, close buttons, nav items on touch devices
+   * ══════════════════════════════════════════════════════════ */
+
+  --touch-target: 44px;
+  --touch-target-lg: 48px;
+
+  /* ══════════════════════════════════════════════════════════
    * AVATAR SIZES
    * Standardized avatar dimensions
    * ══════════════════════════════════════════════════════════ */

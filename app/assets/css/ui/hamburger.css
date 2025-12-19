@@ -39,6 +39,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
     overflow: visible;
     margin: 0;
     padding: var(--hamburger-padding);

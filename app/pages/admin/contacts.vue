@@ -96,6 +96,11 @@ async function deleteMessage(item: ContactSubmission) {
 }
 
 function selectMessage(item: ContactSubmission) {
+  // Toggle: click same message again to close
+  if (selectedMessage.value?.id === item.id) {
+    selectedMessage.value = null
+    return
+  }
   selectedMessage.value = item
   // Mark as read when opening
   if (!item.read) {
@@ -133,32 +138,66 @@ function formatDate(timestamp: number) {
       <p>{{ t('admin.noMessages') }}</p>
     </div>
 
-    <!-- Messages grid: list + detail -->
-    <div v-else class="grid gap-4" style="grid-template-columns: minmax(280px, 1fr) 2fr;">
-      <!-- Messages list -->
-      <div class="card flex flex-col" style="max-height: 70vh; overflow-y: auto;">
-        <button
+    <!-- Messages: Desktop = side-by-side cards, Mobile = accordion cards -->
+    <div v-else class="inbox-layout">
+      <!-- Messages list - each item is a card -->
+      <div class="inbox-list">
+        <div
           v-for="item in items"
           :key="item.id"
-          type="button"
-          class="card-body flex flex-col gap-1 text-start border-b cursor-pointer"
+          class="card contact-item"
           :class="{
-            'bg-brand-subtle': selectedMessage?.id === item.id,
-            'font-bold': !item.read
+            'is-selected': selectedMessage?.id === item.id,
+            'is-unread': !item.read
           }"
-          @click="selectMessage(item)"
         >
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-medium truncate">{{ item.name }}</span>
-            <span class="text-xs text-secondary whitespace-nowrap">{{ formatDate(item.createdAt) }}</span>
+          <!-- Message preview (always visible) -->
+          <button
+            type="button"
+            class="contact-preview"
+            @click="selectMessage(item)"
+          >
+            <div class="contact-preview-header">
+              <span class="contact-name">{{ item.name }}</span>
+              <span class="contact-date">{{ formatDate(item.createdAt) }}</span>
+            </div>
+            <div class="contact-subject">{{ item.subject || t('admin.noSubject') }}</div>
+            <div class="contact-excerpt">{{ item.message.slice(0, 60) }}{{ item.message.length > 60 ? '...' : '' }}</div>
+          </button>
+
+          <!-- Expanded content (mobile only, inline accordion) -->
+          <div v-if="selectedMessage?.id === item.id" class="contact-expanded">
+            <div class="contact-expanded-actions">
+              <button
+                type="button"
+                class="btn btn-icon btn-ghost"
+                @click.stop="toggleRead(item)"
+                :title="item.read ? t('admin.markUnread') : t('admin.markRead')"
+              >
+                <IconMailOpened v-if="item.read" />
+                <IconMail v-else />
+              </button>
+              <button
+                type="button"
+                class="btn btn-icon btn-ghost text-danger"
+                @click.stop="deleteMessage(item)"
+                :disabled="deleting === item.id"
+                :title="t('common.delete')"
+              >
+                <IconTrash />
+              </button>
+            </div>
+            <div class="contact-expanded-meta">
+              <p><strong>{{ t('admin.from') }}:</strong> {{ item.name }} &lt;{{ item.email }}&gt;</p>
+              <p v-if="item.phone"><strong>{{ t('admin.phone') }}:</strong> {{ item.phone }}</p>
+            </div>
+            <div class="contact-expanded-body">{{ item.message }}</div>
           </div>
-          <div class="text-sm truncate">{{ item.subject || t('admin.noSubject') }}</div>
-          <div class="text-sm text-secondary truncate">{{ item.message.slice(0, 60) }}{{ item.message.length > 60 ? '...' : '' }}</div>
-        </button>
+        </div>
       </div>
 
-      <!-- Message detail -->
-      <div class="card">
+      <!-- Message detail panel (desktop only) - separate card -->
+      <div class="card inbox-detail">
         <template v-if="selectedMessage">
           <div class="card-header">
             <h2>{{ selectedMessage.subject || t('admin.noSubject') }}</h2>
@@ -172,10 +211,6 @@ function formatDate(timestamp: number) {
                 <IconMailOpened v-if="selectedMessage.read" />
                 <IconMail v-else />
               </button>
-              <!--
-                UX Design Decision: Uses text-danger (always red icon) instead of btn-danger (red on hover).
-                Single-item context = prominent delete is acceptable. For tables/grids with many items, use btn-ghost btn-danger.
-              -->
               <button
                 type="button"
                 class="btn btn-icon btn-ghost text-danger"
@@ -187,17 +222,17 @@ function formatDate(timestamp: number) {
               </button>
             </div>
           </div>
-          <div class="card-body flex flex-col gap-4">
-            <div class="flex flex-col gap-1 text-sm text-secondary">
+          <div class="inbox-detail-content">
+            <div class="inbox-detail-meta">
               <p><strong>{{ t('admin.from') }}:</strong> {{ selectedMessage.name }} &lt;{{ selectedMessage.email }}&gt;</p>
               <p v-if="selectedMessage.phone"><strong>{{ t('admin.phone') }}:</strong> {{ selectedMessage.phone }}</p>
               <p><strong>{{ t('admin.date') }}:</strong> {{ formatDate(selectedMessage.createdAt) }}</p>
             </div>
-            <div class="whitespace-pre-wrap">{{ selectedMessage.message }}</div>
+            <div class="inbox-detail-body">{{ selectedMessage.message }}</div>
           </div>
         </template>
-        <div v-else class="card-body text-center text-secondary">
-          <IconMail class="icon-xl mx-auto mb-4 opacity-50" />
+        <div v-else class="inbox-detail-empty">
+          <IconMail class="icon-xl opacity-50" />
           <p>{{ t('admin.selectMessage') }}</p>
         </div>
       </div>

@@ -178,24 +178,24 @@ const localeNames: Record<string, string> = {
     </div>
 
     <!-- Translations table -->
-    <div v-else class="translations-table card">
-      <table>
+    <div v-else class="card">
+      <table class="data-table">
         <thead>
           <tr>
             <th>{{ t('admin.translationKey') }}</th>
             <th>{{ t('admin.translationValue') }}</th>
-            <th></th>
+            <th class="actions-col"></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in filteredTranslations" :key="item.id">
-            <td class="key-cell">
+            <td class="cell--key" :data-label="t('admin.translationKey')">
               <code>{{ item.key }}</code>
             </td>
-            <td class="value-cell" @click="openEdit(item)">
+            <td class="cell--value cell--editable" :data-label="t('admin.translationValue')" dir="auto" @click="openEdit(item)">
               {{ item.value }}
             </td>
-            <td class="actions-cell">
+            <td class="actions-col">
               <button
                 class="btn btn-icon btn-ghost btn-danger"
                 @click="deleteTranslation(item)"
@@ -242,6 +242,7 @@ const localeNames: Record<string, string> = {
                 class="input"
                 rows="3"
                 required
+                dir="auto"
               ></textarea>
             </div>
 
