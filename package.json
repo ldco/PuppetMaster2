@@ -15,7 +15,8 @@
     "db:seed": "tsx server/database/seed.ts",
     "db:reset": "rm -f data/sqlite.db && npm run db:migrate && npm run db:seed",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "generate:favicons": "create-favicon public/favicon.svg public --overwrite --no-manifest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.952.0",
@@ -42,6 +43,7 @@
     "@iconify/json": "^2.2.418",
     "@types/better-sqlite3": "^7.6.13",
     "@types/nodemailer": "^7.0.4",
+    "create-favicon": "^2.1.0",
     "drizzle-kit": "^0.31.8",
     "postcss-preset-env": "^10.5.0",
     "tsx": "^4.21.0"
