@@ -13,12 +13,27 @@
   font-weight: var(--font-medium);
   border-radius: var(--radius-md);
   border: none;
-  transition: background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease,
-              border-color var(--transition-normal) ease,
-              transform var(--transition-fast) ease;
   cursor: pointer;
   text-decoration: none;
+
+  /* Modern micro-interaction transitions */
+  transition:
+    background-color var(--transition-fast) var(--ease-smooth),
+    color var(--transition-fast) var(--ease-smooth),
+    border-color var(--transition-fast) var(--ease-smooth),
+    box-shadow var(--transition-fast) var(--ease-smooth),
+    transform var(--transition-instant) var(--ease-out);
+}
+
+/* Subtle lift on hover - modern feel */
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* Press down effect - tactile feedback */
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  transition-duration: var(--transition-instant);
 }
 
 .btn:focus-visible {
@@ -35,14 +50,17 @@
 .btn-primary {
   background: var(--i-brand);
   color: var(--t-on-brand);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 10%);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--i-brand-hover);
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 15%);
 }
 
 .btn-primary:active:not(:disabled) {
   background: var(--i-brand-active);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 10%);
 }
 
 /* Secondary button */

@@ -22,13 +22,10 @@ import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconLogout from '~icons/tabler/logout'
-import IconSun from '~icons/tabler/sun'
-import IconMoon from '~icons/tabler/moon'
 
 const route = useRoute()
-const { t, locale, locales, setLocale } = useI18n()
+const { t } = useI18n()
 const localePath = useLocalePath()
-const colorMode = useColorMode()
 const { user, logout, isLoading, canManageUsers } = useAuth()
 const { shortLogo } = useLogo()
 
@@ -101,15 +98,8 @@ async function handleLogout() {
   await logout()
 }
 
-function toggleTheme() {
-  colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'
-}
-
-// Select locale (for mobile menu)
-function selectLocale(code: 'en' | 'ru' | 'he') {
-  setLocale(code)
-  mobileUserMenuOpen.value = false
-}
+// Theme toggle and language switcher now use shared components
+// with View Transitions API animations (ThemeToggle, LangSwitcher)
 
 // Close panels on click outside
 function handleClickOutside(e: MouseEvent) {
@@ -168,18 +158,8 @@ onUnmounted(() => {
 
       <!-- Footer actions -->
       <div class="sidebar-footer">
-        <!-- Theme toggle - no tooltip needed (sun/moon is self-explanatory) -->
-        <ClientOnly>
-          <button type="button" class="sidebar-icon-btn" @click="toggleTheme" :aria-label="colorMode.preference === 'dark' ? 'Light mode' : 'Dark mode'">
-            <IconSun v-if="colorMode.preference === 'dark'" />
-            <IconMoon v-else />
-          </button>
-          <template #fallback>
-            <button type="button" class="sidebar-icon-btn" aria-label="Theme">
-              <IconSun />
-            </button>
-          </template>
-        </ClientOnly>
+        <!-- Theme toggle - uses shared component with View Transitions animation -->
+        <AtomsThemeToggle class="sidebar-icon-btn" />
 
         <!-- Language switcher - reusable component -->
         <AtomsLangSwitcher direction="side" />
@@ -231,30 +211,10 @@ onUnmounted(() => {
 
             <div class="mobile-menu-divider"></div>
 
-            <!-- Theme toggle -->
-            <ClientOnly>
-              <button type="button" class="mobile-menu-item" @click="toggleTheme">
-                <IconSun v-if="colorMode.preference === 'dark'" />
-                <IconMoon v-else />
-                <span>{{ t('common.theme') }}</span>
-              </button>
-            </ClientOnly>
-
-            <!-- Language options -->
-            <div class="mobile-lang-group">
-              <span class="mobile-lang-label">{{ t('common.language') }}</span>
-              <div class="mobile-lang-options">
-                <button
-                  v-for="loc in locales"
-                  :key="loc.code"
-                  type="button"
-                  class="mobile-lang-btn"
-                  :class="{ active: locale === loc.code }"
-                  @click="selectLocale(loc.code)"
-                >
-                  {{ loc.code.toUpperCase() }}
-                </button>
-              </div>
+            <!-- Theme & Language - uses shared components for consistency -->
+            <div class="mobile-menu-toggles">
+              <AtomsThemeToggle />
+              <AtomsLangSwitcher direction="inline" />
             </div>
 
             <div class="mobile-menu-divider"></div>

@@ -16,8 +16,8 @@ import config from '~/puppet-master.config'
 const props = withDefaults(defineProps<{
   /** Show contact buttons (set false in mobile menu where they're in header) */
   showContact?: boolean
-  /** Language switcher direction (side for mobile slide menu) */
-  langDirection?: 'down' | 'side'
+  /** Language switcher direction: down (header), side (sidebar), inline (mobile menu) */
+  langDirection?: 'down' | 'side' | 'inline'
 }>(), {
   showContact: true,
   langDirection: 'down'

@@ -2,9 +2,10 @@
  * Language Switcher
  *
  * Button-based language switcher with popup panel.
- * Supports two directions via modifier classes:
+ * Supports three modes:
  * - .lang-switcher--down (header: opens below)
  * - .lang-switcher--side (sidebar: opens to the side)
+ * - .lang-switcher-inline (compact menus: all options visible, no popup)
  */
 
 /* Wrapper for positioning */
@@ -101,6 +102,9 @@
 /* ═══════════════════════════════════════════════════════════
  * DIRECTION: SIDE (sidebar)
  * Opens to the side, vertically centered
+ *
+ * NOTE: Using margin-top trick instead of transform: translateY(-50%)
+ * because transform would conflict with Vue transition animations.
  * ═══════════════════════════════════════════════════════════ */
 
 .lang-switcher--side .lang-switcher-btn {
@@ -112,7 +116,19 @@
 .lang-switcher--side .lang-switcher-panel {
   inset-inline-start: 120%;
   top: 50%;
-  transform: translateY(-50%);
+  /* Use negative margin instead of transform to center vertically
+     This avoids conflict with Vue transition's transform animation */
+  margin-top: calc(-0.5 * (36px + var(--space-2) * 2)); /* half of panel height (option height + padding) */
   margin-inline-start: var(--space-2);
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * MODE: INLINE (compact menus)
+ * All options visible, no popup - for space-constrained menus
+ * ═══════════════════════════════════════════════════════════ */
+
+.lang-switcher-inline {
+  display: flex;
+  gap: var(--space-1);
 }
 

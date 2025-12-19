@@ -6,7 +6,7 @@
  * Uses @nuxtjs/i18n under the hood.
  *
  * Props:
- * - direction: 'down' (header) | 'side' (sidebar) - where panel opens
+ * - direction: 'down' (header) | 'side' (sidebar) | 'inline' (compact menus) - where panel opens
  *
  * Wrapped in ClientOnly because locale depends on cookies (client-side only).
  * This prevents SSR/hydration mismatch where server renders 'en' but
@@ -14,8 +14,8 @@
  */
 
 const props = withDefaults(defineProps<{
-  /** Direction panel opens: 'down' for header, 'side' for sidebar */
-  direction?: 'down' | 'side'
+  /** Direction panel opens: 'down' for header, 'side' for sidebar, 'inline' for compact menus */
+  direction?: 'down' | 'side' | 'inline'
 }>(), {
   direction: 'down'
 })
@@ -34,7 +34,7 @@ function selectLocale(code: string) {
   panelOpen.value = false
 }
 
-// Close on click outside
+// Close on click outside (only needed for popup modes)
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (!target.closest('.lang-switcher-wrapper')) {
@@ -43,17 +43,37 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  if (props.direction !== 'inline') {
+    document.addEventListener('click', handleClickOutside)
+  }
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  if (props.direction !== 'inline') {
+    document.removeEventListener('click', handleClickOutside)
+  }
 })
 </script>
 
 <template>
   <ClientOnly>
+    <!-- Inline mode: show all options directly (no popup) -->
+    <div v-if="direction === 'inline'" class="lang-switcher-inline">
+      <button
+        v-for="loc in locales"
+        :key="loc.code"
+        type="button"
+        class="lang-switcher-option"
+        :class="{ active: locale === loc.code }"
+        @click="selectLocale(loc.code)"
+      >
+        {{ loc.code.toUpperCase() }}
+      </button>
+    </div>
+
+    <!-- Popup mode: button + panel -->
     <div
+      v-else
       class="lang-switcher-wrapper"
       :class="`lang-switcher--${direction}`"
     >
@@ -61,23 +81,26 @@ onUnmounted(() => {
         type="button"
         class="lang-switcher-btn"
         :aria-label="t('common.language')"
+        :aria-expanded="panelOpen"
         @click="togglePanel"
       >
         <span class="lang-switcher-code">{{ locale.toUpperCase() }}</span>
       </button>
 
-      <div v-if="panelOpen" class="lang-switcher-panel">
-        <button
-          v-for="loc in locales"
-          :key="loc.code"
-          type="button"
-          class="lang-switcher-option"
-          :class="{ active: locale === loc.code }"
-          @click="selectLocale(loc.code)"
-        >
-          {{ loc.code.toUpperCase() }}
-        </button>
-      </div>
+      <Transition :name="direction === 'down' ? 'dropdown' : 'popover-side'">
+        <div v-if="panelOpen" class="lang-switcher-panel">
+          <button
+            v-for="loc in locales"
+            :key="loc.code"
+            type="button"
+            class="lang-switcher-option"
+            :class="{ active: locale === loc.code }"
+            @click="selectLocale(loc.code)"
+          >
+            {{ loc.code.toUpperCase() }}
+          </button>
+        </div>
+      </Transition>
     </div>
   </ClientOnly>
 </template>

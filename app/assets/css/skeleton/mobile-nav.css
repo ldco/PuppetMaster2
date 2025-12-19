@@ -7,7 +7,9 @@
 .mobile-nav-backdrop {
   position: fixed;
   inset: 0;
-  background: oklch(0% 0 0 / 50%);
+  background: oklch(0% 0 0 / 40%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: var(--z-drawer-backdrop);
 }
 
@@ -132,7 +134,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
- * MOBILE NAV ANIMATIONS (Smooth & Delayed)
+ * MOBILE NAV ANIMATIONS (Modern & Smooth)
  * ═══════════════════════════════════════════════════════════
  *
  * IMPORTANT: We use inset-inline-start animation instead of translate/transform!
@@ -142,12 +144,17 @@
  *
  * Solution: Animate the actual position (inset-inline-start) instead of transform.
  * This is slightly less performant but ensures dropdowns work correctly.
+ *
+ * 2025 UPDATE: Using modern easing curves for premium feel.
  * ═══════════════════════════════════════════════════════════ */
 
-/* Backdrop fade */
-.backdrop-enter-active,
+/* Backdrop fade with blur effect */
+.backdrop-enter-active {
+  transition: opacity var(--transition-slower) var(--ease-smooth);
+}
+
 .backdrop-leave-active {
-  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--transition-slow) var(--ease-smooth-in);
 }
 
 .backdrop-enter-from,
@@ -158,14 +165,14 @@
 /*
  * Slide from inline-start (LEFT in LTR, RIGHT in RTL)
  * Uses inset-inline-start instead of translate for dropdown compatibility
- * Note: Using custom cubic-bezier for smooth drawer animation
+ * Modern spring easing for playful, premium feel
  */
 .slide-left-enter-active {
-  transition: inset-inline-start 0.4s var(--ease-bounce);
+  transition: inset-inline-start var(--transition-slower) var(--ease-spring);
 }
 
 .slide-left-leave-active {
-  transition: inset-inline-start var(--transition-slow) var(--ease-out);
+  transition: inset-inline-start var(--transition-slow) var(--ease-smooth-in);
 }
 
 .slide-left-enter-from,
@@ -183,11 +190,11 @@
  * For RTL layouts where hamburger is on the right
  */
 .slide-right-enter-active {
-  transition: inset-inline-end 0.4s var(--ease-bounce);
+  transition: inset-inline-end var(--transition-slower) var(--ease-spring);
 }
 
 .slide-right-leave-active {
-  transition: inset-inline-end var(--transition-slow) var(--ease-out);
+  transition: inset-inline-end var(--transition-slow) var(--ease-smooth-in);
 }
 
 .slide-right-enter-from,

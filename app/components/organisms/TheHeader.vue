@@ -89,7 +89,7 @@ function closeMenu() {
             <MoleculesNavLinks vertical @navigate="closeMenu" />
           </div>
           <div class="mobile-nav-settings">
-            <MoleculesHeaderActions :show-contact="false" lang-direction="side" />
+            <MoleculesHeaderActions :show-contact="false" lang-direction="inline" />
           </div>
         </nav>
       </Transition>

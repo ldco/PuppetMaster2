@@ -11,16 +11,45 @@
   /* ══════════════════════════════════════════════════════════
    * TRANSITION DURATIONS
    * Use these for all animations and transitions
+   *
+   * MICRO-INTERACTION TIMING (2025 Best Practices):
+   * - Hover/tap feedback: 120-180ms (instant feel)
+   * - Menu open/close: 200-300ms (smooth but snappy)
+   * - Page transitions: 300-500ms (noticeable but not slow)
    * ══════════════════════════════════════════════════════════ */
 
-  --transition-fast: 0.15s;
-  --transition-normal: 0.2s;
-  --transition-slow: 0.3s;
+  --transition-instant: 0.1s;   /* 100ms - micro-interactions */
+  --transition-fast: 0.15s;     /* 150ms - hover states */
+  --transition-normal: 0.2s;    /* 200ms - standard UI */
+  --transition-slow: 0.3s;      /* 300ms - menus, panels */
+  --transition-slower: 0.4s;    /* 400ms - drawers, modals */
+  --transition-page: 0.5s;      /* 500ms - page transitions */
 
-  /* Common easing functions */
+  /* ══════════════════════════════════════════════════════════
+   * EASING FUNCTIONS (Modern 2025 Curves)
+   *
+   * USAGE GUIDE:
+   * - ease-out: Elements entering (appear, open)
+   * - ease-in: Elements leaving (disappear, close)
+   * - ease-in-out: Continuous motion (toggle, slide)
+   * - ease-spring: Playful bounce (buttons, toggles)
+   * - ease-smooth: Premium feel (Apple-style)
+   * ══════════════════════════════════════════════════════════ */
+
+  /* Standard easing */
   --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Bounce/Spring easing - playful, modern feel */
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Premium/Smooth easing - Apple-style polish */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-smooth-in: cubic-bezier(0.4, 0, 1, 1);
 
   /* ══════════════════════════════════════════════════════════
    * ICON SIZES
