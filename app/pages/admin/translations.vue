@@ -36,9 +36,6 @@ const { data, pending, error: fetchError, refresh } = await useFetch<Translation
   headers
 })
 
-// Debug
-console.log('[translations page] data:', data.value, 'error:', fetchError.value)
-
 const locales = computed(() => data.value?.locales || ['en', 'ru', 'he'])
 const translations = computed(() => data.value?.translations || {})
 
@@ -145,16 +142,16 @@ const localeNames: Record<string, string> = {
     </div>
 
     <!-- Locale tabs -->
-    <div class="locale-tabs">
+    <div class="tabs tabs--underline">
       <button
         v-for="loc in locales"
         :key="loc"
-        class="locale-tab"
+        class="tab"
         :class="{ 'is-active': activeLocale === loc }"
         @click="activeLocale = loc"
       >
         {{ localeNames[loc] || loc.toUpperCase() }}
-        <span class="badge badge-secondary">{{ (translations[loc] || []).length }}</span>
+        <span class="tab-badge">{{ (translations[loc] || []).length }}</span>
       </button>
     </div>
 
@@ -263,7 +260,9 @@ const localeNames: Record<string, string> = {
 
 <!--
   Uses global CSS classes:
-  - admin/index.css: .locale-tabs, .locale-tab, .search-bar, .search-icon, .translations-table, .key-cell, .value-cell, .actions-cell, .form-hint
-  - ui/overlays/index.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
+  - ui/content/tabs.css: .tabs, .tabs--underline, .tab, .tab-badge
+  - ui/forms/search.css: .search-bar, .search-icon
+  - ui/content/data-table.css: .data-table
+  - ui/overlays/modal.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
 -->
 

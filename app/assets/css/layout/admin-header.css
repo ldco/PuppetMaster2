@@ -1,0 +1,133 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ADMIN HEADER - Mobile header and user menu for admin/app mode
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* Admin mobile header */
+.admin-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  padding: var(--space-3) var(--space-4);
+  background: var(--l-bg);
+  border-block-end: 1px solid var(--l-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.admin-title {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-lg);
+}
+
+/* Mobile user avatar and menu */
+.mobile-user-wrapper {
+  position: relative;
+}
+
+.mobile-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--i-brand);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+}
+
+.mobile-user-menu {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + var(--space-2));
+  min-width: 220px;
+  padding: var(--space-3);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-popover);
+}
+/* Note: inset-inline-end: 0 works correctly for both LTR (right) and RTL (left) */
+
+.mobile-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-block-end: var(--space-3);
+}
+
+.mobile-user-name {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  color: var(--t-primary);
+}
+
+.mobile-user-email {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+  word-break: break-all;
+}
+
+.mobile-user-role {
+  font-size: var(--text-xs);
+  color: var(--t-tertiary);
+  text-transform: capitalize;
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  background: var(--l-border);
+  margin-block: var(--space-2);
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--t-primary);
+  font-size: var(--text-sm);
+  transition: background-color var(--transition-fast) ease;
+}
+
+.mobile-menu-item:hover {
+  background: var(--l-bg-sunken);
+}
+
+.mobile-menu-item svg {
+  width: var(--icon-md, 20px);
+  height: var(--icon-md, 20px);
+  color: var(--t-secondary);
+}
+
+.mobile-menu-logout {
+  color: var(--s-danger);
+}
+
+.mobile-menu-logout svg {
+  color: var(--s-danger);
+}
+
+/* Theme & language toggles container for mobile menu */
+.mobile-menu-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-md);
+  padding: var(--space-2);
+}
+

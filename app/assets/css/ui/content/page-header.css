@@ -1,9 +1,40 @@
 /**
- * Page Header Enhancements
- *
- * Additional modifiers for page headers.
- * Base .page-header and .page-title are defined in layout/page.css
+ * ═══════════════════════════════════════════════════════════════════════════
+ * PAGE HEADER - Header section with title, subtitle, and actions
+ * ═══════════════════════════════════════════════════════════════════════════
  */
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  margin-block-end: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+/* Subtitle below page title */
+.page-subtitle,
+.page-header p {
+  margin: var(--space-1) 0 0;
+  color: var(--t-secondary);
+  font-size: var(--text-base);
+}
+
+/* Page actions container */
+.page-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  align-items: center;
+  flex-shrink: 0;
+}
 
 /* Page title with icon */
 .page-title-icon {

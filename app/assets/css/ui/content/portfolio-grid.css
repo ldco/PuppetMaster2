@@ -1,0 +1,69 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * PORTFOLIO GRID - Admin portfolio management grid
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--gap-lg);
+}
+
+.portfolio-item {
+  position: relative;
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal) ease,
+              transform var(--transition-normal) ease;
+}
+
+.portfolio-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.portfolio-item-image {
+  position: relative;
+  aspect-ratio: 16/10;
+  background: var(--l-bg-sunken);
+  overflow: hidden;
+}
+
+.portfolio-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolio-item-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--t-muted);
+}
+
+.portfolio-item-info {
+  padding: var(--space-4);
+}
+
+.portfolio-item-title {
+  font-weight: var(--font-semibold);
+  margin-block-end: var(--space-1);
+}
+
+.portfolio-item-category {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+}
+
+.portfolio-item-actions {
+  display: flex;
+  gap: var(--gap-xs);
+  padding: var(--space-2) var(--space-4);
+  border-block-start: 1px solid var(--l-border);
+}
+

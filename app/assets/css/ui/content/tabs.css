@@ -96,3 +96,22 @@
   color: var(--t-on-brand);
 }
 
+/* ══════════════════════════════════════════════════════════
+ * UNDERLINE VARIANT - Active tab has bottom border indicator
+ * Used for: locale switcher tabs, category tabs
+ * ══════════════════════════════════════════════════════════ */
+
+.tabs--underline {
+  gap: var(--space-1);
+  padding-block-end: var(--space-1);
+}
+
+.tabs--underline .tab {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.tabs--underline .tab.is-active {
+  border-block-end: 2px solid var(--i-brand);
+  margin-block-end: -1px; /* Overlap container border */
+}
+

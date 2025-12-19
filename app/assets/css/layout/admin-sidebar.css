@@ -1,0 +1,25 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ADMIN SIDEBAR - Fixed navigation sidebar for admin/app mode
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+.layout-admin .admin-sidebar {
+  position: fixed;
+  inset-block: 0; /* top: 0; bottom: 0; */
+  inset-inline-start: 0; /* left in LTR, right in RTL */
+  display: flex;
+  flex-direction: column;
+  width: var(--admin-sidebar-width, 60px);
+  background: var(--l-bg-elevated);
+  border-inline-end: 1px solid var(--l-border);
+  overflow: visible; /* Allow tooltips to overflow */
+  z-index: var(--z-fixed);
+}
+
+.layout-admin .admin-main {
+  margin-inline-start: var(--admin-sidebar-width, 60px); /* Push content to the right of fixed sidebar */
+  container-type: inline-size;
+  min-height: 100dvh;
+}
+

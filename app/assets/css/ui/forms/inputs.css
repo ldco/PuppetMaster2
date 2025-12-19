@@ -117,11 +117,6 @@ select.input option:hover {
   color: var(--d-error);
 }
 
-.form-hint {
-  font-size: var(--text-sm);
-  color: var(--t-muted);
-}
-
 /* Contact form layout */
 .contact-form {
   display: flex;

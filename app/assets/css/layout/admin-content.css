@@ -1,0 +1,20 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ADMIN CONTENT - Content area padding and layout for admin pages
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* Admin content area - generous padding for breathing room */
+.admin-content {
+  padding: var(--space-10) var(--space-10); /* More top padding for air */
+  max-width: 1000px; /* Narrower max for better readability */
+  margin-inline: auto; /* Center content horizontally */
+}
+
+/* Responsive padding for smaller screens */
+@container (max-width: 768px) {
+  .admin-content {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+

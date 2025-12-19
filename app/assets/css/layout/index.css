@@ -10,6 +10,11 @@
  * - containers.css  → Container widths and padding
  * - grid.css        → Grid utilities (.grid-2, .grid-3, etc.)
  *
+ * Admin layout components (modular):
+ * - admin-sidebar.css → .admin-sidebar, .admin-main
+ * - admin-content.css → .admin-content padding/container
+ * - admin-header.css  → .admin-header, mobile user menu
+ *
  * NOTE: responsive.css is imported separately in main.css → layer(utilities)
  * ───────────────────────────────────────────────────────────────────────────
  */
@@ -18,6 +23,9 @@
 @import './breakpoints.css';
 
 @import './page.css';
+@import './admin-sidebar.css';
+@import './admin-content.css';
+@import './admin-header.css';
 @import './sections.css';
 @import './containers.css';
 @import './grid.css';
