@@ -55,8 +55,8 @@ defineProps<{
       <div class="hero-logo">
         <slot name="logo">
           <!-- Render BOTH logos, CSS shows correct one based on theme class -->
-          <img :src="lightThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--light" />
-          <img :src="darkThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--dark" />
+          <img :src="lightThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--light" width="200" height="200" />
+          <img :src="darkThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--dark" width="200" height="200" />
         </slot>
       </div>
       <p class="hero-subtitle">

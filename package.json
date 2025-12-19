@@ -46,6 +46,7 @@
     "@vite-pwa/nuxt": "^1.1.0",
     "create-favicon": "^2.1.0",
     "drizzle-kit": "^0.31.8",
+    "lighthouse": "^13.0.1",
     "postcss-preset-env": "^10.5.0",
     "tsx": "^4.21.0"
   }

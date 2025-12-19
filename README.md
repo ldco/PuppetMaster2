@@ -25,9 +25,11 @@
 - 🌓 **Theme System** - Light/dark mode with automatic theme-aware logos
 - 📱 **Mobile-First Responsive** - Modern breakpoints with container queries
 - ⚡ **Interactive Header** - Scroll-based header style changes with glassmorphism
-- 🔐 **Secure by Design** - SQLite database, server-side rendering
+- 🔐 **Secure by Design** - SQLite database OR external API, server-side rendering
 - 🎭 **One-pager Mode** - Toggle between scroll-based or route-based navigation
 - 📝 **CMS Admin Panel** - Built-in content management (optional)
+- 🔌 **External API Ready** - Swap SQLite for any REST API with OAuth 2.0/JWT auth
+- 🛡️ **Production Resilience** - Circuit breakers, retry logic, intelligent caching
 - 🎯 **DX-Focused** - Comprehensive documentation, well-commented code
 
 ## 🛠️ Tech Stack
@@ -36,7 +38,7 @@
 |----------|------------|
 | **Framework** | Nuxt 4 (Vue 3, TypeScript) |
 | **Styling** | Pure CSS (OKLCH, light-dark(), CSS layers) |
-| **Database** | SQLite + Drizzle ORM |
+| **Data Source** | SQLite + Drizzle ORM **OR** External REST API |
 | **State** | Pinia |
 | **i18n** | @nuxtjs/i18n (database-driven) |
 | **Icons** | unplugin-icons (any icon set) |
@@ -107,6 +109,7 @@ export default {
 |----------|---------|
 | [docs/PUPPET-MASTER-STATUS.md](./docs/PUPPET-MASTER-STATUS.md) | Project status, file structure |
 | [docs/PUPPET-MASTER-TECHNICAL-BRIEF.md](./docs/PUPPET-MASTER-TECHNICAL-BRIEF.md) | Architecture decisions, database schema |
+| [docs/EXTERNAL_API.md](./docs/EXTERNAL_API.md) | **External API integration guide** |
 | [docs/styles/](./docs/styles/) | **CSS system documentation** |
 | [docs/PM_BEST_PRACTICES.md](./docs/PM_BEST_PRACTICES.md) | Development standards |
 | [docs/USAGE.md](./docs/USAGE.md) | Developer workflow guide |

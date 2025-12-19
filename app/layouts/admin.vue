@@ -130,9 +130,9 @@ onUnmounted(() => {
       <div class="sidebar-header">
         <NuxtLink :to="localePath('/admin')">
           <ClientOnly>
-            <img :src="shortLogo" alt="Logo" class="logo-img" />
+            <img :src="shortLogo" alt="Logo" class="logo-img" width="40" height="40" />
             <template #fallback>
-              <img :src="`${config.logo.basePath}/circle_${config.defaultTheme === 'dark' ? 'light' : 'dark'}_${config.defaultLocale}.svg`" alt="Logo" class="logo-img" />
+              <img :src="`${config.logo.basePath}/circle_${config.defaultTheme === 'dark' ? 'light' : 'dark'}_${config.defaultLocale}.svg`" alt="Logo" class="logo-img" width="40" height="40" />
             </template>
           </ClientOnly>
         </NuxtLink>

@@ -36,8 +36,8 @@ const darkThemeLogo = computed(() => `${basePath}/horizontal_light_${langSuffix.
       :aria-label="t('footer.puppetMaster')"
     >
       <!-- 2 theme variants - CSS shows correct one, language is in the path -->
-      <img :src="lightThemeLogo" alt="Puppet Master" class="made-with-logo light-logo" />
-      <img :src="darkThemeLogo" alt="Puppet Master" class="made-with-logo dark-logo" />
+      <img :src="lightThemeLogo" alt="Puppet Master" class="made-with-logo light-logo" width="120" height="24" />
+      <img :src="darkThemeLogo" alt="Puppet Master" class="made-with-logo dark-logo" width="120" height="24" />
     </a>
   </div>
 </template>

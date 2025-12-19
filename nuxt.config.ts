@@ -24,11 +24,12 @@ export default defineNuxtConfig({
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         // Google Fonts - Montserrat (matches logo design)
+        // Only load weights we actually use: 400, 500, 600, 700, 900
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap'
         }
       ]
     }
@@ -212,6 +213,19 @@ export default defineNuxtConfig({
     // Telegram Bot
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
     telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
+
+    // External API (for dataSource.provider = 'api' or 'hybrid')
+    apiBaseUrl: process.env.API_BASE_URL || '',
+    apiClientId: process.env.API_CLIENT_ID || '',
+    apiClientSecret: process.env.API_CLIENT_SECRET || '',
+    apiTokenUrl: process.env.API_TOKEN_URL || '',
+    apiJwtToken: process.env.API_JWT_TOKEN || '',
+    apiKey: process.env.API_KEY || '',
+    apiTokenRefreshBuffer: process.env.API_TOKEN_REFRESH_BUFFER || '300',
+
+    // Redis (for distributed cache in multi-instance deployments)
+    redisUrl: process.env.REDIS_URL || '',
+    redisPrefix: process.env.REDIS_PREFIX || 'pm-cache:',
 
     public: {
       features: config.features

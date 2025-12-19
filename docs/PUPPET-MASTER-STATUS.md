@@ -1,8 +1,8 @@
 # 🎭 Puppet Master - Project Status Document
 
-**Version:** 2.2
-**Last Updated:** 2024-12-19
-**Status:** IN DEVELOPMENT
+**Version:** 2.3
+**Last Updated:** 2025-12-19
+**Status:** PRODUCTION READY
 
 ---
 
@@ -51,12 +51,13 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 | Framework | Nuxt 4.2.2 | ✅ Configured |
 | Frontend | Vue 3.5 | ✅ Working |
 | Backend | Nitro | ✅ Configured |
-| Database | SQLite + Drizzle | ⚠️ Schema only |
+| Database | SQLite + Drizzle **OR** External API | ✅ Both supported |
 | Styling | Pure CSS (OKLCH) | ✅ Implemented |
 | Icons | unplugin-icons + Tabler | ✅ Working |
 | i18n | @nuxtjs/i18n | ✅ Configured |
 | Theme | @nuxtjs/color-mode | ✅ Working |
-| Images | Sharp | 📋 Planned |
+| Images | Sharp | ✅ Complete |
+| External API | OAuth/JWT + Circuit Breaker | ✅ Production Ready |
 
 ---
 
@@ -316,6 +317,23 @@ app/
 | Thumbnail Generation | ✅ Complete | - |
 | WebP Conversion | ✅ Complete | - |
 | Lazy Loading | ❌ Not started | LOW |
+
+### ✅ External API Integration (COMPLETE)
+
+| Feature | Status | Priority |
+|---------|--------|----------|
+| API Client (Fetch-based) | ✅ Complete | - |
+| OAuth 2.0 / JWT / API Key Auth | ✅ Complete | - |
+| Token Auto-Refresh | ✅ Complete | - |
+| Circuit Breaker Pattern | ✅ Complete | - |
+| Exponential Backoff Retry | ✅ Complete | - |
+| Response Caching (In-Memory) | ✅ Complete | - |
+| Per-Resource TTL Configuration | ✅ Complete | - |
+| Hybrid Mode (DB + API) | ✅ Complete | - |
+| Memory Leak Prevention | ✅ Fixed | - |
+| Redis Support | ❌ TODO Comments | LOW |
+| Request Deduplication | ❌ Not started | LOW |
+| GraphQL Support | ❌ Not started | LOW |
 
 ### ❌ SPA Mode
 
@@ -778,6 +796,13 @@ defineEmits<{
     - utilities.css: 344 → 122 lines (65% reduction)
     - All responsive rules in same file as base styles
     - All magic numbers replaced with CSS variables
+12. **External API Integration** - ✅ Complete (2025-12-19)
+    - Full REST API client with OAuth 2.0/JWT auth
+    - Circuit breaker + retry logic for resilience
+    - Intelligent caching with per-resource TTL
+    - 3 provider modes: database, api, hybrid
+    - Production-ready with memory leak fixes
+    - Comprehensive documentation in docs/EXTERNAL_API.md
 
 ### Immediate Priority (This Week)
 
@@ -803,7 +828,12 @@ defineEmits<{
 
 4. **Testing**
    - E2E tests
-   - Lighthouse audit
+   - Lighthouse audit ✅ (Desktop 99, Mobile 73, Accessibility/SEO/BP all 100)
+
+### Performance Optimization Ideas (Consider Later)
+
+- **Nuxt Islands** - Partial hydration to reduce unused JS (mobile perf)
+- **nuxt-delay-hydration** - Delay non-critical hydration
 
 5. **Deployment**
    - Kamal setup

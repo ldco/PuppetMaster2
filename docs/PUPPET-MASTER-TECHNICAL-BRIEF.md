@@ -1,8 +1,8 @@
 # 🎭 Puppet Master - Technical Brief
 
-**Version:** 2.2
+**Version:** 2.3
 **Date:** 2024-12-19
-**Status:** IN DEVELOPMENT
+**Status:** PRODUCTION READY
 
 > **📖 CSS Documentation:** See `docs/styles/` folder for detailed CSS system documentation.
 
@@ -16,7 +16,7 @@
 4. [Folder Structure](#4-folder-structure)
 5. [Core Layer Specification](#5-core-layer-specification)
 6. [Project Layer Specification](#6-project-layer-specification) - **Q15 Sections Strategy**
-7. [Database Schema](#7-database-schema)
+7. [Data Source](#7-data-source) - SQLite OR External API
 8. [CSS Architecture](#8-css-architecture) - **Q22 OKLCH Color System**
    - 8.1 [Icons & SVG Graphics](#81-icons--svg-graphics-q23-decision) - Q23
    - 8.2 [Forms & Validation](#82-forms--validation-q24-decision) - Q24
@@ -116,8 +116,8 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 | **Framework** | Nuxt 3 | Full-stack, SSR/SSG, great DX |
 | **Frontend** | Vue 3 | Composition API, reactive |
 | **Backend** | Nitro | Built into Nuxt, fast |
-| **Database** | SQLite | Simple, fast, file-based |
-| **ORM** | Drizzle | Type-safe, lightweight |
+| **Data Source** | SQLite **OR** External API | SQLite: simple, file-based / API: OAuth, circuit breaker |
+| **ORM** | Drizzle | Type-safe, lightweight (for SQLite) |
 | **Styling** | CSS (no framework) | Full control, no bloat |
 | **Images** | Sharp | Fast processing in Node |
 
@@ -475,7 +475,15 @@ export default defineNuxtConfig({
 
 ---
 
-## 7. Database Schema
+## 7. Data Source
+
+> **Note:** Puppet Master supports two data source modes:
+> - **SQLite + Drizzle** (default) - Local database, zero external dependencies
+> - **External REST API** - OAuth 2.0/JWT auth, circuit breaker, caching
+>
+> See [docs/EXTERNAL_API.md](./EXTERNAL_API.md) for API integration guide.
+>
+> This section documents the default SQLite schema. When using external API mode, the same data structure is expected from API endpoints.
 
 ### SQLite + Drizzle
 
@@ -2180,7 +2188,7 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
 | D1 | Backend technology | Nuxt Nitro (drop Python) | Simpler stack, one language |
-| D2 | Database | SQLite + Drizzle | Simple, fast, file-based, sufficient for use case |
+| D2 | Data Source | SQLite + Drizzle **OR** External API | SQLite: default, simple, file-based / API: OAuth, circuit breaker, hybrid mode |
 | D3 | Architecture | Nuxt Layers (core + project) | Separation of reusable code |
 | D4 | Imports | Auto-imports (not ~/) | Required for layers to work |
 | D5 | CSS units | Hybrid clamp() + rem + dvh | Modern, fluid, mobile-friendly |
@@ -2345,8 +2353,8 @@ Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (
 - [ ] Create fresh Nuxt 3 project
 - [ ] Set up core/ layer structure
 - [ ] Configure nuxt.config.ts with extends
-- [ ] Add Drizzle + SQLite
-- [ ] Create database schema
+- [ ] Add Drizzle + SQLite (or configure external API - see docs/EXTERNAL_API.md)
+- [ ] Create database schema (or external API client)
 - [ ] Add @nuxtjs/i18n
 - [ ] Add @nuxtjs/color-mode
 - [ ] Add Pinia (Q25)

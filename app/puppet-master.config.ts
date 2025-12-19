@@ -130,6 +130,68 @@ const config = {
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // DATA SOURCE - Configure where application data comes from
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Provider options:
+  //   - 'database': All data from local SQLite (default, zero config)
+  //   - 'api': All data from external REST API (requires .env credentials)
+  //   - 'hybrid': Per-resource configuration (see resources below)
+  //
+  // For API provider, set these environment variables in .env:
+  //   API_BASE_URL, API_CLIENT_ID, API_CLIENT_SECRET, API_TOKEN_URL
+  //
+  // Hybrid mode allows mixing sources (e.g., auth in DB, content from API)
+  // ═══════════════════════════════════════════════════════════════════════════
+  dataSource: {
+    // Global provider
+    provider: 'database' as 'database' | 'api' | 'hybrid',
+
+    // Per-resource configuration (only used when provider = 'hybrid')
+    resources: {
+      users: 'database' as 'database' | 'api',
+      sessions: 'database' as 'database' | 'api',
+      settings: 'database' as 'database' | 'api',
+      portfolio: 'database' as 'database' | 'api',
+      contacts: 'database' as 'database' | 'api',
+      translations: 'database' as 'database' | 'api',
+    },
+
+    // API client configuration
+    api: {
+      timeout: 30000,  // Request timeout (ms)
+
+      // Retry with exponential backoff
+      retry: {
+        maxAttempts: 3,
+        initialDelay: 1000,
+        maxDelay: 10000,
+        backoffMultiplier: 2,
+      },
+
+      // Circuit breaker (prevent cascading failures)
+      circuitBreaker: {
+        enabled: true,
+        failureThreshold: 5,     // Open after 5 consecutive failures
+        resetTimeout: 60000,      // Try again after 60s
+      },
+
+      // Response caching (per-resource TTL in seconds)
+      cache: {
+        enabled: true,
+        ttl: {
+          users: 300,         // 5 min (rarely changes)
+          sessions: 60,       // 1 min (needs freshness for auth)
+          settings: 600,      // 10 min (mostly static)
+          portfolio: 180,     // 3 min (content updates)
+          contacts: 0,        // No cache (always fresh)
+          translations: 3600, // 1 hour (rarely changes)
+        },
+      },
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // SECTIONS - Source of truth for navigation and routing
   // ═══════════════════════════════════════════════════════════════════════════
   sections: [

@@ -40,12 +40,16 @@ const homePath = computed(() => localePath('/'))
         :src="headerLogo"
         :alt="alt ?? 'Logo'"
         class="logo-img"
+        width="200"
+        height="40"
       />
       <template #fallback>
         <img
           :src="ssrFallbackLogo"
           :alt="alt ?? 'Logo'"
           class="logo-img"
+          width="200"
+          height="40"
         />
       </template>
     </ClientOnly>
