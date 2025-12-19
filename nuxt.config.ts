@@ -38,8 +38,87 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    // PWA module - conditionally loaded based on config.features.pwa
+    ...(config.features.pwa ? ['@vite-pwa/nuxt'] : [])
   ],
+
+  // PWA configuration (only applied when config.features.pwa is true)
+  // Uses favicon assets generated via `npm run generate:favicons`
+  ...(config.features.pwa ? {
+    pwa: {
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Puppet Master',
+        short_name: 'PM',
+        description: 'Puppet Master Application',
+        theme_color: config.colors.brand,
+        background_color: config.colors.white,
+        display: 'standalone',
+        icons: [
+          {
+            src: '/favicon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/favicon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: '/favicon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        // Cache static assets
+        globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,ico,woff,woff2}'],
+        // Runtime caching for API calls
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
+      },
+      client: {
+        installPrompt: true,
+        periodicSyncForUpdates: 3600 // Check for updates every hour
+      },
+      devOptions: {
+        enabled: false, // Disable in dev by default (set true to test PWA locally)
+        type: 'module'
+      }
+    }
+  } : {}),
 
   // Color mode configuration
   // Uses defaultTheme from puppet-master.config.ts

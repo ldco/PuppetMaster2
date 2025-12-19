@@ -54,7 +54,11 @@ const config = {
 
     // Admin features (only apply when mode has admin)
     appVerticalNav: true,       // App mode: true = vertical sidebar, false = horizontal nav
-    // TODO: App-style bottom nav for mobile (mark for later)
+
+    // PWA (Progressive Web App) support
+    // Enables: installable app, offline support, service worker caching
+    // Uses @vite-pwa/nuxt module - requires rebuild after toggle
+    pwa: false,
 
     // Contact form notifications
     // ⚠️ Requires .env configuration - see .env.example
