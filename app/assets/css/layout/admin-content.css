@@ -2,19 +2,31 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * ADMIN CONTENT - Content area padding and layout for admin pages
  * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * BREAKPOINTS (Material Design 3):
+ * - Phone (< 600px): Compact padding
+ * - Tablet (600-839px): Medium padding
+ * - Desktop (≥ 840px): Generous padding
  */
 
-/* Admin content area - generous padding for breathing room */
+/* Base - desktop first */
 .admin-content {
-  padding: var(--space-10) var(--space-10); /* More top padding for air */
-  max-width: 1000px; /* Narrower max for better readability */
-  margin-inline: auto; /* Center content horizontally */
+  padding: var(--space-10);
+  max-width: 62.5rem; /* 1000px, scales with font-size */
+  margin-inline: auto;
 }
 
-/* Responsive padding for smaller screens */
-@container (max-width: 768px) {
+/* Phone (< 600px) */
+@media (width < 600px) {
   .admin-content {
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-6) var(--space-4);
+  }
+}
+
+/* Tablet (600-839px) */
+@media (width >= 600px) and (width < 840px) {
+  .admin-content {
+    padding: var(--space-8) var(--space-5);
   }
 }
 

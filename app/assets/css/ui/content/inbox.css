@@ -8,11 +8,11 @@
 
 .inbox-layout {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) 2fr;
+  grid-template-columns: minmax(18rem, 1fr) 2fr; /* ~288px min, scales with font-size */
   gap: var(--space-4);
   /* Fixed height so both columns scroll independently */
-  max-height: calc(100vh - 200px);
-  min-height: 400px;
+  max-height: calc(100vh - var(--space-32) - var(--space-12)); /* ~176px for header/footer */
+  min-height: var(--space-32); /* 128px = 8rem */
 }
 
 /* Message list - scrollable column of separate cards */
@@ -63,7 +63,7 @@
   justify-content: center;
   gap: var(--space-4);
   height: 100%;
-  min-height: 300px;
+  min-height: var(--space-24); /* 96px = 6rem */
   color: var(--t-muted);
 }
 
@@ -95,8 +95,8 @@
 .contact-item.is-unread .contact-name::before {
   content: '';
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: var(--space-2); /* 8px */
+  height: var(--space-2);
   margin-inline-end: var(--space-2);
   background: var(--i-brand);
   border-radius: var(--radius-full);

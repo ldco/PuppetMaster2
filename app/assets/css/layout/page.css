@@ -155,81 +155,20 @@
    - Phone (< 600px): Bottom navigation, sidebar hidden
    - Tablet portrait (600-839px): Navigation rail (narrow ~80px)
    - Tablet landscape/Desktop (≥ 840px): Full sidebar (60px)
+
+   NOTE: Responsive rules for each component are in their own files:
+   - admin-sidebar.css → sidebar visibility and width
+   - admin-content.css → content padding
+   - admin-header.css  → mobile header visibility
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   PHONE (< 600px) - Bottom Navigation
-   -------------------------------------------------------------------------- */
+/* Phone: Reserve space for bottom nav + hide page title */
 @media (width < 600px) {
-  /* Hide sidebar completely on phones - use bottom nav instead */
-  .layout-admin .admin-sidebar {
-    display: none;
-  }
-
-  /* Main content: full width, add padding for bottom nav */
   .layout-admin .admin-main {
-    margin-inline-start: 0;
-    /* Reserve space for bottom nav + iOS safe area */
     padding-block-end: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 
-  .admin-content {
-    padding: var(--space-6) var(--space-4);
-  }
-
-  /* Show mobile header on phones - override .mobile-only block with flex */
-  .layout-admin .admin-header.mobile-only {
-    display: flex !important;
-  }
-
-  /* Hide page title on phones - mobile header shows it instead */
   .layout-admin .page-title {
     display: none;
   }
 }
-
-/* --------------------------------------------------------------------------
-   TABLET PORTRAIT (600-839px) - Navigation Rail
-   -------------------------------------------------------------------------- */
-@media (width >= 600px) and (width < 840px) {
-  .layout-admin .admin-sidebar {
-    width: var(--app-nav-rail-width, 80px);
-  }
-
-  .layout-admin .admin-main {
-    margin-inline-start: var(--app-nav-rail-width, 80px);
-    /* Still reserve space for bottom nav if we want both on tablets */
-  }
-
-  .admin-content {
-    padding: var(--space-8) var(--space-5);
-  }
-
-  /* Hide mobile header on tablet */
-  .layout-admin .admin-header.mobile-only {
-    display: none;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   TABLET LANDSCAPE / DESKTOP (≥ 840px) - Full Sidebar
-   -------------------------------------------------------------------------- */
-@media (width >= 840px) {
-  .layout-admin .admin-sidebar {
-    width: var(--app-sidebar-width, 60px);
-  }
-
-  .layout-admin .admin-main {
-    margin-inline-start: var(--app-sidebar-width, 60px);
-  }
-
-  .admin-content {
-    padding: var(--space-10);
-  }
-
-  /* Hide mobile header on desktop */
-  .layout-admin .admin-header.mobile-only {
-    display: none;
-  }
-}
-

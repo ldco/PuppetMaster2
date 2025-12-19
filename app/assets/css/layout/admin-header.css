@@ -2,9 +2,13 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * ADMIN HEADER - Mobile header and user menu for admin/app mode
  * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * BREAKPOINTS (Material Design 3):
+ * - Phone (< 600px): Show mobile header
+ * - Tablet/Desktop (≥ 600px): Hide mobile header, show sidebar instead
  */
 
-/* Admin mobile header */
+/* Admin mobile header - base styles */
 .admin-header {
   display: flex;
   flex-direction: row;
@@ -19,6 +23,20 @@
   z-index: var(--z-sticky);
 }
 
+/* Phone (< 600px) - show mobile header */
+@media (width < 600px) {
+  .layout-admin .admin-header.mobile-only {
+    display: flex !important;
+  }
+}
+
+/* Tablet/Desktop (≥ 600px) - hide mobile header */
+@media (width >= 600px) {
+  .layout-admin .admin-header.mobile-only {
+    display: none;
+  }
+}
+
 .admin-title {
   font-weight: var(--font-semibold);
   font-size: var(--text-lg);
@@ -30,8 +48,8 @@
 }
 
 .mobile-user-avatar {
-  width: 36px;
-  height: 36px;
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
   border-radius: var(--radius-full);
   background: var(--i-brand);
   color: white;
@@ -48,7 +66,7 @@
   position: absolute;
   inset-inline-end: 0;
   top: calc(100% + var(--space-2));
-  min-width: 220px;
+  min-width: 14rem; /* ~224px, scales with font-size */
   padding: var(--space-3);
   background: var(--l-bg-elevated);
   border: 1px solid var(--l-border);
