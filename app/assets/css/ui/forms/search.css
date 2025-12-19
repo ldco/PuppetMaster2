@@ -30,7 +30,8 @@
   top: 50%;
   transform: translateY(-50%);
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   width: var(--icon-lg);
   height: var(--icon-lg);
   border: none;

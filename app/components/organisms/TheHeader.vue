@@ -63,8 +63,8 @@ function closeMenu() {
       <!-- Desktop: Actions (right) -->
       <MoleculesHeaderActions class="desktop-only" />
 
-      <!-- Mobile spacer for centering logo -->
-      <div class="mobile-only" style="width: 48px;"></div>
+      <!-- Mobile: Contact buttons (right, opposite to hamburger) -->
+      <MoleculesHeaderContact v-if="config.headerContact?.enabled" class="mobile-only" />
     </div>
 
     <!-- Mobile Navigation Overlay - uses skeleton/mobile-nav.css -->
@@ -89,7 +89,7 @@ function closeMenu() {
             <MoleculesNavLinks vertical @navigate="closeMenu" />
           </div>
           <div class="mobile-nav-settings">
-            <MoleculesHeaderActions />
+            <MoleculesHeaderActions :show-contact="false" lang-direction="side" />
           </div>
         </nav>
       </Transition>

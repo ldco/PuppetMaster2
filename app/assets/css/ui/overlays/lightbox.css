@@ -11,7 +11,8 @@
   z-index: var(--z-modal);
   background: oklch(0% 0 0 / 92%);
   display: flex;
-  place-items: center; /* align-items + justify-content */
+  align-items: center;
+  justify-content: center;
   padding: var(--space-4);
   isolation: isolate; /* Create new stacking context */
 }
@@ -24,7 +25,8 @@
   width: 52px;
   height: 52px;
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   background: oklch(100% 0 0 / 10%);
   color: white;
   border: none;
@@ -53,7 +55,8 @@
   width: 52px;
   height: 52px;
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   background: oklch(100% 0 0 / 10%);
   color: white;
   border: none;
@@ -93,7 +96,8 @@
 .lightbox-media {
   max-height: 70vh;
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .lightbox-image {

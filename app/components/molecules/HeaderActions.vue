@@ -3,6 +3,7 @@
  * HeaderActions Molecule
  *
  * Header action buttons grouped together:
+ * - Quick contact buttons (phone + messenger) - optional via prop
  * - Theme toggle (if doubleTheme enabled)
  * - Language switcher (if multiLangs enabled)
  * - Login button (only in website-app mode)
@@ -12,14 +13,27 @@
 import IconLogin from '~icons/tabler/login'
 import config from '~/puppet-master.config'
 
+const props = withDefaults(defineProps<{
+  /** Show contact buttons (set false in mobile menu where they're in header) */
+  showContact?: boolean
+  /** Language switcher direction (side for mobile slide menu) */
+  langDirection?: 'down' | 'side'
+}>(), {
+  showContact: true,
+  langDirection: 'down'
+})
+
 const { t } = useI18n()
 </script>
 
 <template>
   <!-- Uses global .header-actions class from skeleton/header.css -->
   <div class="header-actions">
+    <!-- Quick contact buttons (left of toggles) - hidden in mobile menu -->
+    <MoleculesHeaderContact v-if="showContact && config.headerContact?.enabled" />
+
     <AtomsThemeToggle v-if="config.hasThemeToggle" />
-    <AtomsLangSwitcher v-if="config.isMultiLang" />
+    <AtomsLangSwitcher v-if="config.isMultiLang" :direction="langDirection" />
 
     <!-- Login button - only in website-app mode -->
     <NuxtLink

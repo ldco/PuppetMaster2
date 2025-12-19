@@ -9,7 +9,8 @@
  * - sections.css    → Fullscreen sections for one-pager (.section, .section-hero)
  * - containers.css  → Container widths and padding
  * - grid.css        → Grid utilities (.grid-2, .grid-3, etc.)
- * - responsive.css  → Breakpoint utilities
+ *
+ * NOTE: responsive.css is imported separately in main.css → layer(utilities)
  * ───────────────────────────────────────────────────────────────────────────
  */
 
@@ -20,5 +21,4 @@
 @import './sections.css';
 @import './containers.css';
 @import './grid.css';
-@import './responsive.css';
 

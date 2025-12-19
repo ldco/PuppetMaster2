@@ -15,9 +15,9 @@
  * --desktop   ≥ 1024px  (laptops, desktops)
  * --large     ≥ 1280px  (large desktops)
  *
- * !important USAGE:
- * Utilities layer (this file) uses !important intentionally to override
- * component styles. This is the documented pattern for utility classes.
+ * NO !important NEEDED:
+ * This file is in layer(utilities) which has highest priority.
+ * Layer ordering handles cascade - utilities always win over components.
  *
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -37,22 +37,27 @@
 
 /* Navigation: hidden by default (mobile), shown on desktop */
 .header-nav {
-  display: none !important;
+  display: none;
 }
 
 /* Mobile menu button: shown by default, hidden on desktop */
 .mobile-menu-btn {
-  display: flex !important;
+  display: flex;
 }
 
 /* Desktop-only elements: hidden on mobile */
 .desktop-only {
-  display: none !important;
+  display: none;
 }
 
-/* Mobile-only elements: shown on mobile */
+/* Mobile-only elements: shown on mobile (flex to preserve child layout) */
 .mobile-only {
-  display: block !important;
+  display: flex;
+}
+
+/* Mobile-only block variant (for non-flex elements) */
+.mobile-only-block {
+  display: block;
 }
 
 /* Mobile spacer for balanced header layout */
@@ -65,16 +70,17 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (--tablet) {
-  .hide-tablet-up { display: none !important; }
-  .show-tablet-up { display: block !important; }
-  .flex-tablet-up { display: flex !important; }
+  .hide-tablet-up { display: none; }
+  .show-tablet-up { display: block; }
+  .flex-tablet-up { display: flex; }
 
   /* Allow 2-column grids on tablets */
   .grid-tablet-2 { grid-template-columns: repeat(2, 1fr); }
 
   /* Mobile-only elements: hidden on tablet+ (sidebar shows user menu) */
-  .mobile-only {
-    display: none !important;
+  .mobile-only,
+  .mobile-only-block {
+    display: none;
   }
 }
 
@@ -85,28 +91,29 @@
 @media (--desktop) {
   /* Show desktop navigation */
   .header-nav {
-    display: flex !important;
+    display: flex;
   }
 
   /* Hide mobile menu button */
   .mobile-menu-btn {
-    display: none !important;
+    display: none;
   }
 
   /* Desktop-only elements: shown on desktop */
   .desktop-only {
-    display: flex !important;
+    display: flex;
   }
 
   /* Mobile-only elements: hidden on desktop */
-  .mobile-only {
-    display: none !important;
+  .mobile-only,
+  .mobile-only-block {
+    display: none;
   }
 
   /* Utility classes */
-  .hide-desktop { display: none !important; }
-  .show-desktop { display: block !important; }
-  .flex-desktop { display: flex !important; }
+  .hide-desktop { display: none; }
+  .show-desktop { display: block; }
+  .flex-desktop { display: flex; }
 
   /* Allow multi-column grids */
   .grid-desktop-3 { grid-template-columns: repeat(3, 1fr); }
@@ -118,8 +125,8 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (--large) {
-  .hide-lg { display: none !important; }
-  .show-lg { display: block !important; }
+  .hide-lg { display: none; }
+  .show-lg { display: block; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -128,13 +135,13 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (orientation: portrait) {
-  .hide-portrait { display: none !important; }
-  .stack-portrait { flex-direction: column !important; }
+  .hide-portrait { display: none; }
+  .stack-portrait { flex-direction: column; }
 }
 
 @media (orientation: landscape) {
-  .hide-landscape { display: none !important; }
-  .stack-landscape { flex-direction: column !important; }
+  .hide-landscape { display: none; }
+  .stack-landscape { flex-direction: column; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -171,8 +178,8 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media print {
-  .no-print { display: none !important; }
-  .header-nav { display: flex !important; }
-  .mobile-menu-btn { display: none !important; }
+  .no-print { display: none; }
+  .header-nav { display: flex; }
+  .mobile-menu-btn { display: none; }
 }
 

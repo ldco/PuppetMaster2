@@ -1,14 +1,118 @@
 /**
  * Language Switcher
  *
- * Compact select dropdown for language switching.
- * Extends base .input select styles.
+ * Button-based language switcher with popup panel.
+ * Supports two directions via modifier classes:
+ * - .lang-switcher--down (header: opens below)
+ * - .lang-switcher--side (sidebar: opens to the side)
  */
 
-.lang-switcher {
-  width: auto;
-  padding: var(--space-1) var(--space-2);
-  padding-inline-end: var(--space-8);
+/* Wrapper for positioning */
+.lang-switcher-wrapper {
+  position: relative;
+}
+
+/* Trigger button - shows current language code */
+.lang-switcher-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  color: var(--t-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
+}
+
+.lang-switcher-btn:hover {
+  background: var(--i-brand-subtle);
+  color: var(--t-primary);
+}
+
+.lang-switcher-btn:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+}
+
+.lang-switcher-code {
   font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Panel with language options */
+.lang-switcher-panel {
+  position: absolute;
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-popover);
+}
+
+/* Language option button */
+.lang-switcher-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--t-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  transition: background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
+}
+
+.lang-switcher-option:hover {
+  background: var(--i-brand-subtle);
+  color: var(--t-primary);
+}
+
+.lang-switcher-option.active {
+  background: var(--i-brand);
+  color: var(--i-brand-text);
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * DIRECTION: DOWN (header)
+ * Opens below the button
+ * ═══════════════════════════════════════════════════════════ */
+
+.lang-switcher--down .lang-switcher-panel {
+  top: 130%;
+  inset-inline-end: 0;
+  margin-top: var(--space-1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+ * DIRECTION: SIDE (sidebar)
+ * Opens to the side, vertically centered
+ * ═══════════════════════════════════════════════════════════ */
+
+.lang-switcher--side .lang-switcher-btn {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+}
+
+.lang-switcher--side .lang-switcher-panel {
+  inset-inline-start: 120%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-inline-start: var(--space-2);
 }
 

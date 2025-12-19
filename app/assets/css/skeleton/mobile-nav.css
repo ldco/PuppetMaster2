@@ -39,7 +39,8 @@
 
 .mobile-nav-close {
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   width: 44px;  /* WCAG touch target */
   height: 44px;
   border: none;

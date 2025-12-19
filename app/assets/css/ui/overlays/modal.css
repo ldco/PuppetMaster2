@@ -19,7 +19,8 @@
   background: oklch(0% 0 0 / 50%);
   z-index: var(--z-modal-backdrop);
   display: flex;
-  place-items: center; /* align-items + justify-content */
+  align-items: center;
+  justify-content: center;
   padding: var(--space-4);
 }
 
@@ -62,7 +63,8 @@
 
 .modal-close {
   display: flex;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   width: 44px;  /* WCAG touch target, matches lightbox close visually */
   height: 44px;
   border: none;

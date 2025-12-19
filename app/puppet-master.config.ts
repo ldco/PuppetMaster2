@@ -70,6 +70,18 @@ const config = {
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // HEADER CONTACT - Quick contact buttons in header (phone + messenger)
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Best practice: Max 2 buttons - phone + primary messenger for instant contact.
+  // Uses setting keys from the settings array below.
+  // Only shown if the setting has a value in database.
+  // ═══════════════════════════════════════════════════════════════════════════
+  headerContact: {
+    enabled: true,
+    items: ['contact.phone', 'social.telegram'] as const
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // STORAGE - File uploads configuration (images & videos)
   // ═══════════════════════════════════════════════════════════════════════════
   //

@@ -105,24 +105,15 @@ function toggleTheme() {
   colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'
 }
 
-// Language switcher panel state
-const langPanelOpen = ref(false)
-
-function toggleLangPanel() {
-  langPanelOpen.value = !langPanelOpen.value
-}
-
+// Select locale (for mobile menu)
 function selectLocale(code: 'en' | 'ru' | 'he') {
   setLocale(code)
-  langPanelOpen.value = false
+  mobileUserMenuOpen.value = false
 }
 
 // Close panels on click outside
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as HTMLElement
-  if (!target.closest('.sidebar-lang-wrapper')) {
-    langPanelOpen.value = false
-  }
   if (!target.closest('.sidebar-user-wrapper')) {
     userMenuOpen.value = false
   }
@@ -190,24 +181,8 @@ onUnmounted(() => {
           </template>
         </ClientOnly>
 
-        <!-- Language switcher - click to open panel -->
-        <div class="sidebar-lang-wrapper">
-          <button type="button" class="sidebar-lang-btn" @click="toggleLangPanel" :aria-label="t('common.language')">
-            <span class="sidebar-lang-code">{{ locale.toUpperCase() }}</span>
-          </button>
-          <div v-if="langPanelOpen" class="sidebar-lang-panel">
-            <button
-              v-for="loc in locales"
-              :key="loc.code"
-              type="button"
-              class="sidebar-lang-option"
-              :class="{ active: locale === loc.code }"
-              @click="selectLocale(loc.code)"
-            >
-              {{ loc.code.toUpperCase() }}
-            </button>
-          </div>
-        </div>
+        <!-- Language switcher - reusable component -->
+        <AtomsLangSwitcher direction="side" />
 
         <!-- User avatar with popover menu (at bottom per UX best practice) -->
         <div class="sidebar-user-wrapper">

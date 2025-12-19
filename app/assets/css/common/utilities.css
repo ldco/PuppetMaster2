@@ -153,7 +153,8 @@
 .justify-end { justify-content: flex-end; }
 .justify-between { justify-content: space-between; }
 
-/* place-items shorthand (align-items + justify-items for grid, align-items + justify-content for flex) */
+/* place-items shorthand - ONLY for display: grid (sets align-items + justify-items) */
+/* WARNING: Does NOT work for flexbox centering! Use align-items + justify-content instead */
 .place-center { place-items: center; }
 .place-start { place-items: start; }
 .place-end { place-items: end; }

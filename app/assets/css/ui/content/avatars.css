@@ -7,7 +7,8 @@
 
 .avatar {
   display: flex;
-  place-items: center; /* align-items + justify-content */
+  align-items: center;
+  justify-content: center;
   width: var(--avatar-md);
   height: var(--avatar-md);
   border-radius: var(--radius-full);

@@ -37,10 +37,13 @@
 /* Import layers in order */
 @import './reset.css' layer(reset);
 @import './colors/index.css' layer(primitives);
-@import './common/index.css' layer(utilities);
 @import './typography/index.css' layer(primitives);
 @import './layout/index.css' layer(components);
 @import './animations/index.css' layer(components);
 @import './skeleton/index.css' layer(components);
 @import './ui/index.css' layer(components);
+
+/* Utilities layer - MUST be last to override components without !important */
+@import './common/index.css' layer(utilities);
+@import './layout/responsive.css' layer(utilities);
 

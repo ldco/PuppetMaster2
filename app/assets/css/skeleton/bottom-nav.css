@@ -57,7 +57,8 @@
 .bottom-nav-item {
   display: flex;
   flex-direction: column;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-1);
 
   /* EQUAL WIDTH: Each item takes equal space regardless of label length

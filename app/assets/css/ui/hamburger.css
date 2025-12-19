@@ -37,7 +37,8 @@
   .hamburger {
     font: inherit;
     display: inline-flex;
-    place-items: center; /* align-items + justify-content */
+    align-items: center;
+    justify-content: center;
     overflow: visible;
     margin: 0;
     padding: var(--hamburger-padding);
