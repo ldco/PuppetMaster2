@@ -129,11 +129,13 @@ assets/css/
 │   ├── primitives.css          # Base colors
 │   └── auto.css                # Auto-calculated colors
 │
-├── typography/                 # Font system
-│   ├── index.css
-│   ├── variables.css           # Font tokens
-│   ├── base.css                # Typography rules
-│   └── fonts/                  # Font files
+├── typography/                 # 4-Layer Font System
+│   ├── index.css               # Entry point
+│   ├── variables.css           # Layers 1-4: fallbacks, brand, semantic, sizes
+│   ├── font-faces.css          # @font-face for self-hosted fonts
+│   ├── lang-overrides.css      # Per-language font overrides (:lang)
+│   ├── base.css                # Apply fonts to HTML elements
+│   └── fonts/                  # Self-hosted font files (.woff2)
 │
 ├── layout/                     # Page structure
 │   ├── index.css
@@ -230,18 +232,43 @@ assets/css/
 | `--l-border` | Border color |
 | `--l-text-muted` | Muted/secondary text |
 
-### Typography Tokens
+### Typography System (4-Layer Architecture)
 
+The typography system uses a 4-layer architecture for maximum flexibility:
+
+**Layer 1: Fallback Stacks** (never change per-client)
+| Token | Use |
+|-------|-----|
+| `--fallback-sans` | Sans-serif system fonts |
+| `--fallback-serif` | Serif system fonts |
+| `--fallback-slab` | Slab-serif system fonts |
+| `--fallback-mono` | Monospace system fonts |
+
+**Layer 2: Brand Fonts** (change per-client)
+| Token | Use |
+|-------|-----|
+| `--font-brand-primary` | Main brand font |
+| `--font-brand-accent` | Headings/display font |
+| `--font-brand-mono` | Code font |
+
+**Layer 3: Semantic Aliases** (use these in CSS)
+| Token | Use |
+|-------|-----|
+| `--font-body` | Body text, paragraphs |
+| `--font-heading` | Headings, titles |
+| `--font-ui` | Buttons, labels, nav |
+| `--font-code` | Code blocks, monospace |
+
+**Layer 4: Sizes**
 | Token | Value | Use |
 |-------|-------|-----|
-| `--font-xs` | 0.75rem | Small labels |
-| `--font-sm` | 0.875rem | Secondary text |
-| `--font-base` | 1rem | Body text |
-| `--font-lg` | 1.125rem | Large body |
-| `--font-xl` | 1.25rem | Subheadings |
-| `--font-2xl` | 1.5rem | Section titles |
-| `--font-3xl` | 1.875rem | Page titles |
-| `--font-4xl` | 2.25rem | Hero headings |
+| `--text-xs` | 0.75rem | Small labels |
+| `--text-sm` | 0.875rem | Secondary text |
+| `--text-base` | 1rem | Body text |
+| `--text-lg` | 1.125rem | Large body |
+| `--text-xl` | 1.25rem | Subheadings |
+| `--text-2xl` | 1.5rem | Section titles |
+| `--heading-1` to `--heading-4` | clamp() | Fluid headings |
 
 ### Avatar Tokens
 
@@ -354,7 +381,11 @@ Scoped styles are ONLY allowed for **custom client sections with heavy custom gr
 | I want to change... | Edit this file |
 |---------------------|----------------|
 | Brand colors | `colors/primitives.css` |
-| Font sizes | `typography/variables.css` |
+| Brand fonts | `typography/variables.css` (Layer 2) |
+| Font sizes | `typography/variables.css` (Layer 4) |
+| Self-hosted fonts | `typography/font-faces.css` |
+| Language-specific fonts | `typography/lang-overrides.css` |
+| Google Fonts | `nuxt.config.ts` (app.head.link) |
 | Site header | `skeleton/header.css` |
 | Site footer | `skeleton/footer.css` |
 | Admin sidebar | `layout/admin-sidebar.css` |

@@ -18,7 +18,26 @@ export default defineNuxtConfig({
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }
       ],
-      // Google Fonts - Montserrat (matches logo design)
+      // ═══════════════════════════════════════════════════════════════════════
+      // GOOGLE FONTS LOADING
+      // ═══════════════════════════════════════════════════════════════════════
+      //
+      // WHY FONTS ARE HERE (not in CSS):
+      //   - <link rel="preconnect"> MUST be in <head> for early connection
+      //   - CSS @import would delay font discovery until CSS is parsed
+      //   - This is the web.dev recommended approach for external fonts
+      //
+      // FOR SELF-HOSTED FONTS:
+      //   - Remove these links
+      //   - Add @font-face rules in assets/css/typography/font-faces.css
+      //
+      // TYPOGRAPHY SYSTEM:
+      //   - Font variables: assets/css/typography/variables.css
+      //   - Language overrides: assets/css/typography/lang-overrides.css
+      //   - Font faces template: assets/css/typography/font-faces.css
+      //
+      // DEFAULT: Montserrat (PuppetMaster branding)
+      // ═══════════════════════════════════════════════════════════════════════
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },

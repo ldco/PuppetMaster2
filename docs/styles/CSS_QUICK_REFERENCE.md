@@ -200,19 +200,32 @@ var(--space-2)   /* 0.5rem */
 var(--space-4)   /* 1rem */
 var(--space-8)   /* 2rem */
 
-/* Typography - Font Family */
-var(--font-sans)   /* Body text (default: Montserrat) */
-var(--font-accent) /* Headings, decorative */
-var(--font-mono)   /* Code, monospace */
+/* Typography - Semantic (USE THESE) */
+var(--font-body)    /* Body text, paragraphs */
+var(--font-heading) /* Headings, titles */
+var(--font-ui)      /* Buttons, labels, nav */
+var(--font-code)    /* Code blocks, monospace */
+
+/* Typography - Brand (change per-client) */
+var(--font-brand-primary) /* Main brand font */
+var(--font-brand-accent)  /* Headings/display font */
+var(--font-brand-mono)    /* Code font */
+
+/* Typography - Fallbacks (never change) */
+var(--fallback-sans)  /* Sans-serif system fonts */
+var(--fallback-serif) /* Serif system fonts */
+var(--fallback-slab)  /* Slab-serif system fonts */
+var(--fallback-mono)  /* Monospace system fonts */
 
 /* Typography - Font Size */
 var(--text-sm)   /* 0.875rem */
 var(--text-base) /* 1rem */
 var(--text-lg)   /* 1.125rem */
+var(--heading-1) /* clamp(2.25rem, 5vw, 3.75rem) */
+var(--heading-2) /* clamp(1.875rem, 4vw, 3rem) */
 
 /* Sizing */
 var(--avatar-sm) /* 32px */
 var(--avatar-md) /* 40px */
 var(--icon-md)   /* 1.25rem */
 ```
-

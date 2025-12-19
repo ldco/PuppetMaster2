@@ -1,14 +1,36 @@
 /**
- * Base Typography Styles
+ * ═══════════════════════════════════════════════════════════════════════════
+ * BASE TYPOGRAPHY STYLES
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Uses semantic font variables from variables.css:
+ *   --font-body     Body text, paragraphs
+ *   --font-heading  Headings, titles
+ *   --font-ui       Buttons, labels, nav
+ *   --font-code     Code blocks, monospace
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
 }
 
-/* Headings */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * HEADINGS
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  font-family: var(--font-heading);
+}
+
 h1, .h1 {
   font-size: var(--heading-1);
   font-weight: var(--font-bold);
@@ -136,9 +158,12 @@ small, .text-sm {
   background-clip: text;
 }
 
-/* Code */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * CODE
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
 code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.875em;
   background: var(--l-bg-sunken);
   padding: 0.125em 0.375em;
@@ -146,7 +171,7 @@ code {
 }
 
 pre {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: var(--text-sm);
   background: var(--l-bg-sunken);
   padding: var(--space-4);
@@ -158,4 +183,3 @@ pre code {
   background: none;
   padding: 0;
 }
-

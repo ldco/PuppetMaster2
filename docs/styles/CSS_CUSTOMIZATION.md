@@ -55,36 +55,48 @@ All other colors are auto-calculated from these 4 values using `color-mix()` and
 }
 ```
 
-### 4. Typography
+### 4. Typography (4-Layer System)
+
+The typography system uses a 4-layer architecture. For client projects, you only need to change **Layer 2 (Brand Fonts)**.
 
 ```css
-/* assets/css/typography/variables.css */
+/* assets/css/typography/variables.css - Layer 2 */
 :root {
-  /* Body text */
-  --font-sans: 'ClientFont', system-ui, sans-serif;
-  /* Headings, decorative (optional - defaults to --font-sans) */
-  --font-accent: 'ClientDisplayFont', serif;
+  /* Primary brand font (body text, UI) */
+  --font-brand-primary: 'ClientFont', var(--fallback-sans);
+
+  /* Accent font for headings (optional - defaults to primary) */
+  --font-brand-accent: 'ClientDisplay', var(--fallback-serif);
 }
 ```
 
-**Default (PuppetMaster branding):** Montserrat for both `--font-sans` and `--font-accent`.
+**Important:** Match the fallback stack to your font type:
+- Sans-serif font → use `var(--fallback-sans)`
+- Serif font → use `var(--fallback-serif)`
+- Slab-serif font → use `var(--fallback-slab)`
 
-**For client projects:** Override with client's brand fonts.
+**Default (PuppetMaster branding):** Montserrat for both primary and accent.
 
 ### Font Loading Options
 
 **Option 1: Google Fonts** (recommended for common fonts)
+
+Edit `nuxt.config.ts` to add the font link:
+
 ```typescript
-// nuxt.config.ts
-googleFonts: {
-  families: {
-    'Open Sans': [400, 500, 700],
-    'Playfair Display': [700]
+// nuxt.config.ts - app.head.link
+link: [
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap'
   }
-}
+]
 ```
 
 **Option 2: Self-hosted** (for custom brand fonts)
+
 ```css
 /* assets/css/typography/font-faces.css */
 @font-face {
@@ -94,7 +106,34 @@ googleFonts: {
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: 'ClientFont';
+  src: url('./fonts/ClientFont-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 ```
+
+### Multi-Language Font Support
+
+For sites with multiple languages, use `typography/lang-overrides.css`:
+
+```css
+/* assets/css/typography/lang-overrides.css */
+:lang(he) {
+  --font-brand-primary: 'Heebo', 'Noto Sans Hebrew', var(--fallback-sans);
+  direction: rtl;
+}
+
+:lang(ar) {
+  --font-brand-primary: 'Cairo', 'Noto Sans Arabic', var(--fallback-sans);
+  direction: rtl;
+}
+```
+
+The browser automatically applies the correct font based on `<html lang="XX">`.
 
 ### 5. Border Radius
 
@@ -115,8 +154,11 @@ googleFonts: {
 | I need to customize... | Edit this file |
 |------------------------|----------------|
 | Brand colors | `colors/primitives.css` |
-| Font family | `typography/variables.css` |
+| Brand fonts | `typography/variables.css` (Layer 2) |
+| Font sizes | `typography/variables.css` (Layer 4) |
 | Self-hosted fonts | `typography/font-faces.css` |
+| Language-specific fonts | `typography/lang-overrides.css` |
+| Google Fonts | `nuxt.config.ts` (app.head.link) |
 | Header | `skeleton/header.css` |
 | Footer | `skeleton/footer.css` |
 | App sidebar | `layout/admin-sidebar.css` |
