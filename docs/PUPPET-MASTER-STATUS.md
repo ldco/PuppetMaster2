@@ -1,7 +1,7 @@
 # 🎭 Puppet Master - Project Status Document
 
-**Version:** 2.1
-**Last Updated:** 2024-12-17
+**Version:** 2.2
+**Last Updated:** 2024-12-19
 **Status:** IN DEVELOPMENT
 
 ---
@@ -355,6 +355,21 @@ app/
 | Header hiding | Changed to shrink-only |
 | Color mode hydration | Removed class from app.vue |
 
+### 🟢 Fixed Issues (2024-12-19) - CSS Refactor
+
+| Issue | Fix Applied |
+|-------|-------------|
+| Admin sidebar showing on mobile | Fixed CSS cascade order, responsive rules now in same file as base styles |
+| Missing `display: flex` in `.admin-sidebar` | Added base display property |
+| Missing `display: flex` in `.admin-header` | Added base display property |
+| Missing `margin-inline-start` in `.admin-main` | Added base margin property |
+| Duplicate `.icon-lg` definitions | Consolidated to single `icons.css` file |
+| Duplicate `.truncate` definitions | Consolidated to single `text.css` file |
+| Duplicate `.form-hint` definitions | Consolidated to single `inputs.css` file |
+| Debug `console.log` in translations.vue | Removed |
+| Magic numbers in CSS | Replaced with CSS variables (e.g., `36px` → `var(--avatar-sm)`) |
+| RTL `border-top` usage | Changed to `border-block-start` |
+
 ---
 
 ## 6. Documentation Status
@@ -382,51 +397,100 @@ app/
 
 ## 7. File Structure
 
-### CSS Architecture (7 Layers)
+### CSS Architecture (5 Layers - Post-Refactor 2024-12-19)
+
+**Layer Order:** `@layer reset, primitives, semantic, components, utilities;`
 
 ```
 assets/css/
-├── main.css              # Entry point, layer order
-├── reset.css             # CSS reset (layer: reset)
-├── colors/               # (layer: colors)
+├── main.css                    # Entry point, layer declarations
+├── reset.css                   # CSS reset (layer: reset)
+│
+├── colors/                     # (layer: primitives)
 │   ├── index.css
-│   ├── primitives.css    # Brand colors
-│   └── auto.css          # Light/dark auto colors
-├── typography/           # (layer: typography)
+│   ├── primitives.css          # Base colors (--c-black, --c-white, --c-brand, --c-accent)
+│   └── auto.css                # Auto-calculated (--l-bg, --l-text, light-dark())
+│
+├── typography/                 # (layer: primitives)
 │   ├── index.css
-│   ├── variables.css     # Font sizes
-│   ├── base.css          # Base typography
-│   └── fonts/            # Font files
-├── layout/               # (layer: layout)
+│   ├── variables.css           # Font tokens (--font-xs to --font-4xl)
+│   ├── base.css                # Base typography
+│   └── fonts/                  # Font files
+│
+├── layout/                     # (layer: components)
 │   ├── index.css
-│   ├── page.css          # Page structure
-│   ├── sections.css      # Full-height sections
-│   ├── containers.css    # Max-width containers
-│   ├── grid.css          # Grid utilities
-│   └── responsive.css    # Breakpoints
-├── skeleton/             # (layer: skeleton)
+│   ├── page.css                # Page structure, CSS variables for breakpoints
+│   ├── breakpoints.css         # Custom media queries (--phone, --tablet, --desktop)
+│   ├── responsive.css          # Responsive utilities (layer: utilities)
+│   ├── sections.css            # Full-height sections
+│   ├── containers.css          # Max-width containers
+│   ├── grid.css                # Grid system
+│   ├── admin-sidebar.css       # Admin panel sidebar (with responsive rules)
+│   ├── admin-content.css       # Admin panel main content area
+│   └── admin-header.css        # Admin panel mobile header
+│
+├── skeleton/                   # (layer: components)
 │   ├── index.css
-│   ├── header.css        # Header styles
-│   ├── footer.css        # Footer styles
-│   ├── nav.css           # Navigation
-│   └── mobile-nav.css    # Mobile drawer
-├── ui/                   # (layer: ui)
+│   ├── header.css              # Site header
+│   ├── footer.css              # Site footer
+│   ├── nav.css                 # Desktop navigation
+│   ├── mobile-nav.css          # Mobile drawer navigation
+│   ├── bottom-nav.css          # App-mode bottom navigation
+│   └── social-nav.css          # Social icons navigation
+│
+├── common/                     # (layer: utilities)
 │   ├── index.css
-│   ├── hamburger.css     # Hamburger icon
-│   ├── forms/            # Form elements
-│   ├── content/          # Content styles
-│   └── overlays/         # Modals, drawers
-├── common/               # (layer: utilities)
+│   ├── utilities.css           # Display, visibility helpers
+│   ├── spacing.css             # Spacing tokens (--space-1 to --space-32)
+│   ├── flexbox.css             # Flex utilities (.flex, .items-center, .gap-*)
+│   ├── grid.css                # Grid utilities (.grid-cols-*, .gap-*)
+│   ├── sizing.css              # Width/height utilities
+│   ├── icons.css               # Icon sizing (.icon-xs to .icon-2xl)
+│   ├── text.css                # Text utilities (.truncate, .line-clamp-*)
+│   ├── accessibility.css       # A11y helpers (.sr-only, .visually-hidden)
+│   ├── effects.css             # Shadows, transitions, transforms
+│   ├── scrollbars.css          # Custom scrollbar styles
+│   └── edge-cases.css          # Browser-specific fixes
+│
+├── ui/                         # (layer: components)
 │   ├── index.css
-│   ├── utilities.css     # Utility classes
-│   ├── spacing.css       # Spacing utilities
-│   ├── scrollbars.css    # Scrollbar styles
-│   └── edge-cases.css    # Browser fixes
-└── animations/           # (no layer, top priority)
+│   ├── hamburger.css           # Hamburger icon animation
+│   ├── forms/
+│   │   ├── index.css
+│   │   ├── inputs.css          # Input fields, textareas
+│   │   ├── buttons.css         # Button variants
+│   │   └── search.css          # Search input component
+│   ├── content/
+│   │   ├── index.css
+│   │   ├── cards.css           # Card components
+│   │   ├── tabs.css            # Tab components (.tabs, .tabs--underline)
+│   │   ├── badges.css          # Badge components
+│   │   ├── avatars.css         # Avatar sizing (--avatar-sm to --avatar-xl)
+│   │   ├── state-indicators.css # Loading states, empty states
+│   │   ├── inbox.css           # Inbox/message list styles
+│   │   ├── settings-form.css   # Settings form layout
+│   │   └── portfolio-grid.css  # Portfolio grid layout
+│   ├── layouts/
+│   │   └── index.css
+│   └── overlays/
+│       ├── index.css
+│       ├── modal.css           # Modal dialogs
+│       ├── lightbox.css        # Image lightbox
+│       ├── confirm.css         # Confirm dialogs
+│       └── toast.css           # Toast notifications
+│
+└── animations/                 # (layer: components)
     ├── index.css
-    ├── keyframes.css
-    └── transitions.css
+    ├── keyframes.css           # @keyframes definitions
+    └── transitions.css         # Transition utilities
 ```
+
+**Key Refactor Changes (2024-12-19):**
+- Split `page.css` from 830 → 236 lines (72% reduction)
+- Split `utilities.css` from 344 → 122 lines (65% reduction)
+- Created 16 new modular CSS files
+- Each component has its own file for easy client customization
+- Admin layout styles now have dedicated files with responsive rules in same file
 
 ### Component Structure (Atomic Design)
 
@@ -535,13 +599,34 @@ components/
 
 ## 9. CSS Architecture
 
+> **📖 Full Documentation:** See `docs/styles/CSS_ARCHITECTURE.md` for comprehensive CSS system documentation.
+
 ### Layer Order (Cascade Priority)
 
 ```css
-@layer reset, colors, typography, layout, skeleton, ui, utilities;
+@layer reset, primitives, semantic, components, utilities;
 ```
 
-Lower layers can be overridden by higher layers.
+| Layer | Purpose | Override Priority |
+|-------|---------|-------------------|
+| `reset` | CSS reset/normalize | Lowest |
+| `primitives` | Raw values (colors, fonts) | ↓ |
+| `semantic` | Calculated values (color-mix, light-dark) | ↓ |
+| `components` | UI styling (skeleton, forms, overlays) | ↓ |
+| `utilities` | Override helpers (.flex, .hidden) | Highest |
+
+### CSS Modular Philosophy
+
+**One file per component** - each CSS component has its own dedicated file:
+
+| Component Type | CSS Location | Purpose |
+|----------------|--------------|---------|
+| Admin Sidebar | `layout/admin-sidebar.css` | Sidebar + responsive rules |
+| Admin Header | `layout/admin-header.css` | Mobile header + responsive |
+| Icons | `common/icons.css` | Icon sizing classes |
+| Tabs | `ui/content/tabs.css` | Tab components |
+
+This allows client customization by editing ONE file for each visual component.
 
 ### CSS Variables
 
@@ -577,6 +662,8 @@ Lower layers can be overridden by higher layers.
   --space-8: 2rem;     /* 32px */
   --space-12: 3rem;    /* 48px */
   --space-16: 4rem;    /* 64px */
+  --space-24: 6rem;    /* 96px */
+  --space-32: 8rem;    /* 128px */
 }
 ```
 
@@ -685,6 +772,12 @@ defineEmits<{
 8. **User Management (RBAC)** - ✅ Complete (Master/Admin/Editor roles)
 9. **Testing Framework** - ✅ Complete (Vitest, 88 tests passing)
 10. **Code Cleanup** - ✅ Complete (105 TS errors fixed, DevTools errors fixed)
+11. **CSS Modular Refactor** - ✅ Complete (2024-12-19)
+    - 16 new modular CSS files
+    - page.css: 830 → 236 lines (72% reduction)
+    - utilities.css: 344 → 122 lines (65% reduction)
+    - All responsive rules in same file as base styles
+    - All magic numbers replaced with CSS variables
 
 ### Immediate Priority (This Week)
 

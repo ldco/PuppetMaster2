@@ -103,23 +103,34 @@ export default {
 
 ## 📖 Documentation
 
-See [PUPPET-MASTER-TECHNICAL-BRIEF.md](./PUPPET-MASTER-TECHNICAL-BRIEF.md) for comprehensive documentation including:
+| Document | Purpose |
+|----------|---------|
+| [docs/PUPPET-MASTER-STATUS.md](./docs/PUPPET-MASTER-STATUS.md) | Project status, file structure |
+| [docs/PUPPET-MASTER-TECHNICAL-BRIEF.md](./docs/PUPPET-MASTER-TECHNICAL-BRIEF.md) | Architecture decisions, database schema |
+| [docs/styles/](./docs/styles/) | **CSS system documentation** |
+| [docs/PM_BEST_PRACTICES.md](./docs/PM_BEST_PRACTICES.md) | Development standards |
+| [docs/USAGE.md](./docs/USAGE.md) | Developer workflow guide |
 
-- Architecture decisions
-- CSS system details
-- Database schema
-- Component patterns
-- DX quick reference for common customizations
+### CSS Documentation (docs/styles/)
+
+| Document | Purpose |
+|----------|---------|
+| [CSS_ARCHITECTURE.md](./docs/styles/CSS_ARCHITECTURE.md) | Complete CSS system architecture |
+| [CSS_QUICK_REFERENCE.md](./docs/styles/CSS_QUICK_REFERENCE.md) | Quick lookup for classes & variables |
+| [CSS_CUSTOMIZATION.md](./docs/styles/CSS_CUSTOMIZATION.md) | How to customize for clients |
 
 ### Quick Customization Reference
 
 | What | Where |
 |------|-------|
-| **Header width** | `skeleton/header.css` → `--header-max-width` |
-| **Footer padding** | `skeleton/footer.css` → `--footer-padding` |
-| **Brand colors** | `colors/primitives.css` → `--p-brand` |
-| **Default font** | `typography/variables.css` → `--font-sans` |
-| **Container width** | `layout/containers.css` → `--content-default` |
+| **Brand colors** | `colors/primitives.css` → `--c-brand`, `--c-accent` |
+| **Header** | `skeleton/header.css` |
+| **Footer** | `skeleton/footer.css` |
+| **Admin sidebar** | `layout/admin-sidebar.css` |
+| **Buttons** | `ui/forms/buttons.css` |
+| **Cards** | `ui/content/cards.css` |
+| **Icon sizes** | `common/icons.css` |
+| **Container width** | `layout/containers.css` |
 
 ## 📁 Project Structure
 
@@ -127,15 +138,24 @@ See [PUPPET-MASTER-TECHNICAL-BRIEF.md](./PUPPET-MASTER-TECHNICAL-BRIEF.md) for c
 puppet-master/
 ├── app/                    # Nuxt application
 │   ├── app/
-│   │   ├── assets/css/     # Pure CSS system
+│   │   ├── assets/css/     # Pure CSS system (50+ modular files)
+│   │   │   ├── colors/     # Color system (4 base colors)
+│   │   │   ├── layout/     # Page structure, admin panel
+│   │   │   ├── skeleton/   # Header, footer, nav
+│   │   │   ├── common/     # Utility classes
+│   │   │   ├── ui/         # Forms, content, overlays
+│   │   │   └── animations/ # Keyframes, transitions
 │   │   ├── components/     # Vue components (Atomic Design)
 │   │   ├── composables/    # Vue composables
 │   │   ├── layouts/        # Page layouts
 │   │   └── puppet-master.config.ts
 │   ├── server/             # API routes, database
-│   └── public/             # Static assets, logos
+│   ├── public/             # Static assets, logos
+│   └── docs/               # Documentation
+│       ├── styles/         # CSS system docs
+│       └── *.md            # Other docs
 ├── pm_design/              # Logo design files
-└── PUPPET-MASTER-TECHNICAL-BRIEF.md
+└── README.md
 ```
 
 ## 🎨 Logo System

@@ -1,8 +1,10 @@
 # 🎭 Puppet Master - Technical Brief
 
-**Version:** 2.1
-**Date:** 2024-12-17
+**Version:** 2.2
+**Date:** 2024-12-19
 **Status:** IN DEVELOPMENT
+
+> **📖 CSS Documentation:** See `docs/styles/` folder for detailed CSS system documentation.
 
 ---
 
@@ -548,17 +550,56 @@ export const contactSubmissions = sqliteTable('contact_submissions', {
 
 ## 8. CSS Architecture
 
+> **📖 Full Documentation:** See `docs/styles/CSS_ARCHITECTURE.md` for comprehensive details.
+
+### Modular File Structure (2024-12-19 Refactor)
+
+**Philosophy:** One file per component for easy client customization.
+
+```
+assets/css/
+├── main.css                    # Entry point, layer declarations
+├── reset.css                   # Browser reset
+├── colors/                     # Color system
+│   ├── primitives.css          # 4 base colors
+│   └── auto.css                # Auto-calculated colors
+├── layout/                     # Page structure
+│   ├── page.css, breakpoints.css, containers.css, grid.css
+│   ├── admin-sidebar.css       # Admin panel sidebar
+│   ├── admin-content.css       # Admin content area
+│   └── admin-header.css        # Admin mobile header
+├── skeleton/                   # Site skeleton
+│   ├── header.css, footer.css, nav.css, mobile-nav.css
+│   ├── bottom-nav.css          # App bottom navigation
+│   └── social-nav.css          # Social icons
+├── common/                     # Utility classes
+│   ├── utilities.css, spacing.css, flexbox.css, grid.css
+│   ├── icons.css               # Icon sizing
+│   ├── text.css                # Text utilities
+│   └── accessibility.css       # A11y helpers
+├── ui/                         # UI components
+│   ├── forms/ (inputs.css, buttons.css, search.css)
+│   ├── content/ (cards.css, tabs.css, badges.css, avatars.css)
+│   └── overlays/ (modal.css, lightbox.css, toast.css)
+└── animations/                 # Animations
+```
+
+**Key Metrics (Refactor 2024-12-19):**
+- `page.css`: 830 → 236 lines (72% reduction)
+- `utilities.css`: 344 → 122 lines (65% reduction)
+- 16 new modular CSS files created
+
 ### Color System (Q22 Decision)
 
 **Modern CSS Color System** with auto-calculation from 4 base colors.
 
-#### File Structure
+#### Color File Structure
 
 ```
-core/assets/styles/colors/
-├── index.css           # Entry point + primitives
-├── auto.css            # Auto-calculated from 4 base colors
-└── manual.css          # Explicit brandbook colors (optional)
+assets/css/colors/
+├── index.css           # Entry point + imports
+├── primitives.css      # 4 base colors in HEX
+└── auto.css            # Auto-calculated from base colors
 ```
 
 #### Mode Toggle (One Comment)
@@ -2170,6 +2211,8 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 | D30 | Font handling | Google Fonts + self-hosted custom | Fast, consistent, no ugly system fonts |
 | D31 | UI components | ui/ folder with forms/overlays/content | Style ALL native elements |
 | D32 | CSS architecture | 3-layer (primitives→semantic→components) | Core defaults, Project overrides primitives only |
+| D33 | Modular CSS | One file per component (2024-12-19) | Easy client customization, responsive in same file |
+| D34 | Responsive location | Media queries in same file as base styles | Prevents CSS cascade order bugs |
 
 ### Questions Resolved
 
@@ -2217,6 +2260,8 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 3. **Node.js handles images** - Sharp is faster than Python Pillow
 4. **Simpler is better** - One codebase > two separate services
 5. **Document decisions** - This brief is essential for fresh starts
+6. **Responsive CSS in same file** - Prevents cascade order issues (2024-12-19)
+7. **Modular CSS files** - One file per component for easy customization (2024-12-19)
 
 ---
 

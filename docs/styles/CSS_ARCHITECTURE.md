@@ -1,0 +1,372 @@
+# 🎨 Puppet Master - CSS Architecture
+
+**Version:** 1.0
+**Last Updated:** 2024-12-19
+
+---
+
+## Table of Contents
+
+1. [Overview](#1-overview)
+2. [Application Modes & Visual Modes](#2-application-modes--visual-modes)
+3. [Layer System](#3-layer-system)
+4. [File Structure](#4-file-structure)
+5. [Design Tokens](#5-design-tokens)
+6. [Responsive System](#6-responsive-system)
+7. [Core Rules](#7-core-rules)
+8. [Finding the Right File](#8-finding-the-right-file)
+
+---
+
+## 1. Overview
+
+Puppet Master uses a **pure CSS architecture** with no frameworks (no Tailwind, no Bootstrap).
+
+### Key Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **One file per component** | Each visual component has its own CSS file |
+| **No scoped styles** | All styles in global CSS files, not `<style scoped>` |
+| **CSS variables everywhere** | No magic numbers, all values are design tokens |
+| **Responsive in same file** | Base styles + media queries together |
+| **Logical properties** | RTL support via CSS logical properties |
+
+### Entry Point
+
+```css
+/* assets/css/main.css */
+@layer reset, primitives, semantic, components, utilities;
+
+@import './reset.css' layer(reset);
+@import './colors/index.css' layer(primitives);
+@import './typography/index.css' layer(primitives);
+@import './layout/index.css' layer(components);
+@import './animations/index.css' layer(components);
+@import './skeleton/index.css' layer(components);
+@import './ui/index.css' layer(components);
+@import './common/index.css' layer(utilities);
+@import './layout/responsive.css' layer(utilities);
+```
+
+---
+
+## 2. Application Modes & Visual Modes
+
+### Application Modes (4 modes)
+
+| Mode | Website Portion | App/Admin Portion |
+|------|-----------------|-------------------|
+| `app-only` | ❌ None | App (vertical sidebar, SPA) |
+| `website-app` | Website (hamburger, can be onepager OR SPA) | App (visible login button) |
+| `website-admin` | Website (hamburger, can be onepager OR SPA) | Admin (hidden at /admin) |
+| `website-only` | Website (hamburger, can be onepager OR SPA) | ❌ None |
+
+### Visual Modes (2 modes)
+
+| Visual Mode | Used By | Desktop | Mobile |
+|-------------|---------|---------|--------|
+| **Website** | Public site | Horizontal header | Hamburger menu |
+| **App** | Admin panel, App | Vertical sidebar | Bottom nav OR mobile header |
+
+**Important:** Admin panel is **ALWAYS** app visual mode, regardless of application mode.
+
+### Website Sub-Modes
+
+| Mode | Navigation | URL Structure |
+|------|------------|---------------|
+| **Onepager** | Scroll-based anchors (`#about`, `#contact`) | Single page with sections |
+| **SPA** | Route-based (`/about`, `/contact`) | Multiple pages via Vue Router |
+
+Controlled by `features.onepager` in `puppet-master.config.ts`.
+
+---
+
+## 3. Layer System
+
+### Cascade Priority (Low → High)
+
+```css
+@layer reset, primitives, semantic, components, utilities;
+```
+
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| `reset` | Normalize browser defaults | CSS reset |
+| `primitives` | Raw design tokens | `--c-brand: #aa0000` |
+| `semantic` | Calculated values | `--l-bg: light-dark(...)` |
+| `components` | UI element styling | `.admin-sidebar { }` |
+| `utilities` | Override helpers | `.flex`, `.hidden` |
+
+### How Layers Work
+
+```css
+/* Lower layer - can be overridden */
+@layer components {
+  .button { background: var(--c-brand); }
+}
+
+/* Higher layer - overrides components without !important */
+@layer utilities {
+  .bg-transparent { background: transparent; }
+}
+```
+
+---
+
+## 4. File Structure
+
+```
+assets/css/
+├── main.css                    # Entry point
+├── reset.css                   # Browser reset
+│
+├── colors/                     # Color system
+│   ├── index.css
+│   ├── primitives.css          # Base colors
+│   └── auto.css                # Auto-calculated colors
+│
+├── typography/                 # Font system
+│   ├── index.css
+│   ├── variables.css           # Font tokens
+│   ├── base.css                # Typography rules
+│   └── fonts/                  # Font files
+│
+├── layout/                     # Page structure
+│   ├── index.css
+│   ├── page.css                # Page wrapper, breakpoint vars
+│   ├── breakpoints.css         # Custom media queries
+│   ├── responsive.css          # Responsive utilities
+│   ├── sections.css            # Full-height sections
+│   ├── containers.css          # Max-width containers
+│   ├── grid.css                # Grid system
+│   ├── admin-sidebar.css       # Admin sidebar
+│   ├── admin-content.css       # Admin content area
+│   └── admin-header.css        # Admin mobile header
+│
+├── skeleton/                   # Site skeleton
+│   ├── index.css
+│   ├── header.css              # Site header
+│   ├── footer.css              # Site footer
+│   ├── nav.css                 # Desktop nav
+│   ├── mobile-nav.css          # Mobile drawer
+│   ├── bottom-nav.css          # App bottom nav
+│   └── social-nav.css          # Social icons
+│
+├── common/                     # Utility classes
+│   ├── index.css
+│   ├── utilities.css           # Display, visibility
+│   ├── spacing.css             # Spacing tokens
+│   ├── flexbox.css             # Flex utilities
+│   ├── grid.css                # Grid utilities
+│   ├── sizing.css              # Width/height
+│   ├── icons.css               # Icon sizing
+│   ├── text.css                # Text utilities
+│   ├── accessibility.css       # A11y helpers
+│   ├── effects.css             # Shadows, transitions
+│   ├── scrollbars.css          # Scrollbar styles
+│   └── edge-cases.css          # Browser fixes
+│
+├── ui/                         # UI components
+│   ├── index.css
+│   ├── hamburger.css
+│   ├── forms/                  # Form elements
+│   │   ├── inputs.css
+│   │   ├── buttons.css
+│   │   └── search.css
+│   ├── content/                # Content elements
+│   │   ├── cards.css
+│   │   ├── tabs.css
+│   │   ├── badges.css
+│   │   ├── avatars.css
+│   │   ├── state-indicators.css
+│   │   ├── inbox.css
+│   │   └── portfolio-grid.css
+│   └── overlays/               # Overlays
+│       ├── modal.css
+│       ├── lightbox.css
+│       ├── confirm.css
+│       └── toast.css
+│
+└── animations/                 # Animations
+    ├── index.css
+    ├── keyframes.css
+    └── transitions.css
+```
+
+---
+
+## 5. Design Tokens
+
+### Spacing Scale
+
+| Token | Value | Pixels |
+|-------|-------|--------|
+| `--space-1` | 0.25rem | 4px |
+| `--space-2` | 0.5rem | 8px |
+| `--space-3` | 0.75rem | 12px |
+| `--space-4` | 1rem | 16px |
+| `--space-6` | 1.5rem | 24px |
+| `--space-8` | 2rem | 32px |
+| `--space-12` | 3rem | 48px |
+| `--space-16` | 4rem | 64px |
+| `--space-24` | 6rem | 96px |
+| `--space-32` | 8rem | 128px |
+
+### Color Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--c-black` | Dark text/backgrounds |
+| `--c-white` | Light text/backgrounds |
+| `--c-brand` | Primary brand color |
+| `--c-accent` | Secondary accent color |
+| `--l-bg` | Current theme background |
+| `--l-text` | Current theme text |
+| `--l-surface` | Elevated surfaces |
+| `--l-border` | Border color |
+| `--l-text-muted` | Muted/secondary text |
+
+### Typography Tokens
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--font-xs` | 0.75rem | Small labels |
+| `--font-sm` | 0.875rem | Secondary text |
+| `--font-base` | 1rem | Body text |
+| `--font-lg` | 1.125rem | Large body |
+| `--font-xl` | 1.25rem | Subheadings |
+| `--font-2xl` | 1.5rem | Section titles |
+| `--font-3xl` | 1.875rem | Page titles |
+| `--font-4xl` | 2.25rem | Hero headings |
+
+### Avatar Tokens
+
+| Token | Use |
+|-------|-----|
+| `--avatar-xs` | 24px - Tiny avatars |
+| `--avatar-sm` | 32px - Small avatars |
+| `--avatar-md` | 40px - Default avatars |
+| `--avatar-lg` | 48px - Large avatars |
+| `--avatar-xl` | 64px - Extra large |
+
+### Icon Tokens
+
+| Token | Use |
+|-------|-----|
+| `--icon-xs` | 0.75rem - Tiny icons |
+| `--icon-sm` | 1rem - Small icons |
+| `--icon-md` | 1.25rem - Default icons |
+| `--icon-lg` | 1.5rem - Large icons |
+| `--icon-xl` | 2rem - Extra large |
+| `--icon-2xl` | 2.5rem - Hero icons |
+
+---
+
+## 6. Responsive System
+
+### Breakpoints (Material Design 3)
+
+| Name | Query | Target |
+|------|-------|--------|
+| Phone | `width < 600px` | Mobile phones |
+| Tablet | `600px <= width < 840px` | Tablets, small laptops |
+| Desktop | `width >= 840px` | Desktop screens |
+
+### Custom Media Queries
+
+```css
+/* Defined in layout/breakpoints.css */
+@custom-media --phone (width < 600px);
+@custom-media --tablet (600px <= width < 840px);
+@custom-media --desktop (width >= 840px);
+```
+
+### Usage in Components
+
+```css
+/* admin-sidebar.css - Example of responsive in same file */
+.admin-sidebar {
+  display: flex;           /* Base - always defined */
+  width: var(--admin-sidebar-width);
+}
+
+@media (--phone) {
+  .admin-sidebar {
+    display: none;         /* Hide on phones */
+  }
+}
+
+@media (--tablet) {
+  .admin-sidebar {
+    width: var(--admin-sidebar-collapsed-width);
+  }
+}
+```
+
+---
+
+## 7. Core Rules
+
+### ❌ NEVER Do
+
+```vue
+<!-- WRONG: Scoped styles in components -->
+<style scoped>
+.my-component { color: red; }
+</style>
+
+<!-- WRONG: Magic numbers -->
+<style>
+.sidebar { width: 280px; padding: 16px; }
+</style>
+```
+
+### ✅ ALWAYS Do
+
+```css
+/* CORRECT: Use CSS variables */
+.sidebar {
+  width: var(--admin-sidebar-width);
+  padding: var(--space-4);
+}
+
+/* CORRECT: Use logical properties for RTL */
+.sidebar {
+  margin-inline-start: var(--space-4);
+  border-block-end: 1px solid var(--l-border);
+}
+```
+
+### Exception
+
+Scoped styles are ONLY allowed for **custom client sections with heavy custom graphics**.
+
+---
+
+## 8. Finding the Right File
+
+### Quick Reference
+
+| I want to change... | Edit this file |
+|---------------------|----------------|
+| Brand colors | `colors/primitives.css` |
+| Font sizes | `typography/variables.css` |
+| Site header | `skeleton/header.css` |
+| Site footer | `skeleton/footer.css` |
+| Admin sidebar | `layout/admin-sidebar.css` |
+| Admin mobile header | `layout/admin-header.css` |
+| Button styles | `ui/forms/buttons.css` |
+| Input fields | `ui/forms/inputs.css` |
+| Card components | `ui/content/cards.css` |
+| Tab components | `ui/content/tabs.css` |
+| Modal dialogs | `ui/overlays/modal.css` |
+| Icon sizes | `common/icons.css` |
+| Text utilities | `common/text.css` |
+| Flexbox utilities | `common/flexbox.css` |
+| Spacing | `common/spacing.css` |
+| Breakpoints | `layout/breakpoints.css` |
+
+---
+
+*This document should be updated when CSS architecture changes.*

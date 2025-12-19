@@ -2,6 +2,8 @@
 
 Quick reference for development standards and conventions.
 
+> **📖 Full CSS Documentation:** See `docs/styles/` folder for comprehensive CSS system docs.
+
 ---
 
 ## CSS Rules
@@ -34,23 +36,64 @@ color: #333;
 /* ✅ CORRECT */
 padding: var(--space-4);
 margin-block-start: var(--space-6);
-color: var(--t-muted);
+color: var(--l-text-muted);
 ```
 
-### 3. CSS Organization by Domain
-CSS files are organized by **domain/purpose**, not atomic level:
-- `colors/` - Color variables, themes
-- `typography/` - Font families, sizes
-- `layout/` - Grid, containers
-- `skeleton/` - Header, footer, nav
-- `ui/` - Forms, buttons, overlays
+### 3. One File Per Component (Modular CSS)
+Each CSS component has its own dedicated file. This makes customization easy:
 
-### 4. CSS Layers
+| Component | File Location |
+|-----------|---------------|
+| Admin sidebar | `layout/admin-sidebar.css` |
+| Admin header | `layout/admin-header.css` |
+| Icon sizes | `common/icons.css` |
+| Text utilities | `common/text.css` |
+| Tab component | `ui/content/tabs.css` |
+
+### 4. Responsive Rules in Same File
+Keep base styles and media queries together in the same file:
+
+```css
+/* admin-sidebar.css */
+.admin-sidebar {
+  display: flex;
+  width: var(--admin-sidebar-width);
+}
+
+@media (--phone) {
+  .admin-sidebar {
+    display: none;
+  }
+}
+```
+
+### 5. CSS Layers
 Use `@layer` for cascade control:
 ```css
-@layer primitives { /* Raw values */ }
-@layer semantic { /* Calculated values */ }
-@layer components { /* UI styling */ }
+@layer reset, primitives, semantic, components, utilities;
+```
+
+| Layer | Purpose |
+|-------|---------|
+| `reset` | Browser normalize |
+| `primitives` | Raw tokens (colors, fonts) |
+| `semantic` | Calculated values |
+| `components` | UI styling |
+| `utilities` | Override helpers (highest priority) |
+
+### 6. Use Logical Properties for RTL
+Always use CSS logical properties for RTL language support:
+
+```css
+/* ❌ WRONG */
+margin-left: 1rem;
+border-top: 1px solid;
+padding-right: 2rem;
+
+/* ✅ CORRECT */
+margin-inline-start: 1rem;
+border-block-start: 1px solid;
+padding-inline-end: 2rem;
 ```
 
 ---
@@ -77,14 +120,14 @@ Use `@layer` for cascade control:
 
 ## CSS Units Strategy
 
-| Use Case | Unit |
-|----------|------|
-| Fluid Typography | `clamp(rem, rem+vw, rem)` |
-| Fluid Spacing | `clamp()` |
-| Fixed Spacing | `rem` |
-| Borders | `px` |
-| Viewport Heights | `dvh` or `vh` |
-| Line Height | unitless |
+| Use Case | Unit | Example |
+|----------|------|---------|
+| Fixed Spacing | `rem` | `max-width: 62.5rem` |
+| Fluid Typography | `clamp()` | `font-size: clamp(1rem, 1rem + 1vw, 1.5rem)` |
+| Borders | `px` | `border: 1px solid` |
+| Viewport Heights | `dvh` | `height: 100dvh` |
+| Line Height | unitless | `line-height: 1.5` |
+| CSS Variables | tokens | `padding: var(--space-4)` |
 
 ---
 
@@ -151,13 +194,35 @@ docs: add PM_BEST_PRACTICES.md
 ```
 
 ---
----
 
 ## File Organization
 
 - Prefer organizing code into folders with separate files for each utility/type
 - Don't consolidate everything into a single file
 - Keep related code close together
+- **CSS**: One file per component (e.g., `icons.css`, `tabs.css`, `admin-sidebar.css`)
+
+---
+
+## Application Modes
+
+### 4 Application Modes
+
+| Mode | Website | App/Admin |
+|------|---------|-----------|
+| `app-only` | ❌ | ✅ App (vertical sidebar) |
+| `website-app` | ✅ (hamburger) | ✅ App (login button visible) |
+| `website-admin` | ✅ (hamburger) | ✅ Admin (hidden at /admin) |
+| `website-only` | ✅ (hamburger) | ❌ |
+
+### Website Sub-Modes
+
+| Mode | Navigation |
+|------|------------|
+| Onepager | Scroll-based anchors (`#about`, `#contact`) |
+| SPA | Route-based (`/about`, `/contact`) |
+
+**Important:** Admin panel is ALWAYS app visual mode (vertical sidebar), regardless of application mode.
 
 ---
 
@@ -168,4 +233,3 @@ When analyzing code, act like a senior dev:
 - Flag over-engineering as PROBLEMS
 - Flag duplicate implementations as PROBLEMS
 - Once a decision is made, document it and don't revisit as open discussion
-
