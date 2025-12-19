@@ -16,12 +16,12 @@ const { locale } = useI18n()
 
 const isRtl = computed(() => isRtlLanguage(locale.value))
 
-// Set dir attribute on <html> element for:
-// 1. Scrollbar position (left side in RTL)
-// 2. All CSS logical properties to work correctly
-// 3. Native browser RTL support (text-align, etc.)
+// Set html attributes for:
+// 1. lang - for CSS language-based styling and accessibility
+// 2. dir - for RTL support (scrollbar, logical properties, text-align)
 useHead({
   htmlAttrs: {
+    lang: () => locale.value,
     dir: () => isRtl.value ? 'rtl' : 'ltr'
   }
 })

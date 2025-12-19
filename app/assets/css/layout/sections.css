@@ -166,6 +166,13 @@
   object-fit: contain;
 }
 
+/* Theme-based logo visibility (avoids hydration mismatch + flash) */
+.hero-logo-img--light { display: block; }
+.hero-logo-img--dark { display: none; }
+
+.dark .hero-logo-img--light { display: none; }
+.dark .hero-logo-img--dark { display: block; }
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;

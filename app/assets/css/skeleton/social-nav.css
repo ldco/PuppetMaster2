@@ -8,7 +8,10 @@
 .social-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap-sm);
+  /* Zero vertical gap: icons are already 36px touch targets */
+  /* Horizontal gap: tiny breathing room between icons */
+  row-gap: 0;
+  column-gap: 4px;
   align-items: center;
 }
 
@@ -44,29 +47,7 @@
   height: var(--icon-md);
 }
 
-/* ══════════════════════════════════════════════════════════
- * PLATFORM HOVER COLORS
- *
- * Brand colors for each social platform.
- * Applied on hover for visual feedback.
- * ══════════════════════════════════════════════════════════ */
-
-.social-nav-link--telegram:hover { color: #0088cc; }
-.social-nav-link--whatsapp:hover { color: #25d366; }
-.social-nav-link--instagram:hover { color: #e4405f; }
-.social-nav-link--facebook:hover { color: #1877f2; }
-.social-nav-link--twitter:hover { color: #1da1f2; }
-.social-nav-link--x:hover { color: #000; }
-.social-nav-link--youtube:hover { color: #ff0000; }
-.social-nav-link--linkedin:hover { color: #0a66c2; }
-.social-nav-link--github:hover { color: #333; }
-.social-nav-link--vk:hover { color: #0077ff; }
-.social-nav-link--tiktok:hover { color: #000; }
-.social-nav-link--pinterest:hover { color: #e60023; }
-.social-nav-link--snapchat:hover { color: #fffc00; }
-.social-nav-link--reddit:hover { color: #ff4500; }
-.social-nav-link--discord:hover { color: #5865f2; }
-.social-nav-link--twitch:hover { color: #9146ff; }
+/* Platform-specific hover colors removed - using unified brand styling */
 
 /* ══════════════════════════════════════════════════════════
  * SIZE VARIANTS
@@ -116,3 +97,18 @@
   border-color: var(--i-brand);
 }
 
+/* Circle variant - subtle circles with brand-colored icons */
+.social-nav--circle .social-nav-link {
+  background: var(--i-brand-subtle);
+  color: var(--i-brand);
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-normal) ease,
+              background-color var(--transition-normal) ease,
+              color var(--transition-normal) ease;
+}
+
+.social-nav--circle .social-nav-link:hover {
+  background: var(--i-brand);
+  color: var(--t-on-brand);
+  transform: translateY(-3px);
+}

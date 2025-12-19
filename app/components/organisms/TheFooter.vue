@@ -43,7 +43,7 @@ const hasLegalLinks = computed(() => showLegalLinks.value && (privacyUrl.value |
       <!-- Grid: Logo | Social | Nav | CTA -->
       <div class="footer-grid">
         <AtomsLogo class="footer-logo" />
-        <MoleculesSocialNav v-if="rich" class="footer-social" />
+        <MoleculesSocialNav v-if="rich" circle class="footer-social" />
         <MoleculesFooterNav v-if="showFooterNav" />
         <MoleculesFooterCta v-if="showFooterCta" />
       </div>

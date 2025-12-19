@@ -10,7 +10,7 @@
  */
 import config from '~/puppet-master.config'
 
-// Tabler brand icons
+// Tabler brand icons (regular/stroked - consistent style)
 import IconBrandTelegram from '~icons/tabler/brand-telegram'
 import IconBrandInstagram from '~icons/tabler/brand-instagram'
 import IconBrandWhatsapp from '~icons/tabler/brand-whatsapp'
@@ -82,6 +82,8 @@ defineProps<{
   vertical?: boolean
   /** Show labels next to icons */
   showLabels?: boolean
+  /** Show icons in filled circles */
+  circle?: boolean
 }>()
 
 // Get social links from settings (only those with values)
@@ -106,7 +108,10 @@ function getIcon(platform: string): Component | undefined {
   <nav
     v-if="activeSocials.length > 0"
     class="social-nav"
-    :class="{ 'social-nav--vertical': vertical }"
+    :class="{
+      'social-nav--vertical': vertical,
+      'social-nav--circle': circle
+    }"
     aria-label="Social media links"
   >
     <a

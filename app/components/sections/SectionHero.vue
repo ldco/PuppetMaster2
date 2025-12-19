@@ -3,9 +3,32 @@
  * Hero Section
  *
  * Main landing section with big logo, subtext, and CTAs.
+ *
+ * Logo Strategy: Render BOTH theme variants, CSS shows correct one.
+ * This avoids SSR hydration mismatch AND flash of wrong logo.
  */
+import config from '~/puppet-master.config'
 
-const { shortLogo } = useLogo()
+const { locale } = useI18n()
+
+// Get effective language for logo (fallback for languages without logos)
+const langSuffix = computed(() => {
+  const lang = locale.value
+  // Check if logo exists for this language
+  const hasLogo = config.logo.available.some(name => name.endsWith(`_${lang}`))
+  if (hasLogo) return lang
+  // Use fallback chain
+  const fallback = config.logo.langFallback as Record<string, string>
+  return fallback[lang] || config.defaultLocale
+})
+
+// Get logo paths for both themes
+const lightThemeLogo = computed(() =>
+  `${config.logo.basePath}/circle_dark_${langSuffix.value}.svg`
+)
+const darkThemeLogo = computed(() =>
+  `${config.logo.basePath}/circle_light_${langSuffix.value}.svg`
+)
 
 defineProps<{
   /** Supporting text */
@@ -31,7 +54,9 @@ defineProps<{
     <div class="container">
       <div class="hero-logo">
         <slot name="logo">
-          <img :src="shortLogo" alt="Logo" class="hero-logo-img" />
+          <!-- Render BOTH logos, CSS shows correct one based on theme class -->
+          <img :src="lightThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--light" />
+          <img :src="darkThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--dark" />
         </slot>
       </div>
       <p class="hero-subtitle">

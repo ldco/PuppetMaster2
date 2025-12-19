@@ -83,7 +83,8 @@
    * SEMANTIC GAP TOKENS
    * Use in grid/flex gaps
    * ══════════════════════════════════════════════════════════ */
-
+  --gap-0: var(--space-0);
+  --gap-xxs: var(--space-1);
   --gap-xs: var(--space-2);
   --gap-sm: var(--space-3);
   --gap-md: var(--space-4);

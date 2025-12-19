@@ -6,12 +6,23 @@
  * Links to the Puppet Master website.
  * Centered at the very bottom of footer.
  *
+ * Logo Strategy: Render BOTH theme variants, CSS shows correct one.
+ * Language is baked into the path via locale (Russian for ru, English for others).
+ *
  * IMPORTANT: Logo is stored in /public/puppetmaster/ - a special folder
  * that should NOT be replaced when customizing the site for clients.
  */
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const puppetMasterUrl = 'https://puppetmaster.dev'
+
+// Get language suffix (ru for Russian, en for all others)
+const langSuffix = computed(() => locale.value === 'ru' ? 'ru' : 'en')
+
+// Logo paths - 2 variants for theme, language baked in
+const basePath = '/puppetmaster'
+const lightThemeLogo = computed(() => `${basePath}/horizontal_dark_${langSuffix.value}.svg`)
+const darkThemeLogo = computed(() => `${basePath}/horizontal_light_${langSuffix.value}.svg`)
 </script>
 
 <template>
@@ -24,17 +35,9 @@ const puppetMasterUrl = 'https://puppetmaster.dev'
       class="made-with-link"
       :aria-label="t('footer.puppetMaster')"
     >
-      <!-- Horizontal logo in /puppetmaster/ folder - framework assets, don't replace! -->
-      <img
-        src="/puppetmaster/horizontal_dark_en.svg"
-        alt="Puppet Master"
-        class="made-with-logo light-logo"
-      />
-      <img
-        src="/puppetmaster/horizontal_light_en.svg"
-        alt="Puppet Master"
-        class="made-with-logo dark-logo"
-      />
+      <!-- 2 theme variants - CSS shows correct one, language is in the path -->
+      <img :src="lightThemeLogo" alt="Puppet Master" class="made-with-logo light-logo" />
+      <img :src="darkThemeLogo" alt="Puppet Master" class="made-with-logo dark-logo" />
     </a>
   </div>
 </template>
