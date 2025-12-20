@@ -25,7 +25,7 @@ image: your-registry/puppetmaster2
 servers:
   web:
     hosts:
-      - your-server-ip  # Replace with your server IP
+      - your-server-ip # Replace with your server IP
     labels:
       traefik.http.routers.puppetmaster2.rule: Host(`your-domain.com`)
       traefik.http.routers.puppetmaster2.tls: true
@@ -36,7 +36,7 @@ servers:
 
 # Container registry configuration
 registry:
-  server: ghcr.io  # GitHub Container Registry (or your registry)
+  server: ghcr.io # GitHub Container Registry (or your registry)
   username:
     - KAMAL_REGISTRY_USERNAME
   password:
@@ -63,25 +63,25 @@ env:
 
 # Persistent storage volumes
 volumes:
-  - "puppetmaster2_data:/app/data"           # SQLite database
-  - "puppetmaster2_uploads:/app/public/uploads"  # User uploads
+  - 'puppetmaster2_data:/app/data' # SQLite database
+  - 'puppetmaster2_uploads:/app/public/uploads' # User uploads
 
 # Traefik configuration for reverse proxy and SSL
 traefik:
   options:
     publish:
-      - "443:443"
-      - "80:80"
+      - '443:443'
+      - '80:80'
     volume:
-      - "/letsencrypt:/letsencrypt"
+      - '/letsencrypt:/letsencrypt'
     network: traefik-public
   args:
-    entryPoints.web.address: ":80"
-    entryPoints.websecure.address: ":443"
+    entryPoints.web.address: ':80'
+    entryPoints.websecure.address: ':443'
     entryPoints.web.http.redirections.entryPoint.to: websecure
     entryPoints.web.http.redirections.entryPoint.scheme: https
-    certificatesResolvers.letsencrypt.acme.email: "your-email@example.com"
-    certificatesResolvers.letsencrypt.acme.storage: "/letsencrypt/acme.json"
+    certificatesResolvers.letsencrypt.acme.email: 'your-email@example.com'
+    certificatesResolvers.letsencrypt.acme.storage: '/letsencrypt/acme.json'
     certificatesResolvers.letsencrypt.acme.httpchallenge: true
     certificatesResolvers.letsencrypt.acme.httpchallenge.entrypoint: web
 
@@ -94,13 +94,13 @@ healthcheck:
 
 # SSH configuration
 ssh:
-  user: deploy  # SSH user on target server
+  user: deploy # SSH user on target server
 
 # Build configuration
 builder:
-  multiarch: false  # Set to true for ARM builds
+  multiarch: false # Set to true for ARM builds
   cache:
-    type: gha       # GitHub Actions cache (if using GHA)
+    type: gha # GitHub Actions cache (if using GHA)
     options: mode=max
 
 # Accessories (optional services)

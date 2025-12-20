@@ -32,7 +32,12 @@ interface TranslationsData {
 
 // Fetch translations - pass cookies for SSR auth
 const headers = useRequestHeaders(['cookie'])
-const { data, pending, error: fetchError, refresh } = await useFetch<TranslationsData>('/api/admin/translations', {
+const {
+  data,
+  pending,
+  error: fetchError,
+  refresh
+} = await useFetch<TranslationsData>('/api/admin/translations', {
   headers
 })
 
@@ -49,9 +54,8 @@ const filteredTranslations = computed(() => {
   const items = translations.value[activeLocale.value] || []
   if (!searchQuery.value) return items
   const query = searchQuery.value.toLowerCase()
-  return items.filter(t => 
-    t.key.toLowerCase().includes(query) || 
-    t.value.toLowerCase().includes(query)
+  return items.filter(
+    t => t.key.toLowerCase().includes(query) || t.value.toLowerCase().includes(query)
   )
 })
 
@@ -137,7 +141,8 @@ const localeNames: Record<string, string> = {
         <p class="text-secondary">{{ t('admin.translationsSubtitle') }}</p>
       </div>
       <button class="btn btn-primary" @click="openAdd">
-        <IconPlus /> {{ t('admin.addTranslation') }}
+        <IconPlus />
+        {{ t('admin.addTranslation') }}
       </button>
     </div>
 
@@ -189,7 +194,12 @@ const localeNames: Record<string, string> = {
             <td class="cell--key" :data-label="t('admin.translationKey')">
               <code>{{ item.key }}</code>
             </td>
-            <td class="cell--value cell--editable" :data-label="t('admin.translationValue')" dir="auto" @click="openEdit(item)">
+            <td
+              class="cell--value cell--editable"
+              :data-label="t('admin.translationValue')"
+              dir="auto"
+              @click="openEdit(item)"
+            >
               {{ item.value }}
             </td>
             <td class="actions-col">
@@ -234,13 +244,7 @@ const localeNames: Record<string, string> = {
 
             <div class="form-group">
               <label class="form-label">{{ t('admin.translationValue') }}</label>
-              <textarea
-                v-model="form.value"
-                class="input"
-                rows="3"
-                required
-                dir="auto"
-              ></textarea>
+              <textarea v-model="form.value" class="input" rows="3" required dir="auto"></textarea>
             </div>
 
             <div class="modal-footer">
@@ -265,4 +269,3 @@ const localeNames: Record<string, string> = {
   - ui/content/data-table.css: .data-table
   - ui/overlays/modal.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
 -->
-

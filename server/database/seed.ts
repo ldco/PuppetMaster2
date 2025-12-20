@@ -47,38 +47,46 @@ async function seed() {
     console.log('👤 Creating example users...\n')
 
     // Master user (developer)
-    db.insert(schema.users).values({
-      email: 'master@example.com',
-      passwordHash: hashPassword('master123'),
-      name: 'Developer',
-      role: 'master'
-    }).run()
+    db.insert(schema.users)
+      .values({
+        email: 'master@example.com',
+        passwordHash: hashPassword('master123'),
+        name: 'Developer',
+        role: 'master'
+      })
+      .run()
     console.log('   ✓ master@example.com / master123 (Master - full access)')
 
     // Admin user (client)
-    db.insert(schema.users).values({
-      email: 'admin@example.com',
-      passwordHash: hashPassword('admin123'),
-      name: 'Client Owner',
-      role: 'admin'
-    }).run()
+    db.insert(schema.users)
+      .values({
+        email: 'admin@example.com',
+        passwordHash: hashPassword('admin123'),
+        name: 'Client Owner',
+        role: 'admin'
+      })
+      .run()
     console.log('   ✓ admin@example.com / admin123 (Admin - client access)')
 
     // Editor users (client employees)
-    db.insert(schema.users).values({
-      email: 'editor@example.com',
-      passwordHash: hashPassword('editor123'),
-      name: 'Content Editor',
-      role: 'editor'
-    }).run()
+    db.insert(schema.users)
+      .values({
+        email: 'editor@example.com',
+        passwordHash: hashPassword('editor123'),
+        name: 'Content Editor',
+        role: 'editor'
+      })
+      .run()
     console.log('   ✓ editor@example.com / editor123 (Editor - content only)')
 
-    db.insert(schema.users).values({
-      email: 'john@example.com',
-      passwordHash: hashPassword('john123'),
-      name: 'John Doe',
-      role: 'editor'
-    }).run()
+    db.insert(schema.users)
+      .values({
+        email: 'john@example.com',
+        passwordHash: hashPassword('john123'),
+        name: 'John Doe',
+        role: 'editor'
+      })
+      .run()
     console.log('   ✓ john@example.com / john123 (Editor - content only)')
 
     console.log('')
@@ -142,7 +150,8 @@ async function seed() {
 
     // SEO
     'seo.title': 'Puppet Master - Modern Web Framework',
-    'seo.description': 'A production-ready Nuxt 3 framework for building client websites with admin panel.',
+    'seo.description':
+      'A production-ready Nuxt 3 framework for building client websites with admin panel.',
     'seo.keywords': 'nuxt, vue, web development, framework, cms',
 
     // Analytics (leave empty - user needs to add their own IDs)
@@ -152,19 +161,25 @@ async function seed() {
 
     // Verification (leave empty - user needs to add their own codes)
     'verification.google': '',
-    'verification.yandex': '',
+    'verification.yandex': ''
   }
 
   let settingsAdded = 0
   for (const setting of config.settings) {
     const defaultValue = defaultValues[setting.key] ?? ''
-    const result = sqlite.prepare(`
+    const result = sqlite
+      .prepare(
+        `
       INSERT OR IGNORE INTO settings (key, value, type, "group")
       VALUES (?, ?, ?, ?)
-    `).run(setting.key, defaultValue, setting.type, setting.group)
+    `
+      )
+      .run(setting.key, defaultValue, setting.type, setting.group)
 
     if (result.changes > 0) {
-      console.log(`   + ${setting.key}${defaultValue ? ` = "${defaultValue.substring(0, 40)}${defaultValue.length > 40 ? '...' : ''}"` : ' (empty)'}`)
+      console.log(
+        `   + ${setting.key}${defaultValue ? ` = "${defaultValue.substring(0, 40)}${defaultValue.length > 40 ? '...' : ''}"` : ' (empty)'}`
+      )
       settingsAdded++
     }
   }
@@ -178,10 +193,14 @@ async function seed() {
 
   const now = Date.now()
   for (const t of translations) {
-    const result = sqlite.prepare(`
+    const result = sqlite
+      .prepare(
+        `
       INSERT OR IGNORE INTO translations (locale, key, value, updated_at)
       VALUES (?, ?, ?, ?)
-    `).run(t.locale, t.key, t.value, now)
+    `
+      )
+      .run(t.locale, t.key, t.value, now)
 
     if (result.changes > 0) {
       translationsAdded++
@@ -209,7 +228,8 @@ async function seed() {
       {
         slug: 'brand-identity-redesign',
         title: 'Brand Identity Redesign',
-        description: 'Complete visual identity overhaul for a tech startup, including logo, color palette, and brand guidelines.',
+        description:
+          'Complete visual identity overhaul for a tech startup, including logo, color palette, and brand guidelines.',
         category: 'Branding',
         tags: JSON.stringify(['branding', 'logo', 'identity']),
         order: 3,
@@ -219,7 +239,8 @@ async function seed() {
       {
         slug: 'e-commerce-platform',
         title: 'E-Commerce Platform',
-        description: 'Full-stack online store with custom checkout, inventory management, and analytics dashboard.',
+        description:
+          'Full-stack online store with custom checkout, inventory management, and analytics dashboard.',
         category: 'Web Development',
         tags: JSON.stringify(['web', 'ecommerce', 'fullstack']),
         order: 2,
@@ -229,7 +250,8 @@ async function seed() {
       {
         slug: 'mobile-fitness-app',
         title: 'Mobile Fitness App',
-        description: 'Cross-platform fitness tracking application with workout plans, progress tracking, and social features.',
+        description:
+          'Cross-platform fitness tracking application with workout plans, progress tracking, and social features.',
         category: 'Mobile',
         tags: JSON.stringify(['mobile', 'app', 'fitness']),
         order: 1,
@@ -239,7 +261,8 @@ async function seed() {
       {
         slug: 'corporate-website',
         title: 'Corporate Website',
-        description: 'Modern responsive website for a financial services company with CMS integration.',
+        description:
+          'Modern responsive website for a financial services company with CMS integration.',
         category: 'Web Development',
         tags: JSON.stringify(['web', 'corporate', 'cms']),
         order: 0,
@@ -260,9 +283,8 @@ async function seed() {
   sqlite.close()
 }
 
-seed().catch((error) => {
+seed().catch(error => {
   console.error('❌ Seed failed:', error)
   sqlite.close()
   process.exit(1)
 })
-

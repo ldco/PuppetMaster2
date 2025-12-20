@@ -20,7 +20,7 @@ interface HealthCheck {
   message?: string
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const startTime = Date.now()
   const checks: HealthCheck[] = []
   let overallStatus: 'ok' | 'degraded' | 'unhealthy' = 'ok'

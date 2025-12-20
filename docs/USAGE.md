@@ -10,20 +10,22 @@ Puppet Master is a studio toolkit for creating landing pages and portfolio sites
 
 ### Two Sources of Truth
 
-| Source | Location | Editable by Client | Purpose |
-|--------|----------|-------------------|---------|
-| **SYSTEM** | `i18n/system.ts` | ❌ Never | UI labels, navigation, admin panel |
-| **CONTENT** | Database | ✅ Via Admin Panel | Section content, SEO, CTAs |
+| Source      | Location         | Editable by Client | Purpose                            |
+| ----------- | ---------------- | ------------------ | ---------------------------------- |
+| **SYSTEM**  | `i18n/system.ts` | ❌ Never           | UI labels, navigation, admin panel |
+| **CONTENT** | Database         | ✅ Via Admin Panel | Section content, SEO, CTAs         |
 
 ### System Translations (Developer-only)
 
 Located in `i18n/system.ts`. These are:
+
 - Version controlled in git
 - Shared across all Puppet Master sites
 - Cannot be broken by client
 - NOT visible in Admin Panel
 
 **Prefixes:**
+
 - `common.*` - Shared UI (loading, save, cancel)
 - `nav.*` - Navigation labels
 - `auth.*` - Login/logout
@@ -37,6 +39,7 @@ Located in `i18n/system.ts`. These are:
 Located in `i18n/content.ts` (defaults) → Database (runtime).
 
 **Prefixes:**
+
 - `hero.*` - Hero section
 - `about.*` - About section
 - `portfolio.*` - Portfolio section
@@ -58,7 +61,7 @@ sections: [
   { id: 'home', inNav: true },
   { id: 'about', inNav: true },
   { id: 'portfolio', inNav: true },
-  { id: 'contact', inNav: true },
+  { id: 'contact', inNav: true }
   // Add new sections here
 ]
 ```
@@ -128,8 +131,8 @@ This populates the database with default content. Existing values are preserved.
 ### Step 6: Client Edits via Admin Panel
 
 Client logs into `/admin` and edits content in **Translations** page.
-They can ONLY see content keys (hero.*, about.*, etc.).
-System keys (nav.*, admin.*, etc.) are hidden and protected.
+They can ONLY see content keys (hero._, about._, etc.).
+System keys (nav._, admin._, etc.) are hidden and protected.
 
 ---
 
@@ -138,6 +141,7 @@ System keys (nav.*, admin.*, etc.) are hidden and protected.
 ### Config-Driven Architecture
 
 `puppet-master.config.ts` is the single source of truth:
+
 - Sections → Navigation is auto-generated
 - Locales → Language switcher is auto-generated
 - Features → Enable/disable onepager mode, etc.
@@ -147,6 +151,7 @@ System keys (nav.*, admin.*, etc.) are hidden and protected.
 **NEVER use scoped styles in components!**
 
 Use the skeleton CSS system with global classes:
+
 - `.section`, `.container`, `.card`
 - `.btn`, `.btn-primary`, `.btn-secondary`
 - `.input`, `.form-group`, `.form-label`
@@ -164,12 +169,12 @@ Use `useLogo()` composable to access logos.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run db:seed` | Seed database with defaults |
+| Command            | Description                        |
+| ------------------ | ---------------------------------- |
+| `npm run dev`      | Start development server           |
+| `npm run db:seed`  | Seed database with defaults        |
 | `npm run db:reset` | Reset database (deletes all data!) |
-| `npm run build` | Build for production |
+| `npm run build`    | Build for production               |
 
 ---
 
@@ -197,4 +202,3 @@ app/
 └── data/
     └── sqlite.db                # SQLite database
 ```
-

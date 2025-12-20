@@ -5,7 +5,7 @@
  * Headers follow OWASP recommendations and modern security best practices.
  */
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(event => {
   const headers = event.node.res
 
   // Prevent clickjacking attacks
@@ -24,10 +24,7 @@ export default defineEventHandler((event) => {
   // Only in production to avoid issues with local development
   if (process.env.NODE_ENV === 'production') {
     // max-age: 1 year, includeSubDomains, preload for HSTS preload list
-    headers.setHeader(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload'
-    )
+    headers.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   }
 
   // Content Security Policy (CSP)
@@ -77,14 +74,14 @@ export default defineEventHandler((event) => {
   // Permissions Policy (formerly Feature-Policy)
   // Restricts access to browser features
   const permissionsPolicies = [
-    'camera=()',           // Disable camera
-    'microphone=()',       // Disable microphone
-    'geolocation=()',      // Disable geolocation
-    'payment=()',          // Disable payment API
-    'usb=()',              // Disable USB
-    'magnetometer=()',     // Disable magnetometer
-    'gyroscope=()',        // Disable gyroscope
-    'accelerometer=()'     // Disable accelerometer
+    'camera=()', // Disable camera
+    'microphone=()', // Disable microphone
+    'geolocation=()', // Disable geolocation
+    'payment=()', // Disable payment API
+    'usb=()', // Disable USB
+    'magnetometer=()', // Disable magnetometer
+    'gyroscope=()', // Disable gyroscope
+    'accelerometer=()' // Disable accelerometer
   ]
 
   headers.setHeader('Permissions-Policy', permissionsPolicies.join(', '))

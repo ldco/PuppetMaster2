@@ -207,8 +207,9 @@
   background: var(--i-brand);
   color: var(--t-on-brand);
   text-decoration: none;
-  transition: background-color var(--transition-normal) ease,
-              transform var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    transform var(--transition-normal) ease;
 }
 
 .header-contact-btn:hover {
@@ -238,8 +239,9 @@
   font-weight: var(--font-medium);
   font-size: var(--text-sm);
   text-decoration: none;
-  transition: background-color var(--transition-normal) ease,
-              transform var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    transform var(--transition-normal) ease;
 }
 
 .header-login-btn:hover {
@@ -332,4 +334,3 @@
   transform: translateY(0);
   pointer-events: auto;
 }
-

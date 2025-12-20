@@ -1,6 +1,6 @@
 /**
  * Unread Messages Count Composable
- * 
+ *
  * Shared state for unread message count across admin panel.
  * Can be refreshed from anywhere (e.g., when marking message as read).
  */
@@ -10,7 +10,7 @@ const isLoading = ref(false)
 
 async function fetchUnreadCount() {
   if (isLoading.value) return
-  
+
   isLoading.value = true
   try {
     const data = await $fetch<{ unreadMessages: number }>('/api/admin/stats')
@@ -38,4 +38,3 @@ export function useUnreadCount() {
     }
   }
 }
-

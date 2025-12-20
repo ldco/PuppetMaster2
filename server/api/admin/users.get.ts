@@ -9,9 +9,13 @@
  */
 import { desc, sql, ne } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
-import { parsePaginationParams, paginationClauses, buildPaginationMeta } from '../../utils/pagination'
+import {
+  parsePaginationParams,
+  paginationClauses,
+  buildPaginationMeta
+} from '../../utils/pagination'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const db = useDatabase()
   const currentUser = event.context.user
   const query = getQuery(event)
@@ -64,4 +68,3 @@ export default defineEventHandler(async (event) => {
 
   return { users, meta }
 })
-

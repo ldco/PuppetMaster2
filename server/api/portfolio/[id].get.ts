@@ -7,7 +7,7 @@
 import { eq, and, or } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const db = useDatabase()
   const idOrSlug = getRouterParam(event, 'id')
   const session = event.context.session
@@ -57,4 +57,3 @@ export default defineEventHandler(async (event) => {
     tags: item.tags ? JSON.parse(item.tags) : []
   }
 })
-

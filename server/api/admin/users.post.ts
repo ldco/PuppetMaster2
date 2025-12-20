@@ -22,7 +22,7 @@ const createUserSchema = z.object({
   role: z.enum(USER_ROLES)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   const currentUser = event.context.user
 
@@ -49,11 +49,7 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   // Check if email already exists
-  const existing = db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .get()
+  const existing = db.select().from(schema.users).where(eq(schema.users.email, email)).get()
 
   if (existing) {
     throw createError({
@@ -65,12 +61,14 @@ export default defineEventHandler(async (event) => {
   // Create user
   const passwordHash = hashPassword(password)
 
-  db.insert(schema.users).values({
-    email,
-    passwordHash,
-    name: name || null,
-    role
-  }).run()
+  db.insert(schema.users)
+    .values({
+      email,
+      passwordHash,
+      name: name || null,
+      role
+    })
+    .run()
 
   // Get created user
   const newUser = db
@@ -95,4 +93,3 @@ export default defineEventHandler(async (event) => {
     user: newUser
   }
 })
-

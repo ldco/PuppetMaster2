@@ -170,7 +170,7 @@ export function useCache(config: CacheConfig) {
     return {
       total,
       active: total - expired,
-      expired,
+      expired
     }
   }
 
@@ -203,6 +203,6 @@ export function useCache(config: CacheConfig) {
     clearPrefix,
     getStats,
     startCleanup,
-    stopCleanup,
+    stopCleanup
   }
 }

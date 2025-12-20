@@ -9,7 +9,7 @@ import { useDatabase, schema } from '../../database/client'
 import { deleteCsrfCookie } from '../../utils/csrf'
 import { audit } from '../../utils/audit'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const sessionId = getCookie(event, 'pm-session')
   let userId: number | undefined
 
@@ -28,9 +28,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Delete session from database
-    db.delete(schema.sessions)
-      .where(eq(schema.sessions.id, sessionId))
-      .run()
+    db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId)).run()
   }
 
   // Log logout
@@ -48,4 +46,3 @@ export default defineEventHandler(async (event) => {
 
   return { success: true }
 })
-

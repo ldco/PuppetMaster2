@@ -28,7 +28,10 @@ export const contactSchema = z.object({
   email: z.string().email('Invalid email address').max(255, 'Email is too long'),
   phone: z.string().max(30, 'Phone number is too long').optional(),
   subject: z.string().max(200, 'Subject is too long').optional(),
-  message: z.string().min(10, 'Message must be at least 10 characters').max(5000, 'Message is too long')
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(5000, 'Message is too long')
 })
 
 export type ContactInput = z.infer<typeof contactSchema>
@@ -60,7 +63,8 @@ export type UpdateUserInput = z.infer<typeof updateUserSchema>
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const portfolioItemSchema = z.object({
-  slug: z.string()
+  slug: z
+    .string()
     .min(1, 'Slug is required')
     .max(100, 'Slug is too long')
     .regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens'),
@@ -96,7 +100,6 @@ export function validateInput<T extends z.ZodSchema>(
 
   // Zod uses result.error.issues
   const issues = result.error.issues
-  const errors = issues.map((e) => e.message)
+  const errors = issues.map(e => e.message)
   return { success: false, errors }
 }
-

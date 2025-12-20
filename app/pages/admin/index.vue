@@ -17,4 +17,3 @@ navigateTo('/admin/settings', { replace: true })
 <template>
   <div></div>
 </template>
-

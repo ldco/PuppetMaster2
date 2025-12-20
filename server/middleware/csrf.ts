@@ -13,16 +13,16 @@ import { validateCsrfToken } from '../utils/csrf'
 
 // Routes that are exempt from CSRF validation
 const CSRF_EXEMPT_ROUTES = [
-  '/api/auth/login',     // No session yet
-  '/api/auth/logout',    // Destroying session
+  '/api/auth/login', // No session yet
+  '/api/auth/logout', // Destroying session
   '/api/contact/submit', // Public form, has its own rate limiting
-  '/api/health'          // Health check
+  '/api/health' // Health check
 ]
 
 // Methods that don't change state
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(event => {
   const method = event.method.toUpperCase()
   const path = getRequestURL(event).pathname
 

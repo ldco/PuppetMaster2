@@ -8,4 +8,3 @@ const RTL_LANGUAGES = ['he', 'ar', 'fa', 'ur']
 export function isRtlLanguage(locale: string): boolean {
   return RTL_LANGUAGES.includes(locale)
 }
-

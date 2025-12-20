@@ -12,7 +12,7 @@
  */
 import config from '~/puppet-master.config'
 
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(to => {
   const mode = config.mode
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -48,4 +48,3 @@ export default defineNuxtRouteMiddleware((to) => {
   // ═══════════════════════════════════════════════════════════════════════════
   // No special routing needed - admin at /admin works as expected
 })
-

@@ -27,7 +27,7 @@ export function useConfirm() {
    * @returns Promise that resolves to true (confirmed) or false (cancelled)
    */
   function confirm(message: string, options: ConfirmOptions = {}): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       state.message = message
       state.options = options
       state.resolve = resolve
@@ -56,4 +56,3 @@ export function useConfirm() {
     close
   }
 }
-

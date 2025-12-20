@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Admin Health Page
- * 
+ *
  * Server health metrics dashboard for master users.
  * TODO: Implement server health monitoring (CPU, memory, disk, uptime, etc.)
  */
@@ -24,4 +24,3 @@ const { t } = useI18n()
     </div>
   </div>
 </template>
-

@@ -49,13 +49,13 @@
 
 :root {
   /* App mode breakpoints - different from website mode! */
-  --bp-app-phone: 600px;    /* Below this: bottom nav */
-  --bp-app-tablet: 840px;   /* Below this: nav rail; above: full sidebar */
+  --bp-app-phone: 600px; /* Below this: bottom nav */
+  --bp-app-tablet: 840px; /* Below this: nav rail; above: full sidebar */
 
   /* App mode dimensions */
-  --app-bottom-nav-height: 56px;    /* Material Design standard */
-  --app-nav-rail-width: 80px;       /* Navigation rail width */
-  --app-sidebar-width: 60px;        /* Full sidebar width (compact) */
+  --app-bottom-nav-height: 56px; /* Material Design standard */
+  --app-nav-rail-width: 80px; /* Navigation rail width */
+  --app-sidebar-width: 60px; /* Full sidebar width (compact) */
 }
 
 /* ==========================================================================
@@ -91,7 +91,6 @@
   container-type: inline-size;
 }
 
-
 /* ==========================================================================
    BLANK LAYOUT - Minimal (just content)
    ========================================================================== */
@@ -105,7 +104,6 @@
 .layout-blank .main {
   container-type: inline-size;
 }
-
 
 /* ==========================================================================
    ADMIN LAYOUT - Narrow Icon Sidebar + Content

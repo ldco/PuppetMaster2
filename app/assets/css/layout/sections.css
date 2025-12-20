@@ -70,7 +70,6 @@
   width: 100%;
 }
 
-
 /* ==========================================================================
    HERO SECTION - First visible section
    ========================================================================== */
@@ -84,7 +83,6 @@
   padding-block-start: calc(var(--header-height, 72px) + var(--space-8));
 }
 
-
 /* ==========================================================================
    AUTO HEIGHT SECTION - Content-based height
    ========================================================================== */
@@ -94,7 +92,6 @@
   justify-content: flex-start; /* Don't center, let content flow naturally */
   padding-block: var(--space-16);
 }
-
 
 /* ==========================================================================
    VERTICAL ALIGNMENT UTILITIES
@@ -107,7 +104,6 @@
 .section-align-end {
   justify-content: flex-end;
 }
-
 
 /* ==========================================================================
    SECTION BACKGROUNDS - Use explicit classes for control
@@ -142,7 +138,6 @@
   color: var(--p-white);
 }
 
-
 /* ==========================================================================
    HERO SECTION LAYOUT
    ========================================================================== */
@@ -167,11 +162,19 @@
 }
 
 /* Theme-based logo visibility (avoids hydration mismatch + flash) */
-.hero-logo-img--light { display: block; }
-.hero-logo-img--dark { display: none; }
+.hero-logo-img--light {
+  display: block;
+}
+.hero-logo-img--dark {
+  display: none;
+}
 
-.dark .hero-logo-img--light { display: none; }
-.dark .hero-logo-img--dark { display: block; }
+.dark .hero-logo-img--light {
+  display: none;
+}
+.dark .hero-logo-img--dark {
+  display: block;
+}
 
 .hero-actions {
   display: flex;
@@ -179,7 +182,6 @@
   gap: var(--gap-md);
   justify-content: center;
 }
-
 
 /* ==========================================================================
    SECTION GRIDS - Common layout patterns
@@ -216,7 +218,6 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
 }
 
-
 /* ==========================================================================
    SECTION CONTENT PATTERNS
    ========================================================================== */
@@ -250,4 +251,3 @@
   width: calc(var(--icon-2xl) * 2);
   height: calc(var(--icon-2xl) * 2);
 }
-

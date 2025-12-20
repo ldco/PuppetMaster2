@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * SocialIcon Atom
- * 
+ *
  * Social media icon link with hover effects.
  * Icons are passed via slot for flexibility.
  */
@@ -12,7 +12,15 @@ defineProps<{
   /** Accessible label */
   label: string
   /** Platform name for styling */
-  platform?: 'telegram' | 'whatsapp' | 'instagram' | 'linkedin' | 'facebook' | 'twitter' | 'youtube' | 'github'
+  platform?:
+    | 'telegram'
+    | 'whatsapp'
+    | 'instagram'
+    | 'linkedin'
+    | 'facebook'
+    | 'twitter'
+    | 'youtube'
+    | 'github'
 }>()
 </script>
 
@@ -31,4 +39,3 @@ defineProps<{
 </template>
 
 <!-- No scoped styles needed - uses skeleton/footer.css -->
-

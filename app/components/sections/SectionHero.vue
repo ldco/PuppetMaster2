@@ -23,12 +23,8 @@ const langSuffix = computed(() => {
 })
 
 // Get logo paths for both themes
-const lightThemeLogo = computed(() =>
-  `${config.logo.basePath}/circle_dark_${langSuffix.value}.svg`
-)
-const darkThemeLogo = computed(() =>
-  `${config.logo.basePath}/circle_light_${langSuffix.value}.svg`
-)
+const lightThemeLogo = computed(() => `${config.logo.basePath}/circle_dark_${langSuffix.value}.svg`)
+const darkThemeLogo = computed(() => `${config.logo.basePath}/circle_light_${langSuffix.value}.svg`)
 
 defineProps<{
   /** Supporting text */
@@ -55,13 +51,28 @@ defineProps<{
       <div class="hero-logo">
         <slot name="logo">
           <!-- Render BOTH logos, CSS shows correct one based on theme class -->
-          <img :src="lightThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--light" width="200" height="200" />
-          <img :src="darkThemeLogo" alt="Logo" class="hero-logo-img hero-logo-img--dark" width="200" height="200" />
+          <img
+            :src="lightThemeLogo"
+            alt="Logo"
+            class="hero-logo-img hero-logo-img--light"
+            width="200"
+            height="200"
+          />
+          <img
+            :src="darkThemeLogo"
+            alt="Logo"
+            class="hero-logo-img hero-logo-img--dark"
+            width="200"
+            height="200"
+          />
         </slot>
       </div>
       <p class="hero-subtitle">
         <slot name="subtitle">
-          {{ subtitle ?? 'A studio toolkit for creating stable, secure landing pages and portfolio sites.' }}
+          {{
+            subtitle ??
+            'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
+          }}
         </slot>
       </p>
       <div class="hero-actions">

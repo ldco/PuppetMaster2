@@ -126,4 +126,3 @@ describe('getAssignableRoles', () => {
     expect(getAssignableRoles('editor')).toEqual([])
   })
 })
-

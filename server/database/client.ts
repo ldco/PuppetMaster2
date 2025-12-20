@@ -44,56 +44,25 @@ export function useDatabase(): DrizzleDB {
 }
 
 /**
- * Execute a function within a database transaction
+ * Execute a synchronous function within a database transaction
+ *
+ * IMPORTANT: better-sqlite3 is synchronous, so this function only supports
+ * synchronous operations. Use transactionSync() for the same functionality.
+ *
+ * @deprecated Use transactionSync() instead for clarity
  *
  * Usage:
- * const result = await withTransaction(async (tx) => {
- *   await tx.insert(schema.users).values({ ... })
- *   await tx.insert(schema.sessions).values({ ... })
+ * const result = withTransaction((db) => {
+ *   db.insert(schema.users).values({ ... }).run()
+ *   db.insert(schema.sessions).values({ ... }).run()
  *   return { success: true }
  * })
  *
  * If any operation fails, all changes are rolled back.
  */
-export async function withTransaction<T>(
-  fn: (tx: DrizzleDB) => T | Promise<T>
-): Promise<T> {
-  const db = useDatabase()
-
-  // For synchronous Drizzle with better-sqlite3, we use the underlying
-  // sqlite3 transaction support
-  if (!_sqlite) {
-    throw new Error('Database not initialized')
-  }
-
-  // Use immediate transaction for write operations
-  const transaction = _sqlite.transaction((callback: () => T) => {
-    return callback()
-  })
-
-  try {
-    // Wrap the async function execution
-    const result = await (async () => {
-      return transaction(() => {
-        // Execute within transaction
-        const res = fn(db)
-        // If it's a promise, we need to resolve it
-        if (res instanceof Promise) {
-          // Note: better-sqlite3 is synchronous, so async operations
-          // within transactions require careful handling
-          throw new Error('Async operations in transactions not supported with better-sqlite3. Use synchronous operations.')
-        }
-        return res
-      })
-    })()
-
-    return result
-  } catch (error: any) {
-    logger.error('Transaction failed', {
-      error: error?.message || String(error)
-    })
-    throw error
-  }
+export function withTransaction<T>(fn: (db: DrizzleDB) => T): T {
+  // Delegate to transactionSync for consistency
+  return transactionSync(fn)
 }
 
 /**
@@ -137,4 +106,3 @@ export const db = {
 
 // Re-export schema for convenience
 export { schema }
-

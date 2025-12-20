@@ -17,13 +17,16 @@ const { state, close } = useConfirm()
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
 // Open/close dialog when state changes
-watch(() => state.isOpen, (isOpen) => {
-  if (isOpen) {
-    dialogRef.value?.showModal()
-  } else {
-    dialogRef.value?.close()
+watch(
+  () => state.isOpen,
+  isOpen => {
+    if (isOpen) {
+      dialogRef.value?.showModal()
+    } else {
+      dialogRef.value?.close()
+    }
   }
-})
+)
 
 // Handle ESC key (native dialog handles this, but we need to call close())
 function handleCancel(e: Event) {
@@ -65,12 +68,7 @@ const variant = computed(() => state.options.variant || 'primary')
   >
     <div class="modal-header">
       <h2 id="confirm-title" class="modal-title">{{ title }}</h2>
-      <button
-        type="button"
-        class="modal-close"
-        :aria-label="cancelText"
-        @click="close(false)"
-      >
+      <button type="button" class="modal-close" :aria-label="cancelText" @click="close(false)">
         <IconX />
       </button>
     </div>
@@ -80,11 +78,7 @@ const variant = computed(() => state.options.variant || 'primary')
     </div>
 
     <div class="modal-footer">
-      <button
-        type="button"
-        class="btn btn-secondary"
-        @click="close(false)"
-      >
+      <button type="button" class="btn btn-secondary" @click="close(false)">
         {{ cancelText }}
       </button>
       <button
@@ -110,4 +104,3 @@ const variant = computed(() => state.options.variant || 'primary')
   - ESC key to close
   - Proper stacking context
 -->
-

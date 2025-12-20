@@ -94,17 +94,9 @@ const contactItems = computed(() => {
   >
     <!-- Contact items list -->
     <div v-if="contactItems.length > 0" class="contact-info-list">
-      <div
-        v-for="item in contactItems"
-        :key="item.key"
-        class="contact-info-item"
-      >
+      <div v-for="item in contactItems" :key="item.key" class="contact-info-item">
         <component :is="item.icon" class="contact-info-icon" />
-        <component
-          :is="item.href ? 'a' : 'span'"
-          :href="item.href"
-          class="contact-info-value"
-        >
+        <component :is="item.href ? 'a' : 'span'" :href="item.href" class="contact-info-value">
           {{ item.value }}
         </component>
       </div>
@@ -124,6 +116,3 @@ const contactItems = computed(() => {
     </div>
   </div>
 </template>
-
-
-

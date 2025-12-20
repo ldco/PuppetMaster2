@@ -43,4 +43,3 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 export function generateSessionId(): string {
   return randomBytes(32).toString('hex')
 }
-

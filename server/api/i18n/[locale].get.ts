@@ -7,7 +7,7 @@
 import { useDatabase, schema } from '../../database/client'
 import { eq } from 'drizzle-orm'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const locale = getRouterParam(event, 'locale')
 
   if (!locale) {
@@ -45,4 +45,3 @@ export default defineEventHandler(async (event) => {
 
   return result
 })
-

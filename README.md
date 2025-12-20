@@ -34,16 +34,16 @@
 
 ## 🛠️ Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | Nuxt 4 (Vue 3, TypeScript) |
-| **Styling** | Pure CSS (OKLCH, light-dark(), CSS layers) |
+| Category        | Technology                                    |
+| --------------- | --------------------------------------------- |
+| **Framework**   | Nuxt 4 (Vue 3, TypeScript)                    |
+| **Styling**     | Pure CSS (OKLCH, light-dark(), CSS layers)    |
 | **Data Source** | SQLite + Drizzle ORM **OR** External REST API |
-| **State** | Pinia |
-| **i18n** | @nuxtjs/i18n (database-driven) |
-| **Icons** | unplugin-icons (any icon set) |
-| **Font** | Montserrat (Google Fonts) |
-| **Deployment** | Docker + Kamal |
+| **State**       | Pinia                                         |
+| **i18n**        | @nuxtjs/i18n (database-driven)                |
+| **Icons**       | unplugin-icons (any icon set)                 |
+| **Font**        | Montserrat (Google Fonts)                     |
+| **Deployment**  | Docker + Kamal                                |
 
 ## 🚀 Getting Started
 
@@ -76,64 +76,64 @@ All configuration is centralized in `app/puppet-master.config.ts`:
 ```typescript
 export default {
   features: {
-    multiLangs: true,        // Multi-language support
-    doubleTheme: true,       // Light/dark mode
-    onepager: true,          // One-pager vs SPA mode
-    adminPanel: true,        // Admin CMS panel
-    interactiveHeader: true, // Scroll-based header effects
+    multiLangs: true, // Multi-language support
+    doubleTheme: true, // Light/dark mode
+    onepager: true, // One-pager vs SPA mode
+    adminPanel: true, // Admin CMS panel
+    interactiveHeader: true // Scroll-based header effects
   },
-  
+
   locales: [
     { code: 'en', iso: 'en-US', name: 'English' },
     { code: 'ru', iso: 'ru-RU', name: 'Русский' },
     { code: 'he', iso: 'he-IL', name: 'עברית' }
   ],
-  
+
   logo: {
     basePath: '/logos',
-    langFallback: { he: 'en' }, // Hebrew uses English logo
+    langFallback: { he: 'en' } // Hebrew uses English logo
   },
-  
+
   colors: {
-    black: '#2f2f2f',   // From logo
-    white: '#f0f0f0',   // From logo
-    brand: '#aa0000',   // From logo
-    accent: '#0f172a',
+    black: '#2f2f2f', // From logo
+    white: '#f0f0f0', // From logo
+    brand: '#aa0000', // From logo
+    accent: '#0f172a'
   }
 }
 ```
 
 ## 📖 Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [docs/PUPPET-MASTER-STATUS.md](./docs/PUPPET-MASTER-STATUS.md) | Project status, file structure |
+| Document                                                                         | Purpose                                 |
+| -------------------------------------------------------------------------------- | --------------------------------------- |
+| [docs/PUPPET-MASTER-STATUS.md](./docs/PUPPET-MASTER-STATUS.md)                   | Project status, file structure          |
 | [docs/PUPPET-MASTER-TECHNICAL-BRIEF.md](./docs/PUPPET-MASTER-TECHNICAL-BRIEF.md) | Architecture decisions, database schema |
-| [docs/EXTERNAL_API.md](./docs/EXTERNAL_API.md) | **External API integration guide** |
-| [docs/styles/](./docs/styles/) | **CSS system documentation** |
-| [docs/PM_BEST_PRACTICES.md](./docs/PM_BEST_PRACTICES.md) | Development standards |
-| [docs/USAGE.md](./docs/USAGE.md) | Developer workflow guide |
+| [docs/EXTERNAL_API.md](./docs/EXTERNAL_API.md)                                   | **External API integration guide**      |
+| [docs/styles/](./docs/styles/)                                                   | **CSS system documentation**            |
+| [docs/PM_BEST_PRACTICES.md](./docs/PM_BEST_PRACTICES.md)                         | Development standards                   |
+| [docs/USAGE.md](./docs/USAGE.md)                                                 | Developer workflow guide                |
 
 ### CSS Documentation (docs/styles/)
 
-| Document | Purpose |
-|----------|---------|
-| [CSS_ARCHITECTURE.md](./docs/styles/CSS_ARCHITECTURE.md) | Complete CSS system architecture |
+| Document                                                       | Purpose                              |
+| -------------------------------------------------------------- | ------------------------------------ |
+| [CSS_ARCHITECTURE.md](./docs/styles/CSS_ARCHITECTURE.md)       | Complete CSS system architecture     |
 | [CSS_QUICK_REFERENCE.md](./docs/styles/CSS_QUICK_REFERENCE.md) | Quick lookup for classes & variables |
-| [CSS_CUSTOMIZATION.md](./docs/styles/CSS_CUSTOMIZATION.md) | How to customize for clients |
+| [CSS_CUSTOMIZATION.md](./docs/styles/CSS_CUSTOMIZATION.md)     | How to customize for clients         |
 
 ### Quick Customization Reference
 
-| What | Where |
-|------|-------|
-| **Brand colors** | `colors/primitives.css` → `--c-brand`, `--c-accent` |
-| **Header** | `skeleton/header.css` |
-| **Footer** | `skeleton/footer.css` |
-| **Admin sidebar** | `layout/admin-sidebar.css` |
-| **Buttons** | `ui/forms/buttons.css` |
-| **Cards** | `ui/content/cards.css` |
-| **Icon sizes** | `common/icons.css` |
-| **Container width** | `layout/containers.css` |
+| What                | Where                                               |
+| ------------------- | --------------------------------------------------- |
+| **Brand colors**    | `colors/primitives.css` → `--c-brand`, `--c-accent` |
+| **Header**          | `skeleton/header.css`                               |
+| **Footer**          | `skeleton/footer.css`                               |
+| **Admin sidebar**   | `layout/admin-sidebar.css`                          |
+| **Buttons**         | `ui/forms/buttons.css`                              |
+| **Cards**           | `ui/content/cards.css`                              |
+| **Icon sizes**      | `common/icons.css`                                  |
+| **Container width** | `layout/containers.css`                             |
 
 ## 📁 Project Structure
 

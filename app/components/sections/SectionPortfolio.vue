@@ -59,9 +59,7 @@ function navigateLightbox(index: number) {
       </h2>
 
       <!-- Show message if no items -->
-      <p v-if="!items?.length" class="text-center text-secondary">
-        No portfolio items yet.
-      </p>
+      <p v-if="!items?.length" class="text-center text-secondary">No portfolio items yet.</p>
 
       <div v-else class="section-grid-auto section-grid-auto--lg">
         <article
@@ -105,4 +103,3 @@ function navigateLightbox(index: number) {
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->
-

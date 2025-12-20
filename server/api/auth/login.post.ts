@@ -11,22 +11,20 @@
  * - Password hashed with scrypt
  * - CSRF token generated on success
  */
-import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { verifyPassword, generateSessionId } from '../../utils/password'
 import { generateCsrfToken, setCsrfCookie } from '../../utils/csrf'
 import { loginRateLimiter, getClientIp } from '../../utils/rateLimit'
-import { checkAccountLocked, recordFailedAttempt, resetFailedAttempts } from '../../utils/accountLockout'
+import {
+  checkAccountLocked,
+  recordFailedAttempt,
+  resetFailedAttempts
+} from '../../utils/accountLockout'
 import { audit } from '../../utils/audit'
+import { loginSchema } from '../../utils/validation'
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-  rememberMe: z.boolean().optional().default(false)
-})
-
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Rate limit check - 5 attempts per 15 minutes per IP
   const clientIp = getClientIp(event)
 
@@ -56,11 +54,7 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   // Find user by email
-  const user = db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .get()
+  const user = db.select().from(schema.users).where(eq(schema.users.email, email)).get()
 
   if (!user) {
     // Don't reveal that user doesn't exist - but log it
@@ -128,11 +122,13 @@ export default defineEventHandler(async (event) => {
     expiresAt.setHours(expiresAt.getHours() + 24)
   }
 
-  db.insert(schema.sessions).values({
-    id: sessionId,
-    userId: user.id,
-    expiresAt
-  }).run()
+  db.insert(schema.sessions)
+    .values({
+      id: sessionId,
+      userId: user.id,
+      expiresAt
+    })
+    .run()
 
   // Set session cookie (upgraded to strict SameSite for CSRF protection)
   setCookie(event, 'pm-session', sessionId, {
@@ -158,4 +154,3 @@ export default defineEventHandler(async (event) => {
     csrfToken
   }
 })
-

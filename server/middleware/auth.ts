@@ -15,7 +15,7 @@ import { useDatabase, schema } from '../database/client'
 import { type UserRole } from '../database/schema'
 import { hasRole } from '../utils/roles'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const path = getRequestURL(event).pathname
 
   // Only process /api/* routes
@@ -45,12 +45,7 @@ export default defineEventHandler(async (event) => {
   const session = db
     .select()
     .from(schema.sessions)
-    .where(
-      and(
-        eq(schema.sessions.id, sessionId),
-        gt(schema.sessions.expiresAt, new Date())
-      )
-    )
+    .where(and(eq(schema.sessions.id, sessionId), gt(schema.sessions.expiresAt, new Date())))
     .get()
 
   if (!session) {
@@ -101,4 +96,3 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
-

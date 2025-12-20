@@ -24,13 +24,13 @@ Puppet Master uses a **pure CSS architecture** with no frameworks (no Tailwind, 
 
 ### Key Principles
 
-| Principle | Description |
-|-----------|-------------|
-| **One file per component** | Each visual component has its own CSS file |
-| **No scoped styles** | All styles in global CSS files, not `<style scoped>` |
-| **CSS variables everywhere** | No magic numbers, all values are design tokens |
-| **Responsive in same file** | Base styles + media queries together |
-| **Logical properties** | RTL support via CSS logical properties |
+| Principle                    | Description                                          |
+| ---------------------------- | ---------------------------------------------------- |
+| **One file per component**   | Each visual component has its own CSS file           |
+| **No scoped styles**         | All styles in global CSS files, not `<style scoped>` |
+| **CSS variables everywhere** | No magic numbers, all values are design tokens       |
+| **Responsive in same file**  | Base styles + media queries together                 |
+| **Logical properties**       | RTL support via CSS logical properties               |
 
 ### Entry Point
 
@@ -55,31 +55,32 @@ Puppet Master uses a **pure CSS architecture** with no frameworks (no Tailwind, 
 
 ### Application Modes (4 modes)
 
-| Mode | Website Portion | App Portion |
-|------|-----------------|-------------|
-| `app-only` | ❌ None | ✅ App mode (sidebar + bottom nav) |
-| `website-app` | ✅ Website (hamburger) | ✅ App mode (visible login button) |
-| `website-admin` | ✅ Website (hamburger) | ✅ App mode (hidden at `/admin`) |
-| `website-only` | ✅ Website (hamburger) | ❌ None |
+| Mode            | Website Portion        | App Portion                        |
+| --------------- | ---------------------- | ---------------------------------- |
+| `app-only`      | ❌ None                | ✅ App mode (sidebar + bottom nav) |
+| `website-app`   | ✅ Website (hamburger) | ✅ App mode (visible login button) |
+| `website-admin` | ✅ Website (hamburger) | ✅ App mode (hidden at `/admin`)   |
+| `website-only`  | ✅ Website (hamburger) | ❌ None                            |
 
 ### Visual Modes (2 modes)
 
-| Visual Mode | Desktop | Mobile |
-|-------------|---------|--------|
+| Visual Mode | Desktop           | Mobile                            |
+| ----------- | ----------------- | --------------------------------- |
 | **Website** | Horizontal header | Hamburger menu (slide-out drawer) |
-| **App** | Vertical sidebar | Bottom navigation bar |
+| **App**     | Vertical sidebar  | Bottom navigation bar             |
 
 **Key distinction:**
+
 - **Website mode** = Hamburger menu on mobile (ALWAYS)
 - **App mode** = Bottom nav bar on mobile (ALWAYS)
 - **Admin panel** = App mode (it IS app mode, not a separate visual mode)
 
 ### Website Sub-Modes
 
-| Mode | Navigation | URL Structure |
-|------|------------|---------------|
-| **Onepager** | Scroll-based anchors (`#about`, `#contact`) | Single page with sections |
-| **SPA** | Route-based (`/about`, `/contact`) | Multiple pages via Vue Router |
+| Mode         | Navigation                                  | URL Structure                 |
+| ------------ | ------------------------------------------- | ----------------------------- |
+| **Onepager** | Scroll-based anchors (`#about`, `#contact`) | Single page with sections     |
+| **SPA**      | Route-based (`/about`, `/contact`)          | Multiple pages via Vue Router |
 
 Controlled by `features.onepager` in `puppet-master.config.ts`.
 
@@ -93,25 +94,29 @@ Controlled by `features.onepager` in `puppet-master.config.ts`.
 @layer reset, primitives, semantic, components, utilities;
 ```
 
-| Layer | Purpose | Example |
-|-------|---------|---------|
-| `reset` | Normalize browser defaults | CSS reset |
-| `primitives` | Raw design tokens | `--c-brand: #aa0000` |
-| `semantic` | Calculated values | `--l-bg: light-dark(...)` |
-| `components` | UI element styling | `.admin-sidebar { }` |
-| `utilities` | Override helpers | `.flex`, `.hidden` |
+| Layer        | Purpose                    | Example                   |
+| ------------ | -------------------------- | ------------------------- |
+| `reset`      | Normalize browser defaults | CSS reset                 |
+| `primitives` | Raw design tokens          | `--c-brand: #aa0000`      |
+| `semantic`   | Calculated values          | `--l-bg: light-dark(...)` |
+| `components` | UI element styling         | `.admin-sidebar { }`      |
+| `utilities`  | Override helpers           | `.flex`, `.hidden`        |
 
 ### How Layers Work
 
 ```css
 /* Lower layer - can be overridden */
 @layer components {
-  .button { background: var(--c-brand); }
+  .button {
+    background: var(--c-brand);
+  }
 }
 
 /* Higher layer - overrides components without !important */
 @layer utilities {
-  .bg-transparent { background: transparent; }
+  .bg-transparent {
+    background: transparent;
+  }
 }
 ```
 
@@ -149,14 +154,14 @@ assets/css/
 │   ├── admin-content.css       # Admin content area
 │   └── admin-header.css        # Admin mobile header
 │
-├── skeleton/                   # Site skeleton
-│   ├── index.css
-│   ├── header.css              # Site header
-│   ├── footer.css              # Site footer
-│   ├── nav.css                 # Desktop nav
-│   ├── mobile-nav.css          # Mobile drawer
-│   ├── bottom-nav.css          # App bottom nav
-│   └── social-nav.css          # Social icons
+├── skeleton/                   # Site STRUCTURAL CSS (header/footer/nav)
+│   ├── index.css               # ⚠️ "Skeleton" = structural, NOT loading placeholders!
+│   ├── header.css              # Site header structure
+│   ├── footer.css              # Site footer structure
+│   ├── nav.css                 # Desktop navigation
+│   ├── mobile-nav.css          # Mobile drawer navigation
+│   ├── bottom-nav.css          # App bottom navigation (Material Design)
+│   └── social-nav.css          # Social icons navigation
 │
 ├── common/                     # Utility classes
 │   ├── index.css
@@ -205,32 +210,32 @@ assets/css/
 
 ### Spacing Scale
 
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--space-1` | 0.25rem | 4px |
-| `--space-2` | 0.5rem | 8px |
-| `--space-3` | 0.75rem | 12px |
-| `--space-4` | 1rem | 16px |
-| `--space-6` | 1.5rem | 24px |
-| `--space-8` | 2rem | 32px |
-| `--space-12` | 3rem | 48px |
-| `--space-16` | 4rem | 64px |
-| `--space-24` | 6rem | 96px |
-| `--space-32` | 8rem | 128px |
+| Token        | Value   | Pixels |
+| ------------ | ------- | ------ |
+| `--space-1`  | 0.25rem | 4px    |
+| `--space-2`  | 0.5rem  | 8px    |
+| `--space-3`  | 0.75rem | 12px   |
+| `--space-4`  | 1rem    | 16px   |
+| `--space-6`  | 1.5rem  | 24px   |
+| `--space-8`  | 2rem    | 32px   |
+| `--space-12` | 3rem    | 48px   |
+| `--space-16` | 4rem    | 64px   |
+| `--space-24` | 6rem    | 96px   |
+| `--space-32` | 8rem    | 128px  |
 
 ### Color Tokens
 
-| Token | Purpose |
-|-------|---------|
-| `--c-black` | Dark text/backgrounds |
-| `--c-white` | Light text/backgrounds |
-| `--c-brand` | Primary brand color |
-| `--c-accent` | Secondary accent color |
-| `--l-bg` | Current theme background |
-| `--l-text` | Current theme text |
-| `--l-surface` | Elevated surfaces |
-| `--l-border` | Border color |
-| `--l-text-muted` | Muted/secondary text |
+| Token            | Purpose                  |
+| ---------------- | ------------------------ |
+| `--c-black`      | Dark text/backgrounds    |
+| `--c-white`      | Light text/backgrounds   |
+| `--c-brand`      | Primary brand color      |
+| `--c-accent`     | Secondary accent color   |
+| `--l-bg`         | Current theme background |
+| `--l-text`       | Current theme text       |
+| `--l-surface`    | Elevated surfaces        |
+| `--l-border`     | Border color             |
+| `--l-text-muted` | Muted/secondary text     |
 
 ### Typography System (4-Layer Architecture)
 
@@ -272,24 +277,24 @@ The typography system uses a 4-layer architecture for maximum flexibility:
 
 ### Avatar Tokens
 
-| Token | Use |
-|-------|-----|
-| `--avatar-xs` | 24px - Tiny avatars |
-| `--avatar-sm` | 32px - Small avatars |
+| Token         | Use                    |
+| ------------- | ---------------------- |
+| `--avatar-xs` | 24px - Tiny avatars    |
+| `--avatar-sm` | 32px - Small avatars   |
 | `--avatar-md` | 40px - Default avatars |
-| `--avatar-lg` | 48px - Large avatars |
-| `--avatar-xl` | 64px - Extra large |
+| `--avatar-lg` | 48px - Large avatars   |
+| `--avatar-xl` | 64px - Extra large     |
 
 ### Icon Tokens
 
-| Token | Use |
-|-------|-----|
-| `--icon-xs` | 0.75rem - Tiny icons |
-| `--icon-sm` | 1rem - Small icons |
-| `--icon-md` | 1.25rem - Default icons |
-| `--icon-lg` | 1.5rem - Large icons |
-| `--icon-xl` | 2rem - Extra large |
-| `--icon-2xl` | 2.5rem - Hero icons |
+| Token        | Use                     |
+| ------------ | ----------------------- |
+| `--icon-xs`  | 0.75rem - Tiny icons    |
+| `--icon-sm`  | 1rem - Small icons      |
+| `--icon-md`  | 1.25rem - Default icons |
+| `--icon-lg`  | 1.5rem - Large icons    |
+| `--icon-xl`  | 2rem - Extra large      |
+| `--icon-2xl` | 2.5rem - Hero icons     |
 
 ---
 
@@ -297,11 +302,11 @@ The typography system uses a 4-layer architecture for maximum flexibility:
 
 ### Breakpoints (Material Design 3)
 
-| Name | Query | Target |
-|------|-------|--------|
-| Phone | `width < 600px` | Mobile phones |
-| Tablet | `600px <= width < 840px` | Tablets, small laptops |
-| Desktop | `width >= 840px` | Desktop screens |
+| Name    | Query                    | Target                 |
+| ------- | ------------------------ | ---------------------- |
+| Phone   | `width < 600px`          | Mobile phones          |
+| Tablet  | `600px <= width < 840px` | Tablets, small laptops |
+| Desktop | `width >= 840px`         | Desktop screens        |
 
 ### Custom Media Queries
 
@@ -317,13 +322,13 @@ The typography system uses a 4-layer architecture for maximum flexibility:
 ```css
 /* admin-sidebar.css - Example of responsive in same file */
 .admin-sidebar {
-  display: flex;           /* Base - always defined */
+  display: flex; /* Base - always defined */
   width: var(--admin-sidebar-width);
 }
 
 @media (--phone) {
   .admin-sidebar {
-    display: none;         /* Hide on phones */
+    display: none; /* Hide on phones */
   }
 }
 
@@ -343,12 +348,17 @@ The typography system uses a 4-layer architecture for maximum flexibility:
 ```vue
 <!-- WRONG: Scoped styles in components -->
 <style scoped>
-.my-component { color: red; }
+.my-component {
+  color: red;
+}
 </style>
 
 <!-- WRONG: Magic numbers -->
 <style>
-.sidebar { width: 280px; padding: 16px; }
+.sidebar {
+  width: 280px;
+  padding: 16px;
+}
 </style>
 ```
 
@@ -378,29 +388,29 @@ Scoped styles are ONLY allowed for **custom client sections with heavy custom gr
 
 ### Quick Reference
 
-| I want to change... | Edit this file |
-|---------------------|----------------|
-| Brand colors | `colors/primitives.css` |
-| Brand fonts | `typography/variables.css` (Layer 2) |
-| Font sizes | `typography/variables.css` (Layer 4) |
-| Self-hosted fonts | `typography/font-faces.css` |
-| Language-specific fonts | `typography/lang-overrides.css` |
-| Google Fonts | `nuxt.config.ts` (app.head.link) |
-| Site header | `skeleton/header.css` |
-| Site footer | `skeleton/footer.css` |
-| Admin sidebar | `layout/admin-sidebar.css` |
-| Admin mobile header | `layout/admin-header.css` |
-| Button styles | `ui/forms/buttons.css` |
-| Input fields | `ui/forms/inputs.css` |
-| Card components | `ui/content/cards.css` |
-| Tab components | `ui/content/tabs.css` |
-| Modal dialogs | `ui/overlays/modal.css` |
-| Icon sizes | `common/icons.css` |
-| Text utilities | `common/text.css` |
-| Flexbox utilities | `common/flexbox.css` |
-| Spacing | `common/spacing.css` |
-| Breakpoints | `layout/breakpoints.css` |
+| I want to change...     | Edit this file                       |
+| ----------------------- | ------------------------------------ |
+| Brand colors            | `colors/primitives.css`              |
+| Brand fonts             | `typography/variables.css` (Layer 2) |
+| Font sizes              | `typography/variables.css` (Layer 4) |
+| Self-hosted fonts       | `typography/font-faces.css`          |
+| Language-specific fonts | `typography/lang-overrides.css`      |
+| Google Fonts            | `nuxt.config.ts` (app.head.link)     |
+| Site header             | `skeleton/header.css`                |
+| Site footer             | `skeleton/footer.css`                |
+| Admin sidebar           | `layout/admin-sidebar.css`           |
+| Admin mobile header     | `layout/admin-header.css`            |
+| Button styles           | `ui/forms/buttons.css`               |
+| Input fields            | `ui/forms/inputs.css`                |
+| Card components         | `ui/content/cards.css`               |
+| Tab components          | `ui/content/tabs.css`                |
+| Modal dialogs           | `ui/overlays/modal.css`              |
+| Icon sizes              | `common/icons.css`                   |
+| Text utilities          | `common/text.css`                    |
+| Flexbox utilities       | `common/flexbox.css`                 |
+| Spacing                 | `common/spacing.css`                 |
+| Breakpoints             | `layout/breakpoints.css`             |
 
 ---
 
-*This document should be updated when CSS architecture changes.*
+_This document should be updated when CSS architecture changes._

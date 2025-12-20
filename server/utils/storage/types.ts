@@ -62,4 +62,3 @@ export interface VideoProcessingOptions {
   fps: number
   outputFormat: 'mp4' | 'webm'
 }
-

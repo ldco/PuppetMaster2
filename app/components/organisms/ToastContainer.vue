@@ -55,4 +55,3 @@ const iconMap = {
     .toast-warning, .toast-info, .toast-icon, .toast-content, .toast-close,
     .toast-enter-active, .toast-leave-active, .toast-enter-from, .toast-leave-to
 -->
-

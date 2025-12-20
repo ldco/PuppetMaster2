@@ -4,15 +4,18 @@
  *
  * Displays a table placeholder with header and rows.
  */
-withDefaults(defineProps<{
-  rows?: number
-  columns?: number
-  showHeader?: boolean
-}>(), {
-  rows: 5,
-  columns: 4,
-  showHeader: true
-})
+withDefaults(
+  defineProps<{
+    rows?: number
+    columns?: number
+    showHeader?: boolean
+  }>(),
+  {
+    rows: 5,
+    columns: 4,
+    showHeader: true
+  }
+)
 </script>
 
 <template>
@@ -27,11 +30,7 @@ withDefaults(defineProps<{
       />
     </div>
     <!-- Data rows -->
-    <div
-      v-for="row in rows"
-      :key="`row-${row}`"
-      class="placeholder-table__row"
-    >
+    <div v-for="row in rows" :key="`row-${row}`" class="placeholder-table__row">
       <LoadingBase
         v-for="col in columns"
         :key="`cell-${row}-${col}`"

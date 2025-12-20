@@ -11,9 +11,13 @@
  */
 import { eq, desc, sql } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
-import { parsePaginationParams, paginationClauses, buildPaginationMeta } from '../../utils/pagination'
+import {
+  parsePaginationParams,
+  paginationClauses,
+  buildPaginationMeta
+} from '../../utils/pagination'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -29,10 +33,20 @@ export default defineEventHandler(async (event) => {
   const { limitClause, offsetClause } = paginationClauses(params.page!, params.limit!)
   const unreadOnly = query.unread === 'true'
 
+  // Get counts in a single query (total and unread)
+  const countsResult = db
+    .select({
+      total: sql<number>`count(*)`,
+      unread: sql<number>`sum(case when read = 0 then 1 else 0 end)`
+    })
+    .from(schema.contactSubmissions)
+    .get()
+
+  const total = unreadOnly ? (countsResult?.unread ?? 0) : (countsResult?.total ?? 0)
+  const unreadCount = countsResult?.unread ?? 0
+
   // Build query with DB-level pagination
   let items
-  let total: number
-
   if (unreadOnly) {
     items = db
       .select()
@@ -42,13 +56,6 @@ export default defineEventHandler(async (event) => {
       .limit(limitClause)
       .offset(offsetClause)
       .all()
-
-    const countResult = db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.contactSubmissions)
-      .where(eq(schema.contactSubmissions.read, false))
-      .get()
-    total = countResult?.count ?? 0
   } else {
     items = db
       .select()
@@ -57,21 +64,7 @@ export default defineEventHandler(async (event) => {
       .limit(limitClause)
       .offset(offsetClause)
       .all()
-
-    const countResult = db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.contactSubmissions)
-      .get()
-    total = countResult?.count ?? 0
   }
-
-  // Count unread (always needed for badge)
-  const unreadResult = db
-    .select({ count: sql<number>`count(*)` })
-    .from(schema.contactSubmissions)
-    .where(eq(schema.contactSubmissions.read, false))
-    .get()
-  const unreadCount = unreadResult?.count ?? 0
 
   const meta = buildPaginationMeta(total, params.page!, params.limit!, items)
 
@@ -81,4 +74,3 @@ export default defineEventHandler(async (event) => {
     unreadCount
   }
 })
-

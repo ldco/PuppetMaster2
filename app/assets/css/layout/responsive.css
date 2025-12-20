@@ -70,12 +70,20 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (--tablet) {
-  .hide-tablet-up { display: none; }
-  .show-tablet-up { display: block; }
-  .flex-tablet-up { display: flex; }
+  .hide-tablet-up {
+    display: none;
+  }
+  .show-tablet-up {
+    display: block;
+  }
+  .flex-tablet-up {
+    display: flex;
+  }
 
   /* Allow 2-column grids on tablets */
-  .grid-tablet-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-tablet-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   /* NOTE: .mobile-only is NOT hidden here - it stays visible until desktop
      This prevents the "dead zone" where neither hamburger nor desktop nav is visible
@@ -109,13 +117,23 @@
   }
 
   /* Utility classes */
-  .hide-desktop { display: none; }
-  .show-desktop { display: block; }
-  .flex-desktop { display: flex; }
+  .hide-desktop {
+    display: none;
+  }
+  .show-desktop {
+    display: block;
+  }
+  .flex-desktop {
+    display: flex;
+  }
 
   /* Allow multi-column grids */
-  .grid-desktop-3 { grid-template-columns: repeat(3, 1fr); }
-  .grid-desktop-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-desktop-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-desktop-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -123,8 +141,12 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (--large) {
-  .hide-lg { display: none; }
-  .show-lg { display: block; }
+  .hide-lg {
+    display: none;
+  }
+  .show-lg {
+    display: block;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -133,13 +155,21 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (orientation: portrait) {
-  .hide-portrait { display: none; }
-  .stack-portrait { flex-direction: column; }
+  .hide-portrait {
+    display: none;
+  }
+  .stack-portrait {
+    flex-direction: column;
+  }
 }
 
 @media (orientation: landscape) {
-  .hide-landscape { display: none; }
-  .stack-landscape { flex-direction: column; }
+  .hide-landscape {
+    display: none;
+  }
+  .stack-landscape {
+    flex-direction: column;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -149,26 +179,42 @@
 
 /* Small container (< 300px) */
 @container (max-width: 299px) {
-  .cq-stack { flex-direction: column; }
-  .cq-hide-sm { display: none; }
+  .cq-stack {
+    flex-direction: column;
+  }
+  .cq-hide-sm {
+    display: none;
+  }
 }
 
 /* Medium container (300px - 500px) */
 @container (min-width: 300px) and (max-width: 499px) {
-  .cq-show-md { display: block; }
-  .cq-flex-md { display: flex; }
+  .cq-show-md {
+    display: block;
+  }
+  .cq-flex-md {
+    display: flex;
+  }
 }
 
 /* Large container (≥ 500px) */
 @container (min-width: 500px) {
-  .cq-show-lg { display: block; }
-  .cq-flex-lg { display: flex; }
-  .cq-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .cq-show-lg {
+    display: block;
+  }
+  .cq-flex-lg {
+    display: flex;
+  }
+  .cq-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Extra large container (≥ 700px) */
 @container (min-width: 700px) {
-  .cq-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .cq-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -176,8 +222,13 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media print {
-  .no-print { display: none; }
-  .header-nav { display: flex; }
-  .mobile-menu-btn { display: none; }
+  .no-print {
+    display: none;
+  }
+  .header-nav {
+    display: flex;
+  }
+  .mobile-menu-btn {
+    display: none;
+  }
 }
-

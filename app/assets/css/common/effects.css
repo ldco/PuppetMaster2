@@ -6,19 +6,25 @@
  */
 
 /* Opacity */
-.opacity-50 { opacity: 0.5; }
-.opacity-75 { opacity: 0.75; }
+.opacity-50 {
+  opacity: 0.5;
+}
+.opacity-75 {
+  opacity: 0.75;
+}
 
 /* Cursor */
-.cursor-pointer { cursor: pointer; }
+.cursor-pointer {
+  cursor: pointer;
+}
 
 /* Hover lift effect */
 .hover-lift {
-  transition: transform var(--transition-normal) ease,
-              box-shadow var(--transition-normal) ease;
+  transition:
+    transform var(--transition-normal) ease,
+    box-shadow var(--transition-normal) ease;
 }
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-

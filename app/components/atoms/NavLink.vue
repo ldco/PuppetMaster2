@@ -44,15 +44,9 @@ const emit = defineEmits<{
 
   <!-- Route links: use NuxtLink for client-side navigation -->
   <!-- NuxtLink auto-applies router-link-active and aria-current="page" -->
-  <NuxtLink
-    v-else
-    :to="to"
-    class="nav-link"
-    @click="emit('click')"
-  >
+  <NuxtLink v-else :to="to" class="nav-link" @click="emit('click')">
     <slot>{{ label }}</slot>
   </NuxtLink>
 </template>
 
 <!-- No scoped styles needed - uses skeleton/nav.css -->
-

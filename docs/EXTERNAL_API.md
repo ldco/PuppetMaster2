@@ -30,17 +30,20 @@ Puppet Master supports using an **external REST API** as an alternative to the b
 ### Key Capabilities
 
 ✅ **Three Provider Modes**:
+
 - `database` - Local SQLite (default, zero configuration)
 - `api` - All data from external REST API
 - `hybrid` - Mix & match per resource (e.g., auth in DB, content from API)
 
 ✅ **Production-Grade Resilience**:
+
 - Circuit breaker pattern prevents cascading failures
 - Exponential backoff retry logic
 - Intelligent caching with per-resource TTL
 - OAuth 2.0 / JWT / API Key authentication
 
 ✅ **Zero Frontend Changes**:
+
 - Frontend always uses same `/api/*` endpoints
 - Data source is completely transparent
 - Toggle providers without touching Vue components
@@ -59,16 +62,17 @@ Frontend → /api/portfolio → Nuxt Backend → External API → Data
 
 **Benefits:**
 
-| **Security** | **Performance** | **Reliability** |
-|--------------|-----------------|-----------------|
-| ✅ Credentials never exposed to browser | ✅ Server-side cache shared across users | ✅ Centralized retry logic + circuit breaker |
-| ✅ No CORS configuration needed | ✅ Request deduplication | ✅ Graceful degradation on failures |
-| ✅ Request signing without client exposure | ✅ Connection pooling | ✅ Automatic OAuth token refresh |
-| ✅ Centralized rate limiting | ✅ Reduced client bundle size | ✅ Fallback to cached data |
+| **Security**                               | **Performance**                          | **Reliability**                              |
+| ------------------------------------------ | ---------------------------------------- | -------------------------------------------- |
+| ✅ Credentials never exposed to browser    | ✅ Server-side cache shared across users | ✅ Centralized retry logic + circuit breaker |
+| ✅ No CORS configuration needed            | ✅ Request deduplication                 | ✅ Graceful degradation on failures          |
+| ✅ Request signing without client exposure | ✅ Connection pooling                    | ✅ Automatic OAuth token refresh             |
+| ✅ Centralized rate limiting               | ✅ Reduced client bundle size            | ✅ Fallback to cached data                   |
 
 ### ❌ Alternative (Frontend Direct API)
 
 **Problems with direct frontend-to-API calls:**
+
 - 🔴 API credentials exposed in browser (DevTools can extract them)
 - 🔴 CORS configuration complexity
 - 🔴 Per-user caching (inefficient, browser storage limits)
@@ -78,6 +82,7 @@ Frontend → /api/portfolio → Nuxt Backend → External API → Data
 - 🔴 Harder to implement circuit breaker patterns
 
 **Only use frontend direct API for:**
+
 - Public APIs (no credentials needed)
 - User-specific OAuth (e.g., "Login with Google")
 - Real-time features (WebSocket/SSE)
@@ -96,51 +101,51 @@ Choose your provider mode:
 export default {
   dataSource: {
     // Provider mode
-    provider: 'database',  // 'database' | 'api' | 'hybrid'
+    provider: 'database', // 'database' | 'api' | 'hybrid'
 
     // Hybrid mode: per-resource configuration
     resources: {
-      users: 'database',         // Keep auth local (recommended)
-      sessions: 'database',      // Keep sessions local (recommended)
-      settings: 'api',           // Fetch settings from API
-      portfolio: 'api',          // Fetch content from API
-      contacts: 'api',           // Send contacts to API
-      translations: 'database',  // Or 'api' depending on your CMS
+      users: 'database', // Keep auth local (recommended)
+      sessions: 'database', // Keep sessions local (recommended)
+      settings: 'api', // Fetch settings from API
+      portfolio: 'api', // Fetch content from API
+      contacts: 'api', // Send contacts to API
+      translations: 'database' // Or 'api' depending on your CMS
     },
 
     // API client configuration
     api: {
-      timeout: 30000,  // Request timeout (30 seconds)
+      timeout: 30000, // Request timeout (30 seconds)
 
       // Retry with exponential backoff
       retry: {
-        maxAttempts: 3,           // Try up to 3 times
-        initialDelay: 1000,       // Start with 1 second
-        maxDelay: 10000,          // Cap at 10 seconds
-        backoffMultiplier: 2,     // Double delay each time
+        maxAttempts: 3, // Try up to 3 times
+        initialDelay: 1000, // Start with 1 second
+        maxDelay: 10000, // Cap at 10 seconds
+        backoffMultiplier: 2 // Double delay each time
       },
 
       // Circuit breaker (prevent cascading failures)
       circuitBreaker: {
         enabled: true,
-        failureThreshold: 5,      // Open after 5 failures
-        resetTimeout: 60000,       // Try again after 60 seconds
+        failureThreshold: 5, // Open after 5 failures
+        resetTimeout: 60000 // Try again after 60 seconds
       },
 
       // Response caching (seconds)
       cache: {
         enabled: true,
         ttl: {
-          users: 300,         // 5 minutes
-          sessions: 60,       // 1 minute
-          settings: 600,      // 10 minutes
-          portfolio: 180,     // 3 minutes
-          contacts: 0,        // No cache (always fresh)
-          translations: 3600, // 1 hour
-        },
-      },
-    },
-  },
+          users: 300, // 5 minutes
+          sessions: 60, // 1 minute
+          settings: 600, // 10 minutes
+          portfolio: 180, // 3 minutes
+          contacts: 0, // No cache (always fresh)
+          translations: 3600 // 1 hour
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -223,23 +228,27 @@ REDIS_PREFIX=pm-cache:
 ### Component Breakdown
 
 **1. API Client** (`server/utils/api/client.ts`)
+
 - Centralized HTTP client with fetch API
 - Handles all external API communication
 - Singleton pattern for efficiency
 
 **2. Authentication Manager** (`server/utils/api/auth.ts`)
+
 - OAuth 2.0 client credentials flow
 - JWT token management
 - Automatic token refresh
 - Support for static tokens and API keys
 
 **3. Cache Layer** (`server/utils/api/cache.ts`)
+
 - In-memory cache (Map-based)
 - Automatic cleanup of expired entries
 - Redis-ready for multi-instance deployments
 - Per-resource TTL configuration
 
 **4. Retry Logic + Circuit Breaker** (`server/utils/api/retry.ts`)
+
 - Exponential backoff algorithm
 - Configurable max attempts and delays
 - Circuit breaker states: CLOSED → OPEN → HALF_OPEN
@@ -298,11 +307,13 @@ Max reached: 10000ms (10 seconds)
 ```
 
 **Retryable errors:**
+
 - Network errors (connection refused, timeout)
 - HTTP 5xx (server errors)
 - HTTP 429 (rate limit)
 
 **Non-retryable errors:**
+
 - HTTP 4xx (except 429) - client errors
 - Validation failures
 - Authentication failures (401)
@@ -310,6 +321,7 @@ Max reached: 10000ms (10 seconds)
 ### Intelligent Caching
 
 **Cache Strategy:**
+
 - **GET requests only** (no caching of mutations)
 - **Per-resource TTL** (configure in config)
 - **Prefix-based invalidation** (clear all portfolio cache)
@@ -365,6 +377,7 @@ API_JWT_TOKEN=your-strapi-api-token
 ```
 
 **API Contract:** Your Strapi API must provide:
+
 - `GET /portfolio` - List items
 - `GET /portfolio/:id` - Get single item
 - `POST /portfolio` - Create item
@@ -452,11 +465,13 @@ export default defineEventHandler(() => {
 ### Scaling Considerations
 
 **Single Instance:**
+
 - ✅ In-memory cache works great
 - ✅ Circuit breaker per instance
 - ✅ Simple deployment
 
 **Multi-Instance (Load Balanced):**
+
 - ⚠️ Need Redis for shared cache
 - ⚠️ Each instance has separate circuit state
 - ⚠️ Consider centralizing circuit breaker in Redis
@@ -465,11 +480,13 @@ export default defineEventHandler(() => {
 ### Cost Considerations
 
 **API Calls:**
+
 - Caching reduces API calls by 70%+
 - Circuit breaker prevents wasted calls when API is down
 - Retries multiply your costs (1 request = up to 3 API calls)
 
 **Optimization:**
+
 - Increase cache TTLs for static content
 - Use `provider: 'hybrid'` to keep frequently accessed data in DB
 - Monitor and optimize slow endpoints
@@ -485,6 +502,7 @@ export default defineEventHandler(() => {
 **Cause:** External API has failed 5+ times
 
 **Solution:**
+
 1. Check if external API is online
 2. Verify credentials in `.env`
 3. Check API logs for errors
@@ -496,6 +514,7 @@ export default defineEventHandler(() => {
 **Cause:** OAuth credentials invalid or token endpoint unreachable
 
 **Solution:**
+
 1. Verify `API_CLIENT_ID` and `API_CLIENT_SECRET`
 2. Check `API_TOKEN_URL` is correct
 3. Test OAuth endpoint manually:
@@ -511,6 +530,7 @@ export default defineEventHandler(() => {
 **Cause:** All 3 retry attempts failed
 
 **Solution:**
+
 1. Check external API health
 2. Verify network connectivity
 3. Increase `retry.maxAttempts` if API is flaky
@@ -521,6 +541,7 @@ export default defineEventHandler(() => {
 **Cause:** Cache TTL too long or cache not invalidated
 
 **Solution:**
+
 1. Lower `cache.ttl` for that resource
 2. Manually invalidate cache:
    ```typescript
@@ -533,15 +554,17 @@ export default defineEventHandler(() => {
 **Symptoms:** Slow response times
 
 **Diagnosis:**
+
 1. Check cache hit rate:
    ```typescript
    const stats = apiClient.getCacheStats()
-   console.log('Hit rate:', stats.active / stats.total * 100 + '%')
+   console.log('Hit rate:', (stats.active / stats.total) * 100 + '%')
    ```
 2. Monitor external API response times
 3. Check if retry logic is triggering often
 
 **Solutions:**
+
 - Increase cache TTLs
 - Use `provider: 'hybrid'` for frequently accessed data
 - Optimize external API endpoints

@@ -41,10 +41,7 @@ export default defineNuxtPlugin(() => {
           )
           console.log('Run useA11y().checkA11y() for details')
         } else {
-          console.log(
-            '%c[A11y] Page passes WCAG 2.1 AA checks',
-            'color: #188038'
-          )
+          console.log('%c[A11y] Page passes WCAG 2.1 AA checks', 'color: #188038')
         }
       } catch (e) {
         // axe-core not installed, silently skip

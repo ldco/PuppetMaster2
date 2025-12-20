@@ -45,7 +45,8 @@ export function useToast() {
 
   const toast = {
     success: (message: string, options?: ToastOptions) => addToast('success', message, options),
-    error: (message: string, options?: ToastOptions) => addToast('error', message, { duration: 6000, ...options }),
+    error: (message: string, options?: ToastOptions) =>
+      addToast('error', message, { duration: 6000, ...options }),
     warning: (message: string, options?: ToastOptions) => addToast('warning', message, options),
     info: (message: string, options?: ToastOptions) => addToast('info', message, options)
   }
@@ -56,4 +57,3 @@ export function useToast() {
     removeToast
   }
 }
-

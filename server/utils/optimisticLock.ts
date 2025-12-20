@@ -34,17 +34,19 @@ export function checkVersion(
   }
 
   // Normalize both to timestamps for comparison
-  const currentTs = currentVersion instanceof Date
-    ? currentVersion.getTime()
-    : typeof currentVersion === 'number'
-      ? currentVersion
-      : new Date(currentVersion).getTime()
+  const currentTs =
+    currentVersion instanceof Date
+      ? currentVersion.getTime()
+      : typeof currentVersion === 'number'
+        ? currentVersion
+        : new Date(currentVersion).getTime()
 
-  const expectedTs = expectedVersion instanceof Date
-    ? expectedVersion.getTime()
-    : typeof expectedVersion === 'number'
-      ? expectedVersion
-      : new Date(expectedVersion).getTime()
+  const expectedTs =
+    expectedVersion instanceof Date
+      ? expectedVersion.getTime()
+      : typeof expectedVersion === 'number'
+        ? expectedVersion
+        : new Date(expectedVersion).getTime()
 
   // Check for invalid dates
   if (isNaN(currentTs) || isNaN(expectedTs)) {

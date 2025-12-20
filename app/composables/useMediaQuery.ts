@@ -104,4 +104,3 @@ export function useCanHover() {
 export function useIsTouch() {
   return useMediaQuery('(pointer: coarse)')
 }
-

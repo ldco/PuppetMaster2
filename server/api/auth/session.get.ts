@@ -9,7 +9,7 @@ import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { getCsrfToken, generateCsrfToken, setCsrfCookie, deleteCsrfCookie } from '../../utils/csrf'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const sessionId = getCookie(event, 'pm-session')
 
   if (!sessionId) {
@@ -24,12 +24,7 @@ export default defineEventHandler(async (event) => {
   const session = db
     .select()
     .from(schema.sessions)
-    .where(
-      and(
-        eq(schema.sessions.id, sessionId),
-        gt(schema.sessions.expiresAt, new Date())
-      )
-    )
+    .where(and(eq(schema.sessions.id, sessionId), gt(schema.sessions.expiresAt, new Date())))
     .get()
 
   if (!session) {
@@ -53,9 +48,7 @@ export default defineEventHandler(async (event) => {
 
   if (!user) {
     // User deleted, clear session
-    db.delete(schema.sessions)
-      .where(eq(schema.sessions.id, sessionId))
-      .run()
+    db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId)).run()
     deleteCookie(event, 'pm-session', { path: '/' })
     deleteCsrfCookie(event)
     return { user: null, csrfToken: null }
@@ -71,4 +64,3 @@ export default defineEventHandler(async (event) => {
 
   return { user, csrfToken }
 })
-

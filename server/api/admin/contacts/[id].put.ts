@@ -12,7 +12,7 @@ const updateSchema = z.object({
   read: z.boolean()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -70,4 +70,3 @@ export default defineEventHandler(async (event) => {
     item: updated
   }
 })
-

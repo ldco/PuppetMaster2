@@ -37,26 +37,55 @@ const DANGEROUS_TAGS = [
 
 // Tags that are safe for rich text content
 const ALLOWED_TAGS = [
-  'p', 'br', 'hr',
-  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'ul', 'ol', 'li',
-  'blockquote', 'pre', 'code',
-  'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'del', 'ins',
-  'a', 'img',
-  'table', 'thead', 'tbody', 'tr', 'th', 'td',
-  'div', 'span',
-  'figure', 'figcaption',
-  'sup', 'sub',
-  'mark', 'small'
+  'p',
+  'br',
+  'hr',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+  'pre',
+  'code',
+  'strong',
+  'b',
+  'em',
+  'i',
+  'u',
+  's',
+  'strike',
+  'del',
+  'ins',
+  'a',
+  'img',
+  'table',
+  'thead',
+  'tbody',
+  'tr',
+  'th',
+  'td',
+  'div',
+  'span',
+  'figure',
+  'figcaption',
+  'sup',
+  'sub',
+  'mark',
+  'small'
 ]
 
 // Attributes that are safe
 const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   '*': ['class', 'id', 'title'],
-  'a': ['href', 'target', 'rel'],
-  'img': ['src', 'alt', 'width', 'height', 'loading'],
-  'td': ['colspan', 'rowspan'],
-  'th': ['colspan', 'rowspan', 'scope']
+  a: ['href', 'target', 'rel'],
+  img: ['src', 'alt', 'width', 'height', 'loading'],
+  td: ['colspan', 'rowspan'],
+  th: ['colspan', 'rowspan', 'scope']
 }
 
 // Event handler pattern (on*)
@@ -87,21 +116,15 @@ export function sanitizeHtml(html: string | null | undefined): string {
   result = result.replace(EVENT_HANDLER_REGEX, ' ')
 
   // 3. Sanitize href and src attributes
-  result = result.replace(
-    /(href|src)\s*=\s*["']([^"']*)["']/gi,
-    (match, attr, url) => {
-      if (DANGEROUS_URL_REGEX.test(url)) {
-        return `${attr}="#"` // Replace with safe URL
-      }
-      return match
+  result = result.replace(/(href|src)\s*=\s*["']([^"']*)["']/gi, (match, attr, url) => {
+    if (DANGEROUS_URL_REGEX.test(url)) {
+      return `${attr}="#"` // Replace with safe URL
     }
-  )
+    return match
+  })
 
   // 4. Remove expression() in style attributes (IE CSS expression attack)
-  result = result.replace(
-    /style\s*=\s*["'][^"']*expression\s*\([^"']*["']/gi,
-    'style=""'
-  )
+  result = result.replace(/style\s*=\s*["'][^"']*expression\s*\([^"']*["']/gi, 'style=""')
 
   // 5. Remove data-* attributes that could contain encoded scripts
   result = result.replace(/\s+data-[a-z-]+\s*=\s*["'][^"']*["']/gi, '')

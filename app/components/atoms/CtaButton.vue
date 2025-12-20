@@ -42,12 +42,7 @@ const btnClasses = computed(() => [
   -->
 
   <!-- Internal link: use NuxtLink -->
-  <NuxtLink
-    v-if="to"
-    :to="to"
-    :class="btnClasses"
-    @click="emit('click', $event)"
-  >
+  <NuxtLink v-if="to" :to="to" :class="btnClasses" @click="emit('click', $event)">
     <slot />
   </NuxtLink>
 
@@ -76,4 +71,3 @@ const btnClasses = computed(() => [
 </template>
 
 <!-- No scoped styles needed - all styles come from ui/forms/buttons.css -->
-

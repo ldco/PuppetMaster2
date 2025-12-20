@@ -16,7 +16,7 @@ import type { SQL } from 'drizzle-orm'
 export interface PaginationParams {
   page?: number
   limit?: number
-  cursor?: number | string  // For cursor-based pagination
+  cursor?: number | string // For cursor-based pagination
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
 }
@@ -43,7 +43,10 @@ const MAX_LIMIT = 100
  */
 export function parsePaginationParams(query: Record<string, unknown>): PaginationParams {
   const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
-  const limit = Math.min(MAX_LIMIT, Math.max(1, parseInt(String(query.limit || DEFAULT_LIMIT), 10) || DEFAULT_LIMIT))
+  const limit = Math.min(
+    MAX_LIMIT,
+    Math.max(1, parseInt(String(query.limit || DEFAULT_LIMIT), 10) || DEFAULT_LIMIT)
+  )
   const cursor = query.cursor as string | undefined
   const sortBy = query.sortBy as string | undefined
   const sortOrder = (query.sortOrder === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc'
@@ -96,7 +99,10 @@ export function buildPaginationMeta(
  * Apply pagination to a SQL query
  * Returns the SQL clauses to add (LIMIT and OFFSET)
  */
-export function paginationClauses(page: number, limit: number): { limitClause: number; offsetClause: number } {
+export function paginationClauses(
+  page: number,
+  limit: number
+): { limitClause: number; offsetClause: number } {
   return {
     limitClause: limit,
     offsetClause: calculateOffset(page, limit)

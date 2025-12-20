@@ -13,15 +13,18 @@
 import IconLogin from '~icons/tabler/login'
 import config from '~/puppet-master.config'
 
-const props = withDefaults(defineProps<{
-  /** Show contact buttons (set false in mobile menu where they're in header) */
-  showContact?: boolean
-  /** Language switcher direction: down (header), side (sidebar), inline (mobile menu) */
-  langDirection?: 'down' | 'side' | 'inline'
-}>(), {
-  showContact: true,
-  langDirection: 'down'
-})
+const props = withDefaults(
+  defineProps<{
+    /** Show contact buttons (set false in mobile menu where they're in header) */
+    showContact?: boolean
+    /** Language switcher direction: down (header), side (sidebar), inline (mobile menu) */
+    langDirection?: 'down' | 'side' | 'inline'
+  }>(),
+  {
+    showContact: true,
+    langDirection: 'down'
+  }
+)
 
 const { t } = useI18n()
 </script>
@@ -36,11 +39,7 @@ const { t } = useI18n()
     <AtomsLangSwitcher v-if="config.isMultiLang" :direction="langDirection" />
 
     <!-- Login button - only in website-app mode -->
-    <NuxtLink
-      v-if="config.hasLoginButton"
-      to="/login"
-      class="header-login-btn"
-    >
+    <NuxtLink v-if="config.hasLoginButton" to="/login" class="header-login-btn">
       <IconLogin aria-hidden="true" />
       <span>{{ t('auth.login') }}</span>
     </NuxtLink>
@@ -48,4 +47,3 @@ const { t } = useI18n()
 </template>
 
 <!-- No scoped styles needed - uses skeleton/header.css -->
-

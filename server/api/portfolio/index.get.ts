@@ -13,7 +13,7 @@
 import { eq, desc, and } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const db = useDatabase()
   const query = getQuery(event)
   const session = event.context.session
@@ -31,29 +31,36 @@ export default defineEventHandler(async (event) => {
     conditions.push(eq(schema.portfolioItems.category, query.category as string))
   }
 
-  // Execute query
-  let items
-  if (conditions.length > 0) {
-    items = db
-      .select()
-      .from(schema.portfolioItems)
-      .where(conditions.length === 1 ? conditions[0] : and(...conditions))
-      .orderBy(desc(schema.portfolioItems.order), desc(schema.portfolioItems.createdAt))
-      .all()
-  } else {
-    items = db
-      .select()
-      .from(schema.portfolioItems)
-      .orderBy(desc(schema.portfolioItems.order), desc(schema.portfolioItems.createdAt))
-      .all()
-  }
-
-  // Apply pagination
+  // Parse pagination params
   const limit = query.limit ? parseInt(query.limit as string) : undefined
   const offset = query.offset ? parseInt(query.offset as string) : 0
 
-  if (limit) {
-    items = items.slice(offset, offset + limit)
+  // Execute query with database-level pagination
+  let items
+  const whereClause =
+    conditions.length === 0
+      ? undefined
+      : conditions.length === 1
+        ? conditions[0]
+        : and(...conditions)
+
+  const baseQuery = db
+    .select()
+    .from(schema.portfolioItems)
+    .orderBy(desc(schema.portfolioItems.order), desc(schema.portfolioItems.createdAt))
+
+  if (whereClause) {
+    if (limit) {
+      items = baseQuery.where(whereClause).limit(limit).offset(offset).all()
+    } else {
+      items = baseQuery.where(whereClause).all()
+    }
+  } else {
+    if (limit) {
+      items = baseQuery.limit(limit).offset(offset).all()
+    } else {
+      items = baseQuery.all()
+    }
   }
 
   // Parse tags JSON for each item
@@ -62,4 +69,3 @@ export default defineEventHandler(async (event) => {
     tags: item.tags ? JSON.parse(item.tags) : []
   }))
 })
-

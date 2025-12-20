@@ -8,10 +8,14 @@
  * MAX_VISIBLE_ITEMS: 5 (Material Design recommendation)
  * When items exceed 5, shows 4 items + "More" button with overflow menu.
  *
+ * Navigation is config-driven via config.adminSections in puppet-master.config.ts
+ *
  * Uses global CSS:
  * - skeleton/bottom-nav.css: .bottom-nav, .bottom-nav-item, .bottom-nav-label
  * - ui/content/badges.css: .badge-dot
  */
+import type { Component } from 'vue'
+import config from '~/puppet-master.config'
 import IconSettings from '~icons/tabler/settings'
 import IconPhoto from '~icons/tabler/photo'
 import IconMail from '~icons/tabler/mail'
@@ -20,9 +24,19 @@ import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconDotsVertical from '~icons/tabler/dots-vertical'
 
+// Icon mapping from config icon names to components
+const iconMap: Record<string, Component> = {
+  settings: IconSettings,
+  photo: IconPhoto,
+  mail: IconMail,
+  language: IconLanguage,
+  users: IconUsers,
+  heartbeat: IconHeartbeat
+}
+
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { canManageUsers } = useAuth()
+const { hasRole } = useAuth()
 const { unreadCount } = useUnreadCount()
 
 // Maximum items to show directly (Material Design: 3-5, we use 5)
@@ -31,21 +45,24 @@ const MAX_VISIBLE_ITEMS = 5
 // State for overflow menu
 const showMoreMenu = ref(false)
 
-// Navigation items matching admin.vue sidebar - use localePath for locale-aware navigation
+// Check if user can access a section based on roles
+function canAccessSection(roles: readonly string[]): boolean {
+  if (roles.length === 0) return true
+  return roles.some(role => hasRole(role as 'master' | 'admin' | 'editor'))
+}
+
+// Config-driven navigation items - filtered by role access
 // Uses short single-word labels (admin.navXxx) for compact bottom nav display
 const allNavItems = computed(() => {
-  const items = [
-    { to: localePath('/admin/settings'), label: 'admin.navSettings', icon: IconSettings },
-    { to: localePath('/admin/portfolio'), label: 'admin.navPortfolio', icon: IconPhoto },
-    { to: localePath('/admin/contacts'), label: 'admin.navContacts', icon: IconMail, badge: true },
-    { to: localePath('/admin/translations'), label: 'admin.navTranslations', icon: IconLanguage },
-  ]
-  if (canManageUsers.value) {
-    items.push({ to: localePath('/admin/users'), label: 'admin.navUsers', icon: IconUsers })
-    // Health page - master user only (for now, same as canManageUsers)
-    items.push({ to: localePath('/admin/health'), label: 'admin.navHealth', icon: IconHeartbeat })
-  }
-  return items
+  return config.adminSections
+    .filter(section => canAccessSection(section.roles))
+    .map(section => ({
+      to: localePath(`/admin/${section.id}`),
+      // Use short nav labels for bottom nav (admin.navSettings, admin.navPortfolio, etc.)
+      label: `admin.nav${section.label.charAt(0).toUpperCase() + section.label.slice(1)}`,
+      icon: iconMap[section.icon] || IconSettings,
+      badge: section.badge
+    }))
 })
 
 // Split items into visible and overflow
@@ -58,8 +75,8 @@ const overflowItems = computed(() =>
 )
 
 // Check if any overflow item has a badge with count
-const overflowHasBadge = computed(() =>
-  overflowItems.value.some(item => item.badge) && unreadCount.value > 0
+const overflowHasBadge = computed(
+  () => overflowItems.value.some(item => item.badge) && unreadCount.value > 0
 )
 
 function toggleMoreMenu() {
@@ -74,12 +91,7 @@ function closeMoreMenu() {
 <template>
   <nav class="bottom-nav" aria-label="Main navigation">
     <!-- Visible navigation items -->
-    <NuxtLink
-      v-for="item in visibleItems"
-      :key="item.to"
-      :to="item.to"
-      class="bottom-nav-item"
-    >
+    <NuxtLink v-for="item in visibleItems" :key="item.to" :to="item.to" class="bottom-nav-item">
       <span class="relative">
         <component :is="item.icon" class="bottom-nav-icon" />
         <span v-if="item.badge && unreadCount > 0" class="badge-dot">
@@ -137,4 +149,3 @@ function closeMoreMenu() {
   Uses global CSS classes from skeleton/bottom-nav.css
   No scoped styles needed - following PuppetMaster CSS architecture
 -->
-

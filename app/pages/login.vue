@@ -50,9 +50,9 @@ async function handleSubmit() {
       <!-- Logo - using circle variant for auth pages - ClientOnly for SSR -->
       <div class="auth-logo">
         <ClientOnly>
-          <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+          <img :src="shortLogo" alt="Logo" class="auth-logo-img" />
           <template #fallback>
-            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img">
+            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img" />
           </template>
         </ClientOnly>
       </div>
@@ -74,7 +74,7 @@ async function handleSubmit() {
               class="input"
               autocomplete="email"
               required
-            >
+            />
           </div>
         </div>
 
@@ -90,14 +90,14 @@ async function handleSubmit() {
               class="input"
               autocomplete="current-password"
               required
-            >
+            />
           </div>
         </div>
 
         <!-- Remember me + Forgot password -->
         <div class="flex justify-between items-center gap-4">
           <label class="checkbox">
-            <input v-model="rememberMe" type="checkbox">
+            <input v-model="rememberMe" type="checkbox" />
             <span>{{ t('auth.rememberMe') }}</span>
           </label>
           <NuxtLink to="/forgot-password" class="auth-link">
@@ -114,4 +114,3 @@ async function handleSubmit() {
     </div>
   </div>
 </template>
-

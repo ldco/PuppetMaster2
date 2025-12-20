@@ -36,7 +36,9 @@ defineProps<{
           </h2>
           <div class="text-lg text-secondary">
             <slot>
-              <p>{{ content ?? 'Tell your story here. What makes you unique? What drives you?' }}</p>
+              <p>
+                {{ content ?? 'Tell your story here. What makes you unique? What drives you?' }}
+              </p>
             </slot>
           </div>
         </div>
@@ -53,4 +55,3 @@ defineProps<{
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->
-

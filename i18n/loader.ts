@@ -25,7 +25,7 @@ import { getSystemTranslations } from './system'
  * Load messages for a locale
  * Merges system translations (code) with content translations (database)
  */
-export default defineI18nLocale(async (locale) => {
+export default defineI18nLocale(async locale => {
   // 1. Get system translations (always available, from code)
   const systemMessages = getSystemTranslations(locale)
 
@@ -43,4 +43,3 @@ export default defineI18nLocale(async (locale) => {
     ...contentMessages
   }
 })
-

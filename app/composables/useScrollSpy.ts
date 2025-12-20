@@ -1,15 +1,15 @@
 /**
  * useScrollSpy - Active Section Detection for Onepager Navigation
- * 
+ *
  * Uses IntersectionObserver to detect which section is currently in view.
  * Provides the active section ID for nav link highlighting.
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { activeSection } = useScrollSpy(['home', 'about', 'portfolio', 'services', 'contact'])
  * </script>
- * 
+ *
  * <template>
  *   <a :class="{ active: activeSection === 'about' }" href="#about">About</a>
  * </template>
@@ -86,7 +86,7 @@ export function useScrollSpy(
 
     // Create observer
     observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         // Find the entry that is intersecting
         for (const entry of entries) {
           if (entry.isIntersecting) {
@@ -113,21 +113,24 @@ export function useScrollSpy(
 
   // Watch for route changes (locale change triggers route change)
   // Re-detect active section since component doesn't remount
-  watch(() => route.fullPath, () => {
-    nextTick(() => {
-      // If route has a hash, use it directly as active section
-      // (smooth scroll hasn't completed yet, so we can't detect from position)
-      if (route.hash) {
-        const targetSection = route.hash.slice(1) // Remove #
-        if (sectionIds.includes(targetSection)) {
-          activeSection.value = targetSection
-          return
+  watch(
+    () => route.fullPath,
+    () => {
+      nextTick(() => {
+        // If route has a hash, use it directly as active section
+        // (smooth scroll hasn't completed yet, so we can't detect from position)
+        if (route.hash) {
+          const targetSection = route.hash.slice(1) // Remove #
+          if (sectionIds.includes(targetSection)) {
+            activeSection.value = targetSection
+            return
+          }
         }
-      }
-      // No hash - detect from scroll position (e.g., at home with no hash)
-      detectActiveSection()
-    })
-  })
+        // No hash - detect from scroll position (e.g., at home with no hash)
+        detectActiveSection()
+      })
+    }
+  )
 
   onUnmounted(() => {
     if (observer) {
@@ -141,4 +144,3 @@ export function useScrollSpy(
     setActiveSection
   }
 }
-

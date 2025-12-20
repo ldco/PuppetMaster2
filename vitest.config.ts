@@ -15,9 +15,8 @@ export default defineVitestConfig({
     // Coverage configuration (optional, run with --coverage)
     coverage: {
       provider: 'v8',
-      include: ['server/utils/**', 'app/composables/**'],
+      include: ['server/utils/**', 'app/composables/**', 'app/components/**'],
       exclude: ['node_modules', 'tests']
     }
   }
 })
-

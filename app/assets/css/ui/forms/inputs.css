@@ -10,8 +10,9 @@
   border: 1px solid var(--l-border);
   border-radius: var(--radius-md);
   color: var(--t-primary);
-  transition: border-color var(--transition-normal) ease,
-              box-shadow var(--transition-normal) ease;
+  transition:
+    border-color var(--transition-normal) ease,
+    box-shadow var(--transition-normal) ease;
 }
 
 .input::placeholder {
@@ -74,7 +75,7 @@ select.input option:hover {
 }
 
 /* RTL select arrow */
-[dir="rtl"] select.input {
+[dir='rtl'] select.input {
   background-position: left var(--space-3) center;
 }
 
@@ -336,4 +337,3 @@ select.input option:hover {
   border-radius: var(--radius-sm);
   border: 1px solid var(--l-border);
 }
-

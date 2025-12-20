@@ -65,10 +65,7 @@ export function validateCsrfToken(event: H3Event): boolean {
 
   try {
     // Timing-safe comparison
-    return timingSafeEqual(
-      Buffer.from(cookieToken, 'utf8'),
-      Buffer.from(headerToken, 'utf8')
-    )
+    return timingSafeEqual(Buffer.from(cookieToken, 'utf8'), Buffer.from(headerToken, 'utf8'))
   } catch {
     return false
   }

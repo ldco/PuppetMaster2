@@ -21,10 +21,10 @@ import IconMail from '~icons/tabler/mail'
 
 // Icon map
 const iconMap: Record<string, Component> = {
-  'phone': IconPhone,
+  phone: IconPhone,
   'brand-telegram': IconBrandTelegram,
   'brand-whatsapp': IconBrandWhatsapp,
-  'mail': IconMail
+  mail: IconMail
 }
 
 // Get contact values from database
@@ -92,4 +92,3 @@ const contactItems = computed(() => {
     </a>
   </div>
 </template>
-

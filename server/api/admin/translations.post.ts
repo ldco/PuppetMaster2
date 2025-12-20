@@ -9,7 +9,7 @@ import { useDatabase, schema } from '../../database/client'
 import { eq, and } from 'drizzle-orm'
 import { isSystemKey } from '../../../i18n/system'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = getCookie(event, 'auth_session')
   if (!session) {
@@ -41,8 +41,7 @@ export default defineEventHandler(async (event) => {
   const existingRow = existing[0]
   if (existingRow) {
     // Update existing
-    db
-      .update(schema.translations)
+    db.update(schema.translations)
       .set({ value, updatedAt: new Date() })
       .where(eq(schema.translations.id, existingRow.id))
       .run()
@@ -60,4 +59,3 @@ export default defineEventHandler(async (event) => {
     return { success: true, action: 'created', id: newRow?.id }
   }
 })
-

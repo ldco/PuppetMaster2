@@ -54,7 +54,9 @@ export function useAuth() {
     const { setToken, clearToken } = useCsrf()
     isLoading.value = true
     try {
-      const { data } = await useFetch<{ user: User | null; csrfToken: string | null }>('/api/auth/session')
+      const { data } = await useFetch<{ user: User | null; csrfToken: string | null }>(
+        '/api/auth/session'
+      )
       user.value = data.value?.user ?? null
 
       // Restore CSRF token
@@ -78,14 +80,19 @@ export function useAuth() {
    * Login with email and password
    * Sets CSRF token from response for subsequent requests
    */
-  async function login(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
+  async function login(
+    credentials: LoginCredentials
+  ): Promise<{ success: boolean; error?: string }> {
     const { setToken } = useCsrf()
     isLoading.value = true
     try {
-      const response = await $fetch<{ success: boolean; user: User; csrfToken: string }>('/api/auth/login', {
-        method: 'POST',
-        body: credentials
-      })
+      const response = await $fetch<{ success: boolean; user: User; csrfToken: string }>(
+        '/api/auth/login',
+        {
+          method: 'POST',
+          body: credentials
+        }
+      )
       user.value = response.user
 
       // Store CSRF token for subsequent requests
@@ -157,4 +164,3 @@ export function useAuth() {
     getAssignableRoles
   }
 }
-

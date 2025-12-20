@@ -35,9 +35,15 @@
 }
 
 /* Size variants */
-.modal-sm { width: var(--modal-width-sm); }
-.modal-lg { width: var(--modal-width-lg); }
-.modal-xl { width: var(--modal-width-xl); }
+.modal-sm {
+  width: var(--modal-width-sm);
+}
+.modal-lg {
+  width: var(--modal-width-lg);
+}
+.modal-xl {
+  width: var(--modal-width-xl);
+}
 
 .modal-header {
   display: flex;
@@ -72,8 +78,9 @@
   color: var(--t-muted);
   cursor: pointer;
   border-radius: var(--radius-full);
-  transition: background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .modal-close:hover {
@@ -146,8 +153,12 @@ dialog.modal[open] {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modal-enter {
@@ -166,4 +177,3 @@ dialog.modal[open] {
   margin: 0;
   color: var(--t-secondary);
 }
-

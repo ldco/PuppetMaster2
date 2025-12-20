@@ -11,9 +11,9 @@ export interface AuthConfig {
   clientId?: string
   clientSecret?: string
   tokenUrl?: string
-  staticToken?: string  // For JWT
+  staticToken?: string // For JWT
   apiKey?: string
-  refreshBuffer?: number  // Seconds before expiry to refresh
+  refreshBuffer?: number // Seconds before expiry to refresh
 }
 
 /**
@@ -50,7 +50,7 @@ export interface CircuitBreakerConfig {
  */
 export interface CacheConfig {
   enabled: boolean
-  ttl: Record<string, number>  // Per-resource TTL in seconds
+  ttl: Record<string, number> // Per-resource TTL in seconds
 }
 
 /**

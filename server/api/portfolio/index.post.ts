@@ -10,7 +10,11 @@ import { sanitizeHtml, escapeHtml } from '../../utils/sanitize'
 
 // Validation schema
 const createSchema = z.object({
-  slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with dashes'),
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with dashes'),
   title: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   content: z.string().optional(),
@@ -22,7 +26,7 @@ const createSchema = z.object({
   published: z.boolean().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -95,4 +99,3 @@ export default defineEventHandler(async (event) => {
 
 // Import eq for slug check
 import { eq } from 'drizzle-orm'
-

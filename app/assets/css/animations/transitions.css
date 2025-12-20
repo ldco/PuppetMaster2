@@ -71,9 +71,10 @@
 
 /* Theme toggle button - subtle hover lift */
 .theme-toggle {
-  transition: transform var(--transition-fast) var(--ease-out),
-              background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    transform var(--transition-fast) var(--ease-out),
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .theme-toggle:hover {
@@ -183,7 +184,7 @@
   transform-origin: left center;
 }
 
-[dir="rtl"] .popover-side-enter-active {
+[dir='rtl'] .popover-side-enter-active {
   transform-origin: right center;
 }
 
@@ -192,7 +193,7 @@
   transform-origin: left center;
 }
 
-[dir="rtl"] .popover-side-leave-active {
+[dir='rtl'] .popover-side-leave-active {
   transform-origin: right center;
 }
 
@@ -202,8 +203,8 @@
   transform: scaleX(0.8) translateX(-4px);
 }
 
-[dir="rtl"] .popover-side-enter-from,
-[dir="rtl"] .popover-side-leave-to {
+[dir='rtl'] .popover-side-enter-from,
+[dir='rtl'] .popover-side-leave-to {
   transform: scaleX(0.8) translateX(4px);
 }
 
@@ -306,4 +307,3 @@ a:focus-visible {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
-

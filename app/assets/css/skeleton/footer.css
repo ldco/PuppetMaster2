@@ -22,7 +22,7 @@
 
 :root {
   --footer-padding-block: var(--space-8) var(--space-4);
-  --footer-link-height: 28px;  /* Compact icons: 28px container, 18px icon */
+  --footer-link-height: 28px; /* Compact icons: 28px container, 18px icon */
   --footer-link-gap: var(--gap-xs);
 }
 
@@ -48,13 +48,15 @@
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
-    "logo cta"
-    "social nav";
+    'logo cta'
+    'social nav';
   align-items: start;
   gap: var(--gap-sm) var(--gap-lg);
 }
 
-.footer-logo { grid-area: logo; }
+.footer-logo {
+  grid-area: logo;
+}
 
 .footer-cta {
   grid-area: cta;
@@ -74,7 +76,7 @@
   grid-area: social;
   width: 50cqw;
   max-width: 50cqw;
-  gap: var(--gap-sm);  /* Equal horizontal & vertical gap */
+  gap: var(--gap-sm); /* Equal horizontal & vertical gap */
 }
 
 /* Smaller icons in footer */
@@ -133,7 +135,7 @@
 @media (--phone) {
   .footer-grid {
     grid-template-columns: 1fr;
-    grid-template-areas: "logo" "cta" "social" "nav";
+    grid-template-areas: 'logo' 'cta' 'social' 'nav';
     justify-items: center;
     text-align: center;
     gap: var(--gap-md);
@@ -250,7 +252,9 @@
     text-align: center;
   }
   .legal-row,
-  .legal-links { justify-content: center; }
+  .legal-links {
+    justify-content: center;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -297,10 +301,18 @@
 }
 
 /* Theme-aware logo (language is handled via dynamic src path) */
-.made-with .light-logo { display: block; }
-.made-with .dark-logo { display: none; }
-:root.dark .made-with .light-logo { display: none; }
-:root.dark .made-with .dark-logo { display: block; }
+.made-with .light-logo {
+  display: block;
+}
+.made-with .dark-logo {
+  display: none;
+}
+:root.dark .made-with .light-logo {
+  display: none;
+}
+:root.dark .made-with .dark-logo {
+  display: block;
+}
 
 /* Phone: stack text on top of logo */
 @media (--phone) {
@@ -309,4 +321,3 @@
     gap: 0;
   }
 }
-

@@ -4,14 +4,14 @@
 
 - name: Create deploy group
   group:
-    name: "{{ deploy_user }}"
+    name: '{{ deploy_user }}'
     state: present
   tags: [deploy-user]
 
 - name: Create deploy user
   user:
-    name: "{{ deploy_user }}"
-    group: "{{ deploy_user }}"
+    name: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
     groups: docker
     shell: /bin/bash
     create_home: yes
@@ -37,24 +37,24 @@
   file:
     path: /home/{{ deploy_user }}/.ssh
     state: directory
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_user }}"
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
     mode: '0700'
   tags: [deploy-user]
 
 - name: Add SSH authorized key
   authorized_key:
-    user: "{{ deploy_user }}"
-    key: "{{ deploy_user_ssh_key }}"
+    user: '{{ deploy_user }}'
+    key: '{{ deploy_user_ssh_key }}'
     state: present
   tags: [deploy-user]
 
 - name: Create app directories
   file:
-    path: "{{ item }}"
+    path: '{{ item }}'
     state: directory
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_user }}"
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
     mode: '0755'
   loop:
     - /home/{{ deploy_user }}/app

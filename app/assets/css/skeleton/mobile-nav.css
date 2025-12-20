@@ -15,9 +15,9 @@
 
 .mobile-nav {
   position: fixed;
-  inset-block: 0;              /* top: 0; bottom: 0; */
-  inset-inline-start: 0;       /* LEFT in LTR, RIGHT in RTL - same side as hamburger! */
-  width: min(280px, 85vw);     /* Modern min() instead of width + max-width */
+  inset-block: 0; /* top: 0; bottom: 0; */
+  inset-inline-start: 0; /* LEFT in LTR, RIGHT in RTL - same side as hamburger! */
+  width: min(280px, 85vw); /* Modern min() instead of width + max-width */
   background: var(--l-bg);
   z-index: var(--z-drawer);
   display: flex;
@@ -27,7 +27,7 @@
 }
 
 /* RTL shadow flip */
-[dir="rtl"] .mobile-nav {
+[dir='rtl'] .mobile-nav {
   box-shadow: -4px 0 20px oklch(0% 0 0 / 10%);
 }
 
@@ -50,8 +50,9 @@
   border-radius: var(--radius-md);
   color: var(--t-secondary);
   cursor: pointer;
-  transition: background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .mobile-nav-close:hover {
@@ -83,8 +84,9 @@
   color: var(--t-primary);
   font-weight: var(--font-medium);
   text-decoration: none;
-  transition: background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .mobile-nav-link:hover {
@@ -250,8 +252,7 @@
   transform: translateX(-100%);
 }
 
-[dir="rtl"] .slide-enter-from,
-[dir="rtl"] .slide-leave-to {
+[dir='rtl'] .slide-enter-from,
+[dir='rtl'] .slide-leave-to {
   transform: translateX(100%);
 }
-

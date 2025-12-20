@@ -23,9 +23,11 @@ const { isScrolled, isHidden } = useScrollHeader({
 })
 
 // Animation timing for hamburger
-watch(isMenuOpen, (open) => {
+watch(isMenuOpen, open => {
   if (open) {
-    setTimeout(() => { showMenu.value = true }, 200)
+    setTimeout(() => {
+      showMenu.value = true
+    }, 200)
   } else {
     showMenu.value = false
   }
@@ -104,4 +106,3 @@ function closeMenu() {
   - skeleton/nav.css (nav links)
   No scoped styles needed!
 -->
-

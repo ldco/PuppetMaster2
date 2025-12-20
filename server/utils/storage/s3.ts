@@ -7,7 +7,13 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
 import sharp from 'sharp'
-import type { StorageAdapter, UploadResult, UploadOptions, ImageProcessingOptions, VideoProcessingOptions } from './types'
+import type {
+  StorageAdapter,
+  UploadResult,
+  UploadOptions,
+  ImageProcessingOptions,
+  VideoProcessingOptions
+} from './types'
 
 export class S3Storage implements StorageAdapter {
   private client: S3Client
@@ -27,7 +33,9 @@ export class S3Storage implements StorageAdapter {
     const region = process.env.S3_REGION || 'auto'
 
     if (!endpoint || !accessKeyId || !secretAccessKey) {
-      throw new Error('S3 credentials not configured. Set S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY in .env')
+      throw new Error(
+        'S3 credentials not configured. Set S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY in .env'
+      )
     }
 
     this.bucket = process.env.S3_BUCKET || 'uploads'
@@ -54,8 +62,13 @@ export class S3Storage implements StorageAdapter {
     }
   }
 
-  private async uploadImage(buffer: Buffer, id: string, options: UploadOptions): Promise<UploadResult> {
-    const { maxWidth, maxHeight, quality, thumbnailWidth, thumbnailHeight, thumbnailQuality } = this.imageOptions
+  private async uploadImage(
+    buffer: Buffer,
+    id: string,
+    options: UploadOptions
+  ): Promise<UploadResult> {
+    const { maxWidth, maxHeight, quality, thumbnailWidth, thumbnailHeight, thumbnailQuality } =
+      this.imageOptions
 
     // Get original metadata
     const metadata = await sharp(buffer).metadata()
@@ -90,7 +103,11 @@ export class S3Storage implements StorageAdapter {
     }
   }
 
-  private async uploadVideo(buffer: Buffer, id: string, options: UploadOptions): Promise<UploadResult> {
+  private async uploadVideo(
+    buffer: Buffer,
+    id: string,
+    options: UploadOptions
+  ): Promise<UploadResult> {
     const ext = this.videoOptions.outputFormat
     const key = `${id}.${ext}`
     const contentType = ext === 'mp4' ? 'video/mp4' : 'video/webm'
@@ -107,28 +124,25 @@ export class S3Storage implements StorageAdapter {
   }
 
   private async putObject(key: string, buffer: Buffer, contentType: string): Promise<void> {
-    await this.client.send(new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-      ACL: 'public-read'
-    }))
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+        ACL: 'public-read'
+      })
+    )
   }
 
   async delete(id: string): Promise<void> {
-    const keys = [
-      `${id}.webp`,
-      `${id}-thumb.webp`,
-      `${id}.mp4`,
-      `${id}.webm`,
-      `${id}-thumb.jpg`
-    ]
+    const keys = [`${id}.webp`, `${id}-thumb.webp`, `${id}.mp4`, `${id}.webm`, `${id}-thumb.jpg`]
 
     await Promise.all(
       keys.map(key =>
-        this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }))
-          .catch(() => { /* Ignore if file doesn't exist */ })
+        this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key })).catch(() => {
+          /* Ignore if file doesn't exist */
+        })
       )
     )
   }
@@ -138,4 +152,3 @@ export class S3Storage implements StorageAdapter {
     return `${this.publicUrl}/${id}${suffix}.webp`
   }
 }
-

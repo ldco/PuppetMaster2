@@ -20,4 +20,3 @@ export default defineI18nConfig(() => ({
   fallbackWarn: false
   // Messages are loaded from locale files via lazy loading
 }))
-

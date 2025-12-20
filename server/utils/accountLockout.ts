@@ -149,10 +149,7 @@ export async function recordFailedAttempt(userId: number): Promise<{
     updateData.lockedUntil = new Date(now.getTime() + LOCKOUT_DURATION_MS)
   }
 
-  db.update(schema.users)
-    .set(updateData)
-    .where(eq(schema.users.id, userId))
-    .run()
+  db.update(schema.users).set(updateData).where(eq(schema.users.id, userId)).run()
 
   const isLocked = newAttempts >= MAX_FAILED_ATTEMPTS
   return {

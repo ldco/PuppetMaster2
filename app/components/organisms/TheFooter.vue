@@ -39,7 +39,6 @@ const hasLegalLinks = computed(() => showLegalLinks.value && (privacyUrl.value |
 <template>
   <footer class="footer" :class="{ 'footer-rich': rich }">
     <div class="container">
-
       <!-- Grid: Logo | Social | Nav | CTA -->
       <div class="footer-grid">
         <AtomsLogo class="footer-logo" />
@@ -59,8 +58,6 @@ const hasLegalLinks = computed(() => showLegalLinks.value && (privacyUrl.value |
 
       <!-- Made with PM -->
       <AtomsMadeWith v-if="showMadeWith" class="footer-made-with" />
-
     </div>
   </footer>
 </template>
-

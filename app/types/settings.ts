@@ -9,7 +9,7 @@ export interface SiteSettings {
   contact: {
     email: string | null
     phone: string | null
-    location: string | null  // empty=hidden, address text, or "lat,lng" for map
+    location: string | null // empty=hidden, address text, or "lat,lng" for map
   }
   social: {
     // Messaging
@@ -39,30 +39,30 @@ export interface SiteSettings {
     behance: string | null
   }
   legal: {
-    companyName: string | null  // For copyright: © 2024 {companyName}
-    inn: string | null          // Tax ID
-    ogrn: string | null         // Registration Number
-    address: string | null      // Legal address
-    email: string | null        // Legal email
+    companyName: string | null // For copyright: © 2024 {companyName}
+    inn: string | null // Tax ID
+    ogrn: string | null // Registration Number
+    address: string | null // Legal address
+    email: string | null // Legal email
   }
   footer: {
-    ctaText: string | null      // CTA button text
-    ctaUrl: string | null       // CTA button URL
-    privacyUrl: string | null   // Privacy policy URL
-    termsUrl: string | null     // Terms of service URL
+    ctaText: string | null // CTA button text
+    ctaUrl: string | null // CTA button URL
+    privacyUrl: string | null // Privacy policy URL
+    termsUrl: string | null // Terms of service URL
   }
   seo: {
-    title: string | null        // Page title (also used as site name fallback)
-    description: string | null  // SEO description
-    keywords: string | null     // Meta keywords
+    title: string | null // Page title (also used as site name fallback)
+    description: string | null // SEO description
+    keywords: string | null // Meta keywords
   }
   analytics: {
-    googleId: string | null     // Google Analytics ID (G-XXXXXXXX)
-    yandexId: string | null     // Yandex Metrica ID
+    googleId: string | null // Google Analytics ID (G-XXXXXXXX)
+    yandexId: string | null // Yandex Metrica ID
     facebookPixel: string | null // Facebook Pixel ID
   }
   verification: {
-    google: string | null       // Google Search Console
-    yandex: string | null       // Yandex Webmaster
+    google: string | null // Google Search Console
+    yandex: string | null // Yandex Webmaster
   }
 }

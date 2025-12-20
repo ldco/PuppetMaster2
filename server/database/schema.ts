@@ -17,7 +17,7 @@ import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
  * - editor: Client's employees (can only edit content)
  */
 export const USER_ROLES = ['master', 'admin', 'editor'] as const
-export type UserRole = typeof USER_ROLES[number]
+export type UserRole = (typeof USER_ROLES)[number]
 
 /**
  * Admin users
@@ -27,7 +27,9 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name'),
-  role: text('role', { enum: ['master', 'admin', 'editor'] }).default('editor').notNull(),
+  role: text('role', { enum: ['master', 'admin', 'editor'] })
+    .default('editor')
+    .notNull(),
   // Account lockout fields (CRIT-04)
   failedLoginAttempts: integer('failed_login_attempts').default(0),
   lockedUntil: integer('locked_until', { mode: 'timestamp' }),
@@ -41,7 +43,9 @@ export const users = sqliteTable('users', {
  */
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(), // UUID
-  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -57,7 +61,9 @@ export const settings = sqliteTable('settings', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   key: text('key').notNull().unique(),
   value: text('value'),
-  type: text('type', { enum: ['string', 'number', 'boolean', 'json'] }).default('string').notNull(),
+  type: text('type', { enum: ['string', 'number', 'boolean', 'json'] })
+    .default('string')
+    .notNull(),
   group: text('group').default('general'), // For organizing in admin UI
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -107,15 +113,17 @@ export const contactSubmissions = sqliteTable('contact_submissions', {
 /**
  * Translation strings by locale
  */
-export const translations = sqliteTable('translations', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  locale: text('locale').notNull(), // 'en', 'ru', 'he'
-  key: text('key').notNull(), // 'nav.home', 'common.submit'
-  value: text('value').notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
-}, (table) => [
-  unique().on(table.locale, table.key)
-])
+export const translations = sqliteTable(
+  'translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    locale: text('locale').notNull(), // 'en', 'ru', 'he'
+    key: text('key').notNull(), // 'nav.home', 'common.submit'
+    value: text('value').notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [unique().on(table.locale, table.key)]
+)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AUDIT LOGGING (HIGH-04)
@@ -137,7 +145,7 @@ export const AUDIT_ACTIONS = [
   'account_unlocked',
   'session_expired'
 ] as const
-export type AuditAction = typeof AUDIT_ACTIONS[number]
+export type AuditAction = (typeof AUDIT_ACTIONS)[number]
 
 /**
  * Audit log for security-relevant events
@@ -172,4 +180,3 @@ export type ContactSubmission = typeof contactSubmissions.$inferSelect
 export type NewContactSubmission = typeof contactSubmissions.$inferInsert
 export type Translation = typeof translations.$inferSelect
 export type NewTranslation = typeof translations.$inferInsert
-

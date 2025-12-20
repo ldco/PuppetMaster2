@@ -34,7 +34,11 @@ interface PortfolioItem {
 
 // Fetch portfolio items (including unpublished for admin)
 const headers = useRequestHeaders(['cookie'])
-const { data: items, pending, refresh } = await useFetch<PortfolioItem[]>('/api/portfolio', {
+const {
+  data: items,
+  pending,
+  refresh
+} = await useFetch<PortfolioItem[]>('/api/portfolio', {
   query: { all: 'true' },
   headers
 })
@@ -112,10 +116,13 @@ async function saveItem() {
       uploading.value = true
       const formData = new FormData()
       formData.append('image', imageFile.value)
-      const uploadResult = await $fetch<{ url: string; thumbnailUrl: string }>('/api/upload/image', {
-        method: 'POST',
-        body: formData
-      })
+      const uploadResult = await $fetch<{ url: string; thumbnailUrl: string }>(
+        '/api/upload/image',
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
       imageUrl = uploadResult.url
       thumbnailUrl = uploadResult.thumbnailUrl
       uploading.value = false
@@ -126,7 +133,12 @@ async function saveItem() {
       title: form.title,
       description: form.description || null,
       category: form.category || null,
-      tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      tags: form.tags
+        ? form.tags
+            .split(',')
+            .map(t => t.trim())
+            .filter(Boolean)
+        : [],
       published: form.published,
       order: form.order,
       imageUrl,
@@ -177,7 +189,8 @@ async function deleteItem(item: PortfolioItem) {
     <div class="page-header">
       <h1 class="page-title">{{ t('admin.portfolio') }}</h1>
       <button class="btn btn-primary" @click="openCreate">
-        <IconPlus /> {{ t('admin.addItem') }}
+        <IconPlus />
+        {{ t('admin.addItem') }}
       </button>
     </div>
 
@@ -202,7 +215,11 @@ async function deleteItem(item: PortfolioItem) {
           <p v-if="item.category" class="portfolio-item-category">{{ item.category }}</p>
         </div>
         <div class="portfolio-item-actions">
-          <button class="btn btn-icon btn-ghost" @click="openEdit(item)" :title="t('admin.editItem')">
+          <button
+            class="btn btn-icon btn-ghost"
+            @click="openEdit(item)"
+            :title="t('admin.editItem')"
+          >
             <IconEdit />
           </button>
           <button
@@ -222,7 +239,9 @@ async function deleteItem(item: PortfolioItem) {
       <div v-if="showModal" class="modal-backdrop" @click.self="showModal = false">
         <div class="modal">
           <div class="modal-header">
-            <h2>{{ editingItem ? t('common.edit') : t('common.create') }} {{ t('admin.portfolio') }}</h2>
+            <h2>
+              {{ editingItem ? t('common.edit') : t('common.create') }} {{ t('admin.portfolio') }}
+            </h2>
             <button type="button" class="btn btn-icon btn-ghost" @click="showModal = false">
               <IconX />
             </button>
@@ -246,7 +265,13 @@ async function deleteItem(item: PortfolioItem) {
               </div>
               <div class="form-group">
                 <label class="form-label">{{ t('admin.slug') }} *</label>
-                <input v-model="form.slug" type="text" class="input" required pattern="[a-z0-9-]+" />
+                <input
+                  v-model="form.slug"
+                  type="text"
+                  class="input"
+                  required
+                  pattern="[a-z0-9-]+"
+                />
               </div>
               <div class="form-group">
                 <label class="form-label">{{ t('admin.category') }}</label>
@@ -265,7 +290,12 @@ async function deleteItem(item: PortfolioItem) {
 
             <div class="form-group">
               <label class="form-label">{{ t('admin.tags') }}</label>
-              <input v-model="form.tags" type="text" class="input" :placeholder="t('admin.tagsHint')" />
+              <input
+                v-model="form.tags"
+                type="text"
+                class="input"
+                :placeholder="t('admin.tagsHint')"
+              />
             </div>
 
             <div class="form-group">
@@ -295,4 +325,3 @@ async function deleteItem(item: PortfolioItem) {
   - admin/index.css: .portfolio-grid, .portfolio-item, .portfolio-item-*, .image-upload, .image-preview
   - ui/overlays/index.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
 -->
-

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Services Section
- * 
+ *
  * Feature cards showcasing services or benefits.
  */
 
@@ -73,11 +73,7 @@ const demoServices: Service[] = [
         <slot name="title">{{ title ?? 'What We Offer' }}</slot>
       </h2>
       <div class="section-grid-auto">
-        <article
-          v-for="service in (services ?? demoServices)"
-          :key="service.id"
-          class="service-card"
-        >
+        <article v-for="service in services ?? demoServices" :key="service.id" class="service-card">
           <div class="service-card-icon">{{ service.icon }}</div>
           <h3 class="service-card-title">{{ service.title }}</h3>
           <p class="service-card-description">{{ service.description }}</p>
@@ -88,4 +84,3 @@ const demoServices: Service[] = [
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->
-

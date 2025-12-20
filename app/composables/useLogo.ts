@@ -47,9 +47,7 @@ export function useLogo(): UseLogoReturn {
     const fallback = config.logo.langFallback as Record<string, string>
 
     // Check if this language has a direct logo
-    const hasDirectLogo = config.logo.available.some(name =>
-      name.endsWith(`_${lang}`)
-    )
+    const hasDirectLogo = config.logo.available.some(name => name.endsWith(`_${lang}`))
 
     if (hasDirectLogo) {
       return lang
@@ -116,4 +114,3 @@ export function useLogo(): UseLogoReturn {
     hasVariant
   }
 }
-

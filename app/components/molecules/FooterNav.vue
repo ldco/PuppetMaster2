@@ -11,9 +11,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 
 // Get sections that should appear in navigation
-const navSections = computed(() =>
-  config.sections.filter(section => section.inNav)
-)
+const navSections = computed(() => config.sections.filter(section => section.inNav))
 
 // Generate nav links
 const navLinks = computed(() =>
@@ -30,9 +28,8 @@ const navLinks = computed(() =>
 <template>
   <!-- Horizontal inline navigation -->
   <nav v-if="navLinks.length > 0" class="footer-nav-inline">
-    <NuxtLink v-for="link in navLinks" :key="link.id" :href="link.href">
+    <NuxtLink v-for="link in navLinks" :key="link.id" :to="link.href">
       {{ link.label }}
     </NuxtLink>
   </nav>
 </template>
-

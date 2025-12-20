@@ -48,4 +48,3 @@ export function useFileStorage(): StorageAdapter {
 
   return storageInstance
 }
-

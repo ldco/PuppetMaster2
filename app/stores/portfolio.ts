@@ -15,7 +15,7 @@ export interface PortfolioItem {
   title: string
   description: string | null
   imageUrl: string | null
-  videoUrl: string | null  // For video portfolio (YouTube blocked in Russia)
+  videoUrl: string | null // For video portfolio (YouTube blocked in Russia)
   category: string | null
   order: number
   published: boolean
@@ -71,9 +71,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     // Apply search
     if (searchQuery.value) {
       const q = searchQuery.value.toLowerCase()
-      result = result.filter(i =>
-        i.title.toLowerCase().includes(q) ||
-        i.description?.toLowerCase().includes(q)
+      result = result.filter(
+        i => i.title.toLowerCase().includes(q) || i.description?.toLowerCase().includes(q)
       )
     }
 
@@ -94,9 +93,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   // Published items only (for public display)
   const publishedItems = computed(() =>
-    items.value
-      .filter(i => i.published)
-      .sort((a, b) => a.order - b.order)
+    items.value.filter(i => i.published).sort((a, b) => a.order - b.order)
   )
 
   // Stats

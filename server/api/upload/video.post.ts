@@ -26,7 +26,7 @@ if (ffmpegStatic) {
 
 const TEMP_DIR = './data/temp'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check if video uploads are enabled
   if (!config.storage.video.enabled) {
     throw createError({
@@ -159,14 +159,13 @@ function compressVideo(input: string, output: string): Promise<void> {
   const { compression, outputFormat } = config.storage.video
 
   return new Promise((resolve, reject) => {
-    let command = ffmpeg(input)
-      .outputOptions([
-        `-vf scale='min(${compression.maxWidth},iw)':-2`,
-        `-b:v ${compression.videoBitrate}`,
-        `-b:a ${compression.audioBitrate}`,
-        `-r ${compression.fps}`,
-        '-movflags +faststart' // Enable streaming
-      ])
+    let command = ffmpeg(input).outputOptions([
+      `-vf scale='min(${compression.maxWidth},iw)':-2`,
+      `-b:v ${compression.videoBitrate}`,
+      `-b:a ${compression.audioBitrate}`,
+      `-r ${compression.fps}`,
+      '-movflags +faststart' // Enable streaming
+    ])
 
     if (outputFormat === 'mp4') {
       command = command.videoCodec('libx264').audioCodec('aac')
@@ -195,4 +194,3 @@ function generateThumbnail(input: string, output: string): Promise<void> {
       .on('error', reject)
   })
 }
-

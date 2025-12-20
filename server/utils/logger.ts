@@ -66,9 +66,7 @@ export function createChildLogger(context: Record<string, unknown>) {
  * Request logger middleware helper
  * Creates a child logger with request context
  */
-export function createRequestLogger(event: {
-  node: { req: { method?: string; url?: string } }
-}) {
+export function createRequestLogger(event: { node: { req: { method?: string; url?: string } } }) {
   return logger.child({
     method: event.node.req.method,
     url: event.node.req.url

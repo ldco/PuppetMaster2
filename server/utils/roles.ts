@@ -55,10 +55,7 @@ export function canManageUsers(userRole: UserRole | undefined): boolean {
  * - Admin can manage admin and editor (not master)
  * - Editor cannot manage anyone
  */
-export function canManageUser(
-  actorRole: UserRole | undefined,
-  targetRole: UserRole
-): boolean {
+export function canManageUser(actorRole: UserRole | undefined, targetRole: UserRole): boolean {
   if (!actorRole) return false
 
   // Master can manage anyone
@@ -140,4 +137,3 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   admin: 'Site owner - can manage content and users',
   editor: 'Content editor - can only edit content'
 }
-

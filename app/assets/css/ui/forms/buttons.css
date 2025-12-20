@@ -200,7 +200,7 @@
 }
 
 .btn-icon.btn-sm {
-  width: 36px;  /* Minimum comfortable touch target for "small" */
+  width: 36px; /* Minimum comfortable touch target for "small" */
   height: 36px;
   padding: var(--space-1);
 }
@@ -210,4 +210,3 @@
   height: 48px;
   padding: var(--space-3);
 }
-

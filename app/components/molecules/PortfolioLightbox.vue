@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Portfolio Lightbox
- * 
+ *
  * Fancy fullscreen lightbox for portfolio images/videos.
  * Features: smooth animations, keyboard navigation, swipe gestures
  */
@@ -54,31 +54,25 @@ onMounted(() => window.addEventListener('keydown', handleKeydown))
 onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 // Lock body scroll and add class when open
-watch(() => props.isOpen, (open) => {
-  document.body.style.overflow = open ? 'hidden' : ''
-  if (open) {
-    document.body.classList.add('lightbox-open')
-  } else {
-    document.body.classList.remove('lightbox-open')
+watch(
+  () => props.isOpen,
+  open => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    if (open) {
+      document.body.classList.add('lightbox-open')
+    } else {
+      document.body.classList.remove('lightbox-open')
+    }
   }
-})
+)
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="lightbox">
-      <div
-        v-if="isOpen && currentItem"
-        class="lightbox"
-        @click.self="emit('close')"
-      >
+      <div v-if="isOpen && currentItem" class="lightbox" @click.self="emit('close')">
         <!-- Close button -->
-        <button
-          type="button"
-          class="lightbox-close"
-          aria-label="Close"
-          @click="emit('close')"
-        >
+        <button type="button" class="lightbox-close" aria-label="Close" @click="emit('close')">
           <IconX />
         </button>
 
@@ -125,9 +119,7 @@ watch(() => props.isOpen, (open) => {
             <p v-if="currentItem.description" class="lightbox-description">
               {{ currentItem.description }}
             </p>
-            <span class="lightbox-counter">
-              {{ currentIndex + 1 }} / {{ items.length }}
-            </span>
+            <span class="lightbox-counter">{{ currentIndex + 1 }} / {{ items.length }}</span>
           </div>
         </div>
       </div>
@@ -142,4 +134,3 @@ watch(() => props.isOpen, (open) => {
   - .lightbox-category, .lightbox-title, .lightbox-description, .lightbox-counter
   - .lightbox-* animation classes
 -->
-

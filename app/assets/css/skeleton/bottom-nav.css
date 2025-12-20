@@ -28,17 +28,17 @@
   height: var(--app-bottom-nav-height, 56px);
   /* Add iOS safe area padding for notch/home indicator */
   padding-block-end: env(safe-area-inset-bottom, 0px);
-  
+
   display: flex;
   justify-content: space-around;
   align-items: center;
-  
+
   background: var(--l-bg-elevated);
   border-block-start: 1px solid var(--l-border);
-  
+
   /* Ensure it's above content but below modals */
   z-index: var(--z-fixed);
-  
+
   /* Smooth animations */
   transition: transform var(--transition-normal) ease;
 }
@@ -80,8 +80,9 @@
   color: var(--t-secondary);
 
   /* Smooth transitions */
-  transition: color var(--transition-normal) ease,
-              background-color var(--transition-normal) ease;
+  transition:
+    color var(--transition-normal) ease,
+    background-color var(--transition-normal) ease;
 
   /* For active indicator positioning */
   position: relative;
@@ -252,4 +253,3 @@
 .slide-up-leave-to {
   transform: translateY(100%);
 }
-

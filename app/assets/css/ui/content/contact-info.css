@@ -84,11 +84,10 @@ a.contact-info-value:focus-visible {
  * RTL SUPPORT
  * ══════════════════════════════════════════════════════════ */
 
-[dir="rtl"] .contact-info-item {
+[dir='rtl'] .contact-info-item {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .contact-info--horizontal .contact-info-list {
+[dir='rtl'] .contact-info--horizontal .contact-info-list {
   flex-direction: row-reverse;
 }
-

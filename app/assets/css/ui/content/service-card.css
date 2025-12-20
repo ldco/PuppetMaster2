@@ -10,8 +10,9 @@
   padding: var(--space-6);
   border-radius: var(--radius-lg);
   border: 1px solid var(--l-border);
-  transition: border-color var(--transition-slow) ease,
-              box-shadow var(--transition-slow) ease;
+  transition:
+    border-color var(--transition-slow) ease,
+    box-shadow var(--transition-slow) ease;
 }
 
 .service-card:hover {
@@ -39,4 +40,3 @@
   color: var(--t-secondary);
   line-height: 1.6;
 }
-

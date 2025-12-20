@@ -15,7 +15,11 @@ definePageMeta({
 const { t } = useI18n()
 
 // Fetch settings
-const { data: settings, pending, refresh } = await useFetch<Record<string, Record<string, string | null>>>('/api/settings')
+const {
+  data: settings,
+  pending,
+  refresh
+} = await useFetch<Record<string, Record<string, string | null>>>('/api/settings')
 
 // Form state - dynamically built from config
 const form = reactive<Record<string, string>>(
@@ -27,7 +31,9 @@ watchEffect(() => {
   if (settings.value) {
     for (const setting of config.settings) {
       const [group, key] = setting.key.split('.')
-      const groupData = group ? (settings.value as Record<string, Record<string, string>>)[group] : undefined
+      const groupData = group
+        ? (settings.value as Record<string, Record<string, string>>)[group]
+        : undefined
       form[setting.key] = (key && groupData?.[key]) || ''
     }
   }
@@ -35,9 +41,9 @@ watchEffect(() => {
 
 // Group settings by their group
 const settingsByGroup = computed(() => {
-  const grouped: Record<string, typeof config.settings[number][]> = {}
+  const grouped: Record<string, (typeof config.settings)[number][]> = {}
   for (const setting of config.settings) {
-    const group = grouped[setting.group] ??= []
+    const group = (grouped[setting.group] ??= [])
     group.push(setting)
   }
   return grouped
@@ -46,11 +52,16 @@ const settingsByGroup = computed(() => {
 // Get input type for setting
 function getInputType(type: string): string {
   switch (type) {
-    case 'email': return 'email'
-    case 'url': return 'url'
-    case 'tel': return 'tel'
-    case 'text': return 'textarea'
-    default: return 'text'
+    case 'email':
+      return 'email'
+    case 'url':
+      return 'url'
+    case 'tel':
+      return 'tel'
+    case 'text':
+      return 'textarea'
+    default:
+      return 'text'
   }
 }
 
@@ -70,7 +81,7 @@ async function saveSettings() {
     })
     saveSuccess.value = true
     await refresh()
-    setTimeout(() => saveSuccess.value = false, 3000)
+    setTimeout(() => (saveSuccess.value = false), 3000)
   } catch (e: any) {
     saveError.value = e.data?.message || 'Failed to save settings'
   } finally {
@@ -135,4 +146,3 @@ async function saveSettings() {
   Uses global CSS classes from admin/index.css:
   - .admin-settings, .section-title, .settings-form, .form-actions
 -->
-

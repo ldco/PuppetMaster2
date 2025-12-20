@@ -13,9 +13,7 @@ const currentYear = new Date().getFullYear()
 
 // Company name for copyright (fallback to 'Puppet Master')
 const companyName = computed(() => {
-  return settings.value?.legal.companyName
-    || settings.value?.seo.title
-    || 'Puppet Master'
+  return settings.value?.legal.companyName || settings.value?.seo.title || 'Puppet Master'
 })
 
 // Legal details (only those with values)
@@ -44,4 +42,3 @@ const legalDetails = computed(() => {
     </template>
   </div>
 </template>
-

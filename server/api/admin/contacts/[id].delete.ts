@@ -7,7 +7,7 @@
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -51,4 +51,3 @@ export default defineEventHandler(async (event) => {
     deleted: { id: parseInt(id) }
   }
 })
-

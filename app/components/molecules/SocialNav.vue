@@ -129,4 +129,3 @@ function getIcon(platform: string): Component | undefined {
     </a>
   </nav>
 </template>
-

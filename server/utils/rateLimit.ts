@@ -93,9 +93,10 @@ export function getClientIp(event: any): string {
   const forwardedFor = event.node?.req?.headers?.['x-forwarded-for']
   if (forwardedFor) {
     // X-Forwarded-For can be comma-separated, first is original client
-    const ip = typeof forwardedFor === 'string'
-      ? forwardedFor.split(',')[0]?.trim()
-      : forwardedFor[0]?.split(',')[0]?.trim()
+    const ip =
+      typeof forwardedFor === 'string'
+        ? forwardedFor.split(',')[0]?.trim()
+        : forwardedFor[0]?.split(',')[0]?.trim()
     if (ip) return ip
   }
 
@@ -111,4 +112,3 @@ export function getClientIp(event: any): string {
 
   return 'unknown'
 }
-

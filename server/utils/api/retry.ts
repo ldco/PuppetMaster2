@@ -5,9 +5,9 @@
 import type { RetryConfig, CircuitBreakerConfig } from './types'
 
 enum CircuitState {
-  CLOSED = 'CLOSED',       // Normal operation
-  OPEN = 'OPEN',           // Failing - reject immediately
-  HALF_OPEN = 'HALF_OPEN', // Testing recovery
+  CLOSED = 'CLOSED', // Normal operation
+  OPEN = 'OPEN', // Failing - reject immediately
+  HALF_OPEN = 'HALF_OPEN' // Testing recovery
 }
 
 export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreakerConfig }) {
@@ -47,10 +47,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
 
         // Don't retry on last attempt
         if (attempt === config.maxAttempts - 1) {
-          console.error(
-            `[Retry] All ${config.maxAttempts} attempts failed for:`,
-            error.message
-          )
+          console.error(`[Retry] All ${config.maxAttempts} attempts failed for:`, error.message)
           break
         }
 
@@ -153,8 +150,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
    * Calculate delay with exponential backoff
    */
   function calculateDelay(attempt: number): number {
-    const delay =
-      config.initialDelay * Math.pow(config.backoffMultiplier, attempt)
+    const delay = config.initialDelay * Math.pow(config.backoffMultiplier, attempt)
     return Math.min(delay, config.maxDelay)
   }
 
@@ -162,7 +158,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
    * Sleep utility
    */
   function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   /**
@@ -172,7 +168,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
     return {
       circuitState,
       failureCount,
-      nextAttemptAt: nextAttemptAt ? new Date(nextAttemptAt) : null,
+      nextAttemptAt: nextAttemptAt ? new Date(nextAttemptAt) : null
     }
   }
 
@@ -189,6 +185,6 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
   return {
     execute,
     getState,
-    reset,
+    reset
   }
 }

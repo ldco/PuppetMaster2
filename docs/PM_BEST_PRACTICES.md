@@ -9,12 +9,15 @@ Quick reference for development standards and conventions.
 ## CSS Rules
 
 ### 1. NO Scoped Styles in Components
+
 **CRITICAL**: Never use `<style scoped>` in Vue components.
 
 ```vue
 <!-- ❌ WRONG -->
 <style scoped>
-.footer { padding: 1rem; }
+.footer {
+  padding: 1rem;
+}
 </style>
 
 <!-- ✅ CORRECT -->
@@ -25,6 +28,7 @@ Quick reference for development standards and conventions.
 **Exception**: Scoped styles are ONLY allowed for custom sections on client sites with heavy custom graphics.
 
 ### 2. Use CSS Variables Only
+
 Never hardcode values. Always use variables from our CSS system.
 
 ```css
@@ -40,17 +44,19 @@ color: var(--l-text-muted);
 ```
 
 ### 3. One File Per Component (Modular CSS)
+
 Each CSS component has its own dedicated file. This makes customization easy:
 
-| Component | File Location |
-|-----------|---------------|
-| Admin sidebar | `layout/admin-sidebar.css` |
-| Admin header | `layout/admin-header.css` |
-| Icon sizes | `common/icons.css` |
-| Text utilities | `common/text.css` |
-| Tab component | `ui/content/tabs.css` |
+| Component      | File Location              |
+| -------------- | -------------------------- |
+| Admin sidebar  | `layout/admin-sidebar.css` |
+| Admin header   | `layout/admin-header.css`  |
+| Icon sizes     | `common/icons.css`         |
+| Text utilities | `common/text.css`          |
+| Tab component  | `ui/content/tabs.css`      |
 
 ### 4. Responsive Rules in Same File
+
 Keep base styles and media queries together in the same file:
 
 ```css
@@ -78,20 +84,23 @@ Keep base styles and media queries together in the same file:
 ```
 
 ### 5. CSS Layers
+
 Use `@layer` for cascade control:
+
 ```css
 @layer reset, primitives, semantic, components, utilities;
 ```
 
-| Layer | Purpose |
-|-------|---------|
-| `reset` | Browser normalize |
-| `primitives` | Raw tokens (colors, fonts) |
-| `semantic` | Calculated values |
-| `components` | UI styling |
-| `utilities` | Override helpers (highest priority) |
+| Layer        | Purpose                             |
+| ------------ | ----------------------------------- |
+| `reset`      | Browser normalize                   |
+| `primitives` | Raw tokens (colors, fonts)          |
+| `semantic`   | Calculated values                   |
+| `components` | UI styling                          |
+| `utilities`  | Override helpers (highest priority) |
 
 ### 6. Use Logical Properties for RTL
+
 Always use CSS logical properties for RTL language support:
 
 ```css
@@ -111,17 +120,20 @@ padding-inline-end: 2rem;
 ## Component Architecture
 
 ### Atomic Design
+
 - **Atoms**: Smallest pieces (Logo, NavLink, ThemeToggle)
 - **Molecules**: Composed atoms (NavLinks, SocialNav, HeaderActions)
 - **Organisms**: Complete sections (TheHeader, TheFooter, MobileNav)
 - **Templates**: Smart switchers (TheHeader choosing Desktop/Mobile)
 
 ### Logo System
+
 - `headerLogo` - Full horizontal logo for header
 - `shortLogo` - Compact circle/icon for sidebar, footer, narrow spaces
 - NOT "mobileLogo" - the term is `shortLogo`
 
 ### Navigation Config
+
 - `verticalNav` - Site vertical navigation (mobile menu)
 - `adminVerticalNav` - Admin panel sidebar navigation
 - Both support narrow icon sidebar with hover tooltips
@@ -130,14 +142,14 @@ padding-inline-end: 2rem;
 
 ## CSS Units Strategy
 
-| Use Case | Unit | Example |
-|----------|------|---------|
-| Fixed Spacing | `rem` | `max-width: 62.5rem` |
+| Use Case         | Unit      | Example                                      |
+| ---------------- | --------- | -------------------------------------------- |
+| Fixed Spacing    | `rem`     | `max-width: 62.5rem`                         |
 | Fluid Typography | `clamp()` | `font-size: clamp(1rem, 1rem + 1vw, 1.5rem)` |
-| Borders | `px` | `border: 1px solid` |
-| Viewport Heights | `dvh` | `height: 100dvh` |
-| Line Height | unitless | `line-height: 1.5` |
-| CSS Variables | tokens | `padding: var(--space-4)` |
+| Borders          | `px`      | `border: 1px solid`                          |
+| Viewport Heights | `dvh`     | `height: 100dvh`                             |
+| Line Height      | unitless  | `line-height: 1.5`                           |
+| CSS Variables    | tokens    | `padding: var(--space-4)`                    |
 
 ---
 
@@ -145,17 +157,19 @@ padding-inline-end: 2rem;
 
 Two sources of truth:
 
-| Type | Source | Editable by Client |
-|------|--------|-------------------|
-| **SYSTEM** | `i18n/system.ts` | ❌ Never |
-| **CONTENT** | Database | ✅ Via Admin Panel |
+| Type        | Source           | Editable by Client |
+| ----------- | ---------------- | ------------------ |
+| **SYSTEM**  | `i18n/system.ts` | ❌ Never           |
+| **CONTENT** | Database         | ✅ Via Admin Panel |
 
 **System translations** (developer-only):
+
 - Prefixes: `common.*`, `nav.*`, `auth.*`, `admin.*`, `theme.*`, `footer.*`, `validation.*`
 - Version controlled in git
 - NOT visible in Admin Panel
 
 **Content translations** (client-editable):
+
 - Prefixes: `hero.*`, `about.*`, `portfolio.*`, `services.*`, `contact.*`, `seo.*`, `cta.*`
 - Defaults in `i18n/content.ts` → seeded to database
 - Client edits via Admin Panel
@@ -166,11 +180,11 @@ See `docs/USAGE.md` for full workflow.
 
 ## Config-Driven Philosophy
 
-| Layer | Defined By | Entered By |
-|-------|------------|------------|
-| Structure/Schema | Developer | - |
-| Behavior/Features | Developer | - |
-| Content/Values | - | Client via Admin |
+| Layer             | Defined By | Entered By       |
+| ----------------- | ---------- | ---------------- |
+| Structure/Schema  | Developer  | -                |
+| Behavior/Features | Developer  | -                |
+| Content/Values    | -          | Client via Admin |
 
 The developer defines WHICH settings exist. The client enters VALUES.
 
@@ -179,6 +193,7 @@ The developer defines WHICH settings exist. The client enters VALUES.
 ## Git Commit Messages
 
 Use conventional commits format:
+
 ```
 <type>(<scope>): <description>
 
@@ -186,6 +201,7 @@ Use conventional commits format:
 ```
 
 ### Types
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `refactor` - Code change (no new feature, no bug fix)
@@ -195,6 +211,7 @@ Use conventional commits format:
 - `perf` - Performance improvement
 
 ### Examples
+
 ```
 feat(footer): add responsive grid layout
 fix(i18n): add missing footer translation keys
@@ -218,34 +235,35 @@ docs: add PM_BEST_PRACTICES.md
 
 ### 4 Application Modes
 
-| Mode | Website | App |
-|------|---------|-----|
-| `app-only` | ❌ | ✅ App mode |
-| `website-app` | ✅ Website mode | ✅ App mode (login visible) |
+| Mode            | Website         | App                              |
+| --------------- | --------------- | -------------------------------- |
+| `app-only`      | ❌              | ✅ App mode                      |
+| `website-app`   | ✅ Website mode | ✅ App mode (login visible)      |
 | `website-admin` | ✅ Website mode | ✅ App mode (hidden at `/admin`) |
-| `website-only` | ✅ Website mode | ❌ |
+| `website-only`  | ✅ Website mode | ❌                               |
 
 ### Visual Modes
 
-| Mode | Desktop | Mobile |
-|------|---------|--------|
+| Mode        | Desktop           | Mobile         |
+| ----------- | ----------------- | -------------- |
 | **Website** | Horizontal header | Hamburger menu |
-| **App** | Vertical sidebar | Bottom nav bar |
+| **App**     | Vertical sidebar  | Bottom nav bar |
 
 **Key:** Admin panel IS app mode - not a separate thing.
 
 ### Website Sub-Modes
 
-| Mode | Navigation |
-|------|------------|
+| Mode     | Navigation                                  |
+| -------- | ------------------------------------------- |
 | Onepager | Scroll-based anchors (`#about`, `#contact`) |
-| SPA | Route-based (`/about`, `/contact`) |
+| SPA      | Route-based (`/about`, `/contact`)          |
 
 ---
 
 ## Code Review Mindset
 
 When analyzing code, act like a senior dev:
+
 - Flag redundancy as PROBLEMS
 - Flag over-engineering as PROBLEMS
 - Flag duplicate implementations as PROBLEMS
@@ -274,6 +292,7 @@ server/api/
 ```
 
 **Conventions:**
+
 - Use folders for resource grouping
 - File suffix indicates HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`
 - `[id]` for dynamic parameters
@@ -297,7 +316,7 @@ const CreatePortfolioSchema = z.object({
   published: z.boolean().default(false)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   const validated = CreatePortfolioSchema.parse(body)
   // ... create in database
@@ -311,7 +330,7 @@ Use transactions for multi-step operations:
 ```typescript
 import { db } from '~/server/database/client'
 
-await db.transaction(async (tx) => {
+await db.transaction(async tx => {
   await tx.insert(portfolioItems).values(item)
   await tx.update(settings).set({ lastUpdated: new Date() })
 })
@@ -374,10 +393,10 @@ In Vue templates, `{{ }}` auto-escapes. Use `v-html` only with sanitized content
 
 ### Input Validation
 
-| Location | Method | Purpose |
-|----------|--------|---------|
-| Client | HTML5 `required`, `pattern` | UX feedback only |
-| Server | Zod schemas | **Security** - never trust client |
+| Location | Method                      | Purpose                           |
+| -------- | --------------------------- | --------------------------------- |
+| Client   | HTML5 `required`, `pattern` | UX feedback only                  |
+| Server   | Zod schemas                 | **Security** - never trust client |
 
 ```typescript
 // Always validate on server, even if client validated
@@ -393,7 +412,7 @@ const schema = z.object({
 // Protect admin routes with middleware
 // server/middleware/auth.ts
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(event => {
   const path = getRequestURL(event).pathname
 
   if (path.startsWith('/api/admin')) {
@@ -407,11 +426,11 @@ export default defineEventHandler((event) => {
 
 ### Secrets Management
 
-| Secret | Location | Never In |
-|--------|----------|----------|
-| Database credentials | `.env` | Code, git |
-| API keys | `.env` | Code, git, client |
-| Session secret | `.env` | Code, git |
+| Secret               | Location | Never In          |
+| -------------------- | -------- | ----------------- |
+| Database credentials | `.env`   | Code, git         |
+| API keys             | `.env`   | Code, git, client |
+| Session secret       | `.env`   | Code, git         |
 
 ```bash
 # .env (never commit)
@@ -430,6 +449,7 @@ TELEGRAM_BOT_TOKEN=
 ### Environment Variables
 
 **Naming convention:**
+
 ```bash
 # Service prefixes
 DB_*          # Database
@@ -489,6 +509,7 @@ export default defineEventHandler(() => ({
 ```
 
 Configure in `deploy.yml`:
+
 ```yaml
 healthcheck:
   path: /api/health
@@ -513,6 +534,7 @@ Always show loading feedback:
 ```
 
 Use skeleton loaders for content:
+
 ```vue
 <LoadingCard v-if="isLoading" />
 <PortfolioCard v-else :item="item" />
@@ -544,19 +566,21 @@ async function handleSave() {
 
 ### Form Validation Feedback
 
-| State | Visual |
-|-------|--------|
-| Pristine | Normal border |
+| State             | Visual                     |
+| ----------------- | -------------------------- |
+| Pristine          | Normal border              |
 | Invalid + touched | Red border + error message |
-| Valid | Green border (optional) |
-| Submitting | Disabled + spinner |
+| Valid             | Green border (optional)    |
+| Submitting        | Disabled + spinner         |
 
 ### Mobile Touch Targets
 
 Minimum touch target: **44x44px**
 
 ```css
-.button, .nav-link, .icon-button {
+.button,
+.nav-link,
+.icon-button {
   min-height: 44px;
   min-width: 44px;
 }
@@ -586,10 +610,10 @@ Use confirm dialogs for destructive actions:
 const { confirm } = useConfirm()
 
 async function handleDelete(item) {
-  const confirmed = await confirm(
-    `Delete "${item.title}"? This cannot be undone.`,
-    { variant: 'danger', confirmText: 'Delete' }
-  )
+  const confirmed = await confirm(`Delete "${item.title}"? This cannot be undone.`, {
+    variant: 'danger',
+    confirmText: 'Delete'
+  })
   if (confirmed) {
     await deleteItem(item.id)
   }
@@ -602,11 +626,11 @@ async function handleDelete(item) {
 
 ### When to Use What
 
-| State Type | Solution | Example |
-|------------|----------|---------|
-| Component-local | `ref()` | Form inputs, open/closed |
-| Shared simple | `useState()` | Auth user, locale |
-| Complex/persisted | Pinia store | Admin UI, portfolio CRUD |
+| State Type        | Solution     | Example                  |
+| ----------------- | ------------ | ------------------------ |
+| Component-local   | `ref()`      | Form inputs, open/closed |
+| Shared simple     | `useState()` | Auth user, locale        |
+| Complex/persisted | Pinia store  | Admin UI, portfolio CRUD |
 
 ### Pinia Store Pattern (Composition API)
 
@@ -652,6 +676,7 @@ types/
 ```
 
 Import from central location:
+
 ```typescript
 import type { User, SiteSettings } from '~/types'
 ```

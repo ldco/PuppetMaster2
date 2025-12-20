@@ -12,9 +12,7 @@ const { t } = useI18n()
 // Page meta with translations
 useHead({
   title: t('seo.homeTitle'),
-  meta: [
-    { name: 'description', content: t('seo.homeDescription') }
-  ]
+  meta: [{ name: 'description', content: t('seo.homeDescription') }]
 })
 </script>
 
@@ -33,7 +31,7 @@ useHead({
     <SectionsSectionAbout>
       <template #title>{{ t('about.title') }}</template>
       <p>{{ t('about.paragraph1') }}</p>
-      <p style="margin-top: var(--space-4);">{{ t('about.paragraph2') }}</p>
+      <p style="margin-top: var(--space-4)">{{ t('about.paragraph2') }}</p>
     </SectionsSectionAbout>
 
     <!-- Portfolio Section -->
@@ -43,10 +41,6 @@ useHead({
     <SectionsSectionServices :title="t('services.title')" />
 
     <!-- Contact Section -->
-    <SectionsSectionContact
-      :title="t('contact.title')"
-      show-info
-    />
+    <SectionsSectionContact :title="t('contact.title')" show-info />
   </div>
 </template>
-

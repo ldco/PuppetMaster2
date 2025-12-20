@@ -5,13 +5,16 @@
  * Displays placeholder lines mimicking text content.
  * Automatically varies line widths for realistic appearance.
  */
-withDefaults(defineProps<{
-  lines?: number
-  lastLineWidth?: string
-}>(), {
-  lines: 3,
-  lastLineWidth: '70%'
-})
+withDefaults(
+  defineProps<{
+    lines?: number
+    lastLineWidth?: string
+  }>(),
+  {
+    lines: 3,
+    lastLineWidth: '70%'
+  }
+)
 </script>
 
 <template>

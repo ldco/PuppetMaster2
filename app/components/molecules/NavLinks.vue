@@ -26,9 +26,7 @@ const emit = defineEmits<{
 
 // Get section IDs for scrollspy
 const sectionIds = computed(() =>
-  (config.sections as readonly Section[])
-    .filter((s: Section) => s.inNav)
-    .map((s: Section) => s.id)
+  (config.sections as readonly Section[]).filter((s: Section) => s.inNav).map((s: Section) => s.id)
 )
 
 // Scrollspy for onepager mode - detects which section is in view
@@ -82,4 +80,3 @@ const navLinks = computed(() => {
 </template>
 
 <!-- No scoped styles needed - uses skeleton/nav.css -->
-

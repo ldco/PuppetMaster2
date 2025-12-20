@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * HamburgerIcon Atom
- * 
+ *
  * Animated hamburger menu icon.
  * Uses hamburgers.css library (Jonathan Suh).
  */
@@ -38,4 +38,3 @@ const emit = defineEmits<{
   - .hamburger, .hamburger--squeeze, .is-active
   - .hamburger-box, .hamburger-inner
 -->
-

@@ -10,29 +10,18 @@
  * - Sends Telegram notification to admin (if bot configured)
  */
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
 import { sendContactConfirmation } from '../../utils/email'
 import { notifyNewContact } from '../../utils/telegram'
 import { contactRateLimiter } from '../../utils/rateLimit'
 import { escapeHtml } from '../../utils/sanitize'
 import { logger } from '../../utils/logger'
+import { contactSchema } from '../../utils/validation'
 import config from '~~/app/puppet-master.config'
 
-// Validation schema
-const contactSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email().max(255),
-  phone: z.string().max(30).optional(),
-  subject: z.string().max(200).optional(),
-  message: z.string().min(10).max(5000)
-})
-
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Get client IP for rate limiting
-  const ip = getHeader(event, 'x-forwarded-for') ||
-             getHeader(event, 'x-real-ip') ||
-             'unknown'
+  const ip = getHeader(event, 'x-forwarded-for') || getHeader(event, 'x-real-ip') || 'unknown'
 
   // Check rate limit
   if (!contactRateLimiter.checkRateLimit(ip)) {
@@ -98,8 +87,11 @@ export default defineEventHandler(async (event) => {
       .get()
     const siteName = companyNameSetting?.value || seoTitleSetting?.value || 'Puppet Master'
 
-    sendContactConfirmation(data.email, data.name, siteName).catch((e: any) => {
-      logger.error('Email notification failed', { error: e?.message || String(e) })
+    sendContactConfirmation(data.email, data.name, siteName).catch((e: unknown) => {
+      logger.error(
+        { error: e instanceof Error ? e.message : String(e) },
+        'Email notification failed'
+      )
     })
   }
 
@@ -110,8 +102,11 @@ export default defineEventHandler(async (event) => {
       email: data.email,
       phone: data.phone,
       message: data.message
-    }).catch((e: any) => {
-      logger.error('Telegram notification failed', { error: e?.message || String(e) })
+    }).catch((e: unknown) => {
+      logger.error(
+        { error: e instanceof Error ? e.message : String(e) },
+        'Telegram notification failed'
+      )
     })
   }
 
@@ -121,4 +116,3 @@ export default defineEventHandler(async (event) => {
     id: submission.id
   }
 })
-

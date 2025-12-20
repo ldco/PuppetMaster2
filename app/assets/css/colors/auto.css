@@ -28,7 +28,7 @@
   /* ══════════════════════════════════════════════════════════
    * LAYOUT COLORS (l-)
    * ══════════════════════════════════════════════════════════ */
-  
+
   /* Backgrounds */
   --l-bg: light-dark(var(--p-white), var(--p-black));
   --l-bg-elevated: light-dark(
@@ -39,7 +39,7 @@
     color-mix(in oklch, var(--p-white), var(--p-black) 6%),
     color-mix(in oklch, var(--p-black), var(--p-white) 2%)
   );
-  
+
   /* Borders */
   --l-border: light-dark(
     color-mix(in oklch, var(--p-black), transparent 88%),
@@ -49,11 +49,11 @@
     color-mix(in oklch, var(--p-black), transparent 75%),
     color-mix(in oklch, var(--p-white), transparent 70%)
   );
-  
+
   /* ══════════════════════════════════════════════════════════
    * TEXT COLORS (t-)
    * ══════════════════════════════════════════════════════════ */
-  
+
   --t-primary: light-dark(var(--p-black), var(--p-white));
   --t-secondary: light-dark(
     color-mix(in oklch, var(--p-black), transparent 35%),
@@ -65,7 +65,7 @@
   );
   --t-on-brand: var(--p-white);
   --t-on-accent: var(--p-white);
-  
+
   /* ══════════════════════════════════════════════════════════
    * INTERACTIVE COLORS (i-)
    * ══════════════════════════════════════════════════════════
@@ -102,34 +102,22 @@
    * DATA/SEMANTIC COLORS (d-)
    * Uses OKLCH to derive from brand hue for harmony
    * ══════════════════════════════════════════════════════════ */
-  
+
   /* Success - green (hue 145) */
   --d-success: oklch(65% 0.2 145);
-  --d-success-bg: light-dark(
-    oklch(95% 0.05 145),
-    oklch(25% 0.05 145)
-  );
-  
+  --d-success-bg: light-dark(oklch(95% 0.05 145), oklch(25% 0.05 145));
+
   /* Warning - yellow/orange (hue 85) */
   --d-warning: oklch(75% 0.15 85);
-  --d-warning-bg: light-dark(
-    oklch(95% 0.05 85),
-    oklch(25% 0.05 85)
-  );
-  
+  --d-warning-bg: light-dark(oklch(95% 0.05 85), oklch(25% 0.05 85));
+
   /* Error - red (hue 25) */
   --d-error: oklch(60% 0.22 25);
-  --d-error-bg: light-dark(
-    oklch(95% 0.05 25),
-    oklch(25% 0.05 25)
-  );
-  
+  --d-error-bg: light-dark(oklch(95% 0.05 25), oklch(25% 0.05 25));
+
   /* Info - blue (hue 250) */
   --d-info: oklch(60% 0.18 250);
-  --d-info-bg: light-dark(
-    oklch(95% 0.05 250),
-    oklch(25% 0.05 250)
-  );
+  --d-info-bg: light-dark(oklch(95% 0.05 250), oklch(25% 0.05 250));
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -140,4 +128,3 @@ body {
   background-color: var(--l-bg);
   color: var(--t-primary);
 }
-

@@ -22,25 +22,43 @@
  * MARGIN UTILITIES
  * ══════════════════════════════════════════════════════════ */
 
-.mb-2 { margin-block-end: var(--space-2); }
-.mb-4 { margin-block-end: var(--space-4); }
-.mb-6 { margin-block-end: var(--space-6); }
-.mt-4 { margin-block-start: var(--space-4); }
-.mt-6 { margin-block-start: var(--space-6); }
-.mx-auto { margin-inline: auto; }
+.mb-2 {
+  margin-block-end: var(--space-2);
+}
+.mb-4 {
+  margin-block-end: var(--space-4);
+}
+.mb-6 {
+  margin-block-end: var(--space-6);
+}
+.mt-4 {
+  margin-block-start: var(--space-4);
+}
+.mt-6 {
+  margin-block-start: var(--space-6);
+}
+.mx-auto {
+  margin-inline: auto;
+}
 
 /* ══════════════════════════════════════════════════════════
  * BORDER UTILITIES
  * ══════════════════════════════════════════════════════════ */
 
-.border-b { border-block-end: 1px solid var(--l-border); }
-.border-t { border-block-start: 1px solid var(--l-border); }
+.border-b {
+  border-block-end: 1px solid var(--l-border);
+}
+.border-t {
+  border-block-start: 1px solid var(--l-border);
+}
 
 /* ══════════════════════════════════════════════════════════
  * BACKGROUND UTILITIES
  * ══════════════════════════════════════════════════════════ */
 
-.bg-brand-subtle { background: var(--i-brand-subtle); }
+.bg-brand-subtle {
+  background: var(--i-brand-subtle);
+}
 
 /* ══════════════════════════════════════════════════════════
  * GENERIC ITEM GRID - Reusable admin grid pattern
@@ -120,4 +138,3 @@
   border-block-start: 1px solid var(--l-border);
   background: var(--l-bg);
 }
-

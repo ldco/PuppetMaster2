@@ -67,9 +67,9 @@ async function handleSubmit() {
       <!-- Logo - using circle variant for auth pages - ClientOnly for SSR -->
       <div class="auth-logo">
         <ClientOnly>
-          <img :src="shortLogo" alt="Logo" class="auth-logo-img">
+          <img :src="shortLogo" alt="Logo" class="auth-logo-img" />
           <template #fallback>
-            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img">
+            <img :src="ssrFallbackLogo" alt="Logo" class="auth-logo-img" />
           </template>
         </ClientOnly>
       </div>
@@ -78,7 +78,11 @@ async function handleSubmit() {
       <h1 class="auth-title">Admin {{ t('auth.login') }}</h1>
 
       <!-- Error Message -->
-      <div v-if="errorMessage" class="form-error" style="text-align: center; margin-block-end: var(--space-4);">
+      <div
+        v-if="errorMessage"
+        class="form-error"
+        style="text-align: center; margin-block-end: var(--space-4)"
+      >
         {{ errorMessage }}
       </div>
 
@@ -96,7 +100,7 @@ async function handleSubmit() {
               class="input"
               autocomplete="email"
               required
-            >
+            />
           </div>
         </div>
 
@@ -112,13 +116,13 @@ async function handleSubmit() {
               class="input"
               autocomplete="current-password"
               required
-            >
+            />
           </div>
         </div>
 
         <!-- Remember me -->
         <label class="checkbox">
-          <input v-model="rememberMe" type="checkbox">
+          <input v-model="rememberMe" type="checkbox" />
           <span>{{ t('auth.rememberMe') }}</span>
         </label>
 
@@ -131,11 +135,8 @@ async function handleSubmit() {
 
       <!-- Back to site link (only for website-admin mode) -->
       <div class="auth-footer">
-        <NuxtLink to="/" class="auth-link">
-          ← Back to website
-        </NuxtLink>
+        <NuxtLink to="/" class="auth-link">← Back to website</NuxtLink>
       </div>
     </div>
   </div>
 </template>
-

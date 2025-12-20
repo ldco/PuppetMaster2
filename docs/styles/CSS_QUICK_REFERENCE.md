@@ -8,20 +8,30 @@ Quick lookup for PuppetMaster CSS classes and variables.
 
 ```html
 <!-- Padding -->
-<div class="p-1">...</div>     <!-- 0.25rem (4px) -->
-<div class="p-2">...</div>     <!-- 0.5rem (8px) -->
-<div class="p-4">...</div>     <!-- 1rem (16px) -->
-<div class="px-4">...</div>    <!-- padding-inline: 1rem -->
-<div class="py-4">...</div>    <!-- padding-block: 1rem -->
+<div class="p-1">...</div>
+<!-- 0.25rem (4px) -->
+<div class="p-2">...</div>
+<!-- 0.5rem (8px) -->
+<div class="p-4">...</div>
+<!-- 1rem (16px) -->
+<div class="px-4">...</div>
+<!-- padding-inline: 1rem -->
+<div class="py-4">...</div>
+<!-- padding-block: 1rem -->
 
 <!-- Margin -->
-<div class="m-4">...</div>     <!-- 1rem all sides -->
-<div class="mx-auto">...</div> <!-- margin-inline: auto (center) -->
-<div class="mt-4">...</div>    <!-- margin-block-start: 1rem -->
+<div class="m-4">...</div>
+<!-- 1rem all sides -->
+<div class="mx-auto">...</div>
+<!-- margin-inline: auto (center) -->
+<div class="mt-4">...</div>
+<!-- margin-block-start: 1rem -->
 
 <!-- Gap (for flex/grid) -->
-<div class="gap-2">...</div>   <!-- gap: 0.5rem -->
-<div class="gap-4">...</div>   <!-- gap: 1rem -->
+<div class="gap-2">...</div>
+<!-- gap: 0.5rem -->
+<div class="gap-4">...</div>
+<!-- gap: 1rem -->
 ```
 
 ---
@@ -29,14 +39,22 @@ Quick lookup for PuppetMaster CSS classes and variables.
 ## Flexbox Classes
 
 ```html
-<div class="flex">...</div>              <!-- display: flex -->
-<div class="flex-col">...</div>          <!-- flex-direction: column -->
-<div class="items-center">...</div>      <!-- align-items: center -->
-<div class="justify-center">...</div>    <!-- justify-content: center -->
-<div class="justify-between">...</div>   <!-- justify-content: space-between -->
-<div class="flex-wrap">...</div>         <!-- flex-wrap: wrap -->
-<div class="flex-1">...</div>            <!-- flex: 1 -->
-<div class="shrink-0">...</div>          <!-- flex-shrink: 0 -->
+<div class="flex">...</div>
+<!-- display: flex -->
+<div class="flex-col">...</div>
+<!-- flex-direction: column -->
+<div class="items-center">...</div>
+<!-- align-items: center -->
+<div class="justify-center">...</div>
+<!-- justify-content: center -->
+<div class="justify-between">...</div>
+<!-- justify-content: space-between -->
+<div class="flex-wrap">...</div>
+<!-- flex-wrap: wrap -->
+<div class="flex-1">...</div>
+<!-- flex: 1 -->
+<div class="shrink-0">...</div>
+<!-- flex-shrink: 0 -->
 ```
 
 ---
@@ -44,11 +62,16 @@ Quick lookup for PuppetMaster CSS classes and variables.
 ## Grid Classes
 
 ```html
-<div class="grid">...</div>              <!-- display: grid -->
-<div class="grid-cols-2">...</div>       <!-- 2 columns -->
-<div class="grid-cols-3">...</div>       <!-- 3 columns -->
-<div class="grid-cols-4">...</div>       <!-- 4 columns -->
-<div class="grid-auto-fit">...</div>     <!-- auto-fit responsive -->
+<div class="grid">...</div>
+<!-- display: grid -->
+<div class="grid-cols-2">...</div>
+<!-- 2 columns -->
+<div class="grid-cols-3">...</div>
+<!-- 3 columns -->
+<div class="grid-cols-4">...</div>
+<!-- 4 columns -->
+<div class="grid-auto-fit">...</div>
+<!-- auto-fit responsive -->
 ```
 
 ---
@@ -57,12 +80,18 @@ Quick lookup for PuppetMaster CSS classes and variables.
 
 ```html
 <!-- Sizes -->
-<span class="text-xs">...</span>    <!-- 0.75rem -->
-<span class="text-sm">...</span>    <!-- 0.875rem -->
-<span class="text-base">...</span>  <!-- 1rem -->
-<span class="text-lg">...</span>    <!-- 1.125rem -->
-<span class="text-xl">...</span>    <!-- 1.25rem -->
-<span class="text-2xl">...</span>   <!-- 1.5rem -->
+<span class="text-xs">...</span>
+<!-- 0.75rem -->
+<span class="text-sm">...</span>
+<!-- 0.875rem -->
+<span class="text-base">...</span>
+<!-- 1rem -->
+<span class="text-lg">...</span>
+<!-- 1.125rem -->
+<span class="text-xl">...</span>
+<!-- 1.25rem -->
+<span class="text-2xl">...</span>
+<!-- 1.5rem -->
 
 <!-- Alignment -->
 <p class="text-center">...</p>
@@ -70,10 +99,13 @@ Quick lookup for PuppetMaster CSS classes and variables.
 <p class="text-end">...</p>
 
 <!-- Utilities -->
-<span class="truncate">...</span>        <!-- Ellipsis overflow -->
-<span class="line-clamp-2">...</span>    <!-- Max 2 lines -->
+<span class="truncate">...</span>
+<!-- Ellipsis overflow -->
+<span class="line-clamp-2">...</span>
+<!-- Max 2 lines -->
 <span class="font-bold">...</span>
-<span class="text-muted">...</span>      <!-- Muted color -->
+<span class="text-muted">...</span>
+<!-- Muted color -->
 ```
 
 ---
@@ -81,12 +113,18 @@ Quick lookup for PuppetMaster CSS classes and variables.
 ## Icon Classes
 
 ```html
-<IconSettings class="icon-xs" />   <!-- 0.75rem -->
-<IconSettings class="icon-sm" />   <!-- 1rem -->
-<IconSettings class="icon-md" />   <!-- 1.25rem -->
-<IconSettings class="icon-lg" />   <!-- 1.5rem -->
-<IconSettings class="icon-xl" />   <!-- 2rem -->
-<IconSettings class="icon-2xl" />  <!-- 2.5rem -->
+<IconSettings class="icon-xs" />
+<!-- 0.75rem -->
+<IconSettings class="icon-sm" />
+<!-- 1rem -->
+<IconSettings class="icon-md" />
+<!-- 1.25rem -->
+<IconSettings class="icon-lg" />
+<!-- 1.5rem -->
+<IconSettings class="icon-xl" />
+<!-- 2rem -->
+<IconSettings class="icon-2xl" />
+<!-- 2.5rem -->
 ```
 
 ---
@@ -95,17 +133,23 @@ Quick lookup for PuppetMaster CSS classes and variables.
 
 ```html
 <!-- Containers -->
-<div class="container">...</div>         <!-- Max-width centered -->
-<div class="container-narrow">...</div>  <!-- Narrower width -->
-<div class="container-wide">...</div>    <!-- Wider width -->
+<div class="container">...</div>
+<!-- Max-width centered -->
+<div class="container-narrow">...</div>
+<!-- Narrower width -->
+<div class="container-wide">...</div>
+<!-- Wider width -->
 
 <!-- Sections -->
-<section class="section">...</section>   <!-- Full-height section -->
+<section class="section">...</section>
+<!-- Full-height section -->
 <section class="section-hero">...</section>
 
 <!-- Display -->
-<div class="hidden">...</div>            <!-- display: none -->
-<div class="block">...</div>             <!-- display: block -->
+<div class="hidden">...</div>
+<!-- display: none -->
+<div class="block">...</div>
+<!-- display: block -->
 ```
 
 ---
@@ -116,7 +160,9 @@ Quick lookup for PuppetMaster CSS classes and variables.
 <!-- Inputs -->
 <input class="input" />
 <textarea class="input"></textarea>
-<select class="input">...</select>
+<select class="input">
+  ...
+</select>
 
 <!-- Buttons -->
 <button class="btn">Default</button>

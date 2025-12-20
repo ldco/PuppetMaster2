@@ -474,10 +474,7 @@ export function isSystemKey(key: string): boolean {
 /**
  * Flatten nested object to dot-notation keys
  */
-export function flattenTranslations(
-  obj: Record<string, any>,
-  prefix = ''
-): Record<string, string> {
+export function flattenTranslations(obj: Record<string, any>, prefix = ''): Record<string, string> {
   const result: Record<string, string> = {}
 
   for (const [key, value] of Object.entries(obj)) {
@@ -508,4 +505,3 @@ export function getSystemTranslationsFlat(locale: string): Record<string, string
 export function getSystemTranslations(locale: string): Record<string, any> {
   return systemTranslations[locale] ?? systemTranslations['en'] ?? {}
 }
-

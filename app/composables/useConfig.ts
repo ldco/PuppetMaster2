@@ -26,10 +26,10 @@ export function useConfig() {
     mode: config.mode as AppMode,
 
     // Mode-derived booleans (for conditional rendering)
-    hasWebsite: config.hasWebsite,         // Has public website (all except app-only)
-    hasAdmin: config.hasAdmin,             // Has admin panel (all except website-only)
+    hasWebsite: config.hasWebsite, // Has public website (all except app-only)
+    hasAdmin: config.hasAdmin, // Has admin panel (all except website-only)
     hasLoginButton: config.hasLoginButton, // Show login button in header (website-app only)
-    isAppPrimary: config.isAppPrimary,     // Admin is the main app (app-only, website-app)
+    isAppPrimary: config.isAppPrimary, // Admin is the main app (app-only, website-app)
     isWebsitePrimary: config.isWebsitePrimary, // Website is the main app (website-admin, website-only)
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -40,7 +40,7 @@ export function useConfig() {
     // Website features
     isMultiLang: config.isMultiLang,
     hasThemeToggle: config.hasThemeToggle,
-    isOnepager: config.useOnepager,              // Combined: hasWebsite && onepager
+    isOnepager: config.useOnepager, // Combined: hasWebsite && onepager
     hasInteractiveHeader: config.useInteractiveHeader, // Combined: hasWebsite && interactiveHeader
     hideHeaderOnScroll: config.features.hideHeaderOnScroll,
 
@@ -60,4 +60,3 @@ export function useConfig() {
     config
   }
 }
-

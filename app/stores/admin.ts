@@ -34,9 +34,7 @@ export const useAdminStore = defineStore('admin', () => {
 
   const hasUnsavedChanges = computed(() => unsavedChanges.value)
 
-  const sidebarWidth = computed(() =>
-    sidebarCollapsed.value ? '64px' : '240px'
-  )
+  const sidebarWidth = computed(() => (sidebarCollapsed.value ? '64px' : '240px'))
 
   // ═══════════════════════════════════════════════════════════════
   // ACTIONS

@@ -30,6 +30,7 @@
 A **config-driven studio toolkit/framework** for building client websites quickly and robustly. Pure CSS architecture (no Tailwind), with Nuxt 4 for full-stack capabilities.
 
 > ### 🎯 MOTTO
+>
 > **"The config file is the developer's best friend!"**
 >
 > Developer defines **structure, schema, and behavior** in config.
@@ -37,27 +38,27 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ### Primary Use Cases
 
-| Type | Description |
-|------|-------------|
-| Landing Pages | Single-page marketing sites |
+| Type            | Description                       |
+| --------------- | --------------------------------- |
+| Landing Pages   | Single-page marketing sites       |
 | Portfolio Sites | Multi-page with project galleries |
-| Business Sites | Company sites with contact forms |
-| Small Apps | Simple SaaS with admin panel |
+| Business Sites  | Company sites with contact forms  |
+| Small Apps      | Simple SaaS with admin panel      |
 
 ### Tech Stack
 
-| Layer | Technology | Status |
-|-------|------------|--------|
-| Framework | Nuxt 4.2.2 | ✅ Configured |
-| Frontend | Vue 3.5 | ✅ Working |
-| Backend | Nitro | ✅ Configured |
-| Database | SQLite + Drizzle **OR** External API | ✅ Both supported |
-| Styling | Pure CSS (OKLCH) | ✅ Implemented |
-| Icons | unplugin-icons + Tabler | ✅ Working |
-| i18n | @nuxtjs/i18n | ✅ Configured |
-| Theme | @nuxtjs/color-mode | ✅ Working |
-| Images | Sharp | ✅ Complete |
-| External API | OAuth/JWT + Circuit Breaker | ✅ Production Ready |
+| Layer        | Technology                           | Status              |
+| ------------ | ------------------------------------ | ------------------- |
+| Framework    | Nuxt 4.2.2                           | ✅ Configured       |
+| Frontend     | Vue 3.5                              | ✅ Working          |
+| Backend      | Nitro                                | ✅ Configured       |
+| Database     | SQLite + Drizzle **OR** External API | ✅ Both supported   |
+| Styling      | Pure CSS (OKLCH)                     | ✅ Implemented      |
+| Icons        | unplugin-icons + Tabler              | ✅ Working          |
+| i18n         | @nuxtjs/i18n                         | ✅ Configured       |
+| Theme        | @nuxtjs/color-mode                   | ✅ Working          |
+| Images       | Sharp                                | ✅ Complete         |
+| External API | OAuth/JWT + Circuit Breaker          | ✅ Production Ready |
 
 ---
 
@@ -66,6 +67,7 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 ### Application Modes
 
 **Two Visual Modes:**
+
 - **Website**: Traditional site UX (hamburger menu on mobile, can use onepager OR SPA)
 - **App**: Application UX (bottom nav on mobile, vertical sidebar, always SPA)
 
@@ -119,144 +121,150 @@ app/
 
 ### ✅ Core Infrastructure
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Nuxt 4 Setup | ✅ Complete | Using app/ directory |
-| Pure CSS Architecture | ✅ Complete | 7-layer system |
-| CSS Variables | ✅ Complete | OKLCH color system |
-| Responsive System | ✅ Complete | Width-based breakpoints |
-| RTL Support | ✅ Complete | Auto-detected from locale |
+| Component             | Status      | Notes                     |
+| --------------------- | ----------- | ------------------------- |
+| Nuxt 4 Setup          | ✅ Complete | Using app/ directory      |
+| Pure CSS Architecture | ✅ Complete | 7-layer system            |
+| CSS Variables         | ✅ Complete | OKLCH color system        |
+| Responsive System     | ✅ Complete | Width-based breakpoints   |
+| RTL Support           | ✅ Complete | Auto-detected from locale |
 
 ### ✅ Configuration System
 
-| Feature | Status | Location |
-|---------|--------|----------|
-| Central Config | ✅ Complete | `puppet-master.config.ts` |
-| Application Modes | ✅ Complete | 4 modes supported |
-| Feature Toggles | ✅ Complete | 6 toggles |
-| useConfig Composable | ✅ Complete | Reactive access |
-| Config-Driven Settings | ✅ Complete | Schema in config, values in Admin Panel |
-| Settings Schema | ✅ Complete | `settings[]` with key, type, group, label, showIn |
-| Setting Groups | ✅ Complete | `settingGroups[]` for admin UI organization |
+| Feature                | Status      | Location                                          |
+| ---------------------- | ----------- | ------------------------------------------------- |
+| Central Config         | ✅ Complete | `puppet-master.config.ts`                         |
+| Application Modes      | ✅ Complete | 4 modes supported                                 |
+| Feature Toggles        | ✅ Complete | 6 toggles                                         |
+| useConfig Composable   | ✅ Complete | Reactive access                                   |
+| Config-Driven Settings | ✅ Complete | Schema in config, values in Admin Panel           |
+| Settings Schema        | ✅ Complete | `settings[]` with key, type, group, label, showIn |
+| Setting Groups         | ✅ Complete | `settingGroups[]` for admin UI organization       |
 
 ### ✅ Layouts
 
-| Layout | Status | Purpose |
-|--------|--------|---------|
+| Layout        | Status      | Purpose                    |
+| ------------- | ----------- | -------------------------- |
 | `default.vue` | ✅ Complete | Website with header/footer |
-| `admin.vue` | ✅ Complete | Admin panel layout |
-| `blank.vue` | ✅ Complete | No chrome (login pages) |
+| `admin.vue`   | ✅ Complete | Admin panel layout         |
+| `blank.vue`   | ✅ Complete | No chrome (login pages)    |
 
 ### ✅ Components (Atomic Design)
 
 #### Atoms (7 components)
-| Component | Status | Features |
-|-----------|--------|----------|
-| `Logo.vue` | ✅ Complete | Theme/lang aware |
-| `NavLink.vue` | ✅ Complete | Anchor + route support |
-| `HamburgerIcon.vue` | ✅ Complete | Animated hamburger |
-| `ThemeToggle.vue` | ✅ Complete | Light/dark switch |
-| `LangSwitcher.vue` | ✅ Complete | Language dropdown |
-| `CtaButton.vue` | ✅ Complete | Call-to-action |
-| `SocialIcon.vue` | ✅ Complete | Social media icons |
+
+| Component           | Status      | Features               |
+| ------------------- | ----------- | ---------------------- |
+| `Logo.vue`          | ✅ Complete | Theme/lang aware       |
+| `NavLink.vue`       | ✅ Complete | Anchor + route support |
+| `HamburgerIcon.vue` | ✅ Complete | Animated hamburger     |
+| `ThemeToggle.vue`   | ✅ Complete | Light/dark switch      |
+| `LangSwitcher.vue`  | ✅ Complete | Language dropdown      |
+| `CtaButton.vue`     | ✅ Complete | Call-to-action         |
+| `SocialIcon.vue`    | ✅ Complete | Social media icons     |
 
 #### Molecules (4 components)
-| Component | Status | Features |
-|-----------|--------|----------|
-| `NavLinks.vue` | ✅ Complete | Nav items from config |
-| `HeaderActions.vue` | ✅ Complete | Theme + Lang + Login |
-| `SocialLinks.vue` | ✅ Complete | Social icons group |
-| `LegalInfo.vue` | ✅ Complete | Copyright/legal |
+
+| Component           | Status      | Features              |
+| ------------------- | ----------- | --------------------- |
+| `NavLinks.vue`      | ✅ Complete | Nav items from config |
+| `HeaderActions.vue` | ✅ Complete | Theme + Lang + Login  |
+| `SocialLinks.vue`   | ✅ Complete | Social icons group    |
+| `LegalInfo.vue`     | ✅ Complete | Copyright/legal       |
 
 #### Organisms (3 components)
-| Component | Status | Features |
-|-----------|--------|----------|
+
+| Component       | Status      | Features                  |
+| --------------- | ----------- | ------------------------- |
 | `TheHeader.vue` | ✅ Complete | Interactive scroll header |
-| `TheFooter.vue` | ✅ Complete | Footer with links |
-| `MobileNav.vue` | ✅ Complete | Slide-out drawer |
+| `TheFooter.vue` | ✅ Complete | Footer with links         |
+| `MobileNav.vue` | ✅ Complete | Slide-out drawer          |
 
 #### Sections (5 components)
-| Component | Status | Features |
-|-----------|--------|----------|
-| `SectionHero.vue` | ✅ Complete | Hero with CTA |
-| `SectionAbout.vue` | ✅ Complete | About content |
+
+| Component              | Status      | Features       |
+| ---------------------- | ----------- | -------------- |
+| `SectionHero.vue`      | ✅ Complete | Hero with CTA  |
+| `SectionAbout.vue`     | ✅ Complete | About content  |
 | `SectionPortfolio.vue` | ✅ Complete | Portfolio grid |
-| `SectionServices.vue` | ✅ Complete | Services list |
-| `SectionContact.vue` | ✅ Complete | Contact form |
+| `SectionServices.vue`  | ✅ Complete | Services list  |
+| `SectionContact.vue`   | ✅ Complete | Contact form   |
 
 ### ✅ Pages
 
-| Page | Status | Purpose |
-|------|--------|---------|
-| `index.vue` | ✅ Complete | Main onepager |
-| `login.vue` | ✅ Complete | Site-app login |
-| `admin/login.vue` | ✅ Complete | Admin login |
-| `admin/index.vue` | ✅ Complete | Admin dashboard |
-| `admin/settings.vue` | ✅ Complete | Site settings editor |
-| `admin/portfolio.vue` | ✅ Complete | Portfolio CRUD |
-| `admin/contacts.vue` | ✅ Complete | Contact messages |
+| Page                  | Status      | Purpose              |
+| --------------------- | ----------- | -------------------- |
+| `index.vue`           | ✅ Complete | Main onepager        |
+| `login.vue`           | ✅ Complete | Site-app login       |
+| `admin/login.vue`     | ✅ Complete | Admin login          |
+| `admin/index.vue`     | ✅ Complete | Admin dashboard      |
+| `admin/settings.vue`  | ✅ Complete | Site settings editor |
+| `admin/portfolio.vue` | ✅ Complete | Portfolio CRUD       |
+| `admin/contacts.vue`  | ✅ Complete | Contact messages     |
 
 ### ✅ Composables
 
-| Composable | Status | Purpose |
-|------------|--------|---------|
-| `useConfig.ts` | ✅ Complete | Config access |
-| `useLogo.ts` | ✅ Complete | Logo path resolution (headerLogo, shortLogo) |
-| `useScrollHeader.ts` | ✅ Complete | Interactive header |
-| `useMediaQuery.ts` | ✅ Complete | Responsive utilities |
-| `useAuth.ts` | ✅ Complete | Authentication state & actions |
-| `useSiteSettings.ts` | ✅ Complete | Runtime site settings from API |
+| Composable           | Status      | Purpose                                      |
+| -------------------- | ----------- | -------------------------------------------- |
+| `useConfig.ts`       | ✅ Complete | Config access                                |
+| `useLogo.ts`         | ✅ Complete | Logo path resolution (headerLogo, shortLogo) |
+| `useScrollHeader.ts` | ✅ Complete | Interactive header                           |
+| `useMediaQuery.ts`   | ✅ Complete | Responsive utilities                         |
+| `useAuth.ts`         | ✅ Complete | Authentication state & actions               |
+| `useSiteSettings.ts` | ✅ Complete | Runtime site settings from API               |
 
 ### ✅ Middleware
 
-| Middleware | Status | Purpose |
-|------------|--------|---------|
-| `app-mode.global.ts` | ✅ Complete | Mode-based routing |
-| `auth.ts` | ✅ Complete | Admin route protection |
+| Middleware           | Status      | Purpose                |
+| -------------------- | ----------- | ---------------------- |
+| `app-mode.global.ts` | ✅ Complete | Mode-based routing     |
+| `auth.ts`            | ✅ Complete | Admin route protection |
 
 ### ✅ Plugins
 
-| Plugin | Status | Purpose |
-|--------|--------|---------|
+| Plugin             | Status      | Purpose             |
+| ------------------ | ----------- | ------------------- |
 | `vh-fix.client.ts` | ✅ Complete | Mobile viewport fix |
 
 ### ✅ Logo System
 
-| Variant | Status |
-|---------|--------|
-| `horizontal_dark_en.svg` | ✅ Available |
-| `horizontal_dark_ru.svg` | ✅ Available |
+| Variant                   | Status       |
+| ------------------------- | ------------ |
+| `horizontal_dark_en.svg`  | ✅ Available |
+| `horizontal_dark_ru.svg`  | ✅ Available |
 | `horizontal_light_en.svg` | ✅ Available |
 | `horizontal_light_ru.svg` | ✅ Available |
-| `circle_dark_en.svg` | ✅ Available |
-| `circle_dark_ru.svg` | ✅ Available |
-| `circle_light_en.svg` | ✅ Available |
-| `circle_light_ru.svg` | ✅ Available |
+| `circle_dark_en.svg`      | ✅ Available |
+| `circle_dark_ru.svg`      | ✅ Available |
+| `circle_light_en.svg`     | ✅ Available |
+| `circle_light_ru.svg`     | ✅ Available |
 
 ### ✅ i18n (Dynamic Architecture)
 
 **New DX-friendly architecture - NO per-locale files needed!**
 
-| File | Purpose |
-|------|---------|
-| `i18n/loader.ts` | Single dynamic loader for ALL locales |
-| `i18n/fallbacks.ts` | Minimal bootstrap translations |
-| `puppet-master.config.ts` | Locale definitions (code, iso, name) |
+| File                      | Purpose                               |
+| ------------------------- | ------------------------------------- |
+| `i18n/loader.ts`          | Single dynamic loader for ALL locales |
+| `i18n/fallbacks.ts`       | Minimal bootstrap translations        |
+| `puppet-master.config.ts` | Locale definitions (code, iso, name)  |
 
 **How it works:**
+
 1. Define locales in `puppet-master.config.ts` - no file creation needed
 2. All locales use the same `loader.ts` file
 3. Loader fetches translations from `/api/i18n/{locale}`
 4. Falls back to `fallbacks.ts` if DB is empty
 5. Manage all text via Admin Panel → Translations
 
-| Language | Status | RTL |
-|----------|--------|-----|
-| English (en) | ✅ Complete | No |
-| Russian (ru) | ✅ Complete | No |
-| Hebrew (he) | ✅ Complete | Yes |
+| Language     | Status      | RTL |
+| ------------ | ----------- | --- |
+| English (en) | ✅ Complete | No  |
+| Russian (ru) | ✅ Complete | No  |
+| Hebrew (he)  | ✅ Complete | Yes |
 
 **Translation Keys Implemented:**
+
 - `nav.*` - Navigation labels
 - `common.*` - Common UI strings
 - `theme.*` - Theme labels
@@ -269,79 +277,79 @@ app/
 
 ### ✅ Backend/API (COMPLETE)
 
-| Component | Status | Priority |
-|-----------|--------|----------|
-| Database Schema | ✅ Complete | - |
-| Drizzle Setup | ✅ Complete | - |
-| Auth API | ✅ Complete | - |
-| Settings API | ✅ Complete | - |
-| Portfolio API (CRUD) | ✅ Complete | - |
-| Upload API (Sharp) | ✅ Complete | - |
-| Contact API | ✅ Complete | - |
-| i18n API | ✅ Complete | - |
+| Component            | Status      | Priority |
+| -------------------- | ----------- | -------- |
+| Database Schema      | ✅ Complete | -        |
+| Drizzle Setup        | ✅ Complete | -        |
+| Auth API             | ✅ Complete | -        |
+| Settings API         | ✅ Complete | -        |
+| Portfolio API (CRUD) | ✅ Complete | -        |
+| Upload API (Sharp)   | ✅ Complete | -        |
+| Contact API          | ✅ Complete | -        |
+| i18n API             | ✅ Complete | -        |
 
 ### ✅ Admin Panel (COMPLETE)
 
-| Component | Status | Priority |
-|-----------|--------|----------|
-| Admin Layout | ✅ Complete | - |
-| Icon Sidebar | ✅ Complete | - |
-| Dashboard Page | ✅ Removed (redirects to settings) | - |
-| Auth Middleware | ✅ Complete | - |
-| Settings Page | ✅ Complete | - |
-| Portfolio Page | ✅ Complete | - |
-| Contacts Page | ✅ Complete | - |
-| Translations Page | ✅ Complete | - |
-| User Management | ✅ Complete | - |
-| Unread Message Badge | ✅ Complete | - |
-| Content Editor | ❌ Not started | MEDIUM |
-| Media Library | ❌ Not started | MEDIUM |
+| Component            | Status                             | Priority |
+| -------------------- | ---------------------------------- | -------- |
+| Admin Layout         | ✅ Complete                        | -        |
+| Icon Sidebar         | ✅ Complete                        | -        |
+| Dashboard Page       | ✅ Removed (redirects to settings) | -        |
+| Auth Middleware      | ✅ Complete                        | -        |
+| Settings Page        | ✅ Complete                        | -        |
+| Portfolio Page       | ✅ Complete                        | -        |
+| Contacts Page        | ✅ Complete                        | -        |
+| Translations Page    | ✅ Complete                        | -        |
+| User Management      | ✅ Complete                        | -        |
+| Unread Message Badge | ✅ Complete                        | -        |
+| Content Editor       | ❌ Not started                     | MEDIUM   |
+| Media Library        | ❌ Not started                     | MEDIUM   |
 
 ### ✅ Authentication (COMPLETE)
 
-| Feature | Status | Priority |
-|---------|--------|----------|
-| Login Logic | ✅ Complete | - |
-| Session Management | ✅ Complete | - |
-| useAuth Composable | ✅ Complete | - |
-| Auth Middleware | ✅ Complete | - |
-| Password Hashing (scrypt) | ✅ Complete | - |
-| Password Reset | ❌ Not started | MEDIUM |
-| Remember Me | ✅ Complete | - |
+| Feature                   | Status         | Priority |
+| ------------------------- | -------------- | -------- |
+| Login Logic               | ✅ Complete    | -        |
+| Session Management        | ✅ Complete    | -        |
+| useAuth Composable        | ✅ Complete    | -        |
+| Auth Middleware           | ✅ Complete    | -        |
+| Password Hashing (scrypt) | ✅ Complete    | -        |
+| Password Reset            | ❌ Not started | MEDIUM   |
+| Remember Me               | ✅ Complete    | -        |
 
 ### ✅ Image Processing (COMPLETE)
 
-| Feature | Status | Priority |
-|---------|--------|----------|
-| Sharp Integration | ✅ Complete | - |
-| Thumbnail Generation | ✅ Complete | - |
-| WebP Conversion | ✅ Complete | - |
-| Lazy Loading | ❌ Not started | LOW |
+| Feature              | Status         | Priority |
+| -------------------- | -------------- | -------- |
+| Sharp Integration    | ✅ Complete    | -        |
+| Thumbnail Generation | ✅ Complete    | -        |
+| WebP Conversion      | ✅ Complete    | -        |
+| Lazy Loading         | ❌ Not started | LOW      |
 
 ### ✅ External API Integration (COMPLETE)
 
-| Feature | Status | Priority |
-|---------|--------|----------|
-| API Client (Fetch-based) | ✅ Complete | - |
-| OAuth 2.0 / JWT / API Key Auth | ✅ Complete | - |
-| Token Auto-Refresh | ✅ Complete | - |
-| Circuit Breaker Pattern | ✅ Complete | - |
-| Exponential Backoff Retry | ✅ Complete | - |
-| Response Caching (In-Memory) | ✅ Complete | - |
-| Per-Resource TTL Configuration | ✅ Complete | - |
-| Hybrid Mode (DB + API) | ✅ Complete | - |
-| Memory Leak Prevention | ✅ Fixed | - |
-| Redis Support | ❌ TODO Comments | LOW |
-| Request Deduplication | ❌ Not started | LOW |
-| GraphQL Support | ❌ Not started | LOW |
+| Feature                        | Status           | Priority |
+| ------------------------------ | ---------------- | -------- |
+| API Client (Fetch-based)       | ✅ Complete      | -        |
+| OAuth 2.0 / JWT / API Key Auth | ✅ Complete      | -        |
+| Token Auto-Refresh             | ✅ Complete      | -        |
+| Circuit Breaker Pattern        | ✅ Complete      | -        |
+| Exponential Backoff Retry      | ✅ Complete      | -        |
+| Response Caching (In-Memory)   | ✅ Complete      | -        |
+| Per-Resource TTL Configuration | ✅ Complete      | -        |
+| Hybrid Mode (DB + API)         | ✅ Complete      | -        |
+| Memory Leak Prevention         | ✅ Fixed         | -        |
+| Redis Support                  | ❌ TODO Comments | LOW      |
+| Request Deduplication          | ❌ Not started   | LOW      |
+| GraphQL Support                | ❌ Not started   | LOW      |
 
 ### ❌ SPA Mode
 
-| Feature | Status | Priority |
-|---------|--------|----------|
-| Individual Pages | ❌ Not started | LOW |
-| Route-based Nav | ✅ Logic ready | - |
-| Page Transitions | ❌ Not started | LOW |
+| Feature          | Status         | Priority |
+| ---------------- | -------------- | -------- |
+| Individual Pages | ❌ Not started | LOW      |
+| Route-based Nav  | ✅ Logic ready | -        |
+| Page Transitions | ❌ Not started | LOW      |
 
 ---
 
@@ -349,44 +357,44 @@ app/
 
 ### 🔴 Critical Issues
 
-| Issue | Description | Status |
-|-------|-------------|--------|
-| None | All critical issues resolved | ✅ |
+| Issue | Description                  | Status |
+| ----- | ---------------------------- | ------ |
+| None  | All critical issues resolved | ✅     |
 
 ### 🟡 Cosmetic Issues
 
-| Issue | Description | Status |
-|-------|-------------|--------|
-| Section Alignment | Sections may not be perfectly centered | ⚠️ Needs verification |
-| Mobile Lang Dropdown | Native select positioning | ⚠️ Partially fixed |
+| Issue                | Description                            | Status                |
+| -------------------- | -------------------------------------- | --------------------- |
+| Section Alignment    | Sections may not be perfectly centered | ⚠️ Needs verification |
+| Mobile Lang Dropdown | Native select positioning              | ⚠️ Partially fixed    |
 
 ### 🟢 Fixed Issues (2024-12-17)
 
-| Issue | Fix Applied |
-|-------|-------------|
-| TypeScript Errors (105) | Fixed all type errors - icons.d.ts, Zod v4 API, null checks |
-| i18n Missing Keys | Fixed `getSystemTranslations()` to return nested objects |
-| Hydration Mismatch (SectionAbout) | Changed `<p>` to `<div>` for slot container |
-| Console Errors | All DevTools errors resolved |
-| Scoped media queries | Moved to global CSS |
-| Emoji icons | Replaced with Tabler icons |
-| Header hiding | Changed to shrink-only |
-| Color mode hydration | Removed class from app.vue |
+| Issue                             | Fix Applied                                                 |
+| --------------------------------- | ----------------------------------------------------------- |
+| TypeScript Errors (105)           | Fixed all type errors - icons.d.ts, Zod v4 API, null checks |
+| i18n Missing Keys                 | Fixed `getSystemTranslations()` to return nested objects    |
+| Hydration Mismatch (SectionAbout) | Changed `<p>` to `<div>` for slot container                 |
+| Console Errors                    | All DevTools errors resolved                                |
+| Scoped media queries              | Moved to global CSS                                         |
+| Emoji icons                       | Replaced with Tabler icons                                  |
+| Header hiding                     | Changed to shrink-only                                      |
+| Color mode hydration              | Removed class from app.vue                                  |
 
 ### 🟢 Fixed Issues (2024-12-19) - CSS Refactor
 
-| Issue | Fix Applied |
-|-------|-------------|
-| Admin sidebar showing on mobile | Fixed CSS cascade order, responsive rules now in same file as base styles |
-| Missing `display: flex` in `.admin-sidebar` | Added base display property |
-| Missing `display: flex` in `.admin-header` | Added base display property |
-| Missing `margin-inline-start` in `.admin-main` | Added base margin property |
-| Duplicate `.icon-lg` definitions | Consolidated to single `icons.css` file |
-| Duplicate `.truncate` definitions | Consolidated to single `text.css` file |
-| Duplicate `.form-hint` definitions | Consolidated to single `inputs.css` file |
-| Debug `console.log` in translations.vue | Removed |
-| Magic numbers in CSS | Replaced with CSS variables (e.g., `36px` → `var(--avatar-sm)`) |
-| RTL `border-top` usage | Changed to `border-block-start` |
+| Issue                                          | Fix Applied                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| Admin sidebar showing on mobile                | Fixed CSS cascade order, responsive rules now in same file as base styles |
+| Missing `display: flex` in `.admin-sidebar`    | Added base display property                                               |
+| Missing `display: flex` in `.admin-header`     | Added base display property                                               |
+| Missing `margin-inline-start` in `.admin-main` | Added base margin property                                                |
+| Duplicate `.icon-lg` definitions               | Consolidated to single `icons.css` file                                   |
+| Duplicate `.truncate` definitions              | Consolidated to single `text.css` file                                    |
+| Duplicate `.form-hint` definitions             | Consolidated to single `inputs.css` file                                  |
+| Debug `console.log` in translations.vue        | Removed                                                                   |
+| Magic numbers in CSS                           | Replaced with CSS variables (e.g., `36px` → `var(--avatar-sm)`)           |
+| RTL `border-top` usage                         | Changed to `border-block-start`                                           |
 
 ---
 
@@ -394,22 +402,22 @@ app/
 
 ### ✅ Documented
 
-| Document | Location | Status |
-|----------|----------|--------|
+| Document        | Location                           | Status                    |
+| --------------- | ---------------------------------- | ------------------------- |
 | Technical Brief | `PUPPET-MASTER-TECHNICAL-BRIEF.md` | ✅ Complete (2800+ lines) |
-| This Status Doc | `PUPPET-MASTER-STATUS.md` | ✅ Complete |
-| Config Comments | `puppet-master.config.ts` | ✅ Well documented |
-| CSS DX Comments | Various CSS files | ✅ Inline docs |
+| This Status Doc | `PUPPET-MASTER-STATUS.md`          | ✅ Complete               |
+| Config Comments | `puppet-master.config.ts`          | ✅ Well documented        |
+| CSS DX Comments | Various CSS files                  | ✅ Inline docs            |
 
 ### ❌ Not Documented
 
-| Topic | Priority |
-|-------|----------|
-| API Documentation | HIGH |
-| Component Props/Events | MEDIUM |
-| Deployment Guide | MEDIUM |
-| Customization Guide | LOW |
-| Contributing Guide | LOW |
+| Topic                  | Priority |
+| ---------------------- | -------- |
+| API Documentation      | HIGH     |
+| Component Props/Events | MEDIUM   |
+| Deployment Guide       | MEDIUM   |
+| Customization Guide    | LOW      |
+| Contributing Guide     | LOW      |
 
 ---
 
@@ -504,6 +512,7 @@ assets/css/
 ```
 
 **Key Refactor Changes (2024-12-19):**
+
 - Split `page.css` from 830 → 236 lines (72% reduction)
 - Split `utilities.css` from 344 → 122 lines (65% reduction)
 - Created 16 new modular CSS files
@@ -625,30 +634,31 @@ components/
 @layer reset, primitives, semantic, components, utilities;
 ```
 
-| Layer | Purpose | Override Priority |
-|-------|---------|-------------------|
-| `reset` | CSS reset/normalize | Lowest |
-| `primitives` | Raw values (colors, fonts) | ↓ |
-| `semantic` | Calculated values (color-mix, light-dark) | ↓ |
-| `components` | UI styling (skeleton, forms, overlays) | ↓ |
-| `utilities` | Override helpers (.flex, .hidden) | Highest |
+| Layer        | Purpose                                   | Override Priority |
+| ------------ | ----------------------------------------- | ----------------- |
+| `reset`      | CSS reset/normalize                       | Lowest            |
+| `primitives` | Raw values (colors, fonts)                | ↓                 |
+| `semantic`   | Calculated values (color-mix, light-dark) | ↓                 |
+| `components` | UI styling (skeleton, forms, overlays)    | ↓                 |
+| `utilities`  | Override helpers (.flex, .hidden)         | Highest           |
 
 ### CSS Modular Philosophy
 
 **One file per component** - each CSS component has its own dedicated file:
 
-| Component Type | CSS Location | Purpose |
-|----------------|--------------|---------|
-| Admin Sidebar | `layout/admin-sidebar.css` | Sidebar + responsive rules |
-| Admin Header | `layout/admin-header.css` | Mobile header + responsive |
-| Icons | `common/icons.css` | Icon sizing classes |
-| Tabs | `ui/content/tabs.css` | Tab components |
+| Component Type | CSS Location               | Purpose                    |
+| -------------- | -------------------------- | -------------------------- |
+| Admin Sidebar  | `layout/admin-sidebar.css` | Sidebar + responsive rules |
+| Admin Header   | `layout/admin-header.css`  | Mobile header + responsive |
+| Icons          | `common/icons.css`         | Icon sizing classes        |
+| Tabs           | `ui/content/tabs.css`      | Tab components             |
 
 This allows client customization by editing ONE file for each visual component.
 
 ### CSS Variables
 
 #### Colors (primitives.css)
+
 ```css
 :root {
   --c-black: oklch(from #2f2f2f l c h);
@@ -659,6 +669,7 @@ This allows client customization by editing ONE file for each visual component.
 ```
 
 #### Auto Colors (auto.css)
+
 ```css
 :root {
   --l-bg: light-dark(var(--c-white), var(--c-black));
@@ -670,22 +681,24 @@ This allows client customization by editing ONE file for each visual component.
 ```
 
 #### Spacing (spacing.css)
+
 ```css
 :root {
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-8: 2rem;     /* 32px */
-  --space-12: 3rem;    /* 48px */
-  --space-16: 4rem;    /* 64px */
-  --space-24: 6rem;    /* 96px */
-  --space-32: 8rem;    /* 128px */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-6: 1.5rem; /* 24px */
+  --space-8: 2rem; /* 32px */
+  --space-12: 3rem; /* 48px */
+  --space-16: 4rem; /* 64px */
+  --space-24: 6rem; /* 96px */
+  --space-32: 8rem; /* 128px */
 }
 ```
 
 #### Typography (variables.css)
+
 ```css
 :root {
   --font-xs: 0.75rem;
@@ -700,12 +713,21 @@ This allows client customization by editing ONE file for each visual component.
 ```
 
 ### Breakpoints (responsive.css)
+
 ```css
 /* Mobile first - min-width queries */
-@media (width >= 640px)  { /* sm */ }
-@media (width >= 768px)  { /* md */ }
-@media (width >= 1024px) { /* lg */ }
-@media (width >= 1280px) { /* xl */ }
+@media (width >= 640px) {
+  /* sm */
+}
+@media (width >= 768px) {
+  /* md */
+}
+@media (width >= 1024px) {
+  /* lg */
+}
+@media (width >= 1280px) {
+  /* xl */
+}
 ```
 
 ---
@@ -715,25 +737,28 @@ This allows client customization by editing ONE file for each visual component.
 ### Props Reference
 
 #### Logo.vue
+
 ```typescript
 defineProps<{
-  shape?: 'horizontal' | 'circle'  // default: 'horizontal'
+  shape?: 'horizontal' | 'circle' // default: 'horizontal'
 }>()
 ```
 
 #### NavLink.vue
+
 ```typescript
 defineProps<{
-  to: string           // URL or anchor
-  label?: string       // Link text
-  isAnchor?: boolean   // Use <a> vs NuxtLink
+  to: string // URL or anchor
+  label?: string // Link text
+  isAnchor?: boolean // Use <a> vs NuxtLink
 }>()
 ```
 
 #### HamburgerIcon.vue
+
 ```typescript
 defineProps<{
-  isActive?: boolean   // Open state
+  isActive?: boolean // Open state
 }>()
 defineEmits<{
   toggle: []
@@ -746,33 +771,33 @@ defineEmits<{
 
 ### Implemented Endpoints
 
-| Endpoint | Method | Purpose | Status |
-|----------|--------|---------|--------|
-| `/api/auth/login` | POST | User login | ✅ Complete |
-| `/api/auth/logout` | POST | User logout | ✅ Complete |
-| `/api/auth/me` | GET | Current user/session | ✅ Complete |
-| `/api/settings` | GET | Get all site settings | ✅ Complete |
-| `/api/settings` | PUT | Update site settings (admin) | ✅ Complete |
-| `/api/portfolio` | GET | List portfolio items | ✅ Complete |
-| `/api/portfolio` | POST | Create portfolio item (admin) | ✅ Complete |
-| `/api/portfolio/[id]` | GET | Get single item | ✅ Complete |
-| `/api/portfolio/[id]` | PUT | Update item (admin) | ✅ Complete |
-| `/api/portfolio/[id]` | DELETE | Delete item (admin) | ✅ Complete |
-| `/api/upload/image` | POST | Upload image with Sharp | ✅ Complete |
-| `/api/contact/submit` | POST | Submit contact form | ✅ Complete |
-| `/api/admin/contacts` | GET | List contact submissions | ✅ Complete |
-| `/api/admin/contacts/[id]` | PUT | Mark read/unread | ✅ Complete |
-| `/api/admin/contacts/[id]` | DELETE | Delete submission | ✅ Complete |
-| `/api/admin/stats` | GET | Dashboard statistics | ✅ Complete |
+| Endpoint                   | Method | Purpose                       | Status      |
+| -------------------------- | ------ | ----------------------------- | ----------- |
+| `/api/auth/login`          | POST   | User login                    | ✅ Complete |
+| `/api/auth/logout`         | POST   | User logout                   | ✅ Complete |
+| `/api/auth/me`             | GET    | Current user/session          | ✅ Complete |
+| `/api/settings`            | GET    | Get all site settings         | ✅ Complete |
+| `/api/settings`            | PUT    | Update site settings (admin)  | ✅ Complete |
+| `/api/portfolio`           | GET    | List portfolio items          | ✅ Complete |
+| `/api/portfolio`           | POST   | Create portfolio item (admin) | ✅ Complete |
+| `/api/portfolio/[id]`      | GET    | Get single item               | ✅ Complete |
+| `/api/portfolio/[id]`      | PUT    | Update item (admin)           | ✅ Complete |
+| `/api/portfolio/[id]`      | DELETE | Delete item (admin)           | ✅ Complete |
+| `/api/upload/image`        | POST   | Upload image with Sharp       | ✅ Complete |
+| `/api/contact/submit`      | POST   | Submit contact form           | ✅ Complete |
+| `/api/admin/contacts`      | GET    | List contact submissions      | ✅ Complete |
+| `/api/admin/contacts/[id]` | PUT    | Mark read/unread              | ✅ Complete |
+| `/api/admin/contacts/[id]` | DELETE | Delete submission             | ✅ Complete |
+| `/api/admin/stats`         | GET    | Dashboard statistics          | ✅ Complete |
 
 ### i18n Endpoints
 
-| Endpoint | Method | Purpose | Status |
-|----------|--------|---------|--------|
-| `/api/i18n/[locale]` | GET | Get translations for locale | ✅ Complete |
-| `/api/admin/translations` | GET | List all translations | ✅ Complete |
-| `/api/admin/translations` | POST | Create/update translation | ✅ Complete |
-| `/api/admin/translations/[id]` | DELETE | Delete translation | ✅ Complete |
+| Endpoint                       | Method | Purpose                     | Status      |
+| ------------------------------ | ------ | --------------------------- | ----------- |
+| `/api/i18n/[locale]`           | GET    | Get translations for locale | ✅ Complete |
+| `/api/admin/translations`      | GET    | List all translations       | ✅ Complete |
+| `/api/admin/translations`      | POST   | Create/update translation   | ✅ Complete |
+| `/api/admin/translations/[id]` | DELETE | Delete translation          | ✅ Complete |
 
 ---
 
@@ -864,30 +889,30 @@ cd app && npm run generate
 
 ### Production Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `nuxt` | ^4.2.2 | Framework |
-| `vue` | ^3.5.25 | Frontend |
-| `vue-router` | ^4.6.3 | Routing |
-| `pinia` | ^3.0.4 | State management |
-| `@pinia/nuxt` | ^0.11.3 | Pinia integration |
-| `@nuxtjs/color-mode` | ^4.0.0 | Theme switching |
-| `@nuxtjs/i18n` | ^10.2.1 | Internationalization |
-| `better-sqlite3` | ^12.5.0 | SQLite database |
-| `drizzle-orm` | ^0.45.1 | ORM |
-| `sharp` | ^0.34.5 | Image processing |
-| `unplugin-icons` | ^22.5.0 | Icon loading |
-| `vite-svg-loader` | ^5.1.0 | SVG as components |
-| `hamburgers` | ^1.2.1 | Hamburger animations |
-| `zod` | ^4.1.13 | Schema validation |
+| Package              | Version | Purpose              |
+| -------------------- | ------- | -------------------- |
+| `nuxt`               | ^4.2.2  | Framework            |
+| `vue`                | ^3.5.25 | Frontend             |
+| `vue-router`         | ^4.6.3  | Routing              |
+| `pinia`              | ^3.0.4  | State management     |
+| `@pinia/nuxt`        | ^0.11.3 | Pinia integration    |
+| `@nuxtjs/color-mode` | ^4.0.0  | Theme switching      |
+| `@nuxtjs/i18n`       | ^10.2.1 | Internationalization |
+| `better-sqlite3`     | ^12.5.0 | SQLite database      |
+| `drizzle-orm`        | ^0.45.1 | ORM                  |
+| `sharp`              | ^0.34.5 | Image processing     |
+| `unplugin-icons`     | ^22.5.0 | Icon loading         |
+| `vite-svg-loader`    | ^5.1.0  | SVG as components    |
+| `hamburgers`         | ^1.2.1  | Hamburger animations |
+| `zod`                | ^4.1.13 | Schema validation    |
 
 ### Dev Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `@iconify/json` | ^2.2.418 | Icon collections |
-| `@types/better-sqlite3` | ^7.6.13 | TypeScript types |
-| `drizzle-kit` | ^0.31.8 | Database migrations |
+| Package                 | Version  | Purpose             |
+| ----------------------- | -------- | ------------------- |
+| `@iconify/json`         | ^2.2.418 | Icon collections    |
+| `@types/better-sqlite3` | ^7.6.13  | TypeScript types    |
+| `drizzle-kit`           | ^0.31.8  | Database migrations |
 
 ---
 
@@ -898,29 +923,29 @@ cd app && npm run generate
 ```typescript
 const {
   // Mode
-  mode,                    // 'app-only' | 'website-app' | 'website-admin' | 'website-only'
-  hasWebsite,              // boolean - has website portion
-  hasAdmin,                // boolean - has admin/app portion
-  hasLoginButton,          // boolean - mode === 'website-app'
-  isAppPrimary,            // boolean - app-only || website-app
-  isWebsitePrimary,        // boolean - website-admin || website-only
+  mode, // 'app-only' | 'website-app' | 'website-admin' | 'website-only'
+  hasWebsite, // boolean - has website portion
+  hasAdmin, // boolean - has admin/app portion
+  hasLoginButton, // boolean - mode === 'website-app'
+  isAppPrimary, // boolean - app-only || website-app
+  isWebsitePrimary, // boolean - website-admin || website-only
 
   // Features
-  features,                // Full features object
-  isMultiLang,             // boolean
-  hasThemeToggle,          // boolean
-  isOnepager,              // boolean - website portion only
-  hasInteractiveHeader,    // boolean
-  hideHeaderOnScroll,      // boolean
-  appVerticalNav,          // boolean - app/admin vertical sidebar
+  features, // Full features object
+  isMultiLang, // boolean
+  hasThemeToggle, // boolean
+  isOnepager, // boolean - website portion only
+  hasInteractiveHeader, // boolean
+  hideHeaderOnScroll, // boolean
+  appVerticalNav, // boolean - app/admin vertical sidebar
 
   // Data
-  locales,                 // Locale[]
-  defaultLocale,           // string
-  sections,                // Section[]
-  colors,                  // Colors object
-  logo,                    // Logo config
-  config                   // Full config access
+  locales, // Locale[]
+  defaultLocale, // string
+  sections, // Section[]
+  colors, // Colors object
+  logo, // Logo config
+  config // Full config access
 } = useConfig()
 ```
 
@@ -928,10 +953,10 @@ const {
 
 ```typescript
 const {
-  headerLogo,              // ComputedRef<string> - Full horizontal logo
-  shortLogo,               // ComputedRef<string> - Compact circle logo (sidebar, footer)
-  getLogoSrc,              // (shape) => string - Get logo path by shape
-  hasVariant,              // (shape, theme, lang) => boolean - Check if variant exists
+  headerLogo, // ComputedRef<string> - Full horizontal logo
+  shortLogo, // ComputedRef<string> - Compact circle logo (sidebar, footer)
+  getLogoSrc, // (shape) => string - Get logo path by shape
+  hasVariant // (shape, theme, lang) => boolean - Check if variant exists
 } = useLogo()
 ```
 
@@ -956,10 +981,10 @@ const {
 
 ```typescript
 const {
-  isMobile,                // ComputedRef<boolean> - width < 768px
-  isTablet,                // ComputedRef<boolean> - width >= 768 && < 1024
-  isDesktop,               // ComputedRef<boolean> - width >= 1024
-  matches,                 // (query: string) => ComputedRef<boolean>
+  isMobile, // ComputedRef<boolean> - width < 768px
+  isTablet, // ComputedRef<boolean> - width >= 768 && < 1024
+  isDesktop, // ComputedRef<boolean> - width >= 1024
+  matches // (query: string) => ComputedRef<boolean>
 } = useMediaQuery()
 ```
 
@@ -969,59 +994,60 @@ const {
 
 ### Layout Classes
 
-| Class | Purpose |
-|-------|---------|
-| `.page` | Main page wrapper |
-| `.section` | Full-height section |
-| `.section-hero` | Hero with extra top padding |
-| `.container` | Max-width container |
-| `.container-narrow` | Narrower container |
-| `.container-wide` | Wider container |
+| Class               | Purpose                     |
+| ------------------- | --------------------------- |
+| `.page`             | Main page wrapper           |
+| `.section`          | Full-height section         |
+| `.section-hero`     | Hero with extra top padding |
+| `.container`        | Max-width container         |
+| `.container-narrow` | Narrower container          |
+| `.container-wide`   | Wider container             |
 
 ### Grid Classes
 
-| Class | Purpose |
-|-------|---------|
-| `.grid` | CSS Grid container |
-| `.grid-cols-2` | 2 column grid |
-| `.grid-cols-3` | 3 column grid |
-| `.grid-cols-4` | 4 column grid |
-| `.gap-4` | Gap of var(--space-4) |
+| Class          | Purpose               |
+| -------------- | --------------------- |
+| `.grid`        | CSS Grid container    |
+| `.grid-cols-2` | 2 column grid         |
+| `.grid-cols-3` | 3 column grid         |
+| `.grid-cols-4` | 4 column grid         |
+| `.gap-4`       | Gap of var(--space-4) |
 
 ### Skeleton Classes
 
-| Class | Purpose |
-|-------|---------|
-| `.header` | Main header |
-| `.header--scrolled` | Scrolled state |
-| `.header--hidden` | Hidden state |
-| `.footer` | Main footer |
-| `.mobile-nav` | Mobile navigation drawer |
-| `.mobile-nav-backdrop` | Overlay behind drawer |
+| Class                  | Purpose                  |
+| ---------------------- | ------------------------ |
+| `.header`              | Main header              |
+| `.header--scrolled`    | Scrolled state           |
+| `.header--hidden`      | Hidden state             |
+| `.footer`              | Main footer              |
+| `.mobile-nav`          | Mobile navigation drawer |
+| `.mobile-nav-backdrop` | Overlay behind drawer    |
 
 ### Typography Classes
 
-| Class | Purpose |
-|-------|---------|
-| `.text-xs` through `.text-4xl` | Font sizes |
-| `.font-bold` | Bold weight |
-| `.text-center` | Center alignment |
-| `.text-muted` | Muted color |
+| Class                          | Purpose          |
+| ------------------------------ | ---------------- |
+| `.text-xs` through `.text-4xl` | Font sizes       |
+| `.font-bold`                   | Bold weight      |
+| `.text-center`                 | Center alignment |
+| `.text-muted`                  | Muted color      |
 
 ### Utility Classes
 
-| Class | Purpose |
-|-------|---------|
-| `.sr-only` | Screen reader only |
-| `.visually-hidden` | Hidden visually |
-| `.flex` | Display flex |
-| `.hidden` | Display none |
+| Class              | Purpose            |
+| ------------------ | ------------------ |
+| `.sr-only`         | Screen reader only |
+| `.visually-hidden` | Hidden visually    |
+| `.flex`            | Display flex       |
+| `.hidden`          | Display none       |
 
 ---
 
 ## Appendix D: Translation Keys
 
-### nav.*
+### nav.\*
+
 ```json
 {
   "home": "Home",
@@ -1034,7 +1060,8 @@ const {
 }
 ```
 
-### common.*
+### common.\*
+
 ```json
 {
   "menu": "Menu",
@@ -1052,7 +1079,8 @@ const {
 }
 ```
 
-### theme.*
+### theme.\*
+
 ```json
 {
   "light": "Light",
@@ -1061,7 +1089,8 @@ const {
 }
 ```
 
-### auth.*
+### auth.\*
+
 ```json
 {
   "login": "Login",
@@ -1074,7 +1103,8 @@ const {
 }
 ```
 
-### footer.*
+### footer.\*
+
 ```json
 {
   "rights": "All rights reserved"
@@ -1087,44 +1117,44 @@ const {
 
 ### Colors (from logo)
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| Black | `#2f2f2f` | Dark backgrounds, text |
-| White | `#f0f0f0` | Light backgrounds, text |
-| Brand | `#aa0000` | Primary accent (dark red) |
-| Accent | `#0f172a` | Secondary (deep slate) |
+| Token  | Hex       | Usage                     |
+| ------ | --------- | ------------------------- |
+| Black  | `#2f2f2f` | Dark backgrounds, text    |
+| White  | `#f0f0f0` | Light backgrounds, text   |
+| Brand  | `#aa0000` | Primary accent (dark red) |
+| Accent | `#0f172a` | Secondary (deep slate)    |
 
 ### Spacing Scale
 
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--space-1` | 0.25rem | 4px |
-| `--space-2` | 0.5rem | 8px |
-| `--space-3` | 0.75rem | 12px |
-| `--space-4` | 1rem | 16px |
-| `--space-6` | 1.5rem | 24px |
-| `--space-8` | 2rem | 32px |
-| `--space-12` | 3rem | 48px |
-| `--space-16` | 4rem | 64px |
+| Token        | Value   | Pixels |
+| ------------ | ------- | ------ |
+| `--space-1`  | 0.25rem | 4px    |
+| `--space-2`  | 0.5rem  | 8px    |
+| `--space-3`  | 0.75rem | 12px   |
+| `--space-4`  | 1rem    | 16px   |
+| `--space-6`  | 1.5rem  | 24px   |
+| `--space-8`  | 2rem    | 32px   |
+| `--space-12` | 3rem    | 48px   |
+| `--space-16` | 4rem    | 64px   |
 
 ### Border Radius
 
-| Token | Value | Pixels | Usage |
-|-------|-------|--------|-------|
-| `--radius-xs` | 0.25rem | 4px | Subtle rounding (code blocks) |
-| `--radius-sm` | 0.375rem | 6px | Buttons, inputs, tooltips |
-| `--radius-md` | 0.5rem | 8px | Cards, modals, medium elements |
-| `--radius-lg` | 0.75rem | 12px | Large cards, containers |
-| `--radius-xl` | 1rem | 16px | Hero sections, large surfaces |
-| `--radius-full` | 9999px | - | Pills, avatars, circles |
+| Token           | Value    | Pixels | Usage                          |
+| --------------- | -------- | ------ | ------------------------------ |
+| `--radius-xs`   | 0.25rem  | 4px    | Subtle rounding (code blocks)  |
+| `--radius-sm`   | 0.375rem | 6px    | Buttons, inputs, tooltips      |
+| `--radius-md`   | 0.5rem   | 8px    | Cards, modals, medium elements |
+| `--radius-lg`   | 0.75rem  | 12px   | Large cards, containers        |
+| `--radius-xl`   | 1rem     | 16px   | Hero sections, large surfaces  |
+| `--radius-full` | 9999px   | -      | Pills, avatars, circles        |
 
 ### Shadows
 
-| Token | Usage |
-|-------|-------|
+| Token         | Usage            |
+| ------------- | ---------------- |
 | `--shadow-sm` | Subtle elevation |
 | `--shadow-md` | Medium elevation |
-| `--shadow-lg` | High elevation |
+| `--shadow-lg` | High elevation   |
 
 ---
 
@@ -1132,27 +1162,26 @@ const {
 
 ### Target Browsers
 
-| Browser | Version | Notes |
-|---------|---------|-------|
-| Chrome | 100+ | Full support |
-| Firefox | 100+ | Full support |
-| Safari | 15.4+ | OKLCH support |
-| Edge | 100+ | Full support |
-| iOS Safari | 15.4+ | Full support |
-| Android Chrome | 100+ | Full support |
+| Browser        | Version | Notes         |
+| -------------- | ------- | ------------- |
+| Chrome         | 100+    | Full support  |
+| Firefox        | 100+    | Full support  |
+| Safari         | 15.4+   | OKLCH support |
+| Edge           | 100+    | Full support  |
+| iOS Safari     | 15.4+   | Full support  |
+| Android Chrome | 100+    | Full support  |
 
 ### CSS Features Used
 
-| Feature | Support |
-|---------|---------|
-| CSS Layers (`@layer`) | Modern browsers |
-| OKLCH Colors | Chrome 111+, Safari 15.4+ |
-| `color-mix()` | Chrome 111+, Safari 16.2+ |
-| `light-dark()` | Chrome 123+, Safari 17.4+ |
-| Container Queries | Chrome 105+, Safari 16+ |
-| Logical Properties | All modern |
+| Feature               | Support                   |
+| --------------------- | ------------------------- |
+| CSS Layers (`@layer`) | Modern browsers           |
+| OKLCH Colors          | Chrome 111+, Safari 15.4+ |
+| `color-mix()`         | Chrome 111+, Safari 16.2+ |
+| `light-dark()`        | Chrome 123+, Safari 17.4+ |
+| Container Queries     | Chrome 105+, Safari 16+   |
+| Logical Properties    | All modern                |
 
 ---
 
-*This document should be updated as the project progresses.*
-
+_This document should be updated as the project progresses._

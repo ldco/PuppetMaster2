@@ -11,10 +11,10 @@ The fastest way to customize for a new client is to update the 4 base colors:
 ```css
 /* assets/css/colors/primitives.css */
 :root {
-  --c-black: oklch(from #2f2f2f l c h);   /* Dark color */
-  --c-white: oklch(from #f0f0f0 l c h);   /* Light color */
-  --c-brand: oklch(from #aa0000 l c h);   /* Primary brand */
-  --c-accent: oklch(from #6366f1 l c h);  /* Secondary accent */
+  --c-black: oklch(from #2f2f2f l c h); /* Dark color */
+  --c-white: oklch(from #f0f0f0 l c h); /* Light color */
+  --c-brand: oklch(from #aa0000 l c h); /* Primary brand */
+  --c-accent: oklch(from #6366f1 l c h); /* Secondary accent */
 }
 ```
 
@@ -71,6 +71,7 @@ The typography system uses a 4-layer architecture. For client projects, you only
 ```
 
 **Important:** Match the fallback stack to your font type:
+
 - Sans-serif font → use `var(--fallback-sans)`
 - Serif font → use `var(--fallback-serif)`
 - Slab-serif font → use `var(--fallback-slab)`
@@ -140,10 +141,10 @@ The browser automatically applies the correct font based on `<html lang="XX">`.
 ```css
 /* assets/css/common/effects.css */
 :root {
-  --radius-sm: 0.375rem;   /* 6px */
-  --radius-md: 0.5rem;     /* 8px */
-  --radius-lg: 0.75rem;    /* 12px */
-  --radius-full: 9999px;   /* Pills, avatars */
+  --radius-sm: 0.375rem; /* 6px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-full: 9999px; /* Pills, avatars */
 }
 ```
 
@@ -151,24 +152,24 @@ The browser automatically applies the correct font based on `<html lang="XX">`.
 
 ## File-by-File Reference
 
-| I need to customize... | Edit this file |
-|------------------------|----------------|
-| Brand colors | `colors/primitives.css` |
-| Brand fonts | `typography/variables.css` (Layer 2) |
-| Font sizes | `typography/variables.css` (Layer 4) |
-| Self-hosted fonts | `typography/font-faces.css` |
-| Language-specific fonts | `typography/lang-overrides.css` |
-| Google Fonts | `nuxt.config.ts` (app.head.link) |
-| Header | `skeleton/header.css` |
-| Footer | `skeleton/footer.css` |
-| App sidebar | `layout/admin-sidebar.css` |
-| App bottom nav | `skeleton/bottom-nav.css` |
-| Buttons | `ui/forms/buttons.css` |
-| Input fields | `ui/forms/inputs.css` |
-| Cards | `ui/content/cards.css` |
-| Tabs | `ui/content/tabs.css` |
-| Modals | `ui/overlays/modal.css` |
-| Spacing scale | `common/spacing.css` |
+| I need to customize...  | Edit this file                       |
+| ----------------------- | ------------------------------------ |
+| Brand colors            | `colors/primitives.css`              |
+| Brand fonts             | `typography/variables.css` (Layer 2) |
+| Font sizes              | `typography/variables.css` (Layer 4) |
+| Self-hosted fonts       | `typography/font-faces.css`          |
+| Language-specific fonts | `typography/lang-overrides.css`      |
+| Google Fonts            | `nuxt.config.ts` (app.head.link)     |
+| Header                  | `skeleton/header.css`                |
+| Footer                  | `skeleton/footer.css`                |
+| App sidebar             | `layout/admin-sidebar.css`           |
+| App bottom nav          | `skeleton/bottom-nav.css`            |
+| Buttons                 | `ui/forms/buttons.css`               |
+| Input fields            | `ui/forms/inputs.css`                |
+| Cards                   | `ui/content/cards.css`               |
+| Tabs                    | `ui/content/tabs.css`                |
+| Modals                  | `ui/overlays/modal.css`              |
+| Spacing scale           | `common/spacing.css`                 |
 
 ---
 
@@ -177,12 +178,14 @@ The browser automatically applies the correct font based on `<html lang="XX">`.
 ### ✅ DO
 
 1. **Use CSS variables** - Never hardcode values
+
    ```css
    /* Good */
    padding: var(--space-4);
    ```
 
 2. **Use logical properties** - For RTL support
+
    ```css
    /* Good */
    margin-inline-start: var(--space-4);
@@ -190,29 +193,40 @@ The browser automatically applies the correct font based on `<html lang="XX">`.
    ```
 
 3. **Keep responsive rules in same file** - Base + media queries together
+
    ```css
    /* Good - in admin-sidebar.css */
-   .admin-sidebar { width: 240px; }
-   @media (--phone) { .admin-sidebar { display: none; } }
+   .admin-sidebar {
+     width: 240px;
+   }
+   @media (--phone) {
+     .admin-sidebar {
+       display: none;
+     }
+   }
    ```
 
 4. **Use rem units** - For scalability
    ```css
    /* Good */
-   max-width: 62.5rem;  /* 1000px */
+   max-width: 62.5rem; /* 1000px */
    ```
 
 ### ❌ DON'T
 
 1. **Don't use scoped styles in Vue components**
+
    ```vue
    <!-- Bad -->
    <style scoped>
-   .custom { color: red; }
+   .custom {
+     color: red;
+   }
    </style>
    ```
 
 2. **Don't use magic numbers**
+
    ```css
    /* Bad */
    width: 280px;
@@ -238,12 +252,14 @@ When adding a new CSS component:
    - Overlay → `ui/overlays/my-component.css`
 
 2. **Import in index.css**:
+
    ```css
    /* ui/content/index.css */
    @import './my-component.css';
    ```
 
 3. **Use design tokens**:
+
    ```css
    .my-component {
      padding: var(--space-4);
@@ -276,9 +292,8 @@ For heavy custom styling on client projects:
 // nuxt.config.ts
 css: [
   '~/assets/css/main.css',
-  '~/assets/css/client/overrides.css'  // Client-specific
+  '~/assets/css/client/overrides.css' // Client-specific
 ]
 ```
 
 This keeps the core framework separate from client customizations.
-

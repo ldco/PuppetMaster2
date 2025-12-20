@@ -24,4 +24,3 @@ const hasValidCta = computed(() => !!(ctaText.value && ctaUrl.value))
     </NuxtLink>
   </div>
 </template>
-

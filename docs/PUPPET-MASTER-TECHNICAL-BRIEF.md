@@ -36,7 +36,9 @@
 14. [Deployment](#14-deployment-q17--q21-decision) - **Q21 Kamal**
 15. [System/Browser Detection](#15-systembrowser-detection-q19-decision) - Q19
 16. [Decisions Log](#16-decisions-log) - **All 34 Decisions**
-   - 16.1 [DX Quick Reference](#161-dx-quick-reference---common-customizations) - **Common Customizations**
+
+- 16.1 [DX Quick Reference](#161-dx-quick-reference---common-customizations) - **Common Customizations**
+
 17. [Implementation Checklist](#17-implementation-checklist)
 18. [File Templates](#18-file-templates)
 19. [Component Architecture](#19-component-architecture-atomic-design) - Atomic Design
@@ -51,6 +53,7 @@
 A **config-driven studio toolkit/framework** for building client websites quickly and robustly.
 
 > ### 🎯 MOTTO
+>
 > **"The config file is the developer's best friend!"**
 >
 > Puppet Master is a **config-driven framework**. The developer defines the structure,
@@ -59,15 +62,16 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ### The Config-Driven Philosophy
 
-| Layer | Defined By | Entered By | Where |
-|-------|------------|------------|-------|
-| **Structure** | Developer | - | `puppet-master.config.ts` |
-| **Schema** | Developer | - | `puppet-master.config.ts` |
-| **Behavior** | Developer | - | `puppet-master.config.ts` |
-| **Content** | - | Client/Admin | Admin Panel → Database |
-| **Values** | - | Client/Admin | Admin Panel → Database |
+| Layer         | Defined By | Entered By   | Where                     |
+| ------------- | ---------- | ------------ | ------------------------- |
+| **Structure** | Developer  | -            | `puppet-master.config.ts` |
+| **Schema**    | Developer  | -            | `puppet-master.config.ts` |
+| **Behavior**  | Developer  | -            | `puppet-master.config.ts` |
+| **Content**   | -          | Client/Admin | Admin Panel → Database    |
+| **Values**    | -          | Client/Admin | Admin Panel → Database    |
 
 **Examples:**
+
 - **Settings**: Developer defines which settings exist (`site.name`, `contact.phone`, etc.) and where they appear on the website. Client enters the actual values.
 - **Sections**: Developer defines which sections exist and their order. Client enters section content.
 - **Portfolio**: Developer enables portfolio feature. Client adds portfolio items.
@@ -75,12 +79,12 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ### Primary Use Cases
 
-| Type | Description |
-|------|-------------|
-| **Landing Pages** | Single-page marketing sites |
+| Type                | Description                       |
+| ------------------- | --------------------------------- |
+| **Landing Pages**   | Single-page marketing sites       |
 | **Portfolio Sites** | Multi-page with project galleries |
-| **Business Sites** | Company sites with contact forms |
-| **Small Apps** | Simple SaaS with admin panel |
+| **Business Sites**  | Company sites with contact forms  |
+| **Small Apps**      | Simple SaaS with admin panel      |
 
 ### Core Principles
 
@@ -92,18 +96,18 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ### Key Requirements
 
-| Requirement | Solution |
-|-------------|----------|
-| Build sites fast | Reusable core layer |
-| Client edits content | Admin panel + CMS |
-| Works without backend | SQLite (single file) |
-| SEO-friendly | SSR/SSG with Nuxt |
-| Mobile-first | Responsive CSS |
-| Multi-language | i18n built-in |
-| RTL support | CSS logical properties |
-| Theme switching | Light/dark mode |
-| One-pager mode | Scroll-based navigation |
-| SPA mode | Route-based navigation |
+| Requirement           | Solution                |
+| --------------------- | ----------------------- |
+| Build sites fast      | Reusable core layer     |
+| Client edits content  | Admin panel + CMS       |
+| Works without backend | SQLite (single file)    |
+| SEO-friendly          | SSR/SSG with Nuxt       |
+| Mobile-first          | Responsive CSS          |
+| Multi-language        | i18n built-in           |
+| RTL support           | CSS logical properties  |
+| Theme switching       | Light/dark mode         |
+| One-pager mode        | Scroll-based navigation |
+| SPA mode              | Route-based navigation  |
 
 ---
 
@@ -111,21 +115,22 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 
 ### Core Stack
 
-| Layer | Technology | Why |
-|-------|------------|-----|
-| **Framework** | Nuxt 3 | Full-stack, SSR/SSG, great DX |
-| **Frontend** | Vue 3 | Composition API, reactive |
-| **Backend** | Nitro | Built into Nuxt, fast |
+| Layer           | Technology                 | Why                                                      |
+| --------------- | -------------------------- | -------------------------------------------------------- |
+| **Framework**   | Nuxt 3                     | Full-stack, SSR/SSG, great DX                            |
+| **Frontend**    | Vue 3                      | Composition API, reactive                                |
+| **Backend**     | Nitro                      | Built into Nuxt, fast                                    |
 | **Data Source** | SQLite **OR** External API | SQLite: simple, file-based / API: OAuth, circuit breaker |
-| **ORM** | Drizzle | Type-safe, lightweight (for SQLite) |
-| **Styling** | CSS (no framework) | Full control, no bloat |
-| **Images** | Sharp | Fast processing in Node |
+| **ORM**         | Drizzle                    | Type-safe, lightweight (for SQLite)                      |
+| **Styling**     | CSS (no framework)         | Full control, no bloat                                   |
+| **Images**      | Sharp                      | Fast processing in Node                                  |
 
 ### No Python Backend
 
 **Decision:** Drop Python backend entirely.
 
 **Rationale:**
+
 - Nuxt Nitro handles all backend needs
 - SQLite handles all database needs
 - Sharp handles all image processing
@@ -201,151 +206,153 @@ A **config-driven studio toolkit/framework** for building client websites quickl
 ## 4. Folder Structure
 
 ```
+
 app/frontend/
-├── nuxt.config.ts              # extends: ['./core']
-├── app.vue                     # Root component
-├── puppet-master.config.ts     # Project configuration
+├── nuxt.config.ts # extends: ['./core']
+├── app.vue # Root component
+├── puppet-master.config.ts # Project configuration
 │
-├── core/                       # ══════ CORE LAYER ══════
-│   ├── nuxt.config.ts          # Core layer config
-│   │
-│   ├── components/
-│   │   ├── atoms/              # Smallest reusable pieces
-│   │   │   ├── Logo.vue        # Universal logo
-│   │   │   ├── NavLink.vue     # Single nav link
-│   │   │   ├── ThemeToggle.vue # Light/dark toggle
-│   │   │   ├── LangSwitcher.vue# Language switcher
-│   │   │   ├── HamburgerIcon.vue# Hamburger button
-│   │   │   ├── CtaButton.vue   # CTA button
-│   │   │   └── SocialIcon.vue  # Social link icon
-│   │   │
-│   │   ├── molecules/          # Composed atoms
-│   │   │   ├── NavLinks.vue    # List of NavLink
-│   │   │   ├── SocialLinks.vue # List of SocialIcon
-│   │   │   ├── HeaderActions.vue# Theme + Lang + Contacts
-│   │   │   └── LegalInfo.vue   # OOO, INN, OGRN
-│   │   │
-│   │   ├── organisms/          # Complete sections
-│   │   │   ├── DesktopHeader.vue# Full desktop header
-│   │   │   ├── MobileHeader.vue # Mobile header bar
-│   │   │   ├── MobileNav.vue   # Slide-out mobile nav
-│   │   │   ├── TheFooter.vue   # Complete footer
-│   │   │   ├── AdminSidebar.vue# Admin sidebar
-│   │   │   └── AdminHeader.vue # Admin top bar
-│   │   │
-│   │   └── templates/          # Smart switchers
-│   │       └── TheHeader.vue   # Desktop OR Mobile
-│   │
-│   ├── composables/
-│   │   ├── useConfig.ts        # Feature config access
-│   │   ├── useAuth.ts          # Auth state
-│   │   ├── useSiteSettings.ts  # CMS content
-│   │   ├── useMediaQuery.ts    # Reactive CSS media query
-│   │   └── useDevice.ts        # Device detection
-│   │
-│   ├── layouts/
-│   │   ├── default.vue         # Main layout (header/footer)
-│   │   ├── admin.vue           # Admin layout (sidebar)
-│   │   └── blank.vue           # No chrome
-│   │
-│   ├── plugins/
-│   │   ├── auth.client.ts      # Auth initialization
-│   │   └── csrf.client.ts      # CSRF protection
-│   │
-│   ├── utils/
-│   │   ├── rtl.ts              # RTL language detection
-│   │   └── random.ts           # Random number utils
-│   │
-│   ├── server/
-│   │   ├── api/
-│   │   │   ├── auth/
-│   │   │   │   ├── login.post.ts
-│   │   │   │   ├── logout.post.ts
-│   │   │   │   └── session.get.ts
-│   │   │   ├── settings/
-│   │   │   │   ├── index.get.ts
-│   │   │   │   └── index.put.ts
-│   │   │   └── upload/
-│   │   │       └── image.post.ts
-│   │   ├── database/
-│   │   │   ├── client.ts       # Drizzle client
-│   │   │   ├── schema.ts       # Database schema
-│   │   │   └── migrations/
-│   │   ├── middleware/
-│   │   │   └── auth.ts         # Protect routes
-│   │   └── utils/
-│   │       └── password.ts     # Hashing
-│   │
-│   ├── assets/
-│   │   ├── styles/
-│   │   │   ├── main.css          # Entry point (imports all, @layer order)
-│   │   │   ├── reset.css         # CSS reset/normalize
-│   │   │   ├── common/           # Base utilities (Q27)
-│   │   │   │   ├── index.css
-│   │   │   │   ├── spacing.css
-│   │   │   │   ├── utilities.css
-│   │   │   │   └── edge-cases.css
-│   │   │   ├── colors/           # Color system (Q22, Q34)
-│   │   │   │   ├── index.css
-│   │   │   │   ├── auto.css
-│   │   │   │   └── manual.css
-│   │   │   ├── typography/       # Typography (Q29, Q32)
-│   │   │   │   ├── index.css
-│   │   │   │   ├── variables.css
-│   │   │   │   ├── base.css
-│   │   │   │   └── fonts/
-│   │   │   ├── layout/           # Layout system (Q31)
-│   │   │   │   ├── index.css
-│   │   │   │   ├── grid.css
-│   │   │   │   ├── containers.css
-│   │   │   │   └── responsive.css
-│   │   │   ├── animations/       # Motion (Q30)
-│   │   │   │   ├── index.css
-│   │   │   │   ├── keyframes.css
-│   │   │   │   ├── transitions.css
-│   │   │   │   └── reduced-motion.css
-│   │   │   ├── skeleton/         # Layout structure
-│   │   │   │   ├── index.css
-│   │   │   │   ├── header.css
-│   │   │   │   ├── footer.css
-│   │   │   │   ├── nav.css
-│   │   │   │   ├── mobile-nav.css
-│   │   │   │   └── admin.css
-│   │   │   └── ui/               # UI components (Q33)
-│   │   │       ├── index.css
-│   │   │       ├── forms/
-│   │   │       ├── overlays/
-│   │   │       └── content/
-│   │   ├── icons/                # Project icons (SVG)
-│   │   └── graphics/             # Illustrations, logos (SVG)
-│   │
-│   └── types/
-│       └── index.ts            # Shared types
+├── core/ # ══════ CORE LAYER ══════
+│ ├── nuxt.config.ts # Core layer config
+│ │
+│ ├── components/
+│ │ ├── atoms/ # Smallest reusable pieces
+│ │ │ ├── Logo.vue # Universal logo
+│ │ │ ├── NavLink.vue # Single nav link
+│ │ │ ├── ThemeToggle.vue # Light/dark toggle
+│ │ │ ├── LangSwitcher.vue# Language switcher
+│ │ │ ├── HamburgerIcon.vue# Hamburger button
+│ │ │ ├── CtaButton.vue # CTA button
+│ │ │ └── SocialIcon.vue # Social link icon
+│ │ │
+│ │ ├── molecules/ # Composed atoms
+│ │ │ ├── NavLinks.vue # List of NavLink
+│ │ │ ├── SocialLinks.vue # List of SocialIcon
+│ │ │ ├── HeaderActions.vue# Theme + Lang + Contacts
+│ │ │ └── LegalInfo.vue # OOO, INN, OGRN
+│ │ │
+│ │ ├── organisms/ # Complete sections
+│ │ │ ├── DesktopHeader.vue# Full desktop header
+│ │ │ ├── MobileHeader.vue # Mobile header bar
+│ │ │ ├── MobileNav.vue # Slide-out mobile nav
+│ │ │ ├── TheFooter.vue # Complete footer
+│ │ │ ├── AdminSidebar.vue# Admin sidebar
+│ │ │ └── AdminHeader.vue # Admin top bar
+│ │ │
+│ │ └── templates/ # Smart switchers
+│ │ └── TheHeader.vue # Desktop OR Mobile
+│ │
+│ ├── composables/
+│ │ ├── useConfig.ts # Feature config access
+│ │ ├── useAuth.ts # Auth state
+│ │ ├── useSiteSettings.ts # CMS content
+│ │ ├── useMediaQuery.ts # Reactive CSS media query
+│ │ └── useDevice.ts # Device detection
+│ │
+│ ├── layouts/
+│ │ ├── default.vue # Main layout (header/footer)
+│ │ ├── admin.vue # Admin layout (sidebar)
+│ │ └── blank.vue # No chrome
+│ │
+│ ├── plugins/
+│ │ ├── auth.client.ts # Auth initialization
+│ │ └── csrf.client.ts # CSRF protection
+│ │
+│ ├── utils/
+│ │ ├── rtl.ts # RTL language detection
+│ │ └── random.ts # Random number utils
+│ │
+│ ├── server/
+│ │ ├── api/
+│ │ │ ├── auth/
+│ │ │ │ ├── login.post.ts
+│ │ │ │ ├── logout.post.ts
+│ │ │ │ └── session.get.ts
+│ │ │ ├── settings/
+│ │ │ │ ├── index.get.ts
+│ │ │ │ └── index.put.ts
+│ │ │ └── upload/
+│ │ │ └── image.post.ts
+│ │ ├── database/
+│ │ │ ├── client.ts # Drizzle client
+│ │ │ ├── schema.ts # Database schema
+│ │ │ └── migrations/
+│ │ ├── middleware/
+│ │ │ └── auth.ts # Protect routes
+│ │ └── utils/
+│ │ └── password.ts # Hashing
+│ │
+│ ├── assets/
+│ │ ├── styles/
+│ │ │ ├── main.css # Entry point (imports all, @layer order)
+│ │ │ ├── reset.css # CSS reset/normalize
+│ │ │ ├── common/ # Base utilities (Q27)
+│ │ │ │ ├── index.css
+│ │ │ │ ├── spacing.css
+│ │ │ │ ├── utilities.css
+│ │ │ │ └── edge-cases.css
+│ │ │ ├── colors/ # Color system (Q22, Q34)
+│ │ │ │ ├── index.css
+│ │ │ │ ├── auto.css
+│ │ │ │ └── manual.css
+│ │ │ ├── typography/ # Typography (Q29, Q32)
+│ │ │ │ ├── index.css
+│ │ │ │ ├── variables.css
+│ │ │ │ ├── base.css
+│ │ │ │ └── fonts/
+│ │ │ ├── layout/ # Layout system (Q31)
+│ │ │ │ ├── index.css
+│ │ │ │ ├── grid.css
+│ │ │ │ ├── containers.css
+│ │ │ │ └── responsive.css
+│ │ │ ├── animations/ # Motion (Q30)
+│ │ │ │ ├── index.css
+│ │ │ │ ├── keyframes.css
+│ │ │ │ ├── transitions.css
+│ │ │ │ └── reduced-motion.css
+│ │ │ ├── skeleton/ # Layout structure
+│ │ │ │ ├── index.css
+│ │ │ │ ├── header.css
+│ │ │ │ ├── footer.css
+│ │ │ │ ├── nav.css
+│ │ │ │ ├── mobile-nav.css
+│ │ │ │ └── admin.css
+│ │ │ └── ui/ # UI components (Q33)
+│ │ │ ├── index.css
+│ │ │ ├── forms/
+│ │ │ ├── overlays/
+│ │ │ └── content/
+│ │ ├── icons/ # Project icons (SVG)
+│ │ └── graphics/ # Illustrations, logos (SVG)
+│ │
+│ └── types/
+│ └── index.ts # Shared types
 │
-├── pages/                      # ══════ MINIMAL PAGES (Q15) ══════
-│   ├── index.vue               # Main page (renders all sections)
-│   ├── admin/                  # Admin routes (if adminPanel: true)
-│   │   ├── index.vue           # Dashboard
-│   │   ├── settings.vue        # Site settings
-│   │   └── portfolio.vue       # Manage portfolio
-│   └── error.vue               # Error page (404, 500)
+├── pages/ # ══════ MINIMAL PAGES (Q15) ══════
+│ ├── index.vue # Main page (renders all sections)
+│ ├── admin/ # Admin routes (if adminPanel: true)
+│ │ ├── index.vue # Dashboard
+│ │ ├── settings.vue # Site settings
+│ │ └── portfolio.vue # Manage portfolio
+│ └── error.vue # Error page (404, 500)
 │
-├── components/                 # ══════ PROJECT SECTIONS (Q15) ══════
-│   └── sections/               # Content sections (SOURCE OF TRUTH)
-│       ├── HeroSection.vue     # order: 1, id: 'home'
-│       ├── AboutSection.vue    # order: 2, id: 'about'
-│       ├── PortfolioSection.vue # order: 3, id: 'portfolio'
-│       ├── ContactSection.vue  # order: 4, id: 'contact'
-│       └── index.ts            # Exports ordered sections array
+├── components/ # ══════ PROJECT SECTIONS (Q15) ══════
+│ └── sections/ # Content sections (SOURCE OF TRUTH)
+│ ├── HeroSection.vue # order: 1, id: 'home'
+│ ├── AboutSection.vue # order: 2, id: 'about'
+│ ├── PortfolioSection.vue # order: 3, id: 'portfolio'
+│ ├── ContactSection.vue # order: 4, id: 'contact'
+│ └── index.ts # Exports ordered sections array
 │
 ├── assets/
-│   └── styles/
-│       └── project.css         # Project colors, fonts, custom
+│ └── styles/
+│ └── project.css # Project colors, fonts, custom
 │
 └── public/
-    ├── favicon.ico
-    └── images/                 # Project images
-```
+├── favicon.ico
+└── images/ # Project images
+
+````
 
 ---
 
@@ -421,7 +428,7 @@ export default defineNuxtConfig({
     fallback: 'light'
   }
 })
-```
+````
 
 ---
 
@@ -429,14 +436,14 @@ export default defineNuxtConfig({
 
 ### What Goes in Project (Root)
 
-| Type | Contents |
-|------|----------|
-| **pages/** | Minimal: index.vue (renders sections), admin/, error.vue |
-| **components/sections/** | Project sections (HeroSection, AboutSection, etc.) - Q15 |
-| **assets/styles/project.css** | Override base colors, fonts, custom |
-| **public/** | Images, favicon, static files |
-| **puppet-master.config.ts** | Project settings (features, locales) |
-| **app.vue** | Root component |
+| Type                          | Contents                                                 |
+| ----------------------------- | -------------------------------------------------------- |
+| **pages/**                    | Minimal: index.vue (renders sections), admin/, error.vue |
+| **components/sections/**      | Project sections (HeroSection, AboutSection, etc.) - Q15 |
+| **assets/styles/project.css** | Override base colors, fonts, custom                      |
+| **public/**                   | Images, favicon, static files                            |
+| **puppet-master.config.ts**   | Project settings (features, locales)                     |
+| **app.vue**                   | Root component                                           |
 
 **Q15 Decision:** Sections are the SOURCE OF TRUTH for navigation. One boolean (`onepager`) switches between scroll-based and route-based navigation.
 
@@ -449,9 +456,7 @@ export default defineNuxtConfig({
   extends: ['./core'],
 
   // Project-specific CSS
-  css: [
-    './assets/styles/project.css'
-  ],
+  css: ['./assets/styles/project.css'],
 
   // Override i18n if needed
   i18n: {
@@ -478,6 +483,7 @@ export default defineNuxtConfig({
 ## 7. Data Source
 
 > **Note:** Puppet Master supports two data source modes:
+>
 > - **SQLite + Drizzle** (default) - Local database, zero external dependencies
 > - **External REST API** - OAuth 2.0/JWT auth, circuit breaker, caching
 >
@@ -489,7 +495,7 @@ export default defineNuxtConfig({
 
 ```typescript
 // core/server/database/schema.ts
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
 // Site settings (editable via admin)
 export const settings = sqliteTable('settings', {
@@ -497,7 +503,7 @@ export const settings = sqliteTable('settings', {
   key: text('key').notNull().unique(),
   value: text('value'),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
-});
+})
 
 // Users (admin accounts)
 export const users = sqliteTable('users', {
@@ -506,14 +512,14 @@ export const users = sqliteTable('users', {
   passwordHash: text('password_hash').notNull(),
   role: text('role').default('admin'),
   createdAt: integer('created_at', { mode: 'timestamp' })
-});
+})
 
 // Sessions
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(),
   userId: integer('user_id').references(() => users.id),
   expiresAt: integer('expires_at', { mode: 'timestamp' })
-});
+})
 
 // Portfolio items (example content type)
 export const portfolioItems = sqliteTable('portfolio_items', {
@@ -526,7 +532,7 @@ export const portfolioItems = sqliteTable('portfolio_items', {
   published: integer('published', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
-});
+})
 
 // Contact form submissions
 export const contactSubmissions = sqliteTable('contact_submissions', {
@@ -535,24 +541,24 @@ export const contactSubmissions = sqliteTable('contact_submissions', {
   email: text('email').notNull(),
   message: text('message').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' })
-});
+})
 ```
 
 ### Settings Keys
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `site.name` | string | Site name |
-| `site.tagline` | string | Site tagline |
-| `contact.email` | string | Contact email |
-| `contact.phone` | string | Contact phone |
-| `contact.address` | string | Physical address |
-| `social.telegram` | string | Telegram URL |
-| `social.instagram` | string | Instagram URL |
-| `social.whatsapp` | string | WhatsApp number |
-| `seo.title` | string | Default page title |
-| `seo.description` | string | Default meta description |
-| `maps.embedUrl` | string | Google Maps embed URL |
+| Key                | Type   | Description              |
+| ------------------ | ------ | ------------------------ |
+| `site.name`        | string | Site name                |
+| `site.tagline`     | string | Site tagline             |
+| `contact.email`    | string | Contact email            |
+| `contact.phone`    | string | Contact phone            |
+| `contact.address`  | string | Physical address         |
+| `social.telegram`  | string | Telegram URL             |
+| `social.instagram` | string | Instagram URL            |
+| `social.whatsapp`  | string | WhatsApp number          |
+| `seo.title`        | string | Default page title       |
+| `seo.description`  | string | Default meta description |
+| `maps.embedUrl`    | string | Google Maps embed URL    |
 
 ---
 
@@ -593,6 +599,7 @@ assets/css/
 ```
 
 **Key Metrics (Refactor 2024-12-19):**
+
 - `page.css`: 830 → 236 lines (72% reduction)
 - `utilities.css`: 344 → 122 lines (65% reduction)
 - 16 new modular CSS files created
@@ -621,9 +628,9 @@ assets/css/colors/
     /* ═══════════════════════════════════════════════════════════
        BASE PRIMITIVES (Define these 4 in hex - Project overrides)
        ═══════════════════════════════════════════════════════════ */
-    --p-black: #0f172a;     /* Default neutral - project overrides */
+    --p-black: #0f172a; /* Default neutral - project overrides */
     --p-white: #f8fafc;
-    --p-brand: #6366f1;     /* Default indigo */
+    --p-brand: #6366f1; /* Default indigo */
     --p-accent: #8b5cf6;
   }
 }
@@ -663,30 +670,30 @@ assets/css/colors/
     --i-brand-text: var(--p-white);
 
     /* DENOTIVES - fixed semantic hues, brand's energy */
-    --d-success: oklch(from var(--p-brand) l c 145);  /* Green hue */
-    --d-error: oklch(from var(--p-brand) l c 25);     /* Red hue */
-    --d-warning: oklch(from var(--p-brand) l c 85);   /* Yellow hue */
-    --d-info: oklch(from var(--p-brand) l c 250);     /* Blue hue */
+    --d-success: oklch(from var(--p-brand) l c 145); /* Green hue */
+    --d-error: oklch(from var(--p-brand) l c 25); /* Red hue */
+    --d-warning: oklch(from var(--p-brand) l c 85); /* Yellow hue */
+    --d-info: oklch(from var(--p-brand) l c 250); /* Blue hue */
   }
 }
 ```
 
 #### Token Naming Convention
 
-| Prefix | Category | Example |
-|--------|----------|---------|
-| `--p-` | Primitive (base colors) | `--p-brand`, `--p-black` |
-| `--l-` | Layout (backgrounds, text) | `--l-bg`, `--l-text` |
-| `--i-` | Interactive (buttons, links) | `--i-brand-hover` |
-| `--d-` | Denotives (semantic) | `--d-success`, `--d-error` |
+| Prefix | Category                     | Example                    |
+| ------ | ---------------------------- | -------------------------- |
+| `--p-` | Primitive (base colors)      | `--p-brand`, `--p-black`   |
+| `--l-` | Layout (backgrounds, text)   | `--l-bg`, `--l-text`       |
+| `--i-` | Interactive (buttons, links) | `--i-brand-hover`          |
+| `--d-` | Denotives (semantic)         | `--d-success`, `--d-error` |
 
 #### Browser Support & Fallback
 
-| Feature | Support | Status |
-|---------|---------|--------|
-| OKLCH | ~95% | ✅ Baseline 2023 |
-| color-mix() | ~92% | ✅ Baseline 2023 |
-| light-dark() | ~90% | ✅ Baseline 2024 |
+| Feature      | Support | Status           |
+| ------------ | ------- | ---------------- |
+| OKLCH        | ~95%    | ✅ Baseline 2023 |
+| color-mix()  | ~92%    | ✅ Baseline 2023 |
+| light-dark() | ~90%    | ✅ Baseline 2024 |
 
 ```css
 /* Fallback for ~10% older browsers */
@@ -712,23 +719,23 @@ Variables are now split across organized folders:
 @layer primitives {
   :root {
     /* Spacing (8px base) */
-    --space-1: 0.25rem;   /* 4px */
-    --space-2: 0.5rem;    /* 8px */
-    --space-3: 0.75rem;   /* 12px */
-    --space-4: 1rem;      /* 16px */
-    --space-6: 1.5rem;    /* 24px */
-    --space-8: 2rem;      /* 32px */
-    --space-12: 3rem;     /* 48px */
-    --space-16: 4rem;     /* 64px */
+    --space-1: 0.25rem; /* 4px */
+    --space-2: 0.5rem; /* 8px */
+    --space-3: 0.75rem; /* 12px */
+    --space-4: 1rem; /* 16px */
+    --space-6: 1.5rem; /* 24px */
+    --space-8: 2rem; /* 32px */
+    --space-12: 3rem; /* 48px */
+    --space-16: 4rem; /* 64px */
 
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-base: 300ms ease;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
     /* Border radius */
     --radius-sm: 0.25rem;
@@ -773,15 +780,15 @@ Variables are now split across organized folders:
 
 ### CSS Units Decision
 
-| Use Case | Unit | Example |
-|----------|------|---------|
-| Fluid Typography | `clamp()` | `clamp(1rem, 0.9rem + 0.5vw, 1.125rem)` |
-| Fluid Spacing | `clamp()` | `clamp(1rem, 0.8rem + 1vw, 1.5rem)` |
-| Fixed Spacing | `rem` | `margin-bottom: 1.5rem` |
-| Borders | `px` | `border: 1px solid` |
-| Viewport Heights | `dvh` | `min-height: 100dvh` |
-| Component Heights | `rem` | `height: 3rem` |
-| Line Height | unitless | `line-height: 1.5` |
+| Use Case          | Unit      | Example                                 |
+| ----------------- | --------- | --------------------------------------- |
+| Fluid Typography  | `clamp()` | `clamp(1rem, 0.9rem + 0.5vw, 1.125rem)` |
+| Fluid Spacing     | `clamp()` | `clamp(1rem, 0.8rem + 1vw, 1.5rem)`     |
+| Fixed Spacing     | `rem`     | `margin-bottom: 1.5rem`                 |
+| Borders           | `px`      | `border: 1px solid`                     |
+| Viewport Heights  | `dvh`     | `min-height: 100dvh`                    |
+| Component Heights | `rem`     | `height: 3rem`                          |
+| Line Height       | unitless  | `line-height: 1.5`                      |
 
 ### RTL Support - CSS Logical Properties
 
@@ -810,9 +817,15 @@ body {
   min-height: 100dvh;
 }
 
-header { grid-row: 1; }
-main { grid-row: 2; }
-footer { grid-row: 3; }
+header {
+  grid-row: 1;
+}
+main {
+  grid-row: 2;
+}
+footer {
+  grid-row: 3;
+}
 ```
 
 ---
@@ -828,7 +841,7 @@ export default defineNuxtConfig({
 
   icons: {
     // Change this ONE line to swap icon library!
-    defaultCollection: 'tabler',  // ~4,500 icons
+    defaultCollection: 'tabler' // ~4,500 icons
     // Alternatives: 'lucide', 'heroicons', 'phosphor'
   }
 })
@@ -875,6 +888,7 @@ import HeroGraphic from '~/assets/graphics/hero.svg?component'
 ### Native HTML5 + Zod + Custom CSS
 
 **Client-side:**
+
 ```vue
 <template>
   <form @submit.prevent="handleSubmit">
@@ -886,16 +900,17 @@ import HeroGraphic from '~/assets/graphics/hero.svg?component'
 ```
 
 **Server-side:**
+
 ```ts
 // server/api/contact.post.ts
 import { z } from 'zod'
 
 const schema = z.object({
   email: z.string().email(),
-  message: z.string().min(10).max(1000),
+  message: z.string().min(10).max(1000)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   const result = schema.safeParse(body)
   if (!result.success) {
@@ -906,10 +921,17 @@ export default defineEventHandler(async (event) => {
 ```
 
 **CSS Form States:**
+
 ```css
-input:invalid:not(:placeholder-shown) { border-color: var(--d-error); }
-input:valid:not(:placeholder-shown) { border-color: var(--d-success); }
-input:focus { box-shadow: 0 0 0 3px color-mix(in oklch, var(--i-brand), transparent 80%); }
+input:invalid:not(:placeholder-shown) {
+  border-color: var(--d-error);
+}
+input:valid:not(:placeholder-shown) {
+  border-color: var(--d-success);
+}
+input:focus {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--i-brand), transparent 80%);
+}
 ```
 
 ---
@@ -918,11 +940,11 @@ input:focus { box-shadow: 0 0 0 3px color-mix(in oklch, var(--i-brand), transpar
 
 ### Pinia (use sparingly)
 
-| State Type | Solution |
-|------------|----------|
-| Component-local | `ref()` |
-| Shared simple | `useState()` |
-| Complex/Admin | Pinia store |
+| State Type      | Solution     |
+| --------------- | ------------ |
+| Component-local | `ref()`      |
+| Shared simple   | `useState()` |
+| Complex/Admin   | Pinia store  |
 
 ```ts
 // stores/admin.ts
@@ -930,13 +952,16 @@ export const useAdminStore = defineStore('admin', () => {
   const sidebarOpen = ref(true)
   const unsavedChanges = ref(false)
 
-  function toggleSidebar() { sidebarOpen.value = !sidebarOpen.value }
+  function toggleSidebar() {
+    sidebarOpen.value = !sidebarOpen.value
+  }
 
   return { sidebarOpen, unsavedChanges, toggleSidebar }
 })
 ```
 
 **NOT in Pinia:**
+
 - Theme → `@nuxtjs/color-mode`
 - Locale → `@nuxtjs/i18n`
 - Server data → `useFetch`
@@ -960,13 +985,44 @@ animations/
 ```css
 /* animations/keyframes.css */
 @layer components {
-  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slide-up { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-  .animate-fade-in { animation: fade-in var(--transition-base) ease-out; }
-  .animate-slide-up { animation: slide-up var(--transition-base) ease-out; }
-  .animate-scale-in { animation: scale-in var(--transition-base) ease-out; }
+  .animate-fade-in {
+    animation: fade-in var(--transition-base) ease-out;
+  }
+  .animate-slide-up {
+    animation: slide-up var(--transition-base) ease-out;
+  }
+  .animate-scale-in {
+    animation: scale-in var(--transition-base) ease-out;
+  }
 }
 ```
 
@@ -976,11 +1032,26 @@ animations/
 /* animations/transitions.css */
 @layer components {
   /* Vue Transition classes */
-  .fade-enter-active, .fade-leave-active { transition: opacity var(--transition-base); }
-  .fade-enter-from, .fade-leave-to { opacity: 0; }
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity var(--transition-base);
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 
-  .slide-enter-active, .slide-leave-active { transition: transform var(--transition-base), opacity var(--transition-base); }
-  .slide-enter-from, .slide-leave-to { opacity: 0; transform: translateY(1rem); }
+  .slide-enter-active,
+  .slide-leave-active {
+    transition:
+      transform var(--transition-base),
+      opacity var(--transition-base);
+  }
+  .slide-enter-from,
+  .slide-leave-to {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
 }
 ```
 
@@ -989,7 +1060,9 @@ animations/
 ```css
 /* animations/reduced-motion.css */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -1008,58 +1081,92 @@ All known browser caveats in one file:
 ```css
 /* iOS Safari - prevent input zoom */
 @supports (-webkit-touch-callout: none) {
-  input, select, textarea { font-size: max(16px, 1rem); }
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
 }
 
 /* Safe areas (notch) */
-body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
 
 /* Tap highlight */
-* { -webkit-tap-highlight-color: transparent; }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* Overscroll */
-html { overscroll-behavior: none; }
+html {
+  overscroll-behavior: none;
+}
 
 /* Dark mode autofill fix */
-:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--l-bg) inset !important; }
+:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--l-bg) inset !important;
+}
 
 /* Focus visible (keyboard only) */
-:focus:not(:focus-visible) { outline: none; }
-:focus-visible { outline: 2px solid var(--i-brand); outline-offset: 2px; }
+:focus:not(:focus-visible) {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--i-brand);
+  outline-offset: 2px;
+}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* High contrast */
 @media (forced-colors: active) {
-  button, .btn { border: 2px solid currentColor !important; }
+  button,
+  .btn {
+    border: 2px solid currentColor !important;
+  }
 }
 
 /* Scrollbars - See common/scrollbars.css for full customization */
-* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
 
 /* RTL phone numbers */
-[dir="rtl"] .phone-number { direction: ltr; unicode-bidi: isolate; }
+[dir='rtl'] .phone-number {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
 
 /* Touch target minimum */
-button, a { min-height: 44px; min-width: 44px; }
+button,
+a {
+  min-height: 44px;
+  min-width: 44px;
+}
 ```
 
 ### Edge Cases Reference
 
-| Issue | Solution |
-|-------|----------|
-| iOS 100vh bug | Use `100dvh` |
-| iOS input zoom | `font-size: 16px` minimum |
-| Safe areas | `env(safe-area-inset-*)` |
-| Dark autofill | Custom `:-webkit-autofill` |
-| Focus on click | `:focus-visible` not `:focus` |
-| Reduced motion | `prefers-reduced-motion` query |
-| RTL icons | `transform: scaleX(-1)` |
-| Touch targets | Minimum 44x44px |
-| Custom scrollbars | `common/scrollbars.css` |
+| Issue             | Solution                       |
+| ----------------- | ------------------------------ |
+| iOS 100vh bug     | Use `100dvh`                   |
+| iOS input zoom    | `font-size: 16px` minimum      |
+| Safe areas        | `env(safe-area-inset-*)`       |
+| Dark autofill     | Custom `:-webkit-autofill`     |
+| Focus on click    | `:focus-visible` not `:focus`  |
+| Reduced motion    | `prefers-reduced-motion` query |
+| RTL icons         | `transform: scaleX(-1)`        |
+| Touch targets     | Minimum 44x44px                |
+| Custom scrollbars | `common/scrollbars.css`        |
 
 ### Custom Scrollbars
 
@@ -1095,10 +1202,10 @@ Full scrollbar customization via CSS variables in `common/scrollbars.css`:
 
 Puppet Master uses **two different organizational paradigms** that work together but are NOT the same:
 
-| Concern | What It Organizes | Naming Convention | Files |
-|---------|-------------------|-------------------|-------|
-| **CSS Architecture** | Stylesheets | By **domain/purpose** | `.css` files |
-| **Component Architecture** | Vue components | By **atomic level** | `.vue` files |
+| Concern                    | What It Organizes | Naming Convention     | Files        |
+| -------------------------- | ----------------- | --------------------- | ------------ |
+| **CSS Architecture**       | Stylesheets       | By **domain/purpose** | `.css` files |
+| **Component Architecture** | Vue components    | By **atomic level**   | `.vue` files |
 
 **These do NOT need to match naming!**
 
@@ -1134,27 +1241,27 @@ Puppet Master uses **two different organizational paradigms** that work together
 
 CSS is organized by **domain** (what the styles affect), not atomic level:
 
-| CSS Folder | Contains Styles For | Used By Components |
-|------------|--------------------|--------------------|
-| `colors/` | Color variables, themes | All components |
-| `typography/` | Font families, sizes, scales | All text |
-| `layout/` | Grid, containers, responsive | Layout components |
-| `skeleton/` | Header, footer, nav layouts | Organisms |
-| `ui/forms/` | Inputs, buttons, selects | Atoms + Molecules |
-| `ui/overlays/` | Modals, dropdowns, tooltips | Organisms |
+| CSS Folder     | Contains Styles For          | Used By Components |
+| -------------- | ---------------------------- | ------------------ |
+| `colors/`      | Color variables, themes      | All components     |
+| `typography/`  | Font families, sizes, scales | All text           |
+| `layout/`      | Grid, containers, responsive | Layout components  |
+| `skeleton/`    | Header, footer, nav layouts  | Organisms          |
+| `ui/forms/`    | Inputs, buttons, selects     | Atoms + Molecules  |
+| `ui/overlays/` | Modals, dropdowns, tooltips  | Organisms          |
 
 ### Where Do "Skeleton" Components Go in Atomic Design?
 
 "Skeleton" is a **domain concept** (fixed layout parts), not an atomic level:
 
-| Component | Atomic Level | Why? |
-|-----------|--------------|------|
-| `Logo.vue` | **Atom** | Single, indivisible element |
-| `NavLink.vue` | **Atom** | Single link |
-| `NavLinks.vue` | **Molecule** | Composed of NavLink atoms |
+| Component           | Atomic Level | Why?                             |
+| ------------------- | ------------ | -------------------------------- |
+| `Logo.vue`          | **Atom**     | Single, indivisible element      |
+| `NavLink.vue`       | **Atom**     | Single link                      |
+| `NavLinks.vue`      | **Molecule** | Composed of NavLink atoms        |
 | `DesktopHeader.vue` | **Organism** | Complete, self-contained section |
-| `TheFooter.vue` | **Organism** | Complete section |
-| `TheHeader.vue` | **Template** | Switches between Desktop/Mobile |
+| `TheFooter.vue`     | **Organism** | Complete section                 |
+| `TheHeader.vue`     | **Template** | Switches between Desktop/Mobile  |
 
 ### The 3-Layer CSS System (Primitives → Semantic → Components)
 
@@ -1163,27 +1270,33 @@ The 3 layers exist **INSIDE the CSS files** via `@layer`, not as separate folder
 ```css
 /* colors/auto.css */
 @layer primitives {
-  :root { --p-brand: #ef922d; }    /* Raw value */
+  :root {
+    --p-brand: #ef922d;
+  } /* Raw value */
 }
 
 @layer semantic {
-  :root { --c-brand: oklch(from var(--p-brand) l c h); }  /* Calculated */
+  :root {
+    --c-brand: oklch(from var(--p-brand) l c h);
+  } /* Calculated */
 }
 
 /* skeleton/header.css */
 @layer components {
-  .site-header { background: var(--c-brand); }  /* Uses semantic token */
+  .site-header {
+    background: var(--c-brand);
+  } /* Uses semantic token */
 }
 ```
 
 ### Summary
 
-| Question | Answer |
-|----------|--------|
-| Why no `atoms/` folder in CSS? | CSS = organized by domain, not atomic level |
-| Where do skeleton components go? | In `organisms/` (they're complete sections) |
-| How do 3 CSS layers work? | `@layer` declarations INSIDE CSS files |
-| Is there conflict? | NO! Two separate systems that complement each other |
+| Question                         | Answer                                              |
+| -------------------------------- | --------------------------------------------------- |
+| Why no `atoms/` folder in CSS?   | CSS = organized by domain, not atomic level         |
+| Where do skeleton components go? | In `organisms/` (they're complete sections)         |
+| How do 3 CSS layers work?        | `@layer` declarations INSIDE CSS files              |
+| Is there conflict?               | NO! Two separate systems that complement each other |
 
 ---
 
@@ -1214,13 +1327,13 @@ The CSS architecture uses CSS `@layer` for proper cascade control and clear sepa
 
 #### Core vs Project Separation
 
-| Layer | Purpose | Defined In |
-|-------|---------|------------|
-| **reset** | CSS reset/normalize | Core (never changes) |
-| **primitives** | Raw values (colors, fonts, spacing) | Core defaults + Project overrides |
-| **semantic** | Calculations (color-mix, light-dark) | Core (never changes) |
-| **components** | UI element styling | Core (uses semantic tokens) |
-| **utilities** | Helper classes | Core (never changes) |
+| Layer          | Purpose                              | Defined In                        |
+| -------------- | ------------------------------------ | --------------------------------- |
+| **reset**      | CSS reset/normalize                  | Core (never changes)              |
+| **primitives** | Raw values (colors, fonts, spacing)  | Core defaults + Project overrides |
+| **semantic**   | Calculations (color-mix, light-dark) | Core (never changes)              |
+| **components** | UI element styling                   | Core (uses semantic tokens)       |
+| **utilities**  | Helper classes                       | Core (never changes)              |
 
 #### How Projects Override
 
@@ -1229,7 +1342,7 @@ The CSS architecture uses CSS `@layer` for proper cascade control and clear sepa
 @layer primitives {
   :root {
     /* Override Core's default values */
-    --p-brand: #ef922d;       /* Client's orange */
+    --p-brand: #ef922d; /* Client's orange */
     --p-black: #001427;
     --p-white: #e4e9ed;
     --p-accent: #7c3aed;
@@ -1267,14 +1380,26 @@ layout/
     gap: var(--space-4);
   }
 
-  .grid-cols-1 { grid-template-columns: 1fr; }
-  .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-  .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-  .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
 
   /* Auto-fit for responsive grids */
-  .grid-auto-fit { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
-  .grid-auto-fill { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+  .grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  }
+  .grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  }
 }
 ```
 
@@ -1286,11 +1411,11 @@ layout/
 /* layout/containers.css */
 :root {
   /* Content widths - semantic names, easy to change */
-  --content-prose: 65ch;              /* Optimal reading width */
+  --content-prose: 65ch; /* Optimal reading width */
   --content-narrow: min(768px, 100%); /* Narrow content */
   --content-default: min(1280px, 100%); /* Default content width */
-  --content-wide: min(1536px, 100%);  /* Wide content */
-  --content-full: 100%;               /* Full width */
+  --content-wide: min(1536px, 100%); /* Wide content */
+  --content-full: 100%; /* Full width */
 
   /* Fluid padding - scales with viewport */
   --container-padding: clamp(1rem, 3vw, 3rem);
@@ -1303,21 +1428,39 @@ layout/
 }
 
 /* Width modifiers */
-.container-prose { max-width: var(--content-prose); }
-.container-narrow { max-width: var(--content-narrow); }
-.container-default { max-width: var(--content-default); }
-.container-wide { max-width: var(--content-wide); }
-.container-full { max-width: var(--content-full); }
-.container-bleed { max-width: none; padding-inline: 0; }
+.container-prose {
+  max-width: var(--content-prose);
+}
+.container-narrow {
+  max-width: var(--content-narrow);
+}
+.container-default {
+  max-width: var(--content-default);
+}
+.container-wide {
+  max-width: var(--content-wide);
+}
+.container-full {
+  max-width: var(--content-full);
+}
+.container-bleed {
+  max-width: none;
+  padding-inline: 0;
+}
 
 /* Container queries */
-.cq { container-type: inline-size; }
-.cq-normal { container-type: normal; }
+.cq {
+  container-type: inline-size;
+}
+.cq-normal {
+  container-type: normal;
+}
 ```
 
 ### 2025 Holy Grail Responsive System (responsive.css)
 
 **Philosophy:**
+
 1. **FLUID FIRST** - Use `clamp()` for typography/spacing (no breakpoints!)
 2. **INTRINSIC LAYOUTS** - Use auto-fit/minmax grids (self-adapting!)
 3. **CONTAINER QUERIES** - Components own their responsive behavior
@@ -1327,12 +1470,12 @@ layout/
 
 Uses `postcss-preset-env` for modern CSS support with automatic fallbacks (breakpoints defined in `breakpoints.css`):
 
-| Name | Value | Target | CSS Usage |
-|------|-------|--------|-----------|
-| `--phone` | max-width: 639px | Phones only | `@media (--phone)` |
-| `--tablet` | min-width: 640px | Tablets + up | `@media (--tablet)` |
-| `--desktop` | min-width: 1024px | Desktops + up | `@media (--desktop)` |
-| `--large` | min-width: 1280px | Large screens | `@media (--large)` |
+| Name              | Value             | Target           | CSS Usage                  |
+| ----------------- | ----------------- | ---------------- | -------------------------- |
+| `--phone`         | max-width: 639px  | Phones only      | `@media (--phone)`         |
+| `--tablet`        | min-width: 640px  | Tablets + up     | `@media (--tablet)`        |
+| `--desktop`       | min-width: 1024px | Desktops + up    | `@media (--desktop)`       |
+| `--large`         | min-width: 1280px | Large screens    | `@media (--large)`         |
 | `--below-desktop` | max-width: 1023px | Phones + tablets | `@media (--below-desktop)` |
 
 ```css
@@ -1348,24 +1491,38 @@ Uses `postcss-preset-env` for modern CSS support with automatic fallbacks (break
 /* layout/responsive.css - usage example */
 
 /* Mobile-first: nav hidden by default */
-.header-nav { display: none !important; }
-.mobile-menu-btn { display: flex !important; }
+.header-nav {
+  display: none !important;
+}
+.mobile-menu-btn {
+  display: flex !important;
+}
 
 /* Desktop: show nav, hide mobile button */
 @media (--desktop) {
-  .header-nav { display: flex !important; }
-  .mobile-menu-btn { display: none !important; }
+  .header-nav {
+    display: flex !important;
+  }
+  .mobile-menu-btn {
+    display: none !important;
+  }
 }
 
 /* Container query responsive utilities */
 @container (min-width: 500px) {
-  .cq-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .cq-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Orientation utilities (use sparingly) */
 @media (orientation: portrait) {
-  .hide-portrait { display: none !important; }
-  .stack-portrait { flex-direction: column !important; }
+  .hide-portrait {
+    display: none !important;
+  }
+  .stack-portrait {
+    flex-direction: column !important;
+  }
 }
 ```
 
@@ -1381,6 +1538,7 @@ Uses `postcss-preset-env` for modern CSS support with automatic fallbacks (break
   gap: var(--space-4);
 }
 ```
+
 This is the secret weapon - items wrap automatically based on available space!
 
 ---
@@ -1391,13 +1549,14 @@ This is the secret weapon - items wrap automatically based on available space!
 
 The header supports scroll-based style changes for a more interactive feel:
 
-| Feature | CSS Class | Description |
-|---------|-----------|-------------|
-| **Scrolled state** | `.header--scrolled` | Applied when page scrolled past threshold |
-| **Hidden state** | `.header--hidden` | Applied when scrolling down (if enabled) |
-| **Visible state** | `.header--visible` | Applied when scrolling up after being hidden |
+| Feature            | CSS Class           | Description                                  |
+| ------------------ | ------------------- | -------------------------------------------- |
+| **Scrolled state** | `.header--scrolled` | Applied when page scrolled past threshold    |
+| **Hidden state**   | `.header--hidden`   | Applied when scrolling down (if enabled)     |
+| **Visible state**  | `.header--visible`  | Applied when scrolling up after being hidden |
 
 **Configuration:**
+
 ```typescript
 // puppet-master.config.ts
 features: {
@@ -1407,6 +1566,7 @@ features: {
 ```
 
 **CSS Variables for Customization:**
+
 ```css
 :root {
   --header-scrolled-height: clamp(48px, 6vh, 56px);
@@ -1418,11 +1578,12 @@ features: {
 ```
 
 **Composable Usage:**
+
 ```typescript
 const { headerClasses, isScrolled, isHidden, scrollDirection } = useScrollHeader({
-  threshold: 50,        // Pixels to scroll before "scrolled" state
-  hideOnScroll: false,  // Enable hide-on-scroll-down behavior
-  scrollDelta: 10       // Minimum scroll delta to trigger hide/show
+  threshold: 50, // Pixels to scroll before "scrolled" state
+  hideOnScroll: false, // Enable hide-on-scroll-down behavior
+  scrollDelta: 10 // Minimum scroll delta to trigger hide/show
 })
 ```
 
@@ -1430,14 +1591,15 @@ const { headerClasses, isScrolled, isHidden, scrollDirection } = useScrollHeader
 
 Following Nielsen Norman Group research for mobile navigation:
 
-| Element | Position | Rationale |
-|---------|----------|-----------|
-| **Hamburger** | Top-left | NN/g research shows left placement is more discoverable |
-| **Logo** | Center | Balanced layout, brand visibility |
-| **Spacer** | Top-right | Maintains visual balance |
-| **Theme/Language** | Inside mobile menu | Reduces header clutter |
+| Element            | Position           | Rationale                                               |
+| ------------------ | ------------------ | ------------------------------------------------------- |
+| **Hamburger**      | Top-left           | NN/g research shows left placement is more discoverable |
+| **Logo**           | Center             | Balanced layout, brand visibility                       |
+| **Spacer**         | Top-right          | Maintains visual balance                                |
+| **Theme/Language** | Inside mobile menu | Reduces header clutter                                  |
 
 **Mobile Menu Animation:**
+
 - Hamburger animates first (200ms delay before menu appears)
 - Menu slides in with smooth cubic-bezier easing
 - Backdrop fades in simultaneously
@@ -1447,15 +1609,16 @@ Following Nielsen Norman Group research for mobile navigation:
 
 5 animation types available (from Hamburgers library):
 
-| Class | Animation |
-|-------|-----------|
-| `hamburger--squeeze` | Clean X animation (default) |
-| `hamburger--spin` | Rotating animation |
-| `hamburger--elastic` | Bouncy animation |
-| `hamburger--collapse` | Collapse to X |
-| `hamburger--slider` | Slide animation |
+| Class                 | Animation                   |
+| --------------------- | --------------------------- |
+| `hamburger--squeeze`  | Clean X animation (default) |
+| `hamburger--spin`     | Rotating animation          |
+| `hamburger--elastic`  | Bouncy animation            |
+| `hamburger--collapse` | Collapse to X               |
+| `hamburger--slider`   | Slide animation             |
 
 **CSS Variables:**
+
 ```css
 :root {
   --hamburger-padding: 0.75rem;
@@ -1474,13 +1637,13 @@ Following Nielsen Norman Group research for mobile navigation:
 
 ### Performance Patterns
 
-| Pattern | Use Case | Example |
-|---------|----------|---------|
-| `v-memo` | Prevent re-renders of expensive list items | `v-memo="[item.id, item.selected]"` |
-| `:key` | Force re-render when needed | `:key="uniqueId"` |
-| `shallowRef` | Large arrays/objects that update wholesale | `const items = shallowRef([])` |
-| `computed` | Derived values (cached until deps change) | `computed(() => items.value.filter(...))` |
-| Avoid inline functions | Prevent function recreation each render | Define methods separately |
+| Pattern                | Use Case                                   | Example                                   |
+| ---------------------- | ------------------------------------------ | ----------------------------------------- |
+| `v-memo`               | Prevent re-renders of expensive list items | `v-memo="[item.id, item.selected]"`       |
+| `:key`                 | Force re-render when needed                | `:key="uniqueId"`                         |
+| `shallowRef`           | Large arrays/objects that update wholesale | `const items = shallowRef([])`            |
+| `computed`             | Derived values (cached until deps change)  | `computed(() => items.value.filter(...))` |
+| Avoid inline functions | Prevent function recreation each render    | Define methods separately                 |
 
 ### v-memo Example
 
@@ -1583,13 +1746,15 @@ settingGroups: [
 ```
 
 **How it works:**
+
 1. Developer adds a setting to `settings` array
 2. Seed script creates empty DB record for that setting
 3. Admin Panel automatically shows the field (based on schema)
 4. Client enters value via Admin Panel
 5. Components use `useSiteSettings()` to display values
 6. `showIn` tells components when to render (optional for documentation)
-```
+
+````
 
 ### Composables
 
@@ -1603,7 +1768,7 @@ const { siteName, contactEmail, socialLinks } = useSiteSettings()
 // useMediaQuery() - Reactive CSS media query (for header switching)
 // Uses width-based breakpoints for reliable behavior
 const isDesktop = useMediaQuery('(min-width: 1024px)')
-```
+````
 
 ### useMediaQuery Composable
 
@@ -1643,13 +1808,13 @@ export function useMediaQuery(query: string) {
 
 ## 10. Feature Toggles
 
-| Feature | Config Key | Default | Effect |
-|---------|------------|---------|--------|
-| **Multi-language** | `multiLangs` | `true` | Show language switcher |
-| **Theme toggle** | `doubleTheme` | `true` | Show light/dark toggle |
-| **One-pager mode** | `onepager` | `false` | Scroll-based navigation |
-| **Admin panel** | `adminPanel` | `true` | Enable /admin routes |
-| **Interactive header** | `interactiveHeader` | `true` | Header style changes on scroll |
+| Feature                   | Config Key           | Default | Effect                                      |
+| ------------------------- | -------------------- | ------- | ------------------------------------------- |
+| **Multi-language**        | `multiLangs`         | `true`  | Show language switcher                      |
+| **Theme toggle**          | `doubleTheme`        | `true`  | Show light/dark toggle                      |
+| **One-pager mode**        | `onepager`           | `false` | Scroll-based navigation                     |
+| **Admin panel**           | `adminPanel`         | `true`  | Enable /admin routes                        |
+| **Interactive header**    | `interactiveHeader`  | `true`  | Header style changes on scroll              |
 | **Hide header on scroll** | `hideHeaderOnScroll` | `false` | Hide header when scrolling down, show on up |
 
 ### One-Pager vs SPA Mode (Q15 Decision)
@@ -1665,6 +1830,7 @@ components/sections/
 ```
 
 Each section defines its own metadata:
+
 ```vue
 <!-- components/sections/AboutSection.vue -->
 <script setup>
@@ -1672,7 +1838,7 @@ defineOptions({
   section: {
     id: 'about',
     order: 2,
-    navLabel: 'nav.about',  // i18n key
+    navLabel: 'nav.about', // i18n key
     showInNav: true
   }
 })
@@ -1681,26 +1847,28 @@ defineOptions({
 
 **Automatic mode switching based on `onepager` boolean:**
 
-| Mode | Nav Items | Link Behavior | Content |
-|------|-----------|---------------|---------|
-| `onepager: true` | Same | `#about` (scroll) | All sections on index.vue |
-| `onepager: false` | Same | `/about` (navigate) | Each section wrapped in own page |
+| Mode              | Nav Items | Link Behavior       | Content                          |
+| ----------------- | --------- | ------------------- | -------------------------------- |
+| `onepager: true`  | Same      | `#about` (scroll)   | All sections on index.vue        |
+| `onepager: false` | Same      | `/about` (navigate) | Each section wrapped in own page |
 
 **NavLink handles both modes automatically:**
+
 ```vue
 <script setup>
 const config = useAppConfig()
 
 const to = computed(() => {
   if (config.onepager) {
-    return { path: '/', hash: `#${props.id}` }  // Scroll to section
+    return { path: '/', hash: `#${props.id}` } // Scroll to section
   }
-  return { path: `/${props.id === 'home' ? '' : props.id}` }  // Navigate
+  return { path: `/${props.id === 'home' ? '' : props.id}` } // Navigate
 })
 </script>
 ```
 
 **Pages are thin wrappers (SPA mode):**
+
 ```vue
 <!-- pages/about.vue -->
 <template>
@@ -1709,6 +1877,7 @@ const to = computed(() => {
 ```
 
 **Benefits:**
+
 - ZERO duplication - sections are single source of truth
 - Boolean toggle switches behavior automatically
 - No separate config for onepager vs SPA
@@ -1721,7 +1890,7 @@ const to = computed(() => {
 
 ```typescript
 // core/server/api/auth/login.post.ts
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { email, password } = await readBody(event)
 
   // Verify credentials
@@ -1729,7 +1898,7 @@ export default defineEventHandler(async (event) => {
     where: eq(users.email, email)
   })
 
-  if (!user || !await verifyPassword(password, user.passwordHash)) {
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
     throw createError({ statusCode: 401, message: 'Invalid credentials' })
   }
 
@@ -1757,7 +1926,7 @@ export default defineEventHandler(async (event) => {
 
 ```typescript
 // core/server/middleware/auth.ts
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Only protect /api/admin/* routes
   if (!event.path.startsWith('/api/admin')) return
 
@@ -1839,14 +2008,15 @@ const isRtl = computed(() => isRtlLanguage(locale.value))
 
 ### Hybrid Strategy: Build-time + On-the-fly
 
-| Image Type | Processing | When |
-|------------|------------|------|
-| **Static** (logo, icons, bg) | Build-time presets | During `nuxt build` |
+| Image Type                         | Processing         | When                        |
+| ---------------------------------- | ------------------ | --------------------------- |
+| **Static** (logo, icons, bg)       | Build-time presets | During `nuxt build`         |
 | **CMS-uploaded** (portfolio, blog) | On-the-fly + cache | First request, cached after |
 
 ### Key Principle: CSS Controls Sizing
 
 **Separation of concerns:**
+
 - **Display size** → CSS (how big image appears)
 - **Source selection** → `sizes` attribute (which optimized version to load)
 
@@ -1905,7 +2075,7 @@ import sharp from 'sharp'
 import { randomUUID } from 'crypto'
 import { writeFile, mkdir } from 'fs/promises'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const formData = await readMultipartFormData(event)
   const file = formData?.find(f => f.name === 'image')
 
@@ -1947,6 +2117,7 @@ export default defineEventHandler(async (event) => {
 ### Strategy: VPS + Docker + Kamal
 
 **Kamal** (by 37signals) for zero-downtime deployments:
+
 - Default deployment tool in **Rails 8** (January 2025)
 - Zero-downtime via **kamal-proxy** (Traefik-based)
 - Simple commands: `kamal deploy`, `kamal rollback`
@@ -2036,11 +2207,11 @@ npm run shell
 
 Three-layer detection system:
 
-| Layer | File | Purpose |
-|-------|------|---------|
-| **Device** | `useDevice.ts` | Device type, browser, OS, touch |
+| Layer        | File                              | Purpose                           |
+| ------------ | --------------------------------- | --------------------------------- |
+| **Device**   | `useDevice.ts`                    | Device type, browser, OS, touch   |
 | **Features** | `useCrossBrowserCompatibility.ts` | Feature detection + browser fixes |
-| **CSS** | `device-specific.css` | Browser/OS-specific styling |
+| **CSS**      | `device-specific.css`             | Browser/OS-specific styling       |
 
 ### useDevice.ts - What to Detect
 
@@ -2071,17 +2242,17 @@ const { isMobile, isTablet, isDesktop, isSafari, isIos, isSamsung } = useDevice(
 ```typescript
 // KEEP (still relevant)
 interface FeatureSupport {
-  webp: boolean              // Image format
-  avif: boolean              // Image format
-  cssContainerQueries: boolean  // For responsive components
-  cssCustomProperties: boolean  // CSS variables support
+  webp: boolean // Image format
+  avif: boolean // Image format
+  cssContainerQueries: boolean // For responsive components
+  cssCustomProperties: boolean // CSS variables support
 }
 
 // ADD (modern requirements)
 interface UserPreferences {
-  prefersReducedMotion: boolean   // Accessibility
-  prefersColorScheme: 'light' | 'dark'  // Theme sync
-  prefersContrast: 'normal' | 'high'    // Accessibility
+  prefersReducedMotion: boolean // Accessibility
+  prefersColorScheme: 'light' | 'dark' // Theme sync
+  prefersContrast: 'normal' | 'high' // Accessibility
 }
 
 // REMOVE (obsolete - 96%+ support)
@@ -2115,12 +2286,12 @@ interface UserPreferences {
 ```html
 <!-- Device -->
 <html class="device-mobile os-ios browser-safari touch-device">
-
-<!-- Features -->
-<html class="supports-webp supports-avif supports-container-queries">
-
-<!-- Preferences -->
-<html class="prefers-dark prefers-reduced-motion">
+  <!-- Features -->
+  <html class="supports-webp supports-avif supports-container-queries">
+    <!-- Preferences -->
+    <html class="prefers-dark prefers-reduced-motion"></html>
+  </html>
+</html>
 ```
 
 ### Accessibility Preferences (ADD)
@@ -2139,7 +2310,9 @@ export function useAccessibilityPreferences() {
 ```css
 /* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
@@ -2152,16 +2325,17 @@ export function useAccessibilityPreferences() {
 
 ### Two-Tier Configuration
 
-| Tier | Location | Contents | Who Changes |
-|------|----------|----------|-------------|
-| **Build-time** | `puppet-master.config.ts` | Features, locales | Developer |
-| **Runtime** | SQLite (via Admin) | Site info, SEO, contact | Client |
+| Tier           | Location                  | Contents                | Who Changes |
+| -------------- | ------------------------- | ----------------------- | ----------- |
+| **Build-time** | `puppet-master.config.ts` | Features, locales       | Developer   |
+| **Runtime**    | SQLite (via Admin)        | Site info, SEO, contact | Client      |
 
 ### CSS Variables for Theming
 
 **See Section 8 (CSS Architecture) for the complete Q22 OKLCH Color System.**
 
 Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
+
 - **4 base colors in HEX** define everything (--p-black, --p-white, --p-brand, --p-accent)
 - **Auto-calculated** shades, surfaces, borders via `color-mix(in oklch, ...)`
 - **Light/dark mode** via single `light-dark()` function
@@ -2169,15 +2343,15 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 
 ### What Goes Where
 
-| Category | Location | Reason |
-|----------|----------|--------|
-| `multiLangs`, `doubleTheme`, `onepager` | Config file | Affects build |
-| `locales`, `defaultLocale` | Config file | Affects routing |
-| Colors, spacing, typography | CSS Variables | Easy theming |
-| Site name, tagline | CMS (SQLite) | Client edits |
-| Contact info | CMS (SQLite) | Client edits |
-| Social links | CMS (SQLite) | Client edits |
-| SEO (title, description) | CMS (SQLite) | Client edits |
+| Category                                | Location      | Reason          |
+| --------------------------------------- | ------------- | --------------- |
+| `multiLangs`, `doubleTheme`, `onepager` | Config file   | Affects build   |
+| `locales`, `defaultLocale`              | Config file   | Affects routing |
+| Colors, spacing, typography             | CSS Variables | Easy theming    |
+| Site name, tagline                      | CMS (SQLite)  | Client edits    |
+| Contact info                            | CMS (SQLite)  | Client edits    |
+| Social links                            | CMS (SQLite)  | Client edits    |
+| SEO (title, description)                | CMS (SQLite)  | Client edits    |
 
 ---
 
@@ -2185,81 +2359,81 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 
 ### Summary of All Architectural Decisions
 
-| # | Decision | Choice | Rationale |
-|---|----------|--------|-----------|
-| D1 | Backend technology | Nuxt Nitro (drop Python) | Simpler stack, one language |
-| D2 | Data Source | SQLite + Drizzle **OR** External API | SQLite: default, simple, file-based / API: OAuth, circuit breaker, hybrid mode |
-| D3 | Architecture | Nuxt Layers (core + project) | Separation of reusable code |
-| D4 | Imports | Auto-imports (not ~/) | Required for layers to work |
-| D5 | CSS units | Hybrid clamp() + rem + dvh | Modern, fluid, mobile-friendly |
-| D6 | RTL support | CSS Logical Properties | Automatic, no build step |
-| D7 | Config system | Two-tier (build + runtime) | Developer vs client control |
-| D8 | Auth | Session-based, cookies | Simple, secure, no JWT complexity |
-| D9 | Image processing | Hybrid (build-time + IPX on-the-fly) | CSS controls sizing |
-| D10 | i18n | @nuxtjs/i18n | Official module, well-maintained |
-| D11 | Theme | @nuxtjs/color-mode | Official module, CSS variables |
-| D12 | One-pager/SPA | Feature toggle | Config-driven |
-| D13 | Navigation | Sections as source of truth | Zero duplication, auto-mode-switch |
-| D14 | Deployment | VPS + Docker + Kamal | Zero-downtime, rollback, npm wrappers |
-| D15 | CSS approach | Pure CSS (no framework) | Full control, handle all edge cases |
-| D16 | System detection | useDevice + useCrossBrowserCompatibility | Simplified, modernized |
-| D17 | Configuration | CSS Variables + two-tier config | Native theming, clear separation |
-| D18 | Deployment tool | Kamal (by 37signals) | Zero-downtime, rollback, simple commands |
-| D19 | Color system | Modern CSS (OKLCH, color-mix, light-dark) | Auto-calculate from 4 base colors |
-| D20 | Icons | unplugin-icons + Tabler (default) | 4,500 icons, swappable, build-time |
-| D21 | SVG Graphics | vite-svg-loader | Build-time inline, tree-shake |
-| D22 | Forms | Native HTML5 + Zod + Custom CSS | Zero client bundle, server validation |
-| D23 | State management | Pinia (use sparingly) | Industry standard, DevTools support |
-| D24 | Animation | CSS animations.css + Vue Transition | No library, reduced motion support |
-| D25 | Edge cases | Dedicated edge-cases.css | All browser fixes in one place |
-| D26 | Vue Performance | v-memo, shallowRef, requestAnimationFrame patterns | Prevent common performance issues |
-| D27 | Typography | Folder structure with fonts/ | Clear separation, easy font swapping |
-| D28 | Animation organization | Folder with keyframes, transitions, reduced-motion | Clear separation of concerns |
-| D29 | Layout system | Grid + container queries + orientation | Modern, component-level responsive |
-| D30 | Font handling | Google Fonts + self-hosted custom | Fast, consistent, no ugly system fonts |
-| D31 | UI components | ui/ folder with forms/overlays/content | Style ALL native elements |
-| D32 | CSS architecture | 3-layer (primitives→semantic→components) | Core defaults, Project overrides primitives only |
-| D33 | Modular CSS | One file per component (2024-12-19) | Easy client customization, responsive in same file |
-| D34 | Responsive location | Media queries in same file as base styles | Prevents CSS cascade order bugs |
+| #   | Decision               | Choice                                             | Rationale                                                                      |
+| --- | ---------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
+| D1  | Backend technology     | Nuxt Nitro (drop Python)                           | Simpler stack, one language                                                    |
+| D2  | Data Source            | SQLite + Drizzle **OR** External API               | SQLite: default, simple, file-based / API: OAuth, circuit breaker, hybrid mode |
+| D3  | Architecture           | Nuxt Layers (core + project)                       | Separation of reusable code                                                    |
+| D4  | Imports                | Auto-imports (not ~/)                              | Required for layers to work                                                    |
+| D5  | CSS units              | Hybrid clamp() + rem + dvh                         | Modern, fluid, mobile-friendly                                                 |
+| D6  | RTL support            | CSS Logical Properties                             | Automatic, no build step                                                       |
+| D7  | Config system          | Two-tier (build + runtime)                         | Developer vs client control                                                    |
+| D8  | Auth                   | Session-based, cookies                             | Simple, secure, no JWT complexity                                              |
+| D9  | Image processing       | Hybrid (build-time + IPX on-the-fly)               | CSS controls sizing                                                            |
+| D10 | i18n                   | @nuxtjs/i18n                                       | Official module, well-maintained                                               |
+| D11 | Theme                  | @nuxtjs/color-mode                                 | Official module, CSS variables                                                 |
+| D12 | One-pager/SPA          | Feature toggle                                     | Config-driven                                                                  |
+| D13 | Navigation             | Sections as source of truth                        | Zero duplication, auto-mode-switch                                             |
+| D14 | Deployment             | VPS + Docker + Kamal                               | Zero-downtime, rollback, npm wrappers                                          |
+| D15 | CSS approach           | Pure CSS (no framework)                            | Full control, handle all edge cases                                            |
+| D16 | System detection       | useDevice + useCrossBrowserCompatibility           | Simplified, modernized                                                         |
+| D17 | Configuration          | CSS Variables + two-tier config                    | Native theming, clear separation                                               |
+| D18 | Deployment tool        | Kamal (by 37signals)                               | Zero-downtime, rollback, simple commands                                       |
+| D19 | Color system           | Modern CSS (OKLCH, color-mix, light-dark)          | Auto-calculate from 4 base colors                                              |
+| D20 | Icons                  | unplugin-icons + Tabler (default)                  | 4,500 icons, swappable, build-time                                             |
+| D21 | SVG Graphics           | vite-svg-loader                                    | Build-time inline, tree-shake                                                  |
+| D22 | Forms                  | Native HTML5 + Zod + Custom CSS                    | Zero client bundle, server validation                                          |
+| D23 | State management       | Pinia (use sparingly)                              | Industry standard, DevTools support                                            |
+| D24 | Animation              | CSS animations.css + Vue Transition                | No library, reduced motion support                                             |
+| D25 | Edge cases             | Dedicated edge-cases.css                           | All browser fixes in one place                                                 |
+| D26 | Vue Performance        | v-memo, shallowRef, requestAnimationFrame patterns | Prevent common performance issues                                              |
+| D27 | Typography             | Folder structure with fonts/                       | Clear separation, easy font swapping                                           |
+| D28 | Animation organization | Folder with keyframes, transitions, reduced-motion | Clear separation of concerns                                                   |
+| D29 | Layout system          | Grid + container queries + orientation             | Modern, component-level responsive                                             |
+| D30 | Font handling          | Google Fonts + self-hosted custom                  | Fast, consistent, no ugly system fonts                                         |
+| D31 | UI components          | ui/ folder with forms/overlays/content             | Style ALL native elements                                                      |
+| D32 | CSS architecture       | 3-layer (primitives→semantic→components)           | Core defaults, Project overrides primitives only                               |
+| D33 | Modular CSS            | One file per component (2024-12-19)                | Easy client customization, responsive in same file                             |
+| D34 | Responsive location    | Media queries in same file as base styles          | Prevents CSS cascade order bugs                                                |
 
 ### Questions Resolved
 
-| # | Question | Decision |
-|---|----------|----------|
-| Q1 | Config system | Hybrid: build-time features + runtime content |
-| Q2 | RTL cleanup | Consolidated to utils/rtl.ts |
-| Q3 | PostCSS RTL | Use CSS Logical Properties instead |
-| Q4 | plugins/i18n.ts conflict | Delete, use @nuxtjs/i18n only |
-| Q5 | Type system | Simplified to types/index.ts |
-| Q6 | Dead code | Deleted all empty files |
-| Q7 | Responsive strategy | ✅ 2025 Holy Grail: fluid CSS + auto-fit grids + container queries + width breakpoints |
-| Q8 | CSS migration | ❌ OBSOLETE (fresh start) |
-| Q9 | Hardcoded values | ❌ OBSOLETE (fresh start) |
-| Q10 | Numbered pages | ❌ OBSOLETE (fresh start) |
-| Q11 | lib/ cleanup | Keep utils/, delete lib/utils and lib/plugins |
-| Q12 | types/ cleanup | Keep simplified types/index.ts |
-| Q13 | services/ | Keep for API service layer |
-| Q14 | Architecture | Nuxt Layers (core + project separation) |
-| Q15 | Navigation/Routes | ✅ Sections as source of truth, auto onepager/SPA |
-| Q16 | Image handling | ✅ Hybrid (build-time + on-the-fly), CSS controls sizing |
-| Q17 | Deployment | ✅ VPS + Docker |
-| Q18 | CSS framework | ✅ Pure CSS, handle all edge cases |
-| Q19 | System detection | ✅ Keep useDevice + useCrossBrowserCompatibility, modernize |
-| Q20 | Configuration | ✅ CSS Variables + two-tier (config + CMS) |
-| Q21 | DevOps/Deployment | ✅ Kamal with npm script wrappers |
-| Q22 | Color system | ✅ Modern CSS (OKLCH, color-mix, light-dark) with auto/manual toggle |
-| Q23 | Icons & SVG | ✅ unplugin-icons + Tabler (default), vite-svg-loader for graphics |
-| Q24 | Forms & Validation | ✅ Native HTML5 (client) + Zod (server) + Custom CSS |
-| Q25 | State Management | ✅ Pinia (industry standard, use sparingly) |
-| Q26 | Animation | ✅ CSS animations.css + Vue Transition + reduced motion |
-| Q27 | Edge Cases | ✅ Dedicated edge-cases.css with ALL browser fixes |
-| Q28 | Vue Performance | ✅ Add section: v-memo, shallowRef, requestAnimationFrame |
-| Q29 | Typography | ✅ Folder structure with fonts/ subfolder |
-| Q30 | Animations | ✅ Folder structure (keyframes, transitions, reduced-motion) |
-| Q31 | Layout System | ✅ 2025 Holy Grail: auto-fit grids + container queries + fluid CSS + width breakpoints |
-| Q32 | Font Handling | ✅ Google Fonts + self-hosted, NO system fonts in design |
-| Q33 | UI Components | ✅ ui/ folder with forms/, overlays/, content/ subfolders |
-| Q34 | Core/Project CSS | ✅ 3-layer system (primitives→semantic→components), Core has defaults, Project overrides primitives only |
+| #   | Question                 | Decision                                                                                                 |
+| --- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Q1  | Config system            | Hybrid: build-time features + runtime content                                                            |
+| Q2  | RTL cleanup              | Consolidated to utils/rtl.ts                                                                             |
+| Q3  | PostCSS RTL              | Use CSS Logical Properties instead                                                                       |
+| Q4  | plugins/i18n.ts conflict | Delete, use @nuxtjs/i18n only                                                                            |
+| Q5  | Type system              | Simplified to types/index.ts                                                                             |
+| Q6  | Dead code                | Deleted all empty files                                                                                  |
+| Q7  | Responsive strategy      | ✅ 2025 Holy Grail: fluid CSS + auto-fit grids + container queries + width breakpoints                   |
+| Q8  | CSS migration            | ❌ OBSOLETE (fresh start)                                                                                |
+| Q9  | Hardcoded values         | ❌ OBSOLETE (fresh start)                                                                                |
+| Q10 | Numbered pages           | ❌ OBSOLETE (fresh start)                                                                                |
+| Q11 | lib/ cleanup             | Keep utils/, delete lib/utils and lib/plugins                                                            |
+| Q12 | types/ cleanup           | Keep simplified types/index.ts                                                                           |
+| Q13 | services/                | Keep for API service layer                                                                               |
+| Q14 | Architecture             | Nuxt Layers (core + project separation)                                                                  |
+| Q15 | Navigation/Routes        | ✅ Sections as source of truth, auto onepager/SPA                                                        |
+| Q16 | Image handling           | ✅ Hybrid (build-time + on-the-fly), CSS controls sizing                                                 |
+| Q17 | Deployment               | ✅ VPS + Docker                                                                                          |
+| Q18 | CSS framework            | ✅ Pure CSS, handle all edge cases                                                                       |
+| Q19 | System detection         | ✅ Keep useDevice + useCrossBrowserCompatibility, modernize                                              |
+| Q20 | Configuration            | ✅ CSS Variables + two-tier (config + CMS)                                                               |
+| Q21 | DevOps/Deployment        | ✅ Kamal with npm script wrappers                                                                        |
+| Q22 | Color system             | ✅ Modern CSS (OKLCH, color-mix, light-dark) with auto/manual toggle                                     |
+| Q23 | Icons & SVG              | ✅ unplugin-icons + Tabler (default), vite-svg-loader for graphics                                       |
+| Q24 | Forms & Validation       | ✅ Native HTML5 (client) + Zod (server) + Custom CSS                                                     |
+| Q25 | State Management         | ✅ Pinia (industry standard, use sparingly)                                                              |
+| Q26 | Animation                | ✅ CSS animations.css + Vue Transition + reduced motion                                                  |
+| Q27 | Edge Cases               | ✅ Dedicated edge-cases.css with ALL browser fixes                                                       |
+| Q28 | Vue Performance          | ✅ Add section: v-memo, shallowRef, requestAnimationFrame                                                |
+| Q29 | Typography               | ✅ Folder structure with fonts/ subfolder                                                                |
+| Q30 | Animations               | ✅ Folder structure (keyframes, transitions, reduced-motion)                                             |
+| Q31 | Layout System            | ✅ 2025 Holy Grail: auto-fit grids + container queries + fluid CSS + width breakpoints                   |
+| Q32 | Font Handling            | ✅ Google Fonts + self-hosted, NO system fonts in design                                                 |
+| Q33 | UI Components            | ✅ ui/ folder with forms/, overlays/, content/ subfolders                                                |
+| Q34 | Core/Project CSS         | ✅ 3-layer system (primitives→semantic→components), Core has defaults, Project overrides primitives only |
 
 ### Lessons Learned
 
@@ -2279,70 +2453,70 @@ Summary: Uses modern CSS with OKLCH, `color-mix()`, and `light-dark()`:
 
 ### Header Customization
 
-| What | Where | How |
-|------|-------|-----|
-| **Header width** | `skeleton/header.css` | `--header-max-width: 1400px;` |
-| **Header height** | `skeleton/header.css` | `--header-height: 80px;` |
-| **Scrolled header height** | `skeleton/header.css` | `--header-scrolled-height: 48px;` |
-| **Scrolled background** | `skeleton/header.css` | `--header-scrolled-bg: color-mix(...)` |
-| **Enable interactive header** | `puppet-master.config.ts` | `features.interactiveHeader: true` |
-| **Hide on scroll down** | `puppet-master.config.ts` | `features.hideHeaderOnScroll: true` |
+| What                          | Where                     | How                                    |
+| ----------------------------- | ------------------------- | -------------------------------------- |
+| **Header width**              | `skeleton/header.css`     | `--header-max-width: 1400px;`          |
+| **Header height**             | `skeleton/header.css`     | `--header-height: 80px;`               |
+| **Scrolled header height**    | `skeleton/header.css`     | `--header-scrolled-height: 48px;`      |
+| **Scrolled background**       | `skeleton/header.css`     | `--header-scrolled-bg: color-mix(...)` |
+| **Enable interactive header** | `puppet-master.config.ts` | `features.interactiveHeader: true`     |
+| **Hide on scroll down**       | `puppet-master.config.ts` | `features.hideHeaderOnScroll: true`    |
 
 ### Footer Customization
 
-| What | Where | How |
-|------|-------|-----|
-| **Footer width** | `skeleton/footer.css` | `--footer-max-width: 1200px;` |
+| What               | Where                 | How                                  |
+| ------------------ | --------------------- | ------------------------------------ |
+| **Footer width**   | `skeleton/footer.css` | `--footer-max-width: 1200px;`        |
 | **Footer padding** | `skeleton/footer.css` | `--footer-padding: var(--space-12);` |
-| **Rich footer** | HTML | Add class `.footer-rich` |
+| **Rich footer**    | HTML                  | Add class `.footer-rich`             |
 
 ### Container Widths
 
-| What | Where | How |
-|------|-------|-----|
+| What                      | Where                   | How                                            |
+| ------------------------- | ----------------------- | ---------------------------------------------- |
 | **Default content width** | `layout/containers.css` | `--content-default: min(1200px, 100% - 2rem);` |
-| **Narrow content** | `layout/containers.css` | `--content-narrow: min(720px, 100% - 2rem);` |
-| **Wide content** | `layout/containers.css` | `--content-wide: min(1400px, 100% - 2rem);` |
-| **Container padding** | `layout/containers.css` | `--container-padding: clamp(1rem, 4vw, 2rem);` |
+| **Narrow content**        | `layout/containers.css` | `--content-narrow: min(720px, 100% - 2rem);`   |
+| **Wide content**          | `layout/containers.css` | `--content-wide: min(1400px, 100% - 2rem);`    |
+| **Container padding**     | `layout/containers.css` | `--container-padding: clamp(1rem, 4vw, 2rem);` |
 
 ### Colors
 
-| What | Where | How |
-|------|-------|-----|
-| **Brand color** | `colors/primitives.css` | `--p-brand: #your-color;` |
-| **Accent color** | `colors/primitives.css` | `--p-accent: #your-color;` |
-| **Background** | `colors/primitives.css` | `--p-white: #your-bg;` (light mode) |
-| **Text** | `colors/primitives.css` | `--p-black: #your-text;` (light mode) |
+| What             | Where                   | How                                   |
+| ---------------- | ----------------------- | ------------------------------------- |
+| **Brand color**  | `colors/primitives.css` | `--p-brand: #your-color;`             |
+| **Accent color** | `colors/primitives.css` | `--p-accent: #your-color;`            |
+| **Background**   | `colors/primitives.css` | `--p-white: #your-bg;` (light mode)   |
+| **Text**         | `colors/primitives.css` | `--p-black: #your-text;` (light mode) |
 
 ### Typography
 
-| What | Where | How |
-|------|-------|-----|
-| **Font family** | `typography/fonts.css` | `--font-sans: 'Your Font', sans-serif;` |
-| **Base font size** | `typography/scale.css` | `--text-base: 1rem;` |
-| **Heading scale** | `typography/scale.css` | `--text-4xl: clamp(2rem, 5vw, 3rem);` |
+| What               | Where                  | How                                     |
+| ------------------ | ---------------------- | --------------------------------------- |
+| **Font family**    | `typography/fonts.css` | `--font-sans: 'Your Font', sans-serif;` |
+| **Base font size** | `typography/scale.css` | `--text-base: 1rem;`                    |
+| **Heading scale**  | `typography/scale.css` | `--text-4xl: clamp(2rem, 5vw, 3rem);`   |
 
 ### Responsive Breakpoints
 
 Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (defined in `layout/breakpoints.css`):
 
-| Breakpoint | Value | Custom Media | Usage |
-|------------|-------|--------------|-------|
-| Phone | `< 640px` | `--phone` | `@media (--phone) { ... }` |
-| Tablet | `≥ 640px` | `--tablet` | `@media (--tablet) { ... }` |
-| Desktop | `≥ 1024px` | `--desktop` | `@media (--desktop) { ... }` |
-| Large | `≥ 1280px` | `--large` | `@media (--large) { ... }` |
+| Breakpoint    | Value      | Custom Media      | Usage                              |
+| ------------- | ---------- | ----------------- | ---------------------------------- |
+| Phone         | `< 640px`  | `--phone`         | `@media (--phone) { ... }`         |
+| Tablet        | `≥ 640px`  | `--tablet`        | `@media (--tablet) { ... }`        |
+| Desktop       | `≥ 1024px` | `--desktop`       | `@media (--desktop) { ... }`       |
+| Large         | `≥ 1280px` | `--large`         | `@media (--large) { ... }`         |
 | Below Desktop | `< 1024px` | `--below-desktop` | `@media (--below-desktop) { ... }` |
 
 ### Feature Toggles
 
-| Feature | Config Key | Default |
-|---------|------------|---------|
-| Multi-language | `features.multiLangs` | `true` |
-| Theme toggle | `features.doubleTheme` | `true` |
-| One-pager mode | `features.onepager` | `false` |
-| Admin panel | `features.adminPanel` | `true` |
-| Interactive header | `features.interactiveHeader` | `true` |
+| Feature               | Config Key                    | Default |
+| --------------------- | ----------------------------- | ------- |
+| Multi-language        | `features.multiLangs`         | `true`  |
+| Theme toggle          | `features.doubleTheme`        | `true`  |
+| One-pager mode        | `features.onepager`           | `false` |
+| Admin panel           | `features.adminPanel`         | `true`  |
+| Interactive header    | `features.interactiveHeader`  | `true`  |
 | Hide header on scroll | `features.hideHeaderOnScroll` | `false` |
 
 ---
@@ -2350,6 +2524,7 @@ Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (
 ## 17. Implementation Checklist
 
 ### Phase 1: Foundation
+
 - [ ] Create fresh Nuxt 3 project
 - [ ] Set up core/ layer structure
 - [ ] Configure nuxt.config.ts with extends
@@ -2363,6 +2538,7 @@ Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (
 - [ ] Add Zod (Q24)
 
 ### Phase 2: Core CSS System (Q22-Q34)
+
 - [ ] Create main.css entry point with @layer order (Q34)
 - [ ] Create reset.css
 - [ ] Create colors/ folder (Q22):
@@ -2398,6 +2574,7 @@ Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (
   - [ ] content/ (card, badge, avatar, tables, lists, etc.)
 
 ### Phase 3: Core Components (Atomic Design)
+
 - [ ] **Atoms:**
   - [ ] Logo.vue (universal, variant prop)
   - [ ] NavLink.vue (SPA or one-pager link)
@@ -2428,23 +2605,27 @@ Uses `postcss-preset-env` for DRY breakpoints with automatic browser fallbacks (
   - [ ] useMediaQuery.ts (reactive CSS media query)
 
 ### Phase 4: Backend
+
 - [ ] Auth API (login, logout, session)
 - [ ] Settings API (get, update)
 - [ ] Upload API (image processing)
 - [ ] Server middleware (auth protection)
 
 ### Phase 5: Admin Panel
+
 - [ ] Admin dashboard page
 - [ ] Settings page
 - [ ] Portfolio management page
 
 ### Phase 6: Project Template
+
 - [ ] Sample index.vue (renders sections)
 - [ ] Sample sections (Hero, About, Portfolio, Contact)
 - [ ] Sample admin pages (if adminPanel: true)
 - [ ] Project CSS template (color overrides)
 
 ### Phase 7: Deployment (Q21)
+
 - [ ] Create Dockerfile
 - [ ] Create config/deploy.yml (Kamal config)
 - [ ] Add npm script wrappers (deploy, rollback, logs, shell)
@@ -2521,6 +2702,7 @@ const isMobile = useMediaQuery('(max-width: 768px)')
 ### The Problem with Current Structure
 
 The current skeleton has coupling issues:
+
 1. **Hamburger contains Nav** - Weird, Nav rendered inside Hamburger.vue
 2. **Logo duplicated** - Footer has inline `<NuxtImg>` instead of using Logo.vue
 3. **CSS-only switching** - Renders all DOM, hides with CSS
@@ -2560,6 +2742,7 @@ core/components/
 ### Atoms Specification
 
 #### Logo.vue
+
 ```vue
 <script setup>
 defineProps<{
@@ -2582,6 +2765,7 @@ const colorMode = useColorMode()
 ```
 
 #### NavLink.vue
+
 ```vue
 <script setup>
 const props = defineProps<{
@@ -2609,6 +2793,7 @@ const handleClick = () => emit('click')
 ```
 
 #### HamburgerIcon.vue
+
 ```vue
 <script setup>
 defineProps<{ isActive: boolean }>()
@@ -2632,6 +2817,7 @@ defineEmits<{ toggle: [] }>()
 ### Molecules Specification
 
 #### NavLinks.vue
+
 ```vue
 <script setup>
 const { onepager, routes } = useConfig()
@@ -2659,6 +2845,7 @@ const navItems = computed(() => routes.value.map((route, i) => ({
 ```
 
 #### HeaderActions.vue
+
 ```vue
 <script setup>
 const { multiLangs, doubleTheme } = useConfig()
@@ -2668,7 +2855,8 @@ const { multiLangs, doubleTheme } = useConfig()
   <div class="header-actions">
     <LangSwitcher v-if="multiLangs" />
     <ThemeToggle v-if="doubleTheme" />
-    <slot /> <!-- For additional items -->
+    <slot />
+    <!-- For additional items -->
   </div>
 </template>
 ```
@@ -2676,6 +2864,7 @@ const { multiLangs, doubleTheme } = useConfig()
 ### Organisms Specification
 
 #### DesktopHeader.vue
+
 ```vue
 <template>
   <header class="header header--desktop">
@@ -2688,6 +2877,7 @@ const { multiLangs, doubleTheme } = useConfig()
 ```
 
 #### MobileHeader.vue
+
 ```vue
 <script setup>
 defineProps<{ menuOpen: boolean }>()
@@ -2704,6 +2894,7 @@ defineEmits<{ 'toggle-menu': [] }>()
 ```
 
 #### MobileNav.vue
+
 ```vue
 <script setup>
 const props = defineProps<{ open: boolean }>()
@@ -2734,6 +2925,7 @@ const close = () => emit('update:open', false)
 ### Templates Specification
 
 #### TheHeader.vue (Smart Switcher)
+
 ```vue
 <script setup>
 // Use CSS media query reactively
@@ -2743,10 +2935,13 @@ const menuOpen = ref(false)
 
 // Close menu on route change
 const route = useRoute()
-watch(() => route.path, () => menuOpen.value = false)
+watch(
+  () => route.path,
+  () => (menuOpen.value = false)
+)
 
 // Close menu when switching to landscape
-watch(isDesktop, (desktop) => {
+watch(isDesktop, desktop => {
   if (desktop) menuOpen.value = false
 })
 </script>
@@ -2754,10 +2949,7 @@ watch(isDesktop, (desktop) => {
 <template>
   <DesktopHeader v-if="isDesktop" />
   <template v-else>
-    <MobileHeader
-      :menu-open="menuOpen"
-      @toggle-menu="menuOpen = !menuOpen"
-    />
+    <MobileHeader :menu-open="menuOpen" @toggle-menu="menuOpen = !menuOpen" />
     <MobileNav v-model:open="menuOpen" />
   </template>
 </template>
@@ -2765,15 +2957,15 @@ watch(isDesktop, (desktop) => {
 
 ### Benefits of This Architecture
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| **Logo reuse** | Duplicated in Footer | One component everywhere |
-| **Mobile nav** | Inside Hamburger.vue | Independent MobileNav.vue |
-| **Hamburger** | Contains nav logic | Just an icon button |
-| **DOM rendering** | All elements, CSS hides | Only renders needed |
-| **Customization** | Override whole header | Override specific atom |
-| **Testing** | Hard to test | Each atom testable |
-| **Mobile/Desktop** | Same component, CSS | Different components |
+| Aspect             | Before                  | After                     |
+| ------------------ | ----------------------- | ------------------------- |
+| **Logo reuse**     | Duplicated in Footer    | One component everywhere  |
+| **Mobile nav**     | Inside Hamburger.vue    | Independent MobileNav.vue |
+| **Hamburger**      | Contains nav logic      | Just an icon button       |
+| **DOM rendering**  | All elements, CSS hides | Only renders needed       |
+| **Customization**  | Override whole header   | Override specific atom    |
+| **Testing**        | Hard to test            | Each atom testable        |
+| **Mobile/Desktop** | Same component, CSS     | Different components      |
 
 ### Component Dependency Graph
 
@@ -2835,6 +3027,7 @@ This document contains everything needed to build Puppet Master 2.0 from scratch
 ### Overview
 
 The logo system automatically selects the correct logo variant based on:
+
 1. **Current theme** (light/dark mode)
 2. **Current language** (en/ru/he/etc.)
 3. **Fallback chain** if variant doesn't exist
@@ -2845,11 +3038,11 @@ The logo system automatically selects the correct logo variant based on:
 /public/logos/{shape}_{theme}_{lang}.svg
 ```
 
-| Component | Options | Description |
-|-----------|---------|-------------|
-| **shape** | `horizontal`, `circle` | Horizontal for header, circle for mobile/footer |
-| **theme** | `dark`, `light` | `dark` = dark text (for light bg), `light` = light text (for dark bg) |
-| **lang** | `en`, `ru`, `he`, etc. | Language-specific version |
+| Component | Options                | Description                                                           |
+| --------- | ---------------------- | --------------------------------------------------------------------- |
+| **shape** | `horizontal`, `circle` | Horizontal for header, circle for mobile/footer                       |
+| **theme** | `dark`, `light`        | `dark` = dark text (for light bg), `light` = light text (for dark bg) |
+| **lang**  | `en`, `ru`, `he`, etc. | Language-specific version                                             |
 
 ### Examples
 
@@ -2911,6 +3104,7 @@ const { headerLogo, mobileLogo, getLogoSrc } = useLogo()
 ### How Theme Mapping Works
 
 **Important:** The logo theme is INVERTED from the UI theme:
+
 - **Dark mode UI** → Uses `light` logo (white/light colored text)
 - **Light mode UI** → Uses `dark` logo (black/dark colored text)
 
@@ -2923,6 +3117,7 @@ const { headerLogo, mobileLogo, getLogoSrc } = useLogo()
    - `circle_light_he.svg`
 
 2. Add to config `available` array:
+
    ```typescript
    available: [
      // ... existing
@@ -2943,6 +3138,7 @@ const { headerLogo, mobileLogo, getLogoSrc } = useLogo()
 ### Fallback Chain
 
 If a logo variant doesn't exist:
+
 1. Check `langFallback` config
 2. Fall back to English (`en`)
 3. Ultimate fallback: `horizontal_dark_en.svg`
@@ -2953,23 +3149,23 @@ If a logo variant doesn't exist:
 
 ### Three-Tier Role System
 
-| Role | Level | Description | Access |
-|------|-------|-------------|--------|
-| **Master** | 2 | Developer/agency who builds the site | Full access to everything |
-| **Admin** | 1 | Client who owns the site | Manages content + users (except master) |
-| **Editor** | 0 | Client's employees | Content only |
+| Role       | Level | Description                          | Access                                  |
+| ---------- | ----- | ------------------------------------ | --------------------------------------- |
+| **Master** | 2     | Developer/agency who builds the site | Full access to everything               |
+| **Admin**  | 1     | Client who owns the site             | Manages content + users (except master) |
+| **Editor** | 0     | Client's employees                   | Content only                            |
 
 ### Permission Matrix
 
-| Feature | Master | Admin | Editor |
-|---------|--------|-------|--------|
-| View Dashboard | ✅ | ✅ | ✅ |
-| Edit Settings | ✅ | ✅ | ❌ |
-| Manage Portfolio | ✅ | ✅ | ✅ |
-| View Contacts | ✅ | ✅ | ✅ |
-| Manage Users | ✅ | ✅ (not master) | ❌ |
-| Manage Translations | ✅ | ✅ | ❌ |
-| Health Monitoring | ✅ | ❌ | ❌ |
+| Feature             | Master | Admin           | Editor |
+| ------------------- | ------ | --------------- | ------ |
+| View Dashboard      | ✅     | ✅              | ✅     |
+| Edit Settings       | ✅     | ✅              | ❌     |
+| Manage Portfolio    | ✅     | ✅              | ✅     |
+| View Contacts       | ✅     | ✅              | ✅     |
+| Manage Users        | ✅     | ✅ (not master) | ❌     |
+| Manage Translations | ✅     | ✅              | ❌     |
+| Health Monitoring   | ✅     | ❌              | ❌     |
 
 ### Implementation
 
@@ -2985,8 +3181,8 @@ export function requireRole(event: H3Event, minRole: 'editor' | 'admin' | 'maste
 }
 
 // Usage in API endpoint
-export default defineEventHandler(async (event) => {
-  requireRole(event, 'admin')  // Only admin+ can access
+export default defineEventHandler(async event => {
+  requireRole(event, 'admin') // Only admin+ can access
   // ...
 })
 ```
@@ -2997,24 +3193,24 @@ export default defineEventHandler(async (event) => {
 
 ### Vitest Setup
 
-| Component | Status |
-|-----------|--------|
-| Vitest | ✅ Configured |
-| Test Files | 7 files |
-| Total Tests | 88 tests |
-| Coverage | All passing |
+| Component   | Status        |
+| ----------- | ------------- |
+| Vitest      | ✅ Configured |
+| Test Files  | 7 files       |
+| Total Tests | 88 tests      |
+| Coverage    | All passing   |
 
 ### Test Categories
 
-| Category | Tests | Description |
-|----------|-------|-------------|
-| Auth | 15 | Login, logout, session, password hashing |
-| Settings | 12 | CRUD operations, validation |
-| Portfolio | 18 | CRUD, ordering, publishing |
-| Contacts | 14 | Submissions, read/unread, deletion |
-| Users | 16 | CRUD, role validation, password changes |
-| Translations | 8 | CRUD, locale handling |
-| Utils | 5 | Helper functions |
+| Category     | Tests | Description                              |
+| ------------ | ----- | ---------------------------------------- |
+| Auth         | 15    | Login, logout, session, password hashing |
+| Settings     | 12    | CRUD operations, validation              |
+| Portfolio    | 18    | CRUD, ordering, publishing               |
+| Contacts     | 14    | Submissions, read/unread, deletion       |
+| Users        | 16    | CRUD, role validation, password changes  |
+| Translations | 8     | CRUD, locale handling                    |
+| Utils        | 5     | Helper functions                         |
 
 ### Running Tests
 
@@ -3035,10 +3231,10 @@ npm run test:coverage
 
 ### Two-Layer Translation System
 
-| Layer | Source | Purpose |
-|-------|--------|---------|
-| **System Translations** | `i18n/system.ts` | UI strings (nav, buttons, labels) |
-| **Content Translations** | Database | User-editable content |
+| Layer                    | Source           | Purpose                           |
+| ------------------------ | ---------------- | --------------------------------- |
+| **System Translations**  | `i18n/system.ts` | UI strings (nav, buttons, labels) |
+| **Content Translations** | Database         | User-editable content             |
 
 ### System Translations Structure
 
@@ -3097,6 +3293,7 @@ Vue I18n expects nested objects for dot-notation keys:
 ```
 
 This causes hydration mismatch because:
+
 1. `<p>` inside `<p>` is invalid HTML
 2. Browser auto-closes the outer `<p>` during SSR
 3. Client-side Vue expects the original structure
@@ -3115,12 +3312,12 @@ This causes hydration mismatch because:
 
 ### Hydration Checklist
 
-| Rule | Description |
-|------|-------------|
-| ✅ Use `<div>` for slot containers | When slot may contain block elements |
-| ✅ Check HTML validity | No `<p>` inside `<p>`, `<a>` inside `<a>`, etc. |
-| ✅ Avoid client-only content in SSR | Use `<ClientOnly>` wrapper if needed |
-| ✅ Match server/client state | Ensure reactive data is consistent |
+| Rule                                | Description                                     |
+| ----------------------------------- | ----------------------------------------------- |
+| ✅ Use `<div>` for slot containers  | When slot may contain block elements            |
+| ✅ Check HTML validity              | No `<p>` inside `<p>`, `<a>` inside `<a>`, etc. |
+| ✅ Avoid client-only content in SSR | Use `<ClientOnly>` wrapper if needed            |
+| ✅ Match server/client state        | Ensure reactive data is consistent              |
 
 ---
 
@@ -3128,10 +3325,10 @@ This causes hydration mismatch because:
 
 ### Dual Storage Strategy
 
-| Mode | Use Case | Configuration |
-|------|----------|---------------|
+| Mode      | Use Case                 | Configuration        |
+| --------- | ------------------------ | -------------------- |
 | **Local** | Development, small sites | `STORAGE_TYPE=local` |
-| **S3** | Production, scalable | `STORAGE_TYPE=s3` |
+| **S3**    | Production, scalable     | `STORAGE_TYPE=s3`    |
 
 ### Environment Variables
 
@@ -3171,12 +3368,12 @@ Optional Telegram notifications for new contact form submissions:
 ```typescript
 // puppet-master.config.ts
 features: {
-  contactTelegramNotify: true  // Enable Telegram notifications
+  contactTelegramNotify: true // Enable Telegram notifications
 }
 
 // .env
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHAT_ID=your_chat_id
+TELEGRAM_BOT_TOKEN = your_bot_token
+TELEGRAM_CHAT_ID = your_chat_id
 ```
 
 ### Implementation

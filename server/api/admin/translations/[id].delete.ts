@@ -9,7 +9,7 @@ import { useDatabase, schema } from '../../../database/client'
 import { eq } from 'drizzle-orm'
 import { isSystemKey } from '../../../../i18n/system'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = getCookie(event, 'auth_session')
   if (!session) {
@@ -25,11 +25,7 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   // Check if translation exists and is not a system key
-  const existing = db
-    .select()
-    .from(schema.translations)
-    .where(eq(schema.translations.id, id))
-    .get()
+  const existing = db.select().from(schema.translations).where(eq(schema.translations.id, id)).get()
 
   if (!existing) {
     throw createError({ statusCode: 404, message: 'Translation not found' })
@@ -43,4 +39,3 @@ export default defineEventHandler(async (event) => {
 
   return { success: true }
 })
-

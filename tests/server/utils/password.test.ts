@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  hashPassword,
-  verifyPassword,
-  generateSessionId
-} from '../../../server/utils/password'
+import { hashPassword, verifyPassword, generateSessionId } from '../../../server/utils/password'
 
 describe('hashPassword', () => {
   it('should return a string with salt:hash format', () => {
@@ -109,4 +105,3 @@ describe('generateSessionId', () => {
     expect(/^[a-f0-9]+$/i.test(sessionId)).toBe(true)
   })
 })
-

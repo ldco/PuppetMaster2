@@ -17,7 +17,7 @@ import type { AuditAction } from '../database/schema'
 import { logger } from './logger'
 
 interface AuditOptions {
-  userId?: number | null       // Actor performing the action
+  userId?: number | null // Actor performing the action
   targetUserId?: number | null // User affected by the action
   details?: Record<string, any>
   success?: boolean
@@ -88,12 +88,7 @@ export const audit = {
   /**
    * Log failed login attempt
    */
-  async loginFailed(
-    event: H3Event,
-    email: string,
-    reason: string,
-    userId?: number
-  ): Promise<void> {
+  async loginFailed(event: H3Event, email: string, reason: string, userId?: number): Promise<void> {
     await logAudit(event, 'login_failed', {
       targetUserId: userId,
       details: { email, reason },
@@ -111,11 +106,7 @@ export const audit = {
   /**
    * Log password change
    */
-  async passwordChange(
-    event: H3Event,
-    actorId: number,
-    targetUserId: number
-  ): Promise<void> {
+  async passwordChange(event: H3Event, actorId: number, targetUserId: number): Promise<void> {
     await logAudit(event, 'password_change', {
       userId: actorId,
       targetUserId,
@@ -192,11 +183,7 @@ export const audit = {
   /**
    * Log account lockout
    */
-  async accountLocked(
-    event: H3Event,
-    userId: number,
-    reason: string
-  ): Promise<void> {
+  async accountLocked(event: H3Event, userId: number, reason: string): Promise<void> {
     await logAudit(event, 'account_locked', {
       targetUserId: userId,
       details: { reason }
@@ -222,10 +209,7 @@ export const audit = {
   /**
    * Log session expiration
    */
-  async sessionExpired(
-    event: H3Event,
-    userId: number
-  ): Promise<void> {
+  async sessionExpired(event: H3Event, userId: number): Promise<void> {
     await logAudit(event, 'session_expired', {
       targetUserId: userId
     })

@@ -14,7 +14,7 @@ import config from '../../../app/puppet-master.config'
 import { useFileStorage } from '../../utils/storage'
 import { validateImageFile } from '../../utils/fileValidation'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -83,4 +83,3 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
-

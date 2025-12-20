@@ -13,20 +13,36 @@
  * ══════════════════════════════════════════════════════════ */
 
 /* Dynamic viewport height - adjusts when browser UI shows/hides */
-.h-dvh { height: 100dvh; }
-.min-h-dvh { min-height: 100dvh; }
+.h-dvh {
+  height: 100dvh;
+}
+.min-h-dvh {
+  min-height: 100dvh;
+}
 
 /* Small viewport height - smallest possible viewport (UI visible) */
-.h-svh { height: 100svh; }
-.min-h-svh { min-height: 100svh; }
+.h-svh {
+  height: 100svh;
+}
+.min-h-svh {
+  min-height: 100svh;
+}
 
 /* Large viewport height - largest possible viewport (UI hidden) */
-.h-lvh { height: 100lvh; }
-.min-h-lvh { min-height: 100lvh; }
+.h-lvh {
+  height: 100lvh;
+}
+.min-h-lvh {
+  min-height: 100lvh;
+}
 
 /* Fallback for very old browsers (pre-2023) */
 @supports not (height: 100dvh) {
-  .h-dvh, .min-h-dvh { height: 100vh; min-height: 100vh; }
+  .h-dvh,
+  .min-h-dvh {
+    height: 100vh;
+    min-height: 100vh;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -50,8 +66,12 @@
 }
 
 /* Legacy aliases for backwards compatibility */
-.safe-area-left { padding-inline-start: env(safe-area-inset-left); }
-.safe-area-right { padding-inline-end: env(safe-area-inset-right); }
+.safe-area-left {
+  padding-inline-start: env(safe-area-inset-left);
+}
+.safe-area-right {
+  padding-inline-end: env(safe-area-inset-right);
+}
 
 /* ══════════════════════════════════════════════════════════
  * iOS Momentum Scrolling
@@ -68,4 +88,3 @@
  * NOTE: Scrollbar styles are defined in scrollbars.css
  * This section is intentionally empty to avoid duplication.
  * ══════════════════════════════════════════════════════════ */
-

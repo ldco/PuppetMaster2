@@ -63,10 +63,7 @@ async function toggleTheme(event: MouseEvent) {
   // Animate the new view with a circle clip-path
   document.documentElement.animate(
     {
-      clipPath: [
-        `circle(0px at ${x}px ${y}px)`,
-        `circle(${endRadius}px at ${x}px ${y}px)`
-      ]
+      clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`]
     },
     {
       duration: 400,
@@ -105,4 +102,3 @@ const isDark = computed(() => colorMode.value === 'dark')
   Uses global CSS classes from animations/keyframes.css
   View Transition styles are in animations/transitions.css
 -->
-

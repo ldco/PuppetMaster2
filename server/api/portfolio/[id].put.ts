@@ -12,7 +12,12 @@ import { checkVersion, versionInfo } from '../../utils/optimisticLock'
 
 // Validation schema (all fields optional for partial update)
 const updateSchema = z.object({
-  slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with dashes').optional(),
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with dashes')
+    .optional(),
   title: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional().nullable(),
   content: z.string().optional().nullable(),
@@ -26,7 +31,7 @@ const updateSchema = z.object({
   expectedVersion: z.string().datetime().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Check authentication
   const session = event.context.session
   if (!session?.userId) {
@@ -99,11 +104,14 @@ export default defineEventHandler(async (event) => {
 
   if (data.slug !== undefined) updateData.slug = data.slug
   if (data.title !== undefined) updateData.title = escapeHtml(data.title)
-  if (data.description !== undefined) updateData.description = data.description ? escapeHtml(data.description) : null
-  if (data.content !== undefined) updateData.content = data.content ? sanitizeHtml(data.content) : null
+  if (data.description !== undefined)
+    updateData.description = data.description ? escapeHtml(data.description) : null
+  if (data.content !== undefined)
+    updateData.content = data.content ? sanitizeHtml(data.content) : null
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
   if (data.thumbnailUrl !== undefined) updateData.thumbnailUrl = data.thumbnailUrl
-  if (data.category !== undefined) updateData.category = data.category ? escapeHtml(data.category) : null
+  if (data.category !== undefined)
+    updateData.category = data.category ? escapeHtml(data.category) : null
   if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags.map(t => escapeHtml(t)))
   if (data.order !== undefined) updateData.order = data.order
   if (data.published !== undefined) {
@@ -132,4 +140,3 @@ export default defineEventHandler(async (event) => {
     ...versionInfo(updated)
   }
 })
-

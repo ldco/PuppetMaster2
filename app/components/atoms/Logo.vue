@@ -36,25 +36,12 @@ const homePath = computed(() => localePath('/'))
   <!-- Uses global classes from skeleton/header.css (.logo-link, .logo-img) -->
   <NuxtLink :to="to ?? homePath" class="logo-link" :class="$props.class">
     <ClientOnly>
-      <img
-        :src="headerLogo"
-        :alt="alt ?? 'Logo'"
-        class="logo-img"
-        width="200"
-        height="40"
-      />
+      <img :src="headerLogo" :alt="alt ?? 'Logo'" class="logo-img" width="200" height="40" />
       <template #fallback>
-        <img
-          :src="ssrFallbackLogo"
-          :alt="alt ?? 'Logo'"
-          class="logo-img"
-          width="200"
-          height="40"
-        />
+        <img :src="ssrFallbackLogo" :alt="alt ?? 'Logo'" class="logo-img" width="200" height="40" />
       </template>
     </ClientOnly>
   </NuxtLink>
 </template>
 
 <!-- No scoped styles needed - all styles come from skeleton/header.css -->
-

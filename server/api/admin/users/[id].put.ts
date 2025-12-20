@@ -25,7 +25,7 @@ const updateUserSchema = z.object({
   expectedVersion: z.string().datetime().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')
   if (!id || !/^\d+$/.test(id)) {
     throw createError({
@@ -52,11 +52,7 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   // Get target user
-  const targetUser = db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.id, userId))
-    .get()
+  const targetUser = db.select().from(schema.users).where(eq(schema.users.id, userId)).get()
 
   if (!targetUser) {
     throw createError({
@@ -89,11 +85,7 @@ export default defineEventHandler(async (event) => {
 
   // Check email uniqueness if changing
   if (email && email !== targetUser.email) {
-    const existing = db
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.email, email))
-      .get()
+    const existing = db.select().from(schema.users).where(eq(schema.users.email, email)).get()
 
     if (existing) {
       throw createError({
@@ -114,10 +106,7 @@ export default defineEventHandler(async (event) => {
   if (password) updates.passwordHash = hashPassword(password)
 
   // Update user
-  db.update(schema.users)
-    .set(updates)
-    .where(eq(schema.users.id, userId))
-    .run()
+  db.update(schema.users).set(updates).where(eq(schema.users.id, userId)).run()
 
   // Audit logging for security-relevant changes
   if (role && role !== targetUser.role) {
@@ -155,4 +144,3 @@ export default defineEventHandler(async (event) => {
     ...versionInfo(updatedUser!)
   }
 })
-

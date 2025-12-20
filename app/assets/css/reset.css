@@ -44,13 +44,23 @@ body {
 }
 
 /* Set shorter line heights on headings and interactive elements */
-h1, h2, h3, h4,
-button, input, label {
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+label {
   line-height: 1.1;
 }
 
 /* Balance text wrapping on headings */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-wrap: balance;
 }
 
@@ -94,7 +104,7 @@ textarea:not([rows]) {
   html:focus-within {
     scroll-behavior: auto;
   }
-  
+
   *,
   *::before,
   *::after {
@@ -118,7 +128,9 @@ button {
 }
 
 /* Samsung Internet fix - prevent input zoom */
-input, select, textarea {
+input,
+select,
+textarea {
   font-size: 16px;
 }
 

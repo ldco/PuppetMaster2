@@ -45,15 +45,15 @@ const config = {
   // ═══════════════════════════════════════════════════════════════════════════
   features: {
     // Website features (only apply when mode has website)
-    multiLangs: true,           // Multiple languages support
-    doubleTheme: true,          // Light/dark mode toggle
-    onepager: true,             // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
-    interactiveHeader: true,    // Header style changes on scroll
-    hideHeaderOnScroll: false,  // Hide header when scrolling down
-    verticalNav: false,         // true = icon sidebar, false = horizontal header
+    multiLangs: true, // Multiple languages support
+    doubleTheme: true, // Light/dark mode toggle
+    onepager: true, // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
+    interactiveHeader: true, // Header style changes on scroll
+    hideHeaderOnScroll: false, // Hide header when scrolling down
+    verticalNav: false, // true = icon sidebar, false = horizontal header
 
     // Admin features (only apply when mode has admin)
-    appVerticalNav: true,       // App mode: true = vertical sidebar, false = horizontal nav
+    appVerticalNav: true, // App mode: true = vertical sidebar, false = horizontal nav
 
     // PWA (Progressive Web App) support
     // Enables: installable app, offline support, service worker caching
@@ -62,15 +62,15 @@ const config = {
 
     // Contact form notifications
     // ⚠️ Requires .env configuration - see .env.example
-    contactEmailConfirmation: false,   // Send confirmation email to user (requires SMTP_* in .env)
-    contactTelegramNotify: false,      // Send Telegram notification to admin (requires TELEGRAM_* in .env)
+    contactEmailConfirmation: false, // Send confirmation email to user (requires SMTP_* in .env)
+    contactTelegramNotify: false, // Send Telegram notification to admin (requires TELEGRAM_* in .env)
 
     // Footer features
-    footerNav: true,              // Show footer navigation links (from sections)
-    footerCta: true,              // Show CTA button in footer
-    footerLegalLinks: true,       // Show legal links (Privacy, Terms)
-    footerMadeWith: true,         // Show "Made with Puppet Master" branding
-    backToTop: true,              // Show back-to-top button on scroll
+    footerNav: true, // Show footer navigation links (from sections)
+    footerCta: true, // Show CTA button in footer
+    footerLegalLinks: true, // Show legal links (Privacy, Terms)
+    footerMadeWith: true, // Show "Made with Puppet Master" branding
+    backToTop: true // Show back-to-top button on scroll
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -103,28 +103,28 @@ const config = {
 
     // Image settings
     image: {
-      maxSizeMB: 10,                    // Max upload size
-      maxWidth: 1920,                   // Resize to max width
-      maxHeight: 1080,                  // Resize to max height
-      quality: 85,                      // WebP quality (1-100)
-      thumbnailWidth: 400,              // Thumbnail width
-      thumbnailHeight: 300,             // Thumbnail height
-      thumbnailQuality: 75,             // Thumbnail WebP quality
+      maxSizeMB: 10, // Max upload size
+      maxWidth: 1920, // Resize to max width
+      maxHeight: 1080, // Resize to max height
+      quality: 85, // WebP quality (1-100)
+      thumbnailWidth: 400, // Thumbnail width
+      thumbnailHeight: 300, // Thumbnail height
+      thumbnailQuality: 75 // Thumbnail WebP quality
     },
 
     // Video settings
     video: {
-      enabled: true,                    // Allow video uploads
-      maxSizeMB: 100,                   // Max upload size
-      maxDurationSeconds: 300,          // Max 5 minutes
+      enabled: true, // Allow video uploads
+      maxSizeMB: 100, // Max upload size
+      maxDurationSeconds: 300, // Max 5 minutes
       allowedTypes: ['mp4', 'webm', 'mov', 'avi'],
       outputFormat: 'mp4' as 'mp4' | 'webm',
       // FFmpeg compression settings
       compression: {
-        videoBitrate: '2M',             // Target video bitrate
-        audioBitrate: '128k',           // Target audio bitrate
-        maxWidth: 1920,                 // Scale down if larger
-        fps: 30,                        // Target frame rate
+        videoBitrate: '2M', // Target video bitrate
+        audioBitrate: '128k', // Target audio bitrate
+        maxWidth: 1920, // Scale down if larger
+        fps: 30 // Target frame rate
       }
     }
   },
@@ -154,45 +154,45 @@ const config = {
       settings: 'database' as 'database' | 'api',
       portfolio: 'database' as 'database' | 'api',
       contacts: 'database' as 'database' | 'api',
-      translations: 'database' as 'database' | 'api',
+      translations: 'database' as 'database' | 'api'
     },
 
     // API client configuration
     api: {
-      timeout: 30000,  // Request timeout (ms)
+      timeout: 30000, // Request timeout (ms)
 
       // Retry with exponential backoff
       retry: {
         maxAttempts: 3,
         initialDelay: 1000,
         maxDelay: 10000,
-        backoffMultiplier: 2,
+        backoffMultiplier: 2
       },
 
       // Circuit breaker (prevent cascading failures)
       circuitBreaker: {
         enabled: true,
-        failureThreshold: 5,     // Open after 5 consecutive failures
-        resetTimeout: 60000,      // Try again after 60s
+        failureThreshold: 5, // Open after 5 consecutive failures
+        resetTimeout: 60000 // Try again after 60s
       },
 
       // Response caching (per-resource TTL in seconds)
       cache: {
         enabled: true,
         ttl: {
-          users: 300,         // 5 min (rarely changes)
-          sessions: 60,       // 1 min (needs freshness for auth)
-          settings: 600,      // 10 min (mostly static)
-          portfolio: 180,     // 3 min (content updates)
-          contacts: 0,        // No cache (always fresh)
-          translations: 3600, // 1 hour (rarely changes)
-        },
-      },
-    },
+          users: 300, // 5 min (rarely changes)
+          sessions: 60, // 1 min (needs freshness for auth)
+          settings: 600, // 10 min (mostly static)
+          portfolio: 180, // 3 min (content updates)
+          contacts: 0, // No cache (always fresh)
+          translations: 3600 // 1 hour (rarely changes)
+        }
+      }
+    }
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SECTIONS - Source of truth for navigation and routing
+  // SECTIONS - Source of truth for website navigation and routing
   // ═══════════════════════════════════════════════════════════════════════════
   sections: [
     { id: 'home', inNav: true },
@@ -200,6 +200,30 @@ const config = {
     { id: 'portfolio', inNav: true },
     { id: 'services', inNav: true },
     { id: 'contact', inNav: true }
+  ] as const,
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ADMIN SECTIONS - Source of truth for admin panel navigation
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Each section defines:
+  //   id      - Route name (maps to /admin/{id})
+  //   icon    - Tabler icon name (without 'tabler:' prefix)
+  //   label   - i18n key suffix (full key: admin.{label})
+  //   badge   - Show unread count badge (e.g., for contacts inbox)
+  //   roles   - Array of roles that can access this section (empty = all)
+  //             Available roles: 'master', 'admin', 'editor'
+  //
+  // Usage in admin.vue and AppBottomNav.vue:
+  //   const adminSections = config.adminSections.filter(s => canAccess(s.roles))
+  // ═══════════════════════════════════════════════════════════════════════════
+  adminSections: [
+    { id: 'settings', icon: 'settings', label: 'settings', badge: false, roles: [] },
+    { id: 'portfolio', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
+    { id: 'contacts', icon: 'mail', label: 'contacts', badge: true, roles: [] },
+    { id: 'translations', icon: 'language', label: 'translations', badge: false, roles: [] },
+    { id: 'users', icon: 'users', label: 'users', badge: false, roles: ['master', 'admin'] },
+    { id: 'health', icon: 'heartbeat', label: 'health', badge: false, roles: ['master'] }
   ] as const,
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -255,14 +279,14 @@ const config = {
 
     // Available shapes and where they're used
     shapes: {
-      horizontal: 'header',  // Full logo for desktop header
-      circle: 'short'        // Compact logo for sidebar, footer, icons
+      horizontal: 'header', // Full logo for desktop header
+      circle: 'short' // Compact logo for sidebar, footer, icons
     },
 
     // Fallback chain for languages without their own logo
     // If Hebrew logo doesn't exist, use English (not Russian)
     langFallback: {
-      he: 'en',  // Hebrew → English
+      he: 'en' // Hebrew → English
       // Add more fallbacks as needed
     },
 
@@ -284,10 +308,10 @@ const config = {
   // Derived from Puppet Master logo design
   // Everything else is auto-calculated via CSS color-mix() and light-dark()
   colors: {
-    black: '#2f2f2f',   // Charcoal gray (from logo dark text)
-    white: '#f0f0f0',   // Off-white (from logo light text)
-    brand: '#aa0000',   // Dark red/maroon (from logo accent)
-    accent: '#0f172a'   // Deep slate (for contrast)
+    black: '#2f2f2f', // Charcoal gray (from logo dark text)
+    white: '#f0f0f0', // Off-white (from logo light text)
+    brand: '#aa0000', // Dark red/maroon (from logo accent)
+    accent: '#0f172a' // Deep slate (for contrast)
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -316,39 +340,116 @@ const config = {
     { key: 'contact.email', type: 'email', group: 'contact', label: 'Email', icon: 'mail' },
     { key: 'contact.phone', type: 'tel', group: 'contact', label: 'Phone', icon: 'phone' },
     // Location: empty=hidden, address text=show text, coordinates (lat,lng)=show Yandex map
-    { key: 'contact.location', type: 'string', group: 'contact', label: 'Location', icon: 'map-pin' },
+    {
+      key: 'contact.location',
+      type: 'string',
+      group: 'contact',
+      label: 'Location',
+      icon: 'map-pin'
+    },
 
     // Social Links (displayed via <SocialNav /> component)
     // Icons: Tabler brand icons (https://tabler.io/icons) or custom-* for custom icons
     // ─── Messaging ───
-    { key: 'social.telegram', type: 'url', group: 'social', label: 'Telegram', icon: 'brand-telegram' },
-    { key: 'social.whatsapp', type: 'url', group: 'social', label: 'WhatsApp', icon: 'brand-whatsapp' },
+    {
+      key: 'social.telegram',
+      type: 'url',
+      group: 'social',
+      label: 'Telegram',
+      icon: 'brand-telegram'
+    },
+    {
+      key: 'social.whatsapp',
+      type: 'url',
+      group: 'social',
+      label: 'WhatsApp',
+      icon: 'brand-whatsapp'
+    },
     { key: 'social.viber', type: 'url', group: 'social', label: 'Viber', icon: 'brand-viber' },
-    { key: 'social.discord', type: 'url', group: 'social', label: 'Discord', icon: 'brand-discord' },
+    {
+      key: 'social.discord',
+      type: 'url',
+      group: 'social',
+      label: 'Discord',
+      icon: 'brand-discord'
+    },
     { key: 'social.max', type: 'url', group: 'social', label: 'MAX Messenger', icon: 'custom-max' },
     // ─── Social Networks ───
-    { key: 'social.instagram', type: 'url', group: 'social', label: 'Instagram', icon: 'brand-instagram' },
-    { key: 'social.facebook', type: 'url', group: 'social', label: 'Facebook', icon: 'brand-facebook' },
+    {
+      key: 'social.instagram',
+      type: 'url',
+      group: 'social',
+      label: 'Instagram',
+      icon: 'brand-instagram'
+    },
+    {
+      key: 'social.facebook',
+      type: 'url',
+      group: 'social',
+      label: 'Facebook',
+      icon: 'brand-facebook'
+    },
     { key: 'social.twitter', type: 'url', group: 'social', label: 'Twitter/X', icon: 'brand-x' },
-    { key: 'social.threads', type: 'url', group: 'social', label: 'Threads', icon: 'brand-threads' },
+    {
+      key: 'social.threads',
+      type: 'url',
+      group: 'social',
+      label: 'Threads',
+      icon: 'brand-threads'
+    },
     { key: 'social.tiktok', type: 'url', group: 'social', label: 'TikTok', icon: 'brand-tiktok' },
-    { key: 'social.pinterest', type: 'url', group: 'social', label: 'Pinterest', icon: 'brand-pinterest' },
+    {
+      key: 'social.pinterest',
+      type: 'url',
+      group: 'social',
+      label: 'Pinterest',
+      icon: 'brand-pinterest'
+    },
     { key: 'social.vk', type: 'url', group: 'social', label: 'VK (ВКонтакте)', icon: 'brand-vk' },
     // ─── Video ───
-    { key: 'social.youtube', type: 'url', group: 'social', label: 'YouTube', icon: 'brand-youtube' },
+    {
+      key: 'social.youtube',
+      type: 'url',
+      group: 'social',
+      label: 'YouTube',
+      icon: 'brand-youtube'
+    },
     { key: 'social.twitch', type: 'url', group: 'social', label: 'Twitch', icon: 'brand-twitch' },
     // ─── Professional ───
-    { key: 'social.linkedin', type: 'url', group: 'social', label: 'LinkedIn', icon: 'brand-linkedin' },
+    {
+      key: 'social.linkedin',
+      type: 'url',
+      group: 'social',
+      label: 'LinkedIn',
+      icon: 'brand-linkedin'
+    },
     { key: 'social.medium', type: 'url', group: 'social', label: 'Medium', icon: 'brand-medium' },
     // ─── Dev/Design ───
     { key: 'social.github', type: 'url', group: 'social', label: 'GitHub', icon: 'brand-github' },
     { key: 'social.gitlab', type: 'url', group: 'social', label: 'GitLab', icon: 'brand-gitlab' },
-    { key: 'social.dribbble', type: 'url', group: 'social', label: 'Dribbble', icon: 'brand-dribbble' },
-    { key: 'social.behance', type: 'url', group: 'social', label: 'Behance', icon: 'brand-behance' },
+    {
+      key: 'social.dribbble',
+      type: 'url',
+      group: 'social',
+      label: 'Dribbble',
+      icon: 'brand-dribbble'
+    },
+    {
+      key: 'social.behance',
+      type: 'url',
+      group: 'social',
+      label: 'Behance',
+      icon: 'brand-behance'
+    },
 
     // Legal/Juridical Info (displayed in footer small print)
     // Russian: ИНН, ОГРН, Юридический адрес
-    { key: 'legal.companyName', type: 'string', group: 'legal', label: 'Company Name (for copyright)' },
+    {
+      key: 'legal.companyName',
+      type: 'string',
+      group: 'legal',
+      label: 'Company Name (for copyright)'
+    },
     { key: 'legal.inn', type: 'string', group: 'legal', label: 'ИНН (Tax ID)' },
     { key: 'legal.ogrn', type: 'string', group: 'legal', label: 'ОГРН (Registration Number)' },
     { key: 'legal.address', type: 'string', group: 'legal', label: 'Legal Address' },
@@ -366,12 +467,27 @@ const config = {
     { key: 'seo.keywords', type: 'string', group: 'seo', label: 'Meta Keywords (comma-separated)' },
 
     // Analytics (IDs only - scripts injected by plugins)
-    { key: 'analytics.googleId', type: 'string', group: 'analytics', label: 'Google Analytics ID (G-XXXXXXXX)' },
+    {
+      key: 'analytics.googleId',
+      type: 'string',
+      group: 'analytics',
+      label: 'Google Analytics ID (G-XXXXXXXX)'
+    },
     { key: 'analytics.yandexId', type: 'string', group: 'analytics', label: 'Yandex Metrica ID' },
-    { key: 'analytics.facebookPixel', type: 'string', group: 'analytics', label: 'Facebook Pixel ID' },
+    {
+      key: 'analytics.facebookPixel',
+      type: 'string',
+      group: 'analytics',
+      label: 'Facebook Pixel ID'
+    },
 
     // Verification codes (for webmaster tools)
-    { key: 'verification.google', type: 'string', group: 'verification', label: 'Google Search Console' },
+    {
+      key: 'verification.google',
+      type: 'string',
+      group: 'verification',
+      label: 'Google Search Console'
+    },
     { key: 'verification.yandex', type: 'string', group: 'verification', label: 'Yandex Webmaster' }
   ] as const,
 
@@ -433,4 +549,3 @@ const config = {
 }
 
 export default config
-

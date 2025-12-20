@@ -13,7 +13,7 @@ import { useDatabase, schema } from '../../database/client'
 // Validation schema for settings update
 const updateSchema = z.record(z.string(), z.string().nullable())
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Auth is handled by middleware - event.context.user is set
 
   // Parse and validate request body
@@ -37,11 +37,7 @@ export default defineEventHandler(async (event) => {
 
   for (const [key, value] of Object.entries(updates)) {
     // Check if setting exists
-    const existing = db
-      .select()
-      .from(schema.settings)
-      .where(eq(schema.settings.key, key))
-      .get()
+    const existing = db.select().from(schema.settings).where(eq(schema.settings.key, key)).get()
 
     if (existing) {
       // Update existing setting
@@ -75,4 +71,3 @@ export default defineEventHandler(async (event) => {
     created
   }
 })
-

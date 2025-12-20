@@ -9,8 +9,9 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--l-bg-elevated);
-  transition: transform var(--transition-slow) ease,
-              box-shadow var(--transition-slow) ease;
+  transition:
+    transform var(--transition-slow) ease,
+    box-shadow var(--transition-slow) ease;
 }
 
 .portfolio-card:hover {
@@ -86,4 +87,3 @@ body.lightbox-open .portfolio-card:hover {
   justify-content: center;
   color: var(--t-muted);
 }
-

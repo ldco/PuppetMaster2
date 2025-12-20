@@ -22,35 +22,45 @@ body {
  * HEADINGS
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-h1, .h1,
-h2, .h2,
-h3, .h3,
-h4, .h4,
-h5, .h5,
-h6, .h6 {
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+h5,
+.h5,
+h6,
+.h6 {
   font-family: var(--font-heading);
 }
 
-h1, .h1 {
+h1,
+.h1 {
   font-size: var(--heading-1);
   font-weight: var(--font-bold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
 }
 
-h2, .h2 {
+h2,
+.h2 {
   font-size: var(--heading-2);
   font-weight: var(--font-bold);
   line-height: var(--leading-tight);
 }
 
-h3, .h3 {
+h3,
+.h3 {
   font-size: var(--heading-3);
   font-weight: var(--font-semibold);
   line-height: var(--leading-snug);
 }
 
-h4, .h4 {
+h4,
+.h4 {
   font-size: var(--heading-4);
   font-weight: var(--font-semibold);
   line-height: var(--leading-snug);
@@ -86,7 +96,8 @@ a:focus-visible {
 }
 
 /* Small text */
-small, .text-sm {
+small,
+.text-sm {
   font-size: var(--text-sm);
 }
 

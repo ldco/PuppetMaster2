@@ -123,11 +123,7 @@ async function handleSubmit() {
             ></textarea>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary btn-lg btn-full"
-            :disabled="isSubmitting"
-          >
+          <button type="submit" class="btn btn-primary btn-lg btn-full" :disabled="isSubmitting">
             {{ isSubmitting ? t('contact.sending') : t('contact.sendButton') }}
           </button>
 
@@ -149,4 +145,3 @@ async function handleSubmit() {
 </template>
 
 <!-- No scoped styles needed - all styles come from global CSS -->
-

@@ -33,18 +33,22 @@ export const contentTranslations: Record<string, Record<string, any>> = {
   en: {
     seo: {
       homeTitle: 'Puppet Master - Pure CSS Studio Toolkit',
-      homeDescription: 'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
+      homeDescription:
+        'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
     },
     hero: {
       title: 'Puppet Master',
-      subtitle: 'A studio toolkit for creating stable, secure landing pages and portfolio sites. Built with pure CSS - no Tailwind!',
+      subtitle:
+        'A studio toolkit for creating stable, secure landing pages and portfolio sites. Built with pure CSS - no Tailwind!',
       primaryCta: 'Get Started',
       secondaryCta: 'View Work'
     },
     about: {
       title: 'About the Project',
-      paragraph1: 'Puppet Master is an opinionated studio toolkit designed for agencies and freelancers who need to quickly deploy professional landing pages and portfolio sites.',
-      paragraph2: 'Built on Nuxt 4 with a pure CSS system (no Tailwind!), it features automatic dark mode, multi-language support with RTL, and a simple SQLite database for content management.'
+      paragraph1:
+        'Puppet Master is an opinionated studio toolkit designed for agencies and freelancers who need to quickly deploy professional landing pages and portfolio sites.',
+      paragraph2:
+        'Built on Nuxt 4 with a pure CSS system (no Tailwind!), it features automatic dark mode, multi-language support with RTL, and a simple SQLite database for content management.'
     },
     portfolio: {
       title: 'Recent Work'
@@ -73,18 +77,22 @@ export const contentTranslations: Record<string, Record<string, any>> = {
   ru: {
     seo: {
       homeTitle: 'Puppet Master - CSS инструментарий для студий',
-      homeDescription: 'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов.'
+      homeDescription:
+        'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов.'
     },
     hero: {
       title: 'Puppet Master',
-      subtitle: 'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов. Чистый CSS - без Tailwind!',
+      subtitle:
+        'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов. Чистый CSS - без Tailwind!',
       primaryCta: 'Начать',
       secondaryCta: 'Смотреть работы'
     },
     about: {
       title: 'О проекте',
-      paragraph1: 'Puppet Master — это инструментарий для агентств и фрилансеров, которым нужно быстро разворачивать профессиональные лендинги и портфолио сайты.',
-      paragraph2: 'Построен на Nuxt 4 с чистым CSS (без Tailwind!), включает автоматическую тёмную тему, мультиязычность с RTL и простую SQLite базу данных.'
+      paragraph1:
+        'Puppet Master — это инструментарий для агентств и фрилансеров, которым нужно быстро разворачивать профессиональные лендинги и портфолио сайты.',
+      paragraph2:
+        'Построен на Nuxt 4 с чистым CSS (без Tailwind!), включает автоматическую тёмную тему, мультиязычность с RTL и простую SQLite базу данных.'
     },
     portfolio: {
       title: 'Наши работы'
@@ -123,8 +131,10 @@ export const contentTranslations: Record<string, Record<string, any>> = {
     },
     about: {
       title: 'אודות',
-      paragraph1: 'אנחנו צוות יצירתי ומקצועי המתמחה בפיתוח אתרים, יישומים ופתרונות דיגיטליים מותאמים אישית לצרכים הייחודיים של כל לקוח.',
-      paragraph2: 'מאמינים בשילוב של טכנולוגיה, עיצוב וחדשנות כדי לספק מוצרים איכותיים, תפקודיים ויעילים.'
+      paragraph1:
+        'אנחנו צוות יצירתי ומקצועי המתמחה בפיתוח אתרים, יישומים ופתרונות דיגיטליים מותאמים אישית לצרכים הייחודיים של כל לקוח.',
+      paragraph2:
+        'מאמינים בשילוב של טכנולוגיה, עיצוב וחדשנות כדי לספק מוצרים איכותיים, תפקודיים ויעילים.'
     },
     portfolio: {
       title: 'תיק העבודות שלנו'
@@ -189,4 +199,3 @@ export function getContentSeedData(): Array<{ locale: string; key: string; value
 
   return result
 }
-

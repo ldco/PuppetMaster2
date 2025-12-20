@@ -17,7 +17,7 @@ const { t, locale } = useI18n()
 const puppetMasterUrl = 'https://puppetmaster.dev'
 
 // Get language suffix (ru for Russian, en for all others)
-const langSuffix = computed(() => locale.value === 'ru' ? 'ru' : 'en')
+const langSuffix = computed(() => (locale.value === 'ru' ? 'ru' : 'en'))
 
 // Logo paths - 2 variants for theme, language baked in
 const basePath = '/puppetmaster'
@@ -36,9 +36,20 @@ const darkThemeLogo = computed(() => `${basePath}/horizontal_light_${langSuffix.
       :aria-label="t('footer.puppetMaster')"
     >
       <!-- 2 theme variants - CSS shows correct one, language is in the path -->
-      <img :src="lightThemeLogo" alt="Puppet Master" class="made-with-logo light-logo" width="120" height="24" />
-      <img :src="darkThemeLogo" alt="Puppet Master" class="made-with-logo dark-logo" width="120" height="24" />
+      <img
+        :src="lightThemeLogo"
+        alt="Puppet Master"
+        class="made-with-logo light-logo"
+        width="120"
+        height="24"
+      />
+      <img
+        :src="darkThemeLogo"
+        alt="Puppet Master"
+        class="made-with-logo dark-logo"
+        width="120"
+        height="24"
+      />
     </a>
   </div>
 </template>
-

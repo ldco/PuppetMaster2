@@ -13,12 +13,15 @@
  * client has 'ru' from cookie.
  */
 
-const props = withDefaults(defineProps<{
-  /** Direction panel opens: 'down' for header, 'side' for sidebar, 'inline' for compact menus */
-  direction?: 'down' | 'side' | 'inline'
-}>(), {
-  direction: 'down'
-})
+const props = withDefaults(
+  defineProps<{
+    /** Direction panel opens: 'down' for header, 'side' for sidebar, 'inline' for compact menus */
+    direction?: 'down' | 'side' | 'inline'
+  }>(),
+  {
+    direction: 'down'
+  }
+)
 
 const { t } = useI18n()
 const { locale, locales, setLocale } = useI18n()
@@ -72,11 +75,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Popup mode: button + panel -->
-    <div
-      v-else
-      class="lang-switcher-wrapper"
-      :class="`lang-switcher--${direction}`"
-    >
+    <div v-else class="lang-switcher-wrapper" :class="`lang-switcher--${direction}`">
       <button
         type="button"
         class="lang-switcher-btn"
@@ -108,4 +107,3 @@ onUnmounted(() => {
 <!--
   Uses global CSS classes from ui/content/lang-switcher.css
 -->
-

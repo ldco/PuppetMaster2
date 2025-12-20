@@ -116,8 +116,8 @@ export function useSiteSettings() {
 
   // Computed helpers for common use cases
   // Site name: legal.companyName → seo.title → 'Puppet Master'
-  const siteName = computed(() =>
-    data.value?.legal.companyName || data.value?.seo.title || 'Puppet Master'
+  const siteName = computed(
+    () => data.value?.legal.companyName || data.value?.seo.title || 'Puppet Master'
   )
   const contactEmail = computed(() => data.value?.contact.email)
   const contactPhone = computed(() => data.value?.contact.phone)
@@ -150,4 +150,3 @@ export function useSiteSettings() {
     seoDescription
   }
 }
-

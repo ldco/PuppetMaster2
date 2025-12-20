@@ -22,7 +22,7 @@ export class APIClient {
     this.cache = useCache(clientConfig.cache)
     this.retry = useRetry({
       ...clientConfig.retry,
-      circuitBreaker: clientConfig.retry.circuitBreaker,
+      circuitBreaker: clientConfig.retry.circuitBreaker
     })
   }
 
@@ -35,8 +35,7 @@ export class APIClient {
     options?: APIRequestOptions
   ): Promise<T> {
     const cacheKey =
-      options?.cache?.key ||
-      `${method}:${path}:${JSON.stringify(options?.query || {})}`
+      options?.cache?.key || `${method}:${path}:${JSON.stringify(options?.query || {})}`
 
     // Try cache first for GET requests
     if (method === 'GET' && options?.cache && config.dataSource.api.cache.enabled) {
@@ -49,16 +48,13 @@ export class APIClient {
     // Execute request with retry
     const result = await this.retry.execute<T>(async () => {
       const url = this.buildUrl(path, options?.query)
-      const headers = await this.buildHeaders(
-        options?.headers,
-        options?.skipAuth
-      )
+      const headers = await this.buildHeaders(options?.headers, options?.skipAuth)
 
       const response = await fetch(url, {
         method,
         headers,
         body: options?.body ? JSON.stringify(options.body) : undefined,
-        signal: AbortSignal.timeout(this.timeout),
+        signal: AbortSignal.timeout(this.timeout)
       })
 
       if (!response.ok) {
@@ -92,22 +88,14 @@ export class APIClient {
   /**
    * POST request
    */
-  post<T>(
-    path: string,
-    body?: any,
-    options?: Omit<APIRequestOptions, 'body'>
-  ): Promise<T> {
+  post<T>(path: string, body?: any, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
     return this.request<T>('POST', path, { ...options, body })
   }
 
   /**
    * PUT request
    */
-  put<T>(
-    path: string,
-    body?: any,
-    options?: Omit<APIRequestOptions, 'body'>
-  ): Promise<T> {
+  put<T>(path: string, body?: any, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
     return this.request<T>('PUT', path, { ...options, body })
   }
 
@@ -131,17 +119,14 @@ export class APIClient {
     const ttl = config.dataSource.api.cache.ttl[resource] ?? 300
     return this.get<T>(path, {
       ...options,
-      cache: ttl > 0 ? { ttl } : undefined,
+      cache: ttl > 0 ? { ttl } : undefined
     })
   }
 
   /**
    * Build full URL with query parameters
    */
-  private buildUrl(
-    path: string,
-    query?: Record<string, string | number | boolean>
-  ): string {
+  private buildUrl(path: string, query?: Record<string, string | number | boolean>): string {
     // Handle absolute vs relative paths
     const url = path.startsWith('http') ? new URL(path) : new URL(path, this.baseUrl)
 
@@ -166,8 +151,8 @@ export class APIClient {
   ): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...customHeaders,
+      Accept: 'application/json',
+      ...customHeaders
     }
 
     // Add authentication
@@ -246,7 +231,9 @@ export function useAPIClient(): APIClient {
 
   // Prevent concurrent initialization (very rare in single-threaded Node.js)
   if (isInitializing) {
-    throw new Error('[APIClient] Concurrent initialization detected - this should not happen in production')
+    throw new Error(
+      '[APIClient] Concurrent initialization detected - this should not happen in production'
+    )
   }
 
   isInitializing = true
@@ -258,23 +245,19 @@ export function useAPIClient(): APIClient {
       baseUrl: runtimeConfig.apiBaseUrl,
       timeout: config.dataSource.api.timeout,
       auth: {
-        type: runtimeConfig.apiJwtToken
-          ? 'jwt'
-          : runtimeConfig.apiKey
-          ? 'apikey'
-          : 'oauth2',
+        type: runtimeConfig.apiJwtToken ? 'jwt' : runtimeConfig.apiKey ? 'apikey' : 'oauth2',
         clientId: runtimeConfig.apiClientId,
         clientSecret: runtimeConfig.apiClientSecret,
         tokenUrl: runtimeConfig.apiTokenUrl,
         staticToken: runtimeConfig.apiJwtToken,
         apiKey: runtimeConfig.apiKey,
-        refreshBuffer: parseInt(runtimeConfig.apiTokenRefreshBuffer),
+        refreshBuffer: parseInt(runtimeConfig.apiTokenRefreshBuffer)
       },
       retry: {
         ...config.dataSource.api.retry,
-        circuitBreaker: config.dataSource.api.circuitBreaker,
+        circuitBreaker: config.dataSource.api.circuitBreaker
       },
-      cache: config.dataSource.api.cache,
+      cache: config.dataSource.api.cache
     })
 
     console.log(`[APIClient] Initialized with baseUrl: ${runtimeConfig.apiBaseUrl}`)

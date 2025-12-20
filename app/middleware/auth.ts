@@ -7,7 +7,7 @@
  * Usage: Add `definePageMeta({ middleware: 'auth' })` to protected pages
  * Or use in layout for all admin pages
  */
-export default defineNuxtRouteMiddleware(async (to) => {
+export default defineNuxtRouteMiddleware(async to => {
   // Only protect /admin routes (except login)
   if (!to.path.startsWith('/admin') || to.path === '/admin/login') {
     return
@@ -25,4 +25,3 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/admin/login', { replace: true })
   }
 })
-

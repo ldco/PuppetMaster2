@@ -14,19 +14,19 @@ import { logger } from './logger'
 
 // Helper: treat empty strings and undefined as "not set" (for optional fields)
 const optionalString = z.preprocess(
-  (val) => (val === '' || val === undefined) ? undefined : val,
+  val => (val === '' || val === undefined ? undefined : val),
   z.string().optional()
 )
 const optionalEmail = z.preprocess(
-  (val) => (val === '' || val === undefined) ? undefined : val,
+  val => (val === '' || val === undefined ? undefined : val),
   z.string().email().optional()
 )
 const optionalUrl = z.preprocess(
-  (val) => (val === '' || val === undefined) ? undefined : val,
+  val => (val === '' || val === undefined ? undefined : val),
   z.string().url().optional()
 )
 const optionalNumber = z.preprocess(
-  (val) => (val === '' || val === undefined) ? undefined : Number(val),
+  val => (val === '' || val === undefined ? undefined : Number(val)),
   z.number().optional()
 )
 

@@ -28,9 +28,9 @@ const showBackToTop = config.features.backToTop
 
 // Feature classes for CSS targeting
 const layoutClasses = computed(() => ({
-  'layout': true,
+  layout: true,
   'interactive-header': config.features.interactiveHeader,
-  'onepager': config.features.onepager
+  onepager: config.features.onepager
 }))
 </script>
 

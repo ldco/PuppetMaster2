@@ -16,8 +16,9 @@
   border: 1px solid var(--l-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: box-shadow var(--transition-normal) ease,
-              transform var(--transition-normal) ease;
+  transition:
+    box-shadow var(--transition-normal) ease,
+    transform var(--transition-normal) ease;
 }
 
 .portfolio-item:hover {
@@ -66,4 +67,3 @@
   padding: var(--space-2) var(--space-4);
   border-block-start: 1px solid var(--l-border);
 }
-

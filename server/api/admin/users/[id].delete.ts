@@ -12,7 +12,7 @@ import { type UserRole } from '../../../database/schema'
 import { canManageUser } from '../../../utils/roles'
 import { audit } from '../../../utils/audit'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')
   if (!id || !/^\d+$/.test(id)) {
     throw createError({
@@ -35,11 +35,7 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   // Get target user
-  const targetUser = db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.id, userId))
-    .get()
+  const targetUser = db.select().from(schema.users).where(eq(schema.users.id, userId)).get()
 
   if (!targetUser) {
     throw createError({
@@ -60,10 +56,7 @@ export default defineEventHandler(async (event) => {
   await audit.userDelete(event, currentUser!.id, userId, targetUser.email)
 
   // Delete user (sessions will cascade delete)
-  db.delete(schema.users)
-    .where(eq(schema.users.id, userId))
-    .run()
+  db.delete(schema.users).where(eq(schema.users.id, userId)).run()
 
   return { success: true }
 })
-

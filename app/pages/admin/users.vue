@@ -36,7 +36,9 @@ interface User {
 
 // Fetch users
 const headers = useRequestHeaders(['cookie'])
-const { data, pending, refresh } = await useFetch<{ users: User[] }>('/api/admin/users', { headers })
+const { data, pending, refresh } = await useFetch<{ users: User[] }>('/api/admin/users', {
+  headers
+})
 const users = computed(() => data.value?.users || [])
 
 // Modal state
@@ -167,7 +169,8 @@ const roleBadgeClass: Record<string, string> = {
       <h1 class="page-title">{{ t('admin.users') }}</h1>
       <div class="page-actions">
         <button class="btn btn-primary" @click="openCreateModal">
-          <IconPlus /> {{ t('admin.addUser') }}
+          <IconPlus />
+          {{ t('admin.addUser') }}
         </button>
       </div>
     </div>
@@ -209,7 +212,11 @@ const roleBadgeClass: Record<string, string> = {
               <button
                 class="btn btn-icon btn-ghost btn-danger"
                 @click="deleteUser(user)"
-                :disabled="deleting === user.id || user.id === currentUser?.id || (user.role === 'master' && !isMaster)"
+                :disabled="
+                  deleting === user.id ||
+                  user.id === currentUser?.id ||
+                  (user.role === 'master' && !isMaster)
+                "
                 :title="t('common.delete')"
               >
                 <IconTrash />
@@ -235,13 +242,7 @@ const roleBadgeClass: Record<string, string> = {
 
             <div class="form-group">
               <label for="email" class="form-label">{{ t('admin.email') }} *</label>
-              <input
-                id="email"
-                v-model="form.email"
-                type="email"
-                class="input"
-                required
-              />
+              <input id="email" v-model="form.email" type="email" class="input" required />
             </div>
 
             <div class="form-group">
@@ -261,22 +262,13 @@ const roleBadgeClass: Record<string, string> = {
 
             <div class="form-group">
               <label for="name" class="form-label">{{ t('admin.name') }}</label>
-              <input
-                id="name"
-                v-model="form.name"
-                type="text"
-                class="input"
-              />
+              <input id="name" v-model="form.name" type="text" class="input" />
             </div>
 
             <div class="form-group">
               <label for="role" class="form-label">{{ t('admin.role') }} *</label>
               <select id="role" v-model="form.role" class="input" required>
-                <option
-                  v-for="role in assignableRoles"
-                  :key="role"
-                  :value="role"
-                >
+                <option v-for="role in assignableRoles" :key="role" :value="role">
                   {{ roleLabels[role] }}
                 </option>
               </select>

@@ -46,4 +46,3 @@
 /* Utilities layer - MUST be last to override components without !important */
 @import './common/index.css' layer(utilities);
 @import './layout/responsive.css' layer(utilities);
-

@@ -29,8 +29,9 @@
   border-radius: var(--radius-full);
   color: var(--t-muted);
   text-decoration: none;
-  transition: color var(--transition-normal) ease,
-              background-color var(--transition-normal) ease;
+  transition:
+    color var(--transition-normal) ease,
+    background-color var(--transition-normal) ease;
 }
 
 .social-nav-link:hover {
@@ -102,9 +103,10 @@
   background: var(--i-brand-subtle);
   color: var(--i-brand);
   border-radius: var(--radius-full);
-  transition: transform var(--transition-normal) ease,
-              background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    transform var(--transition-normal) ease,
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .social-nav--circle .social-nav-link:hover {

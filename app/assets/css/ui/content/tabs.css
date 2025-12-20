@@ -23,8 +23,9 @@
   font-weight: var(--font-medium);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: background-color var(--transition-normal) ease,
-              color var(--transition-normal) ease;
+  transition:
+    background-color var(--transition-normal) ease,
+    color var(--transition-normal) ease;
 }
 
 .tab:hover:not(:disabled) {
@@ -114,4 +115,3 @@
   border-block-end: 2px solid var(--i-brand);
   margin-block-end: -1px; /* Overlap container border */
 }
-

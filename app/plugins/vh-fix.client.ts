@@ -13,4 +13,3 @@ export default defineNuxtPlugin(() => {
   window.addEventListener('resize', setVh)
   window.addEventListener('orientationchange', setVh)
 })
-

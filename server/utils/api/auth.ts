@@ -26,9 +26,7 @@ export function useAuthManager(config: AuthConfig) {
     // OAuth 2.0 - check if token needs refresh
     if (config.type === 'oauth2') {
       const now = new Date()
-      const refreshThreshold = new Date(
-        now.getTime() + (config.refreshBuffer || 300) * 1000
-      )
+      const refreshThreshold = new Date(now.getTime() + (config.refreshBuffer || 300) * 1000)
 
       // Refresh if no token or expiring soon
       if (!currentToken || !tokenExpiresAt || tokenExpiresAt <= refreshThreshold) {
@@ -59,20 +57,18 @@ export function useAuthManager(config: AuthConfig) {
       const response = await fetch(config.tokenUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
           grant_type: 'client_credentials',
           client_id: config.clientId,
-          client_secret: config.clientSecret,
-        }),
+          client_secret: config.clientSecret
+        })
       })
 
       if (!response.ok) {
         const errorText = await response.text()
-        throw new Error(
-          `Token refresh failed (${response.status}): ${errorText}`
-        )
+        throw new Error(`Token refresh failed (${response.status}): ${errorText}`)
       }
 
       const data: TokenResponse = await response.json()
@@ -80,9 +76,7 @@ export function useAuthManager(config: AuthConfig) {
       currentToken = data.access_token
       tokenExpiresAt = new Date(Date.now() + data.expires_in * 1000)
 
-      console.log(
-        `[AuthManager] Token refreshed, expires at: ${tokenExpiresAt.toISOString()}`
-      )
+      console.log(`[AuthManager] Token refreshed, expires at: ${tokenExpiresAt.toISOString()}`)
     } catch (error: any) {
       console.error('[AuthManager] Token refresh error:', error.message)
       throw error
@@ -113,6 +107,6 @@ export function useAuthManager(config: AuthConfig) {
     getToken,
     refreshToken,
     invalidate,
-    isValid,
+    isValid
   }
 }

@@ -8,7 +8,13 @@ import { writeFile, unlink, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import { randomUUID } from 'crypto'
 import sharp from 'sharp'
-import type { StorageAdapter, UploadResult, UploadOptions, ImageProcessingOptions, VideoProcessingOptions } from './types'
+import type {
+  StorageAdapter,
+  UploadResult,
+  UploadOptions,
+  ImageProcessingOptions,
+  VideoProcessingOptions
+} from './types'
 
 const UPLOAD_DIR = './public/uploads'
 
@@ -36,8 +42,13 @@ export class LocalStorage implements StorageAdapter {
     }
   }
 
-  private async uploadImage(buffer: Buffer, id: string, options: UploadOptions): Promise<UploadResult> {
-    const { maxWidth, maxHeight, quality, thumbnailWidth, thumbnailHeight, thumbnailQuality } = this.imageOptions
+  private async uploadImage(
+    buffer: Buffer,
+    id: string,
+    options: UploadOptions
+  ): Promise<UploadResult> {
+    const { maxWidth, maxHeight, quality, thumbnailWidth, thumbnailHeight, thumbnailQuality } =
+      this.imageOptions
 
     // Get original metadata
     const metadata = await sharp(buffer).metadata()
@@ -76,7 +87,11 @@ export class LocalStorage implements StorageAdapter {
     }
   }
 
-  private async uploadVideo(buffer: Buffer, id: string, options: UploadOptions): Promise<UploadResult> {
+  private async uploadVideo(
+    buffer: Buffer,
+    id: string,
+    options: UploadOptions
+  ): Promise<UploadResult> {
     // Video processing is handled separately due to FFmpeg complexity
     // This is a placeholder - actual implementation in video.post.ts
     const ext = this.videoOptions.outputFormat
@@ -114,4 +129,3 @@ export class LocalStorage implements StorageAdapter {
     return `/uploads/${id}${suffix}.webp`
   }
 }
-

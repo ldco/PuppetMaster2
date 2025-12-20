@@ -34,7 +34,10 @@ interface ContactSubmission {
 
 // Fetch contacts - pass cookies for SSR auth
 const headers = useRequestHeaders(['cookie'])
-const { data, pending, refresh } = await useFetch<{ items: ContactSubmission[]; unreadCount: number }>('/api/admin/contacts', {
+const { data, pending, refresh } = await useFetch<{
+  items: ContactSubmission[]
+  unreadCount: number
+}>('/api/admin/contacts', {
   headers
 })
 
@@ -46,6 +49,7 @@ const selectedMessage = ref<ContactSubmission | null>(null)
 
 async function toggleRead(item: ContactSubmission) {
   const wasUnread = !item.read
+  const itemId = item.id
   try {
     await $fetch(`/api/admin/contacts/${item.id}`, {
       method: 'PUT',
@@ -58,10 +62,15 @@ async function toggleRead(item: ContactSubmission) {
       incrementUnread()
     }
     await refresh()
-  } catch (e: any) {
+    // Update selectedMessage to point to the refreshed item
+    if (selectedMessage.value?.id === itemId) {
+      selectedMessage.value = items.value.find(i => i.id === itemId) || null
+    }
+  } catch (e: unknown) {
     // Revert on error
     fetchUnreadCount()
-    toast.error(e.data?.message || 'Failed to update')
+    const errorMsg = e instanceof Error ? e.message : 'Failed to update'
+    toast.error(errorMsg)
   }
 }
 
@@ -87,9 +96,10 @@ async function deleteMessage(item: ContactSubmission) {
       selectedMessage.value = null
     }
     await refresh()
-  } catch (e: any) {
+  } catch (e: unknown) {
     fetchUnreadCount() // Revert on error
-    toast.error(e.data?.message || 'Failed to delete')
+    const errorMsg = e instanceof Error ? e.message : 'Failed to delete'
+    toast.error(errorMsg)
   } finally {
     deleting.value = null
   }
@@ -152,17 +162,15 @@ function formatDate(timestamp: number) {
           }"
         >
           <!-- Message preview (always visible) -->
-          <button
-            type="button"
-            class="contact-preview"
-            @click="selectMessage(item)"
-          >
+          <button type="button" class="contact-preview" @click="selectMessage(item)">
             <div class="contact-preview-header">
               <span class="contact-name">{{ item.name }}</span>
               <span class="contact-date">{{ formatDate(item.createdAt) }}</span>
             </div>
             <div class="contact-subject">{{ item.subject || t('admin.noSubject') }}</div>
-            <div class="contact-excerpt">{{ item.message.slice(0, 60) }}{{ item.message.length > 60 ? '...' : '' }}</div>
+            <div class="contact-excerpt">
+              {{ item.message.slice(0, 60) }}{{ item.message.length > 60 ? '...' : '' }}
+            </div>
           </button>
 
           <!-- Expanded content (mobile only, inline accordion) -->
@@ -188,8 +196,14 @@ function formatDate(timestamp: number) {
               </button>
             </div>
             <div class="contact-expanded-meta">
-              <p><strong>{{ t('admin.from') }}:</strong> {{ item.name }} &lt;{{ item.email }}&gt;</p>
-              <p v-if="item.phone"><strong>{{ t('admin.phone') }}:</strong> {{ item.phone }}</p>
+              <p>
+                <strong>{{ t('admin.from') }}:</strong>
+                {{ item.name }} &lt;{{ item.email }}&gt;
+              </p>
+              <p v-if="item.phone">
+                <strong>{{ t('admin.phone') }}:</strong>
+                {{ item.phone }}
+              </p>
             </div>
             <div class="contact-expanded-body">{{ item.message }}</div>
           </div>
@@ -224,9 +238,18 @@ function formatDate(timestamp: number) {
           </div>
           <div class="inbox-detail-content">
             <div class="inbox-detail-meta">
-              <p><strong>{{ t('admin.from') }}:</strong> {{ selectedMessage.name }} &lt;{{ selectedMessage.email }}&gt;</p>
-              <p v-if="selectedMessage.phone"><strong>{{ t('admin.phone') }}:</strong> {{ selectedMessage.phone }}</p>
-              <p><strong>{{ t('admin.date') }}:</strong> {{ formatDate(selectedMessage.createdAt) }}</p>
+              <p>
+                <strong>{{ t('admin.from') }}:</strong>
+                {{ selectedMessage.name }} &lt;{{ selectedMessage.email }}&gt;
+              </p>
+              <p v-if="selectedMessage.phone">
+                <strong>{{ t('admin.phone') }}:</strong>
+                {{ selectedMessage.phone }}
+              </p>
+              <p>
+                <strong>{{ t('admin.date') }}:</strong>
+                {{ formatDate(selectedMessage.createdAt) }}
+              </p>
             </div>
             <div class="inbox-detail-body">{{ selectedMessage.message }}</div>
           </div>

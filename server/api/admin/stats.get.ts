@@ -8,20 +8,14 @@
 import { useDatabase, schema } from '../../database/client'
 import { count, eq } from 'drizzle-orm'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const db = useDatabase()
 
   // Get portfolio count
-  const portfolioResult = db
-    .select({ count: count() })
-    .from(schema.portfolioItems)
-    .get()
+  const portfolioResult = db.select({ count: count() }).from(schema.portfolioItems).get()
 
   // Get total contact submissions
-  const contactsResult = db
-    .select({ count: count() })
-    .from(schema.contactSubmissions)
-    .get()
+  const contactsResult = db.select({ count: count() }).from(schema.contactSubmissions).get()
 
   // Get unread messages count
   const unreadResult = db
@@ -36,4 +30,3 @@ export default defineEventHandler(async (event) => {
     unreadMessages: unreadResult?.count ?? 0
   }
 })
-

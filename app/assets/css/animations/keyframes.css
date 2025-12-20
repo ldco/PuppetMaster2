@@ -81,7 +81,8 @@
 
 /* Pulse */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -91,7 +92,8 @@
 
 /* Bounce - playful attention grabber */
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -101,13 +103,16 @@
 
 /* Shake - error feedback */
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  20%, 60% {
+  20%,
+  60% {
     transform: translateX(-4px);
   }
-  40%, 80% {
+  40%,
+  80% {
     transform: translateX(4px);
   }
 }
@@ -127,7 +132,8 @@
 
 /* Wiggle - playful hover */
 @keyframes wiggle {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
   25% {
@@ -140,7 +146,8 @@
 
 /* Glow pulse - notification badge */
 @keyframes glow-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 currentColor;
   }
   50% {
@@ -201,4 +208,3 @@
 .hover-pop:hover {
   animation: pop 0.3s var(--ease-spring);
 }
-

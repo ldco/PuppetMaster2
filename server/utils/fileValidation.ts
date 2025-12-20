@@ -16,27 +16,27 @@ const FILE_SIGNATURES = {
   // Images
   jpeg: {
     signatures: [
-      { bytes: [0xFF, 0xD8, 0xFF] } // JPEG/JPG
+      { bytes: [0xff, 0xd8, 0xff] } // JPEG/JPG
     ],
     mime: 'image/jpeg'
   },
   png: {
     signatures: [
-      { bytes: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] } // PNG
+      { bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] } // PNG
     ],
     mime: 'image/png'
   },
   gif: {
     signatures: [
       { bytes: [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] }, // GIF87a
-      { bytes: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] }  // GIF89a
+      { bytes: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] } // GIF89a
     ],
     mime: 'image/gif'
   },
   webp: {
     signatures: [
       { bytes: [0x52, 0x49, 0x46, 0x46], offset: 0 }, // RIFF
-      { bytes: [0x57, 0x45, 0x42, 0x50], offset: 8 }  // WEBP at offset 8
+      { bytes: [0x57, 0x45, 0x42, 0x50], offset: 8 } // WEBP at offset 8
     ],
     mime: 'image/webp',
     multiCheck: true // Both signatures must match
@@ -45,20 +45,20 @@ const FILE_SIGNATURES = {
   // Videos
   mp4: {
     signatures: [
-      { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp at offset 4
+      { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 } // ftyp at offset 4
     ],
     mime: 'video/mp4'
   },
   webm: {
     signatures: [
-      { bytes: [0x1A, 0x45, 0xDF, 0xA3] } // WebM/MKV
+      { bytes: [0x1a, 0x45, 0xdf, 0xa3] } // WebM/MKV
     ],
     mime: 'video/webm'
   },
   mov: {
     signatures: [
       { bytes: [0x66, 0x74, 0x79, 0x70, 0x71, 0x74], offset: 4 }, // ftypqt (QuickTime)
-      { bytes: [0x6D, 0x6F, 0x6F, 0x76], offset: 4 } // moov
+      { bytes: [0x6d, 0x6f, 0x6f, 0x76], offset: 4 } // moov
     ],
     mime: 'video/quicktime'
   },
@@ -75,12 +75,7 @@ const FILE_SIGNATURES = {
 /**
  * Allowed MIME types for images
  */
-const ALLOWED_IMAGE_MIMES = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif'
-])
+const ALLOWED_IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
 /**
  * Allowed MIME types for videos

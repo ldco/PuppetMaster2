@@ -27,10 +27,7 @@ interface A11yViolation {
   }[]
 }
 
-export function useA11y(options?: {
-  runOnMount?: boolean
-  element?: HTMLElement | string
-}) {
+export function useA11y(options?: { runOnMount?: boolean; element?: HTMLElement | string }) {
   const violations = ref<A11yViolation[]>([])
   const isChecking = ref(false)
   const lastCheckedAt = ref<Date | null>(null)

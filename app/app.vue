@@ -22,7 +22,7 @@ const isRtl = computed(() => isRtlLanguage(locale.value))
 useHead({
   htmlAttrs: {
     lang: () => locale.value,
-    dir: () => isRtl.value ? 'rtl' : 'ltr'
+    dir: () => (isRtl.value ? 'rtl' : 'ltr')
   }
 })
 </script>

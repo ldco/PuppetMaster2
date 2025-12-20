@@ -1,23 +1,23 @@
 /**
  * useScrollHeader - Interactive Header on Scroll
- * 
+ *
  * Provides scroll-based header style changes:
  * - Detects scroll position
  * - Adds CSS classes for styling changes
  * - Supports hide-on-scroll-down, show-on-scroll-up pattern
  * - Configurable via puppet-master.config.ts
- * 
+ *
  * @example
  * ```vue
  * <template>
  *   <header :class="headerClasses">...</header>
  * </template>
- * 
+ *
  * <script setup>
  * const { headerClasses, isScrolled, isHidden } = useScrollHeader()
  * </script>
  * ```
- * 
+ *
  * CSS Classes Applied:
  * - `.header--scrolled`: When page is scrolled past threshold
  * - `.header--hidden`: When scrolling down (if hideOnScroll enabled)
@@ -50,7 +50,7 @@ interface ScrollHeaderReturn {
 
 export function useScrollHeader(options: ScrollHeaderOptions = {}): ScrollHeaderReturn {
   const config = useConfig()
-  
+
   // Merge options with config defaults
   const {
     threshold = 50,
@@ -64,7 +64,7 @@ export function useScrollHeader(options: ScrollHeaderOptions = {}): ScrollHeader
   const isScrolled = ref(false)
   const isHidden = ref(false)
   const scrollDirection = ref<'up' | 'down' | null>(null)
-  
+
   const headerClasses = computed(() => ({
     'header--scrolled': enabled && isScrolled.value,
     'header--hidden': enabled && hideOnScroll && isHidden.value,
@@ -138,4 +138,3 @@ export function useScrollHeader(options: ScrollHeaderOptions = {}): ScrollHeader
     scrollDirection
   }
 }
-

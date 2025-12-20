@@ -23,10 +23,10 @@
    * Colors extracted from the Puppet Master logo design
    * ══════════════════════════════════════════════════════════ */
 
-  --p-black: #2f2f2f;    /* Charcoal gray (from logo dark text) */
-  --p-white: #f0f0f0;    /* Off-white (from logo light text) */
-  --p-brand: #aa0000;    /* Dark red/maroon (from logo accent) */
-  --p-accent: #0f172a;   /* Deep slate (for secondary contrast) */
+  --p-black: #2f2f2f; /* Charcoal gray (from logo dark text) */
+  --p-white: #f0f0f0; /* Off-white (from logo light text) */
+  --p-brand: #aa0000; /* Dark red/maroon (from logo accent) */
+  --p-accent: #0f172a; /* Deep slate (for secondary contrast) */
 
   /* Enable light-dark() function */
   color-scheme: light dark;
@@ -43,4 +43,3 @@ html.dark {
 html.light {
   color-scheme: light;
 }
-

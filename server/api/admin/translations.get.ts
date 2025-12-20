@@ -9,7 +9,7 @@ import { useDatabase, schema } from '../../database/client'
 import { asc } from 'drizzle-orm'
 import { isSystemKey } from '../../../i18n/system'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Auth is handled by middleware for /api/admin/* routes
 
   const db = useDatabase()
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
       continue
     }
 
-    const localeGroup = grouped[row.locale] ??= []
+    const localeGroup = (grouped[row.locale] ??= [])
     localeGroup.push({
       id: row.id,
       key: row.key,
@@ -38,11 +38,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  console.log('[translations.get] Found', Object.values(grouped).flat().length, 'content translations')
+  console.log(
+    '[translations.get] Found',
+    Object.values(grouped).flat().length,
+    'content translations'
+  )
 
   return {
     locales: ['en', 'ru', 'he'], // Supported locales
     translations: grouped
   }
 })
-
