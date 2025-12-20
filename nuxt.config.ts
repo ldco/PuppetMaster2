@@ -198,6 +198,19 @@ export default defineNuxtConfig({
     ]
   },
 
+  // Nitro configuration
+  nitro: {
+    // Scheduled tasks (MED-02: Session cleanup)
+    scheduledTasks: {
+      // Run session cleanup every hour at minute 0
+      '0 * * * *': ['cleanup:sessions']
+    },
+    // Experimental features required for scheduled tasks
+    experimental: {
+      tasks: true
+    }
+  },
+
   // Runtime config
   runtimeConfig: {
     // Database

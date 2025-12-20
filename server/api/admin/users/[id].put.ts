@@ -14,12 +14,15 @@ import { USER_ROLES, type UserRole } from '../../../database/schema'
 import { hashPassword } from '../../../utils/password'
 import { canManageUser, getAssignableRoles } from '../../../utils/roles'
 import { audit } from '../../../utils/audit'
+import { checkVersion, versionInfo } from '../../../utils/optimisticLock'
 
 const updateUserSchema = z.object({
   email: z.string().email('Invalid email address').optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').optional(),
   name: z.string().optional().nullable(),
-  role: z.enum(USER_ROLES).optional()
+  role: z.enum(USER_ROLES).optional(),
+  // Optimistic locking (MED-03)
+  expectedVersion: z.string().datetime().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -44,7 +47,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { email, password, name, role } = result.data
+  const { email, password, name, role, expectedVersion } = result.data
 
   const db = useDatabase()
 
@@ -61,6 +64,9 @@ export default defineEventHandler(async (event) => {
       message: 'User not found'
     })
   }
+
+  // Optimistic locking: check version hasn't changed (MED-03)
+  checkVersion(targetUser.updatedAt, expectedVersion)
 
   // Check if current user can manage target user
   if (!canManageUser(currentUser?.role as UserRole, targetUser.role as UserRole)) {
@@ -144,7 +150,9 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    user: updatedUser
+    user: updatedUser,
+    // Include version for optimistic locking (MED-03)
+    ...versionInfo(updatedUser!)
   }
 })
 

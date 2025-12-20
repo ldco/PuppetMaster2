@@ -61,8 +61,8 @@ The remaining **20%** consists primarily of:
 | CRIT-03 | CRITICAL | Login rate limiting | [x] DONE |
 | CRIT-04 | CRITICAL | Account lockout | [x] DONE |
 | CRIT-05 | CRITICAL | File upload validation (magic bytes) | [x] DONE |
-| HIGH-04 | HIGH | Audit logging for auth/role changes | [ ] |
-| HIGH-09 | HIGH | HTML sanitization (DOMPurify) | [ ] |
+| HIGH-04 | HIGH | Audit logging for auth/role changes | [x] DONE |
+| HIGH-09 | HIGH | HTML sanitization (DOMPurify) | [x] DONE |
 | HIGH-10 | HIGH | Upgrade SameSite cookie to strict | [x] DONE |
 
 ### 🚀 Dmitri (DevOps Engineer)
@@ -70,33 +70,33 @@ The remaining **20%** consists primarily of:
 |---------|----------|-------------|--------|
 | CRIT-06 | CRITICAL | Create Dockerfile | [x] DONE |
 | CRIT-07 | CRITICAL | Configure Kamal | [x] DONE |
-| HIGH-03 | HIGH | Structured logging (Pino) | [ ] |
-| HIGH-08 | HIGH | Environment variable validation | [ ] |
+| HIGH-03 | HIGH | Structured logging (Pino) | [x] DONE |
+| HIGH-08 | HIGH | Environment variable validation | [x] DONE |
 | MED-01 | MEDIUM | Public health check endpoint | [x] DONE |
+| MED-02 | MEDIUM | Scheduled session cleanup | [x] DONE |
 | LOW-01 | LOW | Redis for distributed rate limiting | [ ] |
 | LOW-03 | LOW | APM and metrics endpoint | [ ] |
 
 ### ⚙️ Viktor (Backend Engineer)
 | Task ID | Priority | Description | Status |
 |---------|----------|-------------|--------|
-| HIGH-01 | HIGH | Database transactions | [ ] |
-| HIGH-02 | HIGH | DB-level pagination | [ ] |
-| MED-02 | MEDIUM | Session cleanup scheduled job | [ ] |
-| MED-03 | MEDIUM | Optimistic locking | [ ] |
+| HIGH-01 | HIGH | Database transactions | [x] DONE |
+| HIGH-02 | HIGH | DB-level pagination | [x] DONE |
+| MED-03 | MEDIUM | Optimistic locking | [x] DONE |
 | LOW-02 | LOW | Database encryption (SQLCipher) | [ ] |
 | LOW-06 | LOW | GDPR data retention | [ ] |
 
 ### 🎨 Maya (Frontend Engineer)
 | Task ID | Priority | Description | Status |
 |---------|----------|-------------|--------|
-| HIGH-05 | HIGH | Accessibility testing (axe-core) | [ ] |
-| HIGH-06 | HIGH | Loading skeleton components | [ ] |
-| MED-04 | MEDIUM | Reduced motion support | [ ] |
+| HIGH-05 | HIGH | Accessibility testing (axe-core) | [x] DONE |
+| HIGH-06 | HIGH | Loading skeleton components | [x] DONE |
+| MED-04 | MEDIUM | Reduced motion support | [x] DONE |
 
 ### 🎯 Sofia (UX Specialist)
 | Task ID | Priority | Description | Status |
 |---------|----------|-------------|--------|
-| HIGH-07 | HIGH | Empty states design | [ ] |
+| HIGH-07 | HIGH | Empty states design | [x] DONE |
 | LOW-04 | LOW | Keyboard shortcuts in admin | [ ] |
 | LOW-05 | LOW | Onboarding wizard | [ ] |
 | HIGH | 10 | Backend (4), Security (3), Frontend (2), DevOps (1) |

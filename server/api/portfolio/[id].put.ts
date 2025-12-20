@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
 import { sanitizeHtml, escapeHtml } from '../../utils/sanitize'
+import { checkVersion, versionInfo } from '../../utils/optimisticLock'
 
 // Validation schema (all fields optional for partial update)
 const updateSchema = z.object({
@@ -20,7 +21,9 @@ const updateSchema = z.object({
   category: z.string().max(50).optional().nullable(),
   tags: z.array(z.string()).optional(),
   order: z.number().int().optional(),
-  published: z.boolean().optional()
+  published: z.boolean().optional(),
+  // Optimistic locking: client sends last-known version
+  expectedVersion: z.string().datetime().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -69,6 +72,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Portfolio item not found'
     })
   }
+
+  // Optimistic locking: check version hasn't changed (MED-03)
+  checkVersion(existing.updatedAt, data.expectedVersion)
 
   // If slug is being changed, check it doesn't conflict
   if (data.slug && data.slug !== existing.slug) {
@@ -121,7 +127,9 @@ export default defineEventHandler(async (event) => {
     item: {
       ...updated,
       tags: updated.tags ? JSON.parse(updated.tags) : []
-    }
+    },
+    // Include version for optimistic locking (MED-03)
+    ...versionInfo(updated)
   }
 })
 
