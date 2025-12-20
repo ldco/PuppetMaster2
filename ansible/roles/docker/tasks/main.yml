@@ -47,3 +47,25 @@
       }
   notify: Restart Docker
   tags: [docker]
+
+- name: Create Traefik network for Kamal
+  community.docker.docker_network:
+    name: traefik-public
+    state: present
+  tags: [docker, kamal]
+
+- name: Create Docker volumes for Kamal
+  community.docker.docker_volume:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - puppetmaster2_data
+    - puppetmaster2_uploads
+  tags: [docker, kamal]
+
+- name: Create Let's Encrypt directory
+  file:
+    path: /letsencrypt
+    state: directory
+    mode: '0700'
+  tags: [docker, kamal]

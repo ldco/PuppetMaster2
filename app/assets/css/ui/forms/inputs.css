@@ -169,8 +169,10 @@ select.input option:hover {
 .radio {
   display: flex;
   align-items: center;
-  gap: var(--gap-sm);
+  gap: var(--space-2);
   cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
 }
 
 .checkbox input,
@@ -178,12 +180,127 @@ select.input option:hover {
   width: var(--icon-sm);
   height: var(--icon-sm);
   accent-color: var(--i-brand);
+  flex-shrink: 0;
 }
 
 .checkbox input:focus-visible,
 .radio input:focus-visible {
   outline: 2px solid var(--i-focus-ring);
   outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * TOGGLE SWITCH - iOS-style toggle for boolean settings
+ * ══════════════════════════════════════════════════════════
+ * Usage:
+ *   <label class="toggle">
+ *     <input type="checkbox" v-model="value" />
+ *     <span class="toggle-track"></span>
+ *     <span class="toggle-label">Label text</span>
+ *   </label>
+ * ══════════════════════════════════════════════════════════ */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Hide the actual checkbox */
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The track (background) */
+.toggle-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  background: var(--l-border-strong);
+  border-radius: 999px;
+  transition:
+    background-color var(--transition-normal) ease,
+    box-shadow var(--transition-normal) ease;
+}
+
+/* The thumb (circle) */
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--l-bg);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  transition: transform var(--transition-normal) ease;
+}
+
+/* Checked state - track turns brand color */
+.toggle input:checked + .toggle-track {
+  background: var(--i-brand);
+}
+
+/* Checked state - thumb moves to end */
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+/* RTL support for thumb movement */
+[dir='rtl'] .toggle input:checked + .toggle-track::after {
+  transform: translateX(-16px);
+}
+
+/* Focus state */
+.toggle input:focus-visible + .toggle-track {
+  box-shadow: 0 0 0 3px var(--i-focus-ring);
+}
+
+/* Hover state */
+.toggle:hover .toggle-track {
+  background: var(--t-muted);
+}
+
+.toggle:hover input:checked + .toggle-track {
+  background: var(--i-brand-hover);
+}
+
+/* Disabled state */
+.toggle:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Label text */
+.toggle-label {
+  font-size: var(--text-sm);
+  color: var(--t-secondary);
+}
+
+/* Small variant */
+.toggle--sm .toggle-track {
+  width: 28px;
+  height: 16px;
+}
+
+.toggle--sm .toggle-track::after {
+  width: 12px;
+  height: 12px;
+}
+
+.toggle--sm input:checked + .toggle-track::after {
+  transform: translateX(12px);
+}
+
+[dir='rtl'] .toggle--sm input:checked + .toggle-track::after {
+  transform: translateX(-12px);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -234,7 +351,18 @@ select.input option:hover {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-md);
+  gap: var(--space-4);
+}
+
+/* Checkbox in auth form should be closer to previous field */
+.auth-form .checkbox,
+.auth-form .radio {
+  margin-block-start: calc(-1 * var(--space-1));
+}
+
+/* Primary action button in auth form needs more visual separation */
+.auth-form .btn-primary {
+  margin-block-start: var(--space-2);
 }
 
 /* Input with icon */
@@ -255,6 +383,52 @@ select.input option:hover {
 
 .input-with-icon .input {
   padding-inline-start: calc(var(--space-3) + 1.25rem + var(--space-2));
+}
+
+/* Input with action button (right side, e.g., password visibility toggle) */
+.input-with-action {
+  position: relative;
+}
+
+.input-with-action .input {
+  padding-inline-end: calc(var(--space-3) + 1.25rem + var(--space-2));
+}
+
+.input-with-action .input-action {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--t-muted);
+  cursor: pointer;
+  transition: color var(--transition-normal) ease;
+}
+
+.input-with-action .input-action:hover {
+  color: var(--t-primary);
+}
+
+.input-with-action .input-action:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.input-with-action .input-action svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Combined: icon on left + action on right (password fields) */
+.input-with-icon.input-with-action .input {
+  padding-inline-start: calc(var(--space-3) + 1.25rem + var(--space-2));
+  padding-inline-end: calc(var(--space-3) + 1.25rem + var(--space-2));
 }
 
 /* Auth footer links */

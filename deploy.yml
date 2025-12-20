@@ -3,10 +3,14 @@
 # PuppetMaster2 - Nuxt 3 Framework
 # ============================================
 #
+# SINGLE SOURCE OF TRUTH: .kamal/secrets
+# All variables below use ERB to read from secrets file.
+# Edit .kamal/secrets once, deploy.yml reads from it.
+#
 # Prerequisites:
 # 1. Install Kamal: gem install kamal
-# 2. Configure secrets: kamal secrets init
-# 3. Set environment variables in .kamal/secrets
+# 2. Copy secrets: cp .kamal/secrets.example .kamal/secrets
+# 3. Edit .kamal/secrets with your values
 #
 # Commands:
 # - kamal setup     : Initial server setup
@@ -18,16 +22,19 @@
 # Application name (used for container naming)
 service: puppetmaster2
 
-# Docker image name (change to your registry)
-image: your-registry/puppetmaster2
+# Docker image name
+# Uses DOCKER_REGISTRY from secrets, defaults to ghcr.io
+image: <%= ENV.fetch('DOCKER_REGISTRY', 'ghcr.io') %>/<%= ENV.fetch('GITHUB_USERNAME', 'your-username') %>/puppetmaster2
 
 # Servers to deploy to
+# SERVER_IP from .kamal/secrets
 servers:
   web:
     hosts:
-      - your-server-ip # Replace with your server IP
+      - <%= ENV.fetch('SERVER_IP', 'your-server-ip') %>
     labels:
-      traefik.http.routers.puppetmaster2.rule: Host(`your-domain.com`)
+      # SITE_DOMAIN from .kamal/secrets - single source of truth!
+      traefik.http.routers.puppetmaster2.rule: Host(`<%= ENV.fetch('SITE_DOMAIN', 'example.com') %>`)
       traefik.http.routers.puppetmaster2.tls: true
       traefik.http.routers.puppetmaster2.tls.certresolver: letsencrypt
       traefik.http.routers.puppetmaster2.entrypoints: websecure
@@ -36,7 +43,7 @@ servers:
 
 # Container registry configuration
 registry:
-  server: ghcr.io # GitHub Container Registry (or your registry)
+  server: <%= ENV.fetch('DOCKER_REGISTRY', 'ghcr.io') %>
   username:
     - KAMAL_REGISTRY_USERNAME
   password:
@@ -52,6 +59,7 @@ env:
 
   # Secret variables (loaded from .kamal/secrets)
   secret:
+    - SITE_DOMAIN
     - DATABASE_URL
     - SMTP_HOST
     - SMTP_PORT
@@ -60,6 +68,7 @@ env:
     - SMTP_FROM
     - TELEGRAM_BOT_TOKEN
     - TELEGRAM_CHAT_ID
+    - UPTIME_KUMA_SUBDOMAIN
 
 # Persistent storage volumes
 volumes:
@@ -80,7 +89,8 @@ traefik:
     entryPoints.websecure.address: ':443'
     entryPoints.web.http.redirections.entryPoint.to: websecure
     entryPoints.web.http.redirections.entryPoint.scheme: https
-    certificatesResolvers.letsencrypt.acme.email: 'your-email@example.com'
+    # ACME_EMAIL from .kamal/secrets
+    certificatesResolvers.letsencrypt.acme.email: '<%= ENV.fetch('ACME_EMAIL', 'admin@example.com') %>'
     certificatesResolvers.letsencrypt.acme.storage: '/letsencrypt/acme.json'
     certificatesResolvers.letsencrypt.acme.httpchallenge: true
     certificatesResolvers.letsencrypt.acme.httpchallenge.entrypoint: web
@@ -103,14 +113,40 @@ builder:
     type: gha # GitHub Actions cache (if using GHA)
     options: mode=max
 
-# Accessories (optional services)
-# Uncomment if you need Redis for distributed rate limiting
+# ============================================
+# ACCESSORIES (Optional services)
+# ============================================
+# Uncomment to enable. All use variables from .kamal/secrets
+
 # accessories:
+#   # ──────────────────────────────────────────
+#   # Uptime Kuma - External monitoring dashboard
+#   # Access at: https://${UPTIME_KUMA_SUBDOMAIN}.${SITE_DOMAIN}
+#   # ──────────────────────────────────────────
+#   uptime-kuma:
+#     image: louislam/uptime-kuma:1
+#     host: <%= ENV.fetch('SERVER_IP', 'your-server-ip') %>
+#     port: 3001:3001
+#     volumes:
+#       - uptime-kuma-data:/app/data
+#     options:
+#       network: traefik-public
+#     labels:
+#       traefik.enable: true
+#       traefik.http.routers.uptime-kuma.rule: Host(`<%= ENV.fetch('UPTIME_KUMA_SUBDOMAIN', 'status') %>.<%= ENV.fetch('SITE_DOMAIN', 'example.com') %>`)
+#       traefik.http.routers.uptime-kuma.tls: true
+#       traefik.http.routers.uptime-kuma.tls.certresolver: letsencrypt
+#       traefik.http.routers.uptime-kuma.entrypoints: websecure
+#       traefik.http.services.uptime-kuma.loadbalancer.server.port: 3001
+#
+#   # ──────────────────────────────────────────
+#   # Redis - For distributed rate limiting/cache
+#   # ──────────────────────────────────────────
 #   redis:
 #     image: redis:7-alpine
-#     host: your-server-ip
+#     host: <%= ENV.fetch('SERVER_IP', 'your-server-ip') %>
 #     port: 6379
 #     volumes:
-#       - "puppetmaster2_redis:/data"
+#       - puppetmaster2_redis:/data
 #     options:
 #       network: traefik-public

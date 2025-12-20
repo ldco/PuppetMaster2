@@ -56,7 +56,15 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       email: 'Email',
       password: 'Password',
       rememberMe: 'Remember me',
-      loginFailed: 'Login failed. Check your credentials.'
+      forgotPassword: 'Forgot password?',
+      loginFailed: 'Login failed. Check your credentials.',
+      changePassword: 'Change Password',
+      currentPassword: 'Current Password',
+      newPassword: 'New Password',
+      confirmPassword: 'Confirm Password',
+      passwordChanged: 'Password changed successfully',
+      passwordMinLength: 'Password must be at least 8 characters',
+      passwordMismatch: 'Passwords do not match'
     },
     admin: {
       title: 'Admin',
@@ -200,7 +208,15 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       email: 'Email',
       password: 'Пароль',
       rememberMe: 'Запомнить меня',
-      loginFailed: 'Ошибка входа. Проверьте данные.'
+      forgotPassword: 'Забыли пароль?',
+      loginFailed: 'Ошибка входа. Проверьте данные.',
+      changePassword: 'Изменить пароль',
+      currentPassword: 'Текущий пароль',
+      newPassword: 'Новый пароль',
+      confirmPassword: 'Подтвердите пароль',
+      passwordChanged: 'Пароль успешно изменён',
+      passwordMinLength: 'Пароль должен содержать минимум 8 символов',
+      passwordMismatch: 'Пароли не совпадают'
     },
     admin: {
       title: 'Админ',
@@ -343,7 +359,15 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       email: 'דוא"ל',
       password: 'סיסמה',
       rememberMe: 'זכור אותי',
-      loginFailed: 'ההתחברות נכשלה'
+      forgotPassword: 'שכחת סיסמה?',
+      loginFailed: 'ההתחברות נכשלה',
+      changePassword: 'שינוי סיסמה',
+      currentPassword: 'סיסמה נוכחית',
+      newPassword: 'סיסמה חדשה',
+      confirmPassword: 'אימות סיסמה',
+      passwordChanged: 'הסיסמה שונתה בהצלחה',
+      passwordMinLength: 'הסיסמה חייבת להכיל לפחות 8 תווים',
+      passwordMismatch: 'הסיסמאות אינן תואמות'
     },
     admin: {
       title: 'ניהול',

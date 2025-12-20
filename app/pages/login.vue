@@ -15,6 +15,8 @@ import config from '~/puppet-master.config'
 import IconLogin from '~icons/tabler/login'
 import IconMail from '~icons/tabler/mail'
 import IconLock from '~icons/tabler/lock'
+import IconEye from '~icons/tabler/eye'
+import IconEyeOff from '~icons/tabler/eye-off'
 
 definePageMeta({
   layout: 'blank'
@@ -31,6 +33,7 @@ const ssrFallbackLogo = computed(() => {
 
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const rememberMe = ref(false)
 const isLoading = ref(false)
 
@@ -81,16 +84,25 @@ async function handleSubmit() {
         <!-- Password -->
         <div class="form-group">
           <label class="form-label" for="password">{{ t('auth.password') }}</label>
-          <div class="input-with-icon">
+          <div class="input-with-icon input-with-action">
             <IconLock class="input-icon" aria-hidden="true" />
             <input
               id="password"
               v-model="password"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               class="input"
               autocomplete="current-password"
               required
             />
+            <button
+              type="button"
+              class="input-action"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              @click="showPassword = !showPassword"
+            >
+              <IconEyeOff v-if="showPassword" />
+              <IconEye v-else />
+            </button>
           </div>
         </div>
 

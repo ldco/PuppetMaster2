@@ -108,3 +108,11 @@
     line: 'ClientAliveInterval 300'
   notify: Restart SSH
   tags: [security, ssh]
+
+- name: Enable verbose SSH logging for audit
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?LogLevel'
+    line: 'LogLevel VERBOSE'
+  notify: Restart SSH
+  tags: [security, ssh, audit]

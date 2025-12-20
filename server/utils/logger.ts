@@ -4,6 +4,7 @@
  * Uses Pino for high-performance, structured JSON logging.
  * - Production: JSON output for log aggregators (Datadog, Loki, CloudWatch)
  * - Development: Pretty colored output for readability
+ * - All environments: Logs also captured in memory buffer for admin health page
  *
  * Usage:
  * import { logger } from '../utils/logger'
@@ -19,40 +20,61 @@
  * - fatal: Critical errors
  */
 import pino from 'pino'
+import { createBufferDestination } from './logBuffer'
 
 // Check environment
 const isProduction = process.env.NODE_ENV === 'production'
 const logLevel = process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug')
 
+// Create multistream destination for production
+// In production, write to both stdout and the in-memory buffer
+const destinations = isProduction
+  ? pino.multistream([
+      { stream: process.stdout },
+      { stream: createBufferDestination() }
+    ])
+  : undefined
+
 // Create logger instance
-export const logger = pino({
-  level: logLevel,
+export const logger = pino(
+  {
+    level: logLevel,
 
-  // Base context added to all logs
-  base: {
-    service: 'puppetmaster2',
-    version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
-  },
+    // Base context added to all logs
+    base: {
+      service: 'puppetmaster2',
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development'
+    },
 
-  // Timestamp format
-  timestamp: pino.stdTimeFunctions.isoTime,
+    // Timestamp format
+    timestamp: pino.stdTimeFunctions.isoTime,
 
-  // Production: JSON output
-  // Development: Pretty output with pino-pretty
-  ...(isProduction
-    ? {}
-    : {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'HH:MM:ss',
-            ignore: 'pid,hostname,service,version,environment'
-          }
+    // Development: Pretty output with pino-pretty (can't use multistream with transport)
+    ...(!isProduction && {
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          translateTime: 'HH:MM:ss',
+          ignore: 'pid,hostname,service,version,environment'
         }
-      })
-})
+      }
+    }),
+
+    // Production: use hooks to capture logs to buffer
+    ...(isProduction && {
+      hooks: {
+        logMethod(inputArgs, method, _level) {
+          // Call original method
+          return method.apply(this, inputArgs)
+        }
+      }
+    })
+  },
+  // Pass multistream destination for production
+  destinations
+)
 
 /**
  * Create a child logger with pre-set context

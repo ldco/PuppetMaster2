@@ -8,15 +8,18 @@ export default defineVitestConfig({
         domEnvironment: 'happy-dom'
       }
     },
-    // Test files pattern
+    // Test files pattern - excludes playwright tests (they use their own runner)
     include: ['tests/**/*.test.ts'],
-    // Global test timeout
-    testTimeout: 10000,
+    exclude: ['e2e-playwright/**', 'node_modules/**'],
+    // Global test timeout (increased for e2e tests)
+    testTimeout: 30000,
+    // Hook timeout for setup/teardown
+    hookTimeout: 30000,
     // Coverage configuration (optional, run with --coverage)
     coverage: {
       provider: 'v8',
       include: ['server/utils/**', 'app/composables/**', 'app/components/**'],
-      exclude: ['node_modules', 'tests']
+      exclude: ['node_modules', 'tests', 'e2e-playwright']
     }
   }
 })

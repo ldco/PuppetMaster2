@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { resolve } from 'path'
 import config from './app/puppet-master.config'
 import Icons from 'unplugin-icons/vite'
 import svgLoader from 'vite-svg-loader'
@@ -6,6 +7,12 @@ import svgLoader from 'vite-svg-loader'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  // Alias for cleaner imports across the app
+  // Components can use: import config from '@config'
+  alias: {
+    '@config': resolve(__dirname, './app/puppet-master.config.ts')
+  },
 
   // CSS entry point - our custom CSS system
   css: ['~/assets/css/main.css'],
@@ -242,8 +249,16 @@ export default defineNuxtConfig({
     redisUrl: process.env.REDIS_URL || '',
     redisPrefix: process.env.REDIS_PREFIX || 'pm-cache:',
 
+    // Site domain (used for constructing URLs)
+    siteDomain: process.env.SITE_DOMAIN || '',
+
     public: {
-      features: config.features
+      features: config.features,
+      // External monitoring dashboard URL (constructed from subdomain + domain)
+      uptimeKumaUrl:
+        process.env.UPTIME_KUMA_SUBDOMAIN && process.env.SITE_DOMAIN
+          ? `https://${process.env.UPTIME_KUMA_SUBDOMAIN}.${process.env.SITE_DOMAIN}`
+          : ''
     }
   }
 })

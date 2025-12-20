@@ -25,6 +25,7 @@ import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconLogout from '~icons/tabler/logout'
+import IconKey from '~icons/tabler/key'
 
 // Icon mapping from config icon names to components
 const iconMap: Record<string, Component> = {
@@ -46,6 +47,8 @@ const { shortLogo } = useLogo()
 const userMenuOpen = ref(false)
 // Mobile user menu state
 const mobileUserMenuOpen = ref(false)
+// Change password modal state
+const changePasswordModalOpen = ref(false)
 
 function toggleUserMenu() {
   userMenuOpen.value = !userMenuOpen.value
@@ -118,6 +121,12 @@ const adminLinks = computed(() => {
 
 async function handleLogout() {
   await logout()
+}
+
+function openChangePasswordModal() {
+  userMenuOpen.value = false
+  mobileUserMenuOpen.value = false
+  changePasswordModalOpen.value = true
 }
 
 // Theme toggle and language switcher now use shared components
@@ -202,6 +211,10 @@ onUnmounted(() => {
               <span class="user-menu-email">{{ user?.email }}</span>
               <span class="user-menu-role">{{ user?.role }}</span>
             </div>
+            <button type="button" class="user-menu-action" @click="openChangePasswordModal">
+              <IconKey />
+              <span>{{ t('auth.changePassword') }}</span>
+            </button>
             <button
               type="button"
               class="user-menu-logout"
@@ -219,6 +232,7 @@ onUnmounted(() => {
     <!-- Global UI Components -->
     <OrganismsConfirmDialog />
     <OrganismsToastContainer />
+    <OrganismsChangePasswordModal v-model="changePasswordModalOpen" />
 
     <!-- Main Content -->
     <main class="admin-main">
@@ -255,6 +269,12 @@ onUnmounted(() => {
             </div>
 
             <div class="mobile-menu-divider"></div>
+
+            <!-- Change Password -->
+            <button type="button" class="mobile-menu-item" @click="openChangePasswordModal">
+              <IconKey />
+              <span>{{ t('auth.changePassword') }}</span>
+            </button>
 
             <!-- Logout -->
             <button

@@ -22,6 +22,7 @@
 @import './inbox.css';
 @import './settings-form.css';
 @import './portfolio-grid.css';
+@import './health.css';
 
 /* Loading states */
 @import './loading-placeholders.css';
