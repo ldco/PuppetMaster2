@@ -15,6 +15,8 @@ import { useDatabase, schema } from '../../database/client'
 import { sendContactConfirmation } from '../../utils/email'
 import { notifyNewContact } from '../../utils/telegram'
 import { contactRateLimiter } from '../../utils/rateLimit'
+import { escapeHtml } from '../../utils/sanitize'
+import { logger } from '../../utils/logger'
 import config from '~~/app/puppet-master.config'
 
 // Validation schema
@@ -55,15 +57,24 @@ export default defineEventHandler(async (event) => {
   const data = result.data
   const db = useDatabase()
 
+  // Sanitize user input before storing
+  const sanitizedData = {
+    name: escapeHtml(data.name),
+    email: data.email, // Email is validated by zod, no HTML escaping needed
+    phone: data.phone ? escapeHtml(data.phone) : null,
+    subject: data.subject ? escapeHtml(data.subject) : null,
+    message: escapeHtml(data.message)
+  }
+
   // Insert contact submission
   const submission = db
     .insert(schema.contactSubmissions)
     .values({
-      name: data.name,
-      email: data.email,
-      phone: data.phone || null,
-      subject: data.subject || null,
-      message: data.message,
+      name: sanitizedData.name,
+      email: sanitizedData.email,
+      phone: sanitizedData.phone,
+      subject: sanitizedData.subject,
+      message: sanitizedData.message,
       read: false
     })
     .returning()
@@ -87,8 +98,8 @@ export default defineEventHandler(async (event) => {
       .get()
     const siteName = companyNameSetting?.value || seoTitleSetting?.value || 'Puppet Master'
 
-    sendContactConfirmation(data.email, data.name, siteName).catch((e) => {
-      console.error('[Contact] Email notification failed:', e)
+    sendContactConfirmation(data.email, data.name, siteName).catch((e: any) => {
+      logger.error('Email notification failed', { error: e?.message || String(e) })
     })
   }
 
@@ -99,8 +110,8 @@ export default defineEventHandler(async (event) => {
       email: data.email,
       phone: data.phone,
       message: data.message
-    }).catch((e) => {
-      console.error('[Contact] Telegram notification failed:', e)
+    }).catch((e: any) => {
+      logger.error('Telegram notification failed', { error: e?.message || String(e) })
     })
   }
 

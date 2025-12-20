@@ -3,6 +3,7 @@
  *
  * Client-side authentication state management.
  * Provides login, logout, session checking, and role-based access control.
+ * Integrates with CSRF protection via useCsrf composable.
  */
 
 /**
@@ -64,15 +65,26 @@ export function useAuth() {
 
   /**
    * Check current session on app load
+   * Also restores CSRF token from server
    */
   async function checkSession(): Promise<User | null> {
+    const { setToken, clearToken } = useCsrf()
     isLoading.value = true
     try {
-      const { data } = await useFetch<{ user: User | null }>('/api/auth/session')
+      const { data } = await useFetch<{ user: User | null; csrfToken: string | null }>('/api/auth/session')
       user.value = data.value?.user ?? null
+
+      // Restore CSRF token
+      if (data.value?.csrfToken) {
+        setToken(data.value.csrfToken)
+      } else {
+        clearToken()
+      }
+
       return user.value
     } catch {
       user.value = null
+      clearToken()
       return null
     } finally {
       isLoading.value = false
@@ -81,15 +93,23 @@ export function useAuth() {
 
   /**
    * Login with email and password
+   * Sets CSRF token from response for subsequent requests
    */
   async function login(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
+    const { setToken } = useCsrf()
     isLoading.value = true
     try {
-      const response = await $fetch<{ success: boolean; user: User }>('/api/auth/login', {
+      const response = await $fetch<{ success: boolean; user: User; csrfToken: string }>('/api/auth/login', {
         method: 'POST',
         body: credentials
       })
       user.value = response.user
+
+      // Store CSRF token for subsequent requests
+      if (response.csrfToken) {
+        setToken(response.csrfToken)
+      }
+
       return { success: true }
     } catch (error: any) {
       const message = error?.data?.message || error?.message || 'Login failed'
@@ -101,13 +121,16 @@ export function useAuth() {
 
   /**
    * Logout current user
+   * Clears CSRF token
    */
   async function logout(): Promise<void> {
+    const { clearToken } = useCsrf()
     isLoading.value = true
     try {
       await $fetch('/api/auth/logout', { method: 'POST' })
     } finally {
       user.value = null
+      clearToken()
       isLoading.value = false
       // Redirect to login
       navigateTo('/admin/login')

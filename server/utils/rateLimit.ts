@@ -80,3 +80,35 @@ export function createRateLimiter(limit: number, windowMs: number) {
 // Default contact form rate limiter (5 per hour)
 export const contactRateLimiter = createRateLimiter(5, 60 * 60 * 1000)
 
+// Login rate limiter (5 attempts per 15 minutes per IP)
+// Stricter than contact form to prevent brute force
+export const loginRateLimiter = createRateLimiter(5, 15 * 60 * 1000)
+
+/**
+ * Get client IP from H3 event
+ * Handles proxies (X-Forwarded-For, X-Real-IP)
+ */
+export function getClientIp(event: any): string {
+  // Try X-Forwarded-For first (for proxies/load balancers)
+  const forwardedFor = event.node?.req?.headers?.['x-forwarded-for']
+  if (forwardedFor) {
+    // X-Forwarded-For can be comma-separated, first is original client
+    const ip = typeof forwardedFor === 'string'
+      ? forwardedFor.split(',')[0]?.trim()
+      : forwardedFor[0]?.split(',')[0]?.trim()
+    if (ip) return ip
+  }
+
+  // Try X-Real-IP (used by some proxies)
+  const realIp = event.node?.req?.headers?.['x-real-ip']
+  if (realIp) {
+    return typeof realIp === 'string' ? realIp : realIp[0]
+  }
+
+  // Fall back to socket address
+  const socketAddress = event.node?.req?.socket?.remoteAddress
+  if (socketAddress) return socketAddress
+
+  return 'unknown'
+}
+

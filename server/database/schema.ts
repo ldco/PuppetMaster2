@@ -28,6 +28,10 @@ export const users = sqliteTable('users', {
   passwordHash: text('password_hash').notNull(),
   name: text('name'),
   role: text('role', { enum: ['master', 'admin', 'editor'] }).default('editor').notNull(),
+  // Account lockout fields (CRIT-04)
+  failedLoginAttempts: integer('failed_login_attempts').default(0),
+  lockedUntil: integer('locked_until', { mode: 'timestamp' }),
+  lastFailedLogin: integer('last_failed_login', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -114,9 +118,48 @@ export const translations = sqliteTable('translations', {
 ])
 
 // ═══════════════════════════════════════════════════════════════════════════
+// AUDIT LOGGING (HIGH-04)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Audit actions for security-relevant events
+ */
+export const AUDIT_ACTIONS = [
+  'login',
+  'login_failed',
+  'logout',
+  'password_change',
+  'role_change',
+  'user_create',
+  'user_update',
+  'user_delete',
+  'account_locked',
+  'account_unlocked',
+  'session_expired'
+] as const
+export type AuditAction = typeof AUDIT_ACTIONS[number]
+
+/**
+ * Audit log for security-relevant events
+ */
+export const auditLogs = sqliteTable('audit_logs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  action: text('action').notNull(), // AuditAction
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }), // Actor (null for system)
+  targetUserId: integer('target_user_id').references(() => users.id, { onDelete: 'set null' }), // Affected user
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  details: text('details'), // JSON with additional context
+  success: integer('success', { mode: 'boolean' }).default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TYPE EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════
 
+export type AuditLog = typeof auditLogs.$inferSelect
+export type NewAuditLog = typeof auditLogs.$inferInsert
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Session = typeof sessions.$inferSelect

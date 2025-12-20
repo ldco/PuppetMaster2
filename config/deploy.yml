@@ -1,0 +1,116 @@
+# ============================================
+# Kamal Deployment Configuration
+# PuppetMaster2 - Nuxt 3 Framework
+# ============================================
+#
+# Prerequisites:
+# 1. Install Kamal: gem install kamal
+# 2. Configure secrets: kamal secrets init
+# 3. Set environment variables in .kamal/secrets
+#
+# Commands:
+# - kamal setup     : Initial server setup
+# - kamal deploy    : Deploy application
+# - kamal rollback  : Rollback to previous version
+# - kamal logs      : View application logs
+# - kamal details   : Show deployment details
+
+# Application name (used for container naming)
+service: puppetmaster2
+
+# Docker image name (change to your registry)
+image: your-registry/puppetmaster2
+
+# Servers to deploy to
+servers:
+  web:
+    hosts:
+      - your-server-ip  # Replace with your server IP
+    labels:
+      traefik.http.routers.puppetmaster2.rule: Host(`your-domain.com`)
+      traefik.http.routers.puppetmaster2.tls: true
+      traefik.http.routers.puppetmaster2.tls.certresolver: letsencrypt
+      traefik.http.routers.puppetmaster2.entrypoints: websecure
+    options:
+      network: traefik-public
+
+# Container registry configuration
+registry:
+  server: ghcr.io  # GitHub Container Registry (or your registry)
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Environment variables
+env:
+  # Clear (non-secret) variables
+  clear:
+    NODE_ENV: production
+    HOST: 0.0.0.0
+    PORT: 3000
+
+  # Secret variables (loaded from .kamal/secrets)
+  secret:
+    - DATABASE_URL
+    - SMTP_HOST
+    - SMTP_PORT
+    - SMTP_USER
+    - SMTP_PASS
+    - SMTP_FROM
+    - TELEGRAM_BOT_TOKEN
+    - TELEGRAM_CHAT_ID
+
+# Persistent storage volumes
+volumes:
+  - "puppetmaster2_data:/app/data"           # SQLite database
+  - "puppetmaster2_uploads:/app/public/uploads"  # User uploads
+
+# Traefik configuration for reverse proxy and SSL
+traefik:
+  options:
+    publish:
+      - "443:443"
+      - "80:80"
+    volume:
+      - "/letsencrypt:/letsencrypt"
+    network: traefik-public
+  args:
+    entryPoints.web.address: ":80"
+    entryPoints.websecure.address: ":443"
+    entryPoints.web.http.redirections.entryPoint.to: websecure
+    entryPoints.web.http.redirections.entryPoint.scheme: https
+    certificatesResolvers.letsencrypt.acme.email: "your-email@example.com"
+    certificatesResolvers.letsencrypt.acme.storage: "/letsencrypt/acme.json"
+    certificatesResolvers.letsencrypt.acme.httpchallenge: true
+    certificatesResolvers.letsencrypt.acme.httpchallenge.entrypoint: web
+
+# Health check configuration
+healthcheck:
+  path: /api/health
+  port: 3000
+  max_attempts: 10
+  interval: 20s
+
+# SSH configuration
+ssh:
+  user: deploy  # SSH user on target server
+
+# Build configuration
+builder:
+  multiarch: false  # Set to true for ARM builds
+  cache:
+    type: gha       # GitHub Actions cache (if using GHA)
+    options: mode=max
+
+# Accessories (optional services)
+# Uncomment if you need Redis for distributed rate limiting
+# accessories:
+#   redis:
+#     image: redis:7-alpine
+#     host: your-server-ip
+#     port: 6379
+#     volumes:
+#       - "puppetmaster2_redis:/data"
+#     options:
+#       network: traefik-public

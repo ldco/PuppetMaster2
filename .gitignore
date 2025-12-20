@@ -22,3 +22,15 @@ logs
 .env
 .env.*
 !.env.example
+
+# Kamal secrets (never commit!)
+.kamal/secrets
+!.kamal/secrets.example
+
+# SQLite database
+data/*.db
+*.sqlite
+
+# Uploaded files (user content)
+public/uploads/*
+!public/uploads/.gitkeep

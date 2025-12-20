@@ -6,7 +6,9 @@
  * - Generates thumbnail from first frame
  * - Uses storage adapter (local or S3)
  *
- * Requires admin authentication.
+ * Security:
+ * - Validates file content by magic bytes (not just MIME type)
+ * - Requires admin authentication
  */
 import { randomUUID } from 'crypto'
 import { writeFile, unlink, mkdir } from 'fs/promises'
@@ -15,6 +17,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import ffmpegStatic from 'ffmpeg-static'
 import config from '../../../app/puppet-master.config'
 import { useFileStorage } from '../../utils/storage'
+import { validateVideoFile } from '../../utils/fileValidation'
 
 // Set FFmpeg path
 if (ffmpegStatic) {
@@ -59,17 +62,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate file type
-  const mimeType = file.type || ''
-  const allowedMimes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo']
-  if (!allowedMimes.includes(mimeType)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Invalid file type. Allowed: mp4, webm, mov, avi`
-    })
-  }
-
-  // Validate file size
+  // Validate file size first (before expensive validation)
   const maxSize = config.storage.video.maxSizeMB * 1024 * 1024
   if (file.data.length > maxSize) {
     throw createError({
@@ -77,6 +70,18 @@ export default defineEventHandler(async (event) => {
       statusMessage: `File too large. Maximum size: ${config.storage.video.maxSizeMB}MB`
     })
   }
+
+  // Validate file by magic bytes (not just client-provided MIME type)
+  const validation = validateVideoFile(file.data)
+  if (!validation.valid) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: validation.error || 'Invalid file type'
+    })
+  }
+
+  // Use detected MIME type (from magic bytes) instead of client-provided
+  const detectedMime = validation.detectedMime!
 
   // Ensure temp directory exists
   if (!existsSync(TEMP_DIR)) {

@@ -7,6 +7,7 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
+import { sanitizeHtml, escapeHtml } from '../../utils/sanitize'
 
 // Validation schema (all fields optional for partial update)
 const updateSchema = z.object({
@@ -85,19 +86,19 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Build update object
+  // Build update object with sanitized values
   const updateData: Record<string, unknown> = {
     updatedAt: new Date()
   }
 
   if (data.slug !== undefined) updateData.slug = data.slug
-  if (data.title !== undefined) updateData.title = data.title
-  if (data.description !== undefined) updateData.description = data.description
-  if (data.content !== undefined) updateData.content = data.content
+  if (data.title !== undefined) updateData.title = escapeHtml(data.title)
+  if (data.description !== undefined) updateData.description = data.description ? escapeHtml(data.description) : null
+  if (data.content !== undefined) updateData.content = data.content ? sanitizeHtml(data.content) : null
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
   if (data.thumbnailUrl !== undefined) updateData.thumbnailUrl = data.thumbnailUrl
-  if (data.category !== undefined) updateData.category = data.category
-  if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags)
+  if (data.category !== undefined) updateData.category = data.category ? escapeHtml(data.category) : null
+  if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags.map(t => escapeHtml(t)))
   if (data.order !== undefined) updateData.order = data.order
   if (data.published !== undefined) {
     updateData.published = data.published

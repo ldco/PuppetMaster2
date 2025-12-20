@@ -1,16 +1,17 @@
 /**
  * GET /api/admin/contacts
  *
- * Returns all contact form submissions.
+ * Returns paginated contact form submissions.
  * Requires admin authentication.
  *
  * Query params:
  *   - unread: boolean - Only show unread submissions
- *   - limit: number - Limit results
- *   - offset: number - Pagination offset
+ *   - page: number - Page number (default: 1)
+ *   - limit: number - Items per page (default: 20, max: 100)
  */
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, sql } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
+import { parsePaginationParams, paginationClauses, buildPaginationMeta } from '../../utils/pagination'
 
 export default defineEventHandler(async (event) => {
   // Check authentication
@@ -24,42 +25,59 @@ export default defineEventHandler(async (event) => {
 
   const db = useDatabase()
   const query = getQuery(event)
+  const params = parsePaginationParams(query as Record<string, unknown>)
+  const { limitClause, offsetClause } = paginationClauses(params.page!, params.limit!)
+  const unreadOnly = query.unread === 'true'
 
-  // Build query
+  // Build query with DB-level pagination
   let items
-  if (query.unread === 'true') {
+  let total: number
+
+  if (unreadOnly) {
     items = db
       .select()
       .from(schema.contactSubmissions)
       .where(eq(schema.contactSubmissions.read, false))
       .orderBy(desc(schema.contactSubmissions.createdAt))
+      .limit(limitClause)
+      .offset(offsetClause)
       .all()
+
+    const countResult = db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.contactSubmissions)
+      .where(eq(schema.contactSubmissions.read, false))
+      .get()
+    total = countResult?.count ?? 0
   } else {
     items = db
       .select()
       .from(schema.contactSubmissions)
       .orderBy(desc(schema.contactSubmissions.createdAt))
+      .limit(limitClause)
+      .offset(offsetClause)
       .all()
+
+    const countResult = db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.contactSubmissions)
+      .get()
+    total = countResult?.count ?? 0
   }
 
-  // Apply pagination
-  const limit = query.limit ? parseInt(query.limit as string) : undefined
-  const offset = query.offset ? parseInt(query.offset as string) : 0
-
-  if (limit) {
-    items = items.slice(offset, offset + limit)
-  }
-
-  // Count unread
-  const unreadCount = db
-    .select()
+  // Count unread (always needed for badge)
+  const unreadResult = db
+    .select({ count: sql<number>`count(*)` })
     .from(schema.contactSubmissions)
     .where(eq(schema.contactSubmissions.read, false))
-    .all().length
+    .get()
+  const unreadCount = unreadResult?.count ?? 0
+
+  const meta = buildPaginationMeta(total, params.page!, params.limit!, items)
 
   return {
     items,
-    total: items.length,
+    meta,
     unreadCount
   }
 })

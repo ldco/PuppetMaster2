@@ -13,6 +13,7 @@ import { useDatabase, schema } from '../../database/client'
 import { USER_ROLES, type UserRole } from '../../database/schema'
 import { hashPassword } from '../../utils/password'
 import { canManageUser, getAssignableRoles } from '../../utils/roles'
+import { audit } from '../../utils/audit'
 
 const createUserSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -83,6 +84,11 @@ export default defineEventHandler(async (event) => {
     .from(schema.users)
     .where(eq(schema.users.email, email))
     .get()
+
+  // Audit log
+  if (newUser) {
+    await audit.userCreate(event, currentUser!.id, newUser.id, email, role)
+  }
 
   return {
     success: true,

@@ -77,11 +77,9 @@
   /* Allow 2-column grids on tablets */
   .grid-tablet-2 { grid-template-columns: repeat(2, 1fr); }
 
-  /* Mobile-only elements: hidden on tablet+ (sidebar shows user menu) */
-  .mobile-only,
-  .mobile-only-block {
-    display: none;
-  }
+  /* NOTE: .mobile-only is NOT hidden here - it stays visible until desktop
+     This prevents the "dead zone" where neither hamburger nor desktop nav is visible
+     (640px-1023px range). Only hide mobile-only at desktop (1024px+). */
 }
 
 /* ══════════════════════════════════════════════════════════

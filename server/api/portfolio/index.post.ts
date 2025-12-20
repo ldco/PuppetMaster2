@@ -6,6 +6,7 @@
  */
 import { z } from 'zod'
 import { useDatabase, schema } from '../../database/client'
+import { sanitizeHtml, escapeHtml } from '../../utils/sanitize'
 
 // Validation schema
 const createSchema = z.object({
@@ -60,18 +61,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Sanitize HTML content and escape text fields
+  const sanitizedContent = data.content ? sanitizeHtml(data.content) : null
+  const sanitizedDescription = data.description ? escapeHtml(data.description) : null
+
   // Insert new portfolio item
   const newItem = db
     .insert(schema.portfolioItems)
     .values({
       slug: data.slug,
-      title: data.title,
-      description: data.description || null,
-      content: data.content || null,
+      title: escapeHtml(data.title),
+      description: sanitizedDescription,
+      content: sanitizedContent,
       imageUrl: data.imageUrl || null,
       thumbnailUrl: data.thumbnailUrl || null,
-      category: data.category || null,
-      tags: data.tags ? JSON.stringify(data.tags) : null,
+      category: data.category ? escapeHtml(data.category) : null,
+      tags: data.tags ? JSON.stringify(data.tags.map(t => escapeHtml(t))) : null,
       order: data.order || 0,
       published: data.published || false,
       publishedAt: data.published ? new Date() : null

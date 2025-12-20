@@ -13,6 +13,7 @@ import { useDatabase, schema } from '../../../database/client'
 import { USER_ROLES, type UserRole } from '../../../database/schema'
 import { hashPassword } from '../../../utils/password'
 import { canManageUser, getAssignableRoles } from '../../../utils/roles'
+import { audit } from '../../../utils/audit'
 
 const updateUserSchema = z.object({
   email: z.string().email('Invalid email address').optional(),
@@ -111,6 +112,21 @@ export default defineEventHandler(async (event) => {
     .set(updates)
     .where(eq(schema.users.id, userId))
     .run()
+
+  // Audit logging for security-relevant changes
+  if (role && role !== targetUser.role) {
+    await audit.roleChange(event, currentUser!.id, userId, targetUser.role, role)
+  }
+  if (password) {
+    await audit.passwordChange(event, currentUser!.id, userId)
+  }
+  // Log general update (with changes excluding password)
+  const changesForLog = { ...updates }
+  delete changesForLog.passwordHash
+  delete changesForLog.updatedAt
+  if (Object.keys(changesForLog).length > 0) {
+    await audit.userUpdate(event, currentUser!.id, userId, changesForLog)
+  }
 
   // Get updated user
   const updatedUser = db

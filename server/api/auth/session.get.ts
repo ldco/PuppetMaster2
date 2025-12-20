@@ -2,16 +2,20 @@
  * Session API Endpoint
  *
  * GET /api/auth/session
- * Returns current user session if valid, null otherwise
+ * Returns current user session if valid, null otherwise.
+ * Also returns CSRF token for client-side storage.
  */
 import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
+import { getCsrfToken, generateCsrfToken, setCsrfCookie, deleteCsrfCookie } from '../../utils/csrf'
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, 'pm-session')
 
   if (!sessionId) {
-    return { user: null }
+    // No session, ensure CSRF cookie is cleared
+    deleteCsrfCookie(event)
+    return { user: null, csrfToken: null }
   }
 
   const db = useDatabase()
@@ -29,9 +33,10 @@ export default defineEventHandler(async (event) => {
     .get()
 
   if (!session) {
-    // Clear invalid cookie
+    // Clear invalid cookies
     deleteCookie(event, 'pm-session', { path: '/' })
-    return { user: null }
+    deleteCsrfCookie(event)
+    return { user: null, csrfToken: null }
   }
 
   // Get user
@@ -52,9 +57,18 @@ export default defineEventHandler(async (event) => {
       .where(eq(schema.sessions.id, sessionId))
       .run()
     deleteCookie(event, 'pm-session', { path: '/' })
-    return { user: null }
+    deleteCsrfCookie(event)
+    return { user: null, csrfToken: null }
   }
 
-  return { user }
+  // Get or regenerate CSRF token
+  let csrfToken = getCsrfToken(event)
+  if (!csrfToken) {
+    // No CSRF token exists, generate new one
+    csrfToken = generateCsrfToken()
+    setCsrfCookie(event, csrfToken)
+  }
+
+  return { user, csrfToken }
 })
 

@@ -1,0 +1,27 @@
+<script setup lang="ts">
+/**
+ * Text Skeleton Component
+ *
+ * Displays placeholder lines mimicking text content.
+ * Automatically varies line widths for realistic appearance.
+ */
+withDefaults(defineProps<{
+  lines?: number
+  lastLineWidth?: string
+}>(), {
+  lines: 3,
+  lastLineWidth: '70%'
+})
+</script>
+
+<template>
+  <div class="skeleton-text">
+    <SkeletonBase
+      v-for="i in lines"
+      :key="i"
+      height="1em"
+      :width="i === lines ? lastLineWidth : '100%'"
+      :style="{ marginBottom: i < lines ? '0.5em' : '0' }"
+    />
+  </div>
+</template>

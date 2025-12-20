@@ -4,14 +4,15 @@
  * Uploads and processes an image using Sharp.
  * Uses storage adapter (local or S3) based on config.
  *
- * Requires admin authentication.
+ * Security:
+ * - Validates file content by magic bytes (not just MIME type)
+ * - Requires admin authentication
+ *
  * Returns URLs for the processed image and thumbnail.
  */
 import config from '../../../app/puppet-master.config'
 import { useFileStorage } from '../../utils/storage'
-
-// Allowed MIME types
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+import { validateImageFile } from '../../utils/fileValidation'
 
 export default defineEventHandler(async (event) => {
   // Check authentication
@@ -41,16 +42,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate file type
-  const mimeType = file.type || ''
-  if (!ALLOWED_TYPES.includes(mimeType)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Invalid file type. Allowed: ${ALLOWED_TYPES.join(', ')}`
-    })
-  }
-
-  // Validate file size
+  // Validate file size first (before expensive validation)
   const maxSize = config.storage.image.maxSizeMB * 1024 * 1024
   if (file.data.length > maxSize) {
     throw createError({
@@ -58,6 +50,18 @@ export default defineEventHandler(async (event) => {
       statusMessage: `File too large. Maximum size: ${config.storage.image.maxSizeMB}MB`
     })
   }
+
+  // Validate file by magic bytes (not just client-provided MIME type)
+  const validation = validateImageFile(file.data)
+  if (!validation.valid) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: validation.error || 'Invalid file type'
+    })
+  }
+
+  // Use detected MIME type (from magic bytes) instead of client-provided
+  const mimeType = validation.detectedMime!
 
   try {
     const storage = useFileStorage()

@@ -89,15 +89,82 @@ async function seed() {
   // Create settings from config schema - ONLY if they don't exist
   // Uses raw SQL with INSERT OR IGNORE to preserve existing values
   console.log('⚙️  Syncing settings from config schema...')
+
+  // Example default values for ALL settings
+  const defaultValues: Record<string, string> = {
+    // Contact Info
+    'contact.email': 'hello@example.com',
+    'contact.phone': '+1 (555) 123-4567',
+    'contact.location': '123 Main Street, New York, NY 10001',
+
+    // Social - Messaging
+    'social.telegram': 'https://t.me/example',
+    'social.whatsapp': 'https://wa.me/15551234567',
+    'social.viber': 'viber://chat?number=15551234567',
+    'social.discord': 'https://discord.gg/example',
+    'social.max': '',
+
+    // Social - Networks
+    'social.instagram': 'https://instagram.com/example',
+    'social.facebook': 'https://facebook.com/example',
+    'social.twitter': 'https://x.com/example',
+    'social.threads': 'https://threads.net/@example',
+    'social.tiktok': 'https://tiktok.com/@example',
+    'social.pinterest': 'https://pinterest.com/example',
+    'social.vk': 'https://vk.com/example',
+
+    // Social - Video
+    'social.youtube': 'https://youtube.com/@example',
+    'social.twitch': 'https://twitch.tv/example',
+
+    // Social - Professional
+    'social.linkedin': 'https://linkedin.com/company/example',
+    'social.medium': 'https://medium.com/@example',
+
+    // Social - Dev/Design
+    'social.github': 'https://github.com/example',
+    'social.gitlab': 'https://gitlab.com/example',
+    'social.dribbble': 'https://dribbble.com/example',
+    'social.behance': 'https://behance.net/example',
+
+    // Legal
+    'legal.companyName': 'Example Company LLC',
+    'legal.inn': '1234567890',
+    'legal.ogrn': '1234567890123',
+    'legal.address': '123 Main Street, Suite 100, New York, NY 10001',
+    'legal.email': 'legal@example.com',
+
+    // Footer
+    'footer.ctaText': 'Get Started',
+    'footer.ctaUrl': '#contact',
+    'footer.privacyUrl': '/privacy',
+    'footer.termsUrl': '/terms',
+
+    // SEO
+    'seo.title': 'Puppet Master - Modern Web Framework',
+    'seo.description': 'A production-ready Nuxt 3 framework for building client websites with admin panel.',
+    'seo.keywords': 'nuxt, vue, web development, framework, cms',
+
+    // Analytics (leave empty - user needs to add their own IDs)
+    'analytics.googleId': '',
+    'analytics.yandexId': '',
+    'analytics.facebookPixel': '',
+
+    // Verification (leave empty - user needs to add their own codes)
+    'verification.google': '',
+    'verification.yandex': '',
+  }
+
   let settingsAdded = 0
   for (const setting of config.settings) {
+    const defaultValue = defaultValues[setting.key] ?? ''
     const result = sqlite.prepare(`
       INSERT OR IGNORE INTO settings (key, value, type, "group")
-      VALUES (?, '', ?, ?)
-    `).run(setting.key, setting.type, setting.group)
+      VALUES (?, ?, ?, ?)
+    `).run(setting.key, defaultValue, setting.type, setting.group)
 
     if (result.changes > 0) {
-      console.log(`   + ${setting.key} (new)`)
+      console.log(`   + ${setting.key}${defaultValue ? ` = "${defaultValue.substring(0, 40)}${defaultValue.length > 40 ? '...' : ''}"` : ' (empty)'}`)
       settingsAdded++
     }
   }

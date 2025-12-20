@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 import { type UserRole } from '../../../database/schema'
 import { canManageUser } from '../../../utils/roles'
+import { audit } from '../../../utils/audit'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -54,6 +55,9 @@ export default defineEventHandler(async (event) => {
       message: 'You cannot delete this user'
     })
   }
+
+  // Audit log before deletion (need email for log)
+  await audit.userDelete(event, currentUser!.id, userId, targetUser.email)
 
   // Delete user (sessions will cascade delete)
   db.delete(schema.users)
