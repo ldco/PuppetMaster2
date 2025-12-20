@@ -38,7 +38,10 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       theme: 'Theme',
       language: 'Language',
       confirm: 'Confirm',
-      more: 'More'
+      more: 'More',
+      next: 'Next',
+      back: 'Back',
+      skip: 'Skip'
     },
     nav: {
       home: 'Home',
@@ -140,7 +143,35 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       image: 'Image',
       published: 'Published',
       // User menu
-      userMenu: 'User menu'
+      userMenu: 'User menu',
+      // Onboarding wizard (LOW-05)
+      onboarding: {
+        pageTitle: 'Setup Wizard',
+        welcomeTitle: 'Welcome to Puppet Master',
+        welcomeDesc: 'Let\'s set up your website in a few simple steps.',
+        welcomeText: 'This wizard will guide you through the essential configuration. You can always change these settings later.',
+        contactTitle: 'Contact Information',
+        contactDesc: 'How can visitors reach you?',
+        email: 'Email Address',
+        emailPlaceholder: 'your@email.com',
+        phone: 'Phone Number',
+        phonePlaceholder: '+1 234 567 890',
+        location: 'Location',
+        locationPlaceholder: 'City, Country',
+        socialTitle: 'Social Media',
+        socialDesc: 'Connect your social profiles',
+        socialHint: 'You can add more social links later in Settings.',
+        seoTitle: 'Site Identity',
+        seoDesc: 'How should your site appear in search results?',
+        siteTitle: 'Site Title',
+        siteTitlePlaceholder: 'Your Business Name',
+        siteDescription: 'Site Description',
+        siteDescriptionPlaceholder: 'A brief description of your business or website.',
+        completeTitle: 'All Done!',
+        completeDesc: 'Your site is ready to go.',
+        completeText: 'You\'ve completed the initial setup. You can now start adding content or customize settings further.',
+        finish: 'Go to Dashboard'
+      }
     },
     theme: {
       light: 'Light',
@@ -182,7 +213,10 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       theme: 'Тема',
       language: 'Язык',
       confirm: 'Подтвердить',
-      more: 'Ещё'
+      more: 'Ещё',
+      next: 'Далее',
+      back: 'Назад',
+      skip: 'Пропустить'
     },
     nav: {
       home: 'Главная',
@@ -284,7 +318,35 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       image: 'Изображение',
       published: 'Опубликовано',
       // User menu
-      userMenu: 'Меню пользователя'
+      userMenu: 'Меню пользователя',
+      // Onboarding wizard (LOW-05)
+      onboarding: {
+        pageTitle: 'Мастер настройки',
+        welcomeTitle: 'Добро пожаловать в Puppet Master',
+        welcomeDesc: 'Настроим ваш сайт за несколько простых шагов.',
+        welcomeText: 'Этот мастер проведёт вас через основные настройки. Вы всегда сможете изменить их позже.',
+        contactTitle: 'Контактная информация',
+        contactDesc: 'Как посетители могут с вами связаться?',
+        email: 'Email адрес',
+        emailPlaceholder: 'ваш@email.com',
+        phone: 'Номер телефона',
+        phonePlaceholder: '+7 123 456 7890',
+        location: 'Местоположение',
+        locationPlaceholder: 'Город, Страна',
+        socialTitle: 'Социальные сети',
+        socialDesc: 'Подключите ваши профили',
+        socialHint: 'Вы сможете добавить больше ссылок позже в Настройках.',
+        seoTitle: 'Идентичность сайта',
+        seoDesc: 'Как ваш сайт будет выглядеть в поисковых результатах?',
+        siteTitle: 'Название сайта',
+        siteTitlePlaceholder: 'Название вашего бизнеса',
+        siteDescription: 'Описание сайта',
+        siteDescriptionPlaceholder: 'Краткое описание вашего бизнеса или сайта.',
+        completeTitle: 'Готово!',
+        completeDesc: 'Ваш сайт готов к работе.',
+        completeText: 'Вы завершили начальную настройку. Теперь можете добавлять контент или настраивать сайт дальше.',
+        finish: 'Перейти к панели'
+      }
     },
     theme: {
       light: 'Светлая',
@@ -325,7 +387,10 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       theme: 'ערכת נושא',
       language: 'שפה',
       confirm: 'אישור',
-      more: 'עוד'
+      more: 'עוד',
+      next: 'הבא',
+      back: 'חזור',
+      skip: 'דלג'
     },
     nav: {
       home: 'דף הבית',
@@ -427,7 +492,35 @@ export const systemTranslations: Record<string, Record<string, any>> = {
       image: 'תמונה',
       published: 'פורסם',
       // User menu
-      userMenu: 'תפריט משתמש'
+      userMenu: 'תפריט משתמש',
+      // Onboarding wizard (LOW-05)
+      onboarding: {
+        pageTitle: 'אשף ההתקנה',
+        welcomeTitle: 'ברוכים הבאים ל-Puppet Master',
+        welcomeDesc: 'בואו נגדיר את האתר שלכם בכמה צעדים פשוטים.',
+        welcomeText: 'אשף זה ידריך אתכם בהגדרות הבסיסיות. תמיד תוכלו לשנות אותן מאוחר יותר.',
+        contactTitle: 'פרטי התקשרות',
+        contactDesc: 'איך מבקרים יוכלו ליצור אתכם קשר?',
+        email: 'כתובת אימייל',
+        emailPlaceholder: 'your@email.com',
+        phone: 'מספר טלפון',
+        phonePlaceholder: '+972 50 123 4567',
+        location: 'מיקום',
+        locationPlaceholder: 'עיר, מדינה',
+        socialTitle: 'רשתות חברתיות',
+        socialDesc: 'חברו את הפרופילים שלכם',
+        socialHint: 'תוכלו להוסיף עוד קישורים מאוחר יותר בהגדרות.',
+        seoTitle: 'זהות האתר',
+        seoDesc: 'איך האתר שלכם יופיע בתוצאות החיפוש?',
+        siteTitle: 'שם האתר',
+        siteTitlePlaceholder: 'שם העסק שלכם',
+        siteDescription: 'תיאור האתר',
+        siteDescriptionPlaceholder: 'תיאור קצר של העסק או האתר שלכם.',
+        completeTitle: 'סיימנו!',
+        completeDesc: 'האתר שלכם מוכן.',
+        completeText: 'השלמתם את ההגדרה הראשונית. עכשיו תוכלו להתחיל להוסיף תוכן או להמשיך להתאים את ההגדרות.',
+        finish: 'ללוח הבקרה'
+      }
     },
     theme: {
       light: 'בהיר',

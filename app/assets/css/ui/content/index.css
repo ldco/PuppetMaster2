@@ -29,3 +29,6 @@
 /* Empty states */
 @import './empty-states.css';
 
+/* Onboarding wizard */
+@import './onboarding.css';
+

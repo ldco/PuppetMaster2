@@ -98,7 +98,7 @@ The remaining **20%** consists primarily of:
 |---------|----------|-------------|--------|
 | HIGH-07 | HIGH | Empty states design | [x] DONE |
 | LOW-04 | LOW | Keyboard shortcuts in admin | [ ] |
-| LOW-05 | LOW | Onboarding wizard | [ ] |
+| LOW-05 | LOW | Onboarding wizard | [x] DONE |
 | HIGH | 10 | Backend (4), Security (3), Frontend (2), DevOps (1) |
 | MEDIUM | 4 | Backend (2), DevOps (1), Frontend (1) |
 | LOW | 6 | Backend (2), DevOps (2), UX (2) |
