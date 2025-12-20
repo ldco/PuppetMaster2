@@ -11,20 +11,7 @@
  *   toast.warning('Connection slow')
  *   toast.info('New message received')
  */
-
-type ToastType = 'success' | 'error' | 'warning' | 'info'
-
-interface Toast {
-  id: number
-  type: ToastType
-  message: string
-  duration: number
-}
-
-interface ToastOptions {
-  /** Duration in ms before auto-dismiss (default: 4000, 0 = no auto-dismiss) */
-  duration?: number
-}
+import type { ToastType, Toast, ToastOptions } from '~/types'
 
 // Auto-incrementing ID for toast management
 let toastId = 0

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Table Skeleton Component
+ * Table Loading Placeholder Component
  *
  * Displays a table placeholder with header and rows.
  */
@@ -16,10 +16,10 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="skeleton-table">
+  <div class="placeholder-table">
     <!-- Header row -->
-    <div v-if="showHeader" class="skeleton-table__header">
-      <SkeletonBase
+    <div v-if="showHeader" class="placeholder-table__header">
+      <LoadingBase
         v-for="col in columns"
         :key="`header-${col}`"
         height="1.25em"
@@ -30,9 +30,9 @@ withDefaults(defineProps<{
     <div
       v-for="row in rows"
       :key="`row-${row}`"
-      class="skeleton-table__row"
+      class="placeholder-table__row"
     >
-      <SkeletonBase
+      <LoadingBase
         v-for="col in columns"
         :key="`cell-${row}-${col}`"
         height="1em"

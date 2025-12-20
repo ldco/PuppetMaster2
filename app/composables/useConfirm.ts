@@ -9,24 +9,7 @@
  *   const confirmed = await confirm('Are you sure?', { title: 'Delete Item' })
  *   if (confirmed) { ... }
  */
-
-interface ConfirmOptions {
-  /** Dialog title (default: 'Confirm') */
-  title?: string
-  /** Confirm button text (default: 'Confirm') */
-  confirmText?: string
-  /** Cancel button text (default: 'Cancel') */
-  cancelText?: string
-  /** Confirm button variant: 'primary' | 'danger' (default: 'primary') */
-  variant?: 'primary' | 'danger'
-}
-
-interface ConfirmState {
-  isOpen: boolean
-  message: string
-  options: ConfirmOptions
-  resolve: ((value: boolean) => void) | null
-}
+import type { ConfirmOptions, ConfirmState } from '~/types'
 
 // Shared state across all component instances
 const state = reactive<ConfirmState>({

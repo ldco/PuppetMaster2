@@ -27,6 +27,10 @@ logs
 .kamal/secrets
 !.kamal/secrets.example
 
+# Ansible inventory (contains server IPs)
+ansible/inventory.yml
+!ansible/inventory.example.yml
+
 # SQLite database
 data/*.db
 *.sqlite

@@ -137,8 +137,8 @@ async function seed() {
     // Footer
     'footer.ctaText': 'Get Started',
     'footer.ctaUrl': '#contact',
-    'footer.privacyUrl': '/privacy',
-    'footer.termsUrl': '/terms',
+    'footer.privacyUrl': '',
+    'footer.termsUrl': '',
 
     // SEO
     'seo.title': 'Puppet Master - Modern Web Framework',

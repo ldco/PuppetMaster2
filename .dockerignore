@@ -54,7 +54,7 @@ public/uploads/*
 
 # Kamal/deploy files
 .kamal
-config/deploy.yml
+deploy.yml
 
 # Logs
 *.log

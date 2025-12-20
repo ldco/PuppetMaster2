@@ -5,32 +5,15 @@
  * Provides login, logout, session checking, and role-based access control.
  * Integrates with CSRF protection via useCsrf composable.
  */
+import type { UserRole, User, LoginCredentials } from '~/types'
 
-/**
- * User roles hierarchy:
- * - master: Developer/agency who builds the site (full access)
- * - admin: Client who owns the site (can manage content + users except master)
- * - editor: Client's employees (can only edit content)
- */
-export type UserRole = 'master' | 'admin' | 'editor'
+// Re-export for backward compatibility
+export type { UserRole } from '~/types'
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   editor: 0,
   admin: 1,
   master: 2
-}
-
-interface User {
-  id: number
-  email: string
-  name: string | null
-  role: UserRole
-}
-
-interface LoginCredentials {
-  email: string
-  password: string
-  rememberMe?: boolean
 }
 
 export function useAuth() {

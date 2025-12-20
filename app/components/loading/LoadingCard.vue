@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Card Skeleton Component
+ * Card Loading Placeholder Component
  *
  * Displays a card placeholder with image and text areas.
  */
@@ -16,19 +16,19 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="skeleton-card">
-    <SkeletonBase
+  <div class="placeholder-card">
+    <LoadingBase
       v-if="showImage"
       :height="imageHeight"
       borderRadius="8px 8px 0 0"
     />
-    <div class="skeleton-card__content">
-      <SkeletonBase
+    <div class="placeholder-card__content">
+      <LoadingBase
         height="1.5em"
         width="60%"
         style="margin-bottom: 1em"
       />
-      <SkeletonText :lines="textLines" />
+      <LoadingText :lines="textLines" />
     </div>
   </div>
 </template>

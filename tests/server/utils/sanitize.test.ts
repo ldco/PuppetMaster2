@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { escapeHtml } from '../../../server/utils/telegram'
+import { escapeHtml } from '../../../server/utils/sanitize'
 
 describe('escapeHtml', () => {
   it('should escape ampersand', () => {
@@ -15,7 +15,7 @@ describe('escapeHtml', () => {
   })
 
   it('should escape all HTML special characters together', () => {
-    expect(escapeHtml('<script>alert("XSS")</script>')).toBe('&lt;script&gt;alert("XSS")&lt;/script&gt;')
+    expect(escapeHtml('<script>alert("XSS")</script>')).toBe('&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;')
   })
 
   it('should handle multiple occurrences', () => {
@@ -40,7 +40,7 @@ describe('escapeHtml', () => {
 
   it('should handle HTML-like injection attempts', () => {
     expect(escapeHtml('<b>bold</b>')).toBe('&lt;b&gt;bold&lt;/b&gt;')
-    expect(escapeHtml('<a href="http://evil.com">Click</a>')).toBe('&lt;a href="http://evil.com"&gt;Click&lt;/a&gt;')
+    expect(escapeHtml('<a href="http://evil.com">Click</a>')).toBe('&lt;a href=&quot;http://evil.com&quot;&gt;Click&lt;/a&gt;')
   })
 })
 

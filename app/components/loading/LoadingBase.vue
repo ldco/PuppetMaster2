@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * Base Skeleton Component (HIGH-06)
+ * Base Loading Placeholder Component (HIGH-06)
  *
  * Provides the animated loading placeholder base.
- * All skeleton variants extend from this.
+ * All loading variants extend from this.
  */
 withDefaults(defineProps<{
   width?: string
@@ -20,8 +20,8 @@ withDefaults(defineProps<{
 
 <template>
   <div
-    class="skeleton-base"
-    :class="[`skeleton-${animation}`]"
+    class="placeholder-base"
+    :class="[`placeholder-${animation}`]"
     :style="{
       width,
       height,

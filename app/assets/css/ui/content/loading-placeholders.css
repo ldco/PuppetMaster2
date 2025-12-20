@@ -1,29 +1,29 @@
 /**
- * Skeleton Loading Placeholders (HIGH-06)
+ * Loading Placeholders (HIGH-06)
  *
  * Animated placeholders for content loading states.
  * Uses CSS animations for smooth performance.
  */
 
-/* Base skeleton styling */
-.skeleton-base {
-  background: var(--color-skeleton-base, #e0e0e0);
+/* Base placeholder styling */
+.placeholder-base {
+  background: var(--color-placeholder-base, #e0e0e0);
   position: relative;
   overflow: hidden;
 }
 
 /* Dark mode support */
-:root.dark .skeleton-base {
-  --color-skeleton-base: #3a3a3a;
-  --color-skeleton-shine: #4a4a4a;
+:root.dark .placeholder-base {
+  --color-placeholder-base: #3a3a3a;
+  --color-placeholder-shine: #4a4a4a;
 }
 
 /* Pulse animation (default) */
-.skeleton-pulse {
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+.placeholder-pulse {
+  animation: placeholder-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes skeleton-pulse {
+@keyframes placeholder-pulse {
   0%, 100% {
     opacity: 1;
   }
@@ -33,7 +33,7 @@
 }
 
 /* Wave animation (shimmer effect) */
-.skeleton-wave::after {
+.placeholder-wave::after {
   content: '';
   position: absolute;
   top: 0;
@@ -43,13 +43,13 @@
   background: linear-gradient(
     90deg,
     transparent,
-    var(--color-skeleton-shine, rgba(255, 255, 255, 0.4)),
+    var(--color-placeholder-shine, rgba(255, 255, 255, 0.4)),
     transparent
   );
-  animation: skeleton-wave 1.5s ease-in-out infinite;
+  animation: placeholder-wave 1.5s ease-in-out infinite;
 }
 
-@keyframes skeleton-wave {
+@keyframes placeholder-wave {
   0% {
     transform: translateX(-100%);
   }
@@ -58,90 +58,90 @@
   }
 }
 
-/* Text skeleton */
-.skeleton-text {
+/* Text placeholder */
+.placeholder-text {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
 }
 
-/* Card skeleton */
-.skeleton-card {
+/* Card placeholder */
+.placeholder-card {
   border-radius: 8px;
   overflow: hidden;
   background: var(--color-surface, #fff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.skeleton-card__content {
+.placeholder-card__content {
   padding: 1rem;
 }
 
-/* Table skeleton */
-.skeleton-table {
+/* Table placeholder */
+.placeholder-table {
   width: 100%;
 }
 
-.skeleton-table__header {
+.placeholder-table__header {
   display: flex;
   gap: 1rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--color-border, #e0e0e0);
 }
 
-.skeleton-table__header .skeleton-base {
-  background: var(--color-skeleton-header, #c0c0c0);
+.placeholder-table__header .placeholder-base {
+  background: var(--color-placeholder-header, #c0c0c0);
 }
 
-.skeleton-table__row {
+.placeholder-table__row {
   display: flex;
   gap: 1rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--color-border, #e0e0e0);
 }
 
-.skeleton-table__row:last-child {
+.placeholder-table__row:last-child {
   border-bottom: none;
 }
 
-/* Avatar skeleton */
-.skeleton-avatar {
+/* Avatar placeholder */
+.placeholder-avatar {
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* List item skeleton */
-.skeleton-list-item {
+/* List item placeholder */
+.placeholder-list-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 0.75rem 0;
 }
 
-/* Grid skeleton */
-.skeleton-grid {
+/* Grid placeholder */
+.placeholder-grid {
   display: grid;
   gap: 1rem;
 }
 
-/* Button skeleton */
-.skeleton-button {
+/* Button placeholder */
+.placeholder-button {
   display: inline-block;
   height: 2.5rem;
   min-width: 6rem;
   border-radius: 4px;
 }
 
-/* Image skeleton */
-.skeleton-image {
+/* Image placeholder */
+.placeholder-image {
   aspect-ratio: 16 / 9;
   border-radius: 8px;
 }
 
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-pulse,
-  .skeleton-wave::after {
+  .placeholder-pulse,
+  .placeholder-wave::after {
     animation: none;
   }
 }

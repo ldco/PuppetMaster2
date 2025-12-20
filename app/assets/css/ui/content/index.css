@@ -24,11 +24,7 @@
 @import './portfolio-grid.css';
 
 /* Loading states */
-@import './skeleton-loaders.css';
+@import './loading-placeholders.css';
 
 /* Empty states */
 @import './empty-states.css';
-
-/* Onboarding wizard */
-@import './onboarding.css';
-

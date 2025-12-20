@@ -76,6 +76,7 @@ The remaining **20%** consists primarily of:
 | MED-02 | MEDIUM | Scheduled session cleanup | [x] DONE |
 | LOW-01 | LOW | Redis for distributed rate limiting | [ ] |
 | LOW-03 | LOW | APM and metrics endpoint | [ ] |
+| LOW-07 | LOW | Playwright for E2E testing | [ ] |
 
 ### ⚙️ Viktor (Backend Engineer)
 | Task ID | Priority | Description | Status |
@@ -98,11 +99,11 @@ The remaining **20%** consists primarily of:
 |---------|----------|-------------|--------|
 | HIGH-07 | HIGH | Empty states design | [x] DONE |
 | LOW-04 | LOW | Keyboard shortcuts in admin | [ ] |
-| LOW-05 | LOW | Onboarding wizard | [x] DONE |
+| LOW-05 | LOW | Onboarding wizard | [-] SKIPPED |
 | HIGH | 10 | Backend (4), Security (3), Frontend (2), DevOps (1) |
 | MEDIUM | 4 | Backend (2), DevOps (1), Frontend (1) |
-| LOW | 6 | Backend (2), DevOps (2), UX (2) |
-| **Total** | **27** | |
+| LOW | 7 | Backend (2), DevOps (3), UX (2) |
+| **Total** | **28** | |
 
 ---
 
@@ -2033,15 +2034,11 @@ Add keyboard shortcuts with discoverable help modal.
 **Category:** UX
 **Owner:** Frontend
 **Effort:** High (8-12 hours)
-**Status:** [ ] Not Started
+**Status:** [-] SKIPPED - Unnecessary overhead for framework
 
-#### Problem
-No guided setup for first-time users:
-- Must know all settings to configure
-- Easy to miss important config
-
-#### Solution
-Step-by-step onboarding wizard for initial setup.
+#### Reason for Skipping
+Framework doesn't need onboarding wizard. Admin panel settings are self-explanatory.
+Users can configure settings directly without guided setup.
 
 ---
 
@@ -2060,6 +2057,40 @@ No automatic data deletion:
 
 #### Solution
 Scheduled task for data retention with configurable policies.
+
+---
+
+### LOW-07: Add Playwright for E2E Testing
+
+**Category:** DevOps/Testing
+**Owner:** Dmitri (DevOps Engineer)
+**Effort:** Medium (4-6 hours)
+**Status:** [ ] Not Started
+
+#### Problem
+No end-to-end testing:
+- Unit tests exist (Vitest) but no integration/e2e tests
+- User flows not automatically verified
+- Regressions in critical paths may go unnoticed
+
+#### Solution
+Add Playwright for e2e testing framework.
+
+#### Implementation
+1. Install Playwright: `npm install -D @playwright/test`
+2. Create `playwright.config.ts`
+3. Add e2e tests in `tests/e2e/` directory
+4. Key flows to test:
+   - Admin login/logout
+   - Portfolio CRUD
+   - Contact form submission
+   - Settings management
+
+#### Acceptance Criteria
+- [ ] Playwright installed and configured
+- [ ] Critical user flows covered
+- [ ] Tests run in CI pipeline
+- [ ] Headless and headed modes work
 
 ---
 

@@ -6,6 +6,7 @@
  * - TELEGRAM_BOT_TOKEN: Bot token from @BotFather
  * - TELEGRAM_CHAT_ID: Chat/group ID to send messages to
  */
+import { escapeHtml } from './sanitize'
 
 interface TelegramConfig {
   botToken: string
@@ -87,14 +88,3 @@ ${escapeHtml(data.message)}
 
   return sendTelegramMessage(text)
 }
-
-/**
- * Escape HTML special characters for Telegram
- */
-export function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
-

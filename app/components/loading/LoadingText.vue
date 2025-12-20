@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Text Skeleton Component
+ * Text Loading Placeholder Component
  *
  * Displays placeholder lines mimicking text content.
  * Automatically varies line widths for realistic appearance.
@@ -15,8 +15,8 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="skeleton-text">
-    <SkeletonBase
+  <div class="placeholder-text">
+    <LoadingBase
       v-for="i in lines"
       :key="i"
       height="1em"

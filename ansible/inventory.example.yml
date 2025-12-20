@@ -1,0 +1,30 @@
+# ============================================
+# Ansible Inventory - Selectel Servers
+# ============================================
+# Copy to inventory.yml and fill in your values
+# cp inventory.example.yml inventory.yml
+#
+# Never commit inventory.yml to git!
+# ============================================
+
+all:
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    # Deploy user for Kamal
+    deploy_user: deploy
+    deploy_user_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+  children:
+    # Production servers
+    production:
+      hosts:
+        prod-1:
+          ansible_host: YOUR_SERVER_IP
+          domain: your-domain.com
+
+    # Staging servers (optional)
+    staging:
+      hosts:
+        # stage-1:
+        #   ansible_host: YOUR_STAGING_IP
+        #   domain: staging.your-domain.com

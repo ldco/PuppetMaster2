@@ -372,10 +372,7 @@ const config = {
 
     // Verification codes (for webmaster tools)
     { key: 'verification.google', type: 'string', group: 'verification', label: 'Google Search Console' },
-    { key: 'verification.yandex', type: 'string', group: 'verification', label: 'Yandex Webmaster' },
-
-    // System settings (hidden from admin UI)
-    { key: 'system.onboardingComplete', type: 'boolean', group: 'system', label: 'Onboarding Complete' }
+    { key: 'verification.yandex', type: 'string', group: 'verification', label: 'Yandex Webmaster' }
   ] as const,
 
   // Setting groups (for admin UI organization)

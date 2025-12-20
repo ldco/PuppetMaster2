@@ -12,6 +12,24 @@
 import { z } from 'zod'
 import { logger } from './logger'
 
+// Helper: treat empty strings and undefined as "not set" (for optional fields)
+const optionalString = z.preprocess(
+  (val) => (val === '' || val === undefined) ? undefined : val,
+  z.string().optional()
+)
+const optionalEmail = z.preprocess(
+  (val) => (val === '' || val === undefined) ? undefined : val,
+  z.string().email().optional()
+)
+const optionalUrl = z.preprocess(
+  (val) => (val === '' || val === undefined) ? undefined : val,
+  z.string().url().optional()
+)
+const optionalNumber = z.preprocess(
+  (val) => (val === '' || val === undefined) ? undefined : Number(val),
+  z.number().optional()
+)
+
 // Define environment variable schema
 const envSchema = z.object({
   // Node environment
@@ -27,21 +45,21 @@ const envSchema = z.object({
   // Logging
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
 
-  // Email (optional)
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().transform(Number).pipe(z.number()).optional(),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().email().optional(),
+  // Email (optional - empty strings treated as not set)
+  SMTP_HOST: optionalString,
+  SMTP_PORT: optionalNumber,
+  SMTP_USER: optionalString,
+  SMTP_PASS: optionalString,
+  SMTP_FROM: optionalEmail,
 
   // Telegram (optional)
-  TELEGRAM_BOT_TOKEN: z.string().optional(),
-  TELEGRAM_CHAT_ID: z.string().optional(),
+  TELEGRAM_BOT_TOKEN: optionalString,
+  TELEGRAM_CHAT_ID: optionalString,
 
   // External API (optional)
-  API_BASE_URL: z.string().url().optional(),
-  API_CLIENT_ID: z.string().optional(),
-  API_CLIENT_SECRET: z.string().optional()
+  API_BASE_URL: optionalUrl,
+  API_CLIENT_ID: optionalString,
+  API_CLIENT_SECRET: optionalString
 })
 
 // Parsed environment type

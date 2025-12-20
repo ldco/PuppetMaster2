@@ -14,7 +14,7 @@ import { logger } from '../utils/logger'
 
 export default defineTask({
   meta: {
-    name: 'cleanup:sessions',
+    name: 'cleanup-sessions',
     description: 'Remove expired sessions from database'
   },
 
