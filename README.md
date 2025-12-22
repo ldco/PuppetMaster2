@@ -1,51 +1,100 @@
 <p align="center">
-  <img src="pm_design/horizontal_dark_en.svg" alt="Puppet Master" width="400" />
+  <img src="public/logo/horizontal_dark_en.svg" alt="Puppet Master" width="400" />
 </p>
 
 <h1 align="center">Puppet Master</h1>
 
 <p align="center">
-  <strong>A modern, secure, and highly customizable landing page & portfolio framework built with Nuxt 4</strong>
+  <strong>A config-driven studio toolkit for building client websites - fast, secure, and production-ready</strong>
 </p>
 
 <p align="center">
   <a href="#features">Features</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
+  <a href="#quick-start">Quick Start</a> •
   <a href="#configuration">Configuration</a> •
+  <a href="#deployment">Deployment</a> •
   <a href="#documentation">Documentation</a>
 </p>
 
 ---
 
-## ✨ Features
+## What is Puppet Master?
 
-- 🎨 **Pure CSS Architecture** - No Tailwind, modern CSS with OKLCH colors, `light-dark()`, and CSS layers
-- 🌍 **Multi-language Support** - Database-driven i18n with RTL auto-detection
-- 🌓 **Theme System** - Light/dark mode with automatic theme-aware logos
-- 📱 **Mobile-First Responsive** - Modern breakpoints with container queries
-- ⚡ **Interactive Header** - Scroll-based header style changes with glassmorphism
-- 🔐 **Secure by Design** - SQLite database OR external API, server-side rendering
-- 🎭 **One-pager Mode** - Toggle between scroll-based or route-based navigation
-- 📝 **CMS Admin Panel** - Built-in content management (optional)
-- 🔌 **External API Ready** - Swap SQLite for any REST API with OAuth 2.0/JWT auth
-- 🛡️ **Production Resilience** - Circuit breakers, retry logic, intelligent caching
-- 🎯 **DX-Focused** - Comprehensive documentation, well-commented code
+Puppet Master is a **config-driven framework** for web agencies to rapidly deploy client websites. The philosophy: **developers define structure and behavior in configuration, clients fill in content via the Admin Panel**.
 
-## 🛠️ Tech Stack
+Perfect for:
+- Landing pages & marketing sites
+- Portfolio & agency sites
+- Small business websites
+- SaaS applications with admin panels
 
-| Category        | Technology                                    |
-| --------------- | --------------------------------------------- |
-| **Framework**   | Nuxt 4 (Vue 3, TypeScript)                    |
-| **Styling**     | Pure CSS (OKLCH, light-dark(), CSS layers)    |
-| **Data Source** | SQLite + Drizzle ORM **OR** External REST API |
-| **State**       | Pinia                                         |
-| **i18n**        | @nuxtjs/i18n (database-driven)                |
-| **Icons**       | unplugin-icons (any icon set)                 |
-| **Font**        | Montserrat (Google Fonts)                     |
-| **Deployment**  | Docker + Kamal                                |
+---
 
-## 🚀 Getting Started
+## Features
+
+### Core
+
+| Feature | Description |
+|---------|-------------|
+| **4 Application Modes** | `app-only`, `website-app`, `website-admin`, `website-only` - choose your UX |
+| **Pure CSS Architecture** | 5-layer CSS system with OKLCH colors, `light-dark()`, no frameworks |
+| **Multi-language** | Database-driven i18n with automatic RTL support (Hebrew, Arabic) |
+| **Theme System** | Light/dark mode with automatic theme-aware logo switching |
+| **One-pager Toggle** | Switch between scroll-based anchors or route-based navigation |
+| **Admin Panel** | Built-in CMS for settings, portfolios, translations, users, contacts |
+
+### Backend
+
+| Feature | Description |
+|---------|-------------|
+| **Dual Data Source** | SQLite database OR external REST API (with hybrid mode) |
+| **External API Integration** | OAuth 2.0/JWT auth, circuit breaker, retry logic, caching |
+| **Image Processing** | Sharp-based WebP conversion, automatic thumbnails |
+| **Video Processing** | FFmpeg compression (optional) |
+| **WebSocket Support** | Real-time notifications, room-based messaging |
+| **Contact Form** | Email confirmation + Telegram notifications |
+
+### Security
+
+| Feature | Description |
+|---------|-------------|
+| **RBAC** | Three roles: Master (developer), Admin (client), Editor (employee) |
+| **CSRF Protection** | Double-submit cookie pattern |
+| **Security Headers** | CSP, HSTS, X-Frame-Options, and more |
+| **Rate Limiting** | Login and contact form protection |
+| **Account Lockout** | Automatic after failed login attempts |
+| **Audit Logging** | Security event tracking |
+| **File Validation** | Magic byte verification for uploads |
+
+### DevOps
+
+| Feature | Description |
+|---------|-------------|
+| **Docker** | Multi-stage Alpine builds |
+| **Kamal** | Zero-downtime deployments |
+| **Ansible** | Server provisioning automation |
+| **Traefik** | Reverse proxy with automatic SSL |
+| **Health Monitoring** | Uptime Kuma integration |
+| **Structured Logging** | Pino JSON logging |
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Nuxt 3 (Vue 3.5, TypeScript) |
+| Backend | Nitro (H3) |
+| Database | SQLite + Drizzle ORM |
+| Styling | Pure CSS (OKLCH, CSS Layers) |
+| State | Pinia |
+| i18n | @nuxtjs/i18n (database-driven) |
+| Icons | unplugin-icons + Tabler |
+| Deployment | Docker + Kamal + Traefik |
+
+---
+
+## Quick Start
 
 ### Prerequisites
 
@@ -55,130 +104,270 @@
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/puppet-master.git
-cd puppet-master
-
-# Install dependencies
-cd app
+# Clone and install
+git clone <repository-url>
+cd puppet-master/app
 pnpm install
 
-# Start development server
+# Initialize database
+pnpm db:push    # Apply schema
+pnpm db:seed    # Seed initial data
+
+# Start development
 pnpm dev
 ```
 
-The app will be available at `http://localhost:3000`
+Open `http://localhost:3000`
 
-## ⚙️ Configuration
+### Default Accounts
 
-All configuration is centralized in `app/puppet-master.config.ts`:
+| Email | Password | Role |
+|-------|----------|------|
+| master@example.com | master123 | Master (full access) |
+| admin@example.com | admin123 | Admin (client access) |
+| editor@example.com | editor123 | Editor (content only) |
+
+> **Important**: Change these credentials before deploying to production!
+
+---
+
+## Configuration
+
+All build-time configuration is in `app/puppet-master.config.ts`:
 
 ```typescript
 export default {
+  // Application mode
+  mode: 'website-admin', // 'app-only' | 'website-app' | 'website-admin' | 'website-only'
+
+  // Feature toggles
   features: {
-    multiLangs: true, // Multi-language support
-    doubleTheme: true, // Light/dark mode
-    onepager: true, // One-pager vs SPA mode
-    adminPanel: true, // Admin CMS panel
-    interactiveHeader: true // Scroll-based header effects
+    multiLangs: true,      // Multi-language support
+    doubleTheme: true,     // Light/dark mode
+    onepager: true,        // One-pager vs SPA mode
+    pwa: false,            // Progressive Web App
+    verticalNav: false,    // Vertical header navigation
+    contactEmailConfirmation: true,  // Send confirmation emails
+    contactTelegramNotify: true      // Telegram notifications
   },
 
+  // Supported locales
   locales: [
-    { code: 'en', iso: 'en-US', name: 'English' },
-    { code: 'ru', iso: 'ru-RU', name: 'Русский' },
-    { code: 'he', iso: 'he-IL', name: 'עברית' }
+    { code: 'en', iso: 'en-US', name: 'English', dir: 'ltr' },
+    { code: 'ru', iso: 'ru-RU', name: 'Русский', dir: 'ltr' },
+    { code: 'he', iso: 'he-IL', name: 'עברית', dir: 'rtl' }
   ],
+  defaultLocale: 'en',
 
-  logo: {
-    basePath: '/logos',
-    langFallback: { he: 'en' } // Hebrew uses English logo
+  // Data source
+  dataSource: {
+    provider: 'database' // 'database' | 'api' | 'hybrid'
   },
 
+  // Storage
+  storage: {
+    provider: 'local', // 'local' | 's3'
+    local: { uploadDir: 'uploads' }
+  },
+
+  // Brand colors (4 primitives - everything else auto-calculated)
   colors: {
-    black: '#2f2f2f', // From logo
-    white: '#f0f0f0', // From logo
-    brand: '#aa0000', // From logo
+    black: '#2f2f2f',
+    white: '#f0f0f0',
+    brand: '#aa0000',
     accent: '#0f172a'
-  }
+  },
+
+  // Settings schema (editable in admin panel)
+  settings: [
+    { key: 'contact.email', type: 'email', group: 'contact', label: 'Email' },
+    { key: 'contact.phone', type: 'tel', group: 'contact', label: 'Phone' },
+    { key: 'social.instagram', type: 'url', group: 'social', label: 'Instagram' },
+    // ... more settings
+  ]
 }
 ```
 
-## 📖 Documentation
+### Environment Variables
 
-| Document                                                                         | Purpose                                 |
-| -------------------------------------------------------------------------------- | --------------------------------------- |
-| [docs/PUPPET-MASTER-STATUS.md](./docs/PUPPET-MASTER-STATUS.md)                   | Project status, file structure          |
-| [docs/PUPPET-MASTER-TECHNICAL-BRIEF.md](./docs/PUPPET-MASTER-TECHNICAL-BRIEF.md) | Architecture decisions, database schema |
-| [docs/EXTERNAL_API.md](./docs/EXTERNAL_API.md)                                   | **External API integration guide**      |
-| [docs/styles/](./docs/styles/)                                                   | **CSS system documentation**            |
-| [docs/PM_BEST_PRACTICES.md](./docs/PM_BEST_PRACTICES.md)                         | Development standards                   |
-| [docs/USAGE.md](./docs/USAGE.md)                                                 | Developer workflow guide                |
+Copy `.env.example` to `.env` and configure:
 
-### CSS Documentation (docs/styles/)
+```bash
+# Required
+DATABASE_URL=./data/sqlite.db
 
-| Document                                                       | Purpose                              |
-| -------------------------------------------------------------- | ------------------------------------ |
-| [CSS_ARCHITECTURE.md](./docs/styles/CSS_ARCHITECTURE.md)       | Complete CSS system architecture     |
-| [CSS_QUICK_REFERENCE.md](./docs/styles/CSS_QUICK_REFERENCE.md) | Quick lookup for classes & variables |
-| [CSS_CUSTOMIZATION.md](./docs/styles/CSS_CUSTOMIZATION.md)     | How to customize for clients         |
+# Optional - Email
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=user@example.com
+SMTP_PASS=password
+SMTP_FROM="Site Name <noreply@example.com>"
 
-### Quick Customization Reference
+# Optional - Telegram notifications
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
 
-| What                | Where                                               |
-| ------------------- | --------------------------------------------------- |
-| **Brand colors**    | `colors/primitives.css` → `--c-brand`, `--c-accent` |
-| **Header**          | `skeleton/header.css`                               |
-| **Footer**          | `skeleton/footer.css`                               |
-| **Admin sidebar**   | `layout/admin-sidebar.css`                          |
-| **Buttons**         | `ui/forms/buttons.css`                              |
-| **Cards**           | `ui/content/cards.css`                              |
-| **Icon sizes**      | `common/icons.css`                                  |
-| **Container width** | `layout/containers.css`                             |
-
-## 📁 Project Structure
-
-```
-puppet-master/
-├── app/                    # Nuxt application
-│   ├── app/
-│   │   ├── assets/css/     # Pure CSS system (50+ modular files)
-│   │   │   ├── colors/     # Color system (4 base colors)
-│   │   │   ├── layout/     # Page structure, admin panel
-│   │   │   ├── skeleton/   # Header, footer, nav
-│   │   │   ├── common/     # Utility classes
-│   │   │   ├── ui/         # Forms, content, overlays
-│   │   │   └── animations/ # Keyframes, transitions
-│   │   ├── components/     # Vue components (Atomic Design)
-│   │   ├── composables/    # Vue composables
-│   │   ├── layouts/        # Page layouts
-│   │   └── puppet-master.config.ts
-│   ├── server/             # API routes, database
-│   ├── public/             # Static assets, logos
-│   └── docs/               # Documentation
-│       ├── styles/         # CSS system docs
-│       └── *.md            # Other docs
-├── pm_design/              # Logo design files
-└── README.md
+# Optional - S3 storage
+S3_ENDPOINT=https://s3.example.com
+S3_BUCKET=my-bucket
+S3_ACCESS_KEY=key
+S3_SECRET_KEY=secret
 ```
 
-## 🎨 Logo System
+---
 
-Logos automatically switch based on theme and language:
+## Deployment
+
+### Quick Deploy with Kamal
+
+```bash
+# 1. Provision server (first time only)
+cd ansible
+cp inventory.example.yml inventory.yml
+# Edit inventory.yml with your server IP
+pnpm server:provision
+
+# 2. Configure secrets
+cp .kamal/secrets.example .kamal/secrets
+# Edit .kamal/secrets with all values
+
+# 3. Deploy
+pnpm deploy:setup  # First time only
+pnpm deploy        # Deploy application
+```
+
+### Docker
+
+```bash
+# Build
+docker build -t puppet-master .
+
+# Run
+docker run -p 3000:3000 \
+  -v $(pwd)/data:/app/data \
+  -e DATABASE_URL=/app/data/sqlite.db \
+  puppet-master
+```
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full deployment guide.
+
+---
+
+## Documentation
+
+### Guides
+
+| Document | Description |
+|----------|-------------|
+| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Step-by-step setup guide |
+| [CONFIGURATION.md](docs/CONFIGURATION.md) | Configuration reference |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment with Docker/Kamal |
+| [EXTERNAL_API.md](docs/EXTERNAL_API.md) | External API integration |
+| [WEBSOCKET.md](docs/WEBSOCKET.md) | WebSocket setup |
+
+### Reference
+
+| Document | Description |
+|----------|-------------|
+| [API_REFERENCE.md](docs/API_REFERENCE.md) | API endpoints |
+| [CSS_ARCHITECTURE.md](docs/styles/CSS_ARCHITECTURE.md) | CSS system |
+| [CSS_QUICK_REFERENCE.md](docs/styles/CSS_QUICK_REFERENCE.md) | CSS classes lookup |
+
+### Operations
+
+| Document | Description |
+|----------|-------------|
+| [MONITORING.md](docs/MONITORING.md) | Health checks & logging |
+| [SECURITY.md](docs/SECURITY.md) | Security features & checklist |
+| [ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | Admin panel user guide |
+
+---
+
+## Project Structure
 
 ```
-/public/logos/{shape}_{theme}_{lang}.svg
-
-Examples:
-- horizontal_dark_en.svg  → Light mode, English
-- horizontal_light_ru.svg → Dark mode, Russian
+app/
+├── app/                      # Nuxt app directory
+│   ├── assets/css/           # Pure CSS system (50+ files)
+│   │   ├── colors/           # 4 color primitives + auto-calculated
+│   │   ├── layout/           # Page structure, breakpoints
+│   │   ├── skeleton/         # Header, footer, navigation
+│   │   ├── ui/               # Forms, cards, modals
+│   │   └── animations/       # Keyframes, transitions
+│   ├── components/           # Vue components (Atomic Design)
+│   │   ├── atoms/            # Basic elements
+│   │   ├── molecules/        # Component combinations
+│   │   ├── organisms/        # Complex components
+│   │   └── sections/         # Page sections
+│   ├── composables/          # Vue composables (13+)
+│   ├── layouts/              # Page layouts
+│   ├── pages/                # Route pages
+│   │   ├── admin/            # Admin panel pages
+│   │   └── portfolio/        # Portfolio pages
+│   └── puppet-master.config.ts
+├── server/                   # Nitro server
+│   ├── api/                  # API endpoints (30+)
+│   ├── database/             # Schema, migrations, seed
+│   ├── middleware/           # Auth, CSRF, security headers
+│   ├── plugins/              # Server plugins
+│   └── utils/                # Server utilities
+├── i18n/                     # Internationalization
+├── docs/                     # Documentation
+├── tests/                    # Vitest tests (88+)
+├── ansible/                  # Server provisioning
+├── Dockerfile                # Production container
+└── deploy.yml                # Kamal configuration
 ```
 
-## 📄 License
+---
+
+## Commands
+
+### Development
+
+```bash
+pnpm dev          # Start dev server
+pnpm build        # Build for production
+pnpm preview      # Preview production build
+pnpm typecheck    # TypeScript check
+pnpm lint         # Lint code
+```
+
+### Database
+
+```bash
+pnpm db:push      # Push schema changes
+pnpm db:seed      # Seed initial data
+pnpm db:reset     # Reset database
+pnpm db:studio    # Open Drizzle Studio
+```
+
+### Testing
+
+```bash
+pnpm test         # Run all tests
+pnpm test:unit    # Unit tests only
+pnpm test:api     # API tests only
+pnpm test:e2e     # E2E tests only
+```
+
+### Deployment
+
+```bash
+pnpm deploy           # Deploy with Kamal
+pnpm deploy:rollback  # Rollback to previous
+pnpm deploy:logs      # View logs
+pnpm deploy:shell     # Shell into container
+```
+
+---
+
+## License
 
 MIT
 
 ---
 
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/your-username">Your Name</a>
+  Built for web agencies who value speed, security, and maintainability.
 </p>
