@@ -1,7 +1,7 @@
 /**
- * DELETE /api/portfolio/:id
+ * DELETE /api/portfolios/[id]
  *
- * Deletes a portfolio item.
+ * Deletes a portfolio and all its items (cascade).
  * Requires admin authentication.
  */
 import { eq } from 'drizzle-orm'
@@ -18,38 +18,39 @@ export default defineEventHandler(async event => {
   }
 
   const id = getRouterParam(event, 'id')
+
+  // Validate ID
   if (!id || !/^\d+$/.test(id)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Valid ID required'
+      statusMessage: 'Invalid portfolio ID'
     })
   }
 
+  const portfolioId = parseInt(id)
   const db = useDatabase()
 
-  // Check if item exists
+  // Check if portfolio exists
   const existing = db
     .select()
-    .from(schema.portfolioItems)
-    .where(eq(schema.portfolioItems.id, parseInt(id)))
+    .from(schema.portfolios)
+    .where(eq(schema.portfolios.id, portfolioId))
     .get()
 
   if (!existing) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Portfolio item not found'
+      statusMessage: 'Portfolio not found'
     })
   }
 
-  // Delete item
-  db.delete(schema.portfolioItems)
-    .where(eq(schema.portfolioItems.id, parseInt(id)))
-    .run()
+  // Delete portfolio (items cascade automatically due to foreign key)
+  db.delete(schema.portfolios).where(eq(schema.portfolios.id, portfolioId)).run()
 
   return {
     success: true,
     deleted: {
-      id: parseInt(id),
+      id: portfolioId,
       slug: existing.slug
     }
   }

@@ -19,6 +19,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useHead({
+  title: () => `${t('admin.navTranslations')} | Admin`
+})
+
 const { confirm } = useConfirm()
 const { toast } = useToast()
 

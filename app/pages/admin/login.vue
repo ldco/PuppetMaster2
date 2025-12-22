@@ -22,6 +22,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useHead({
+  title: () => `${t('auth.login')} | Admin`
+})
+
 const { login, isLoading, isAuthenticated } = useAuth()
 const { shortLogo } = useLogo()
 

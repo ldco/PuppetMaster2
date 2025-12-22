@@ -15,6 +15,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useHead({
+  title: () => `${t('admin.navContacts')} | Admin`
+})
+
 const { confirm } = useConfirm()
 const { toast } = useToast()
 

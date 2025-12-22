@@ -14,6 +14,10 @@ definePageMeta({
 
 const { t } = useI18n()
 
+useHead({
+  title: () => `${t('admin.navSettings')} | Admin`
+})
+
 // Fetch settings
 const {
   data: settings,

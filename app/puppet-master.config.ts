@@ -219,7 +219,7 @@ const config = {
   // ═══════════════════════════════════════════════════════════════════════════
   adminSections: [
     { id: 'settings', icon: 'settings', label: 'settings', badge: false, roles: [] },
-    { id: 'portfolio', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
+    { id: 'portfolios', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
     { id: 'contacts', icon: 'mail', label: 'contacts', badge: true, roles: [] },
     { id: 'translations', icon: 'language', label: 'translations', badge: false, roles: [] },
     { id: 'users', icon: 'users', label: 'users', badge: false, roles: ['master', 'admin'] },
@@ -455,8 +455,7 @@ const config = {
     { key: 'legal.address', type: 'string', group: 'legal', label: 'Legal Address' },
     { key: 'legal.email', type: 'email', group: 'legal', label: 'Legal Email' },
 
-    // Footer Settings (CTA and legal links)
-    { key: 'footer.ctaText', type: 'string', group: 'footer', label: 'CTA Button Text' },
+    // Footer Settings (CTA text is in translations: cta.footerButton)
     { key: 'footer.ctaUrl', type: 'url', group: 'footer', label: 'CTA Button URL' },
     { key: 'footer.privacyUrl', type: 'url', group: 'footer', label: 'Privacy Policy URL' },
     { key: 'footer.termsUrl', type: 'url', group: 'footer', label: 'Terms of Service URL' },

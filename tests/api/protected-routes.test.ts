@@ -103,8 +103,8 @@ describe('Protected Routes', async () => {
       // Settings should be returned (public endpoint)
     })
 
-    it('GET /api/portfolio returns portfolio items', async () => {
-      const response = await $fetch('/api/portfolio')
+    it('GET /api/portfolios returns portfolio collections', async () => {
+      const response = await $fetch('/api/portfolios')
 
       expect(Array.isArray(response)).toBe(true)
     })

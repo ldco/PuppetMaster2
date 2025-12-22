@@ -20,6 +20,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useHead({
+  title: () => `${t('admin.navHealth')} | Admin`
+})
+
 const { toast } = useToast()
 const config = useRuntimeConfig()
 

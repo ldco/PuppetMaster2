@@ -35,7 +35,7 @@ useHead({
     </SectionsSectionAbout>
 
     <!-- Portfolio Section -->
-    <SectionsSectionPortfolio :title="t('portfolio.title')" />
+    <SectionsSectionPortfolio :title="t('portfolio.title')" portfolio-slug="portfolio" />
 
     <!-- Services Section -->
     <SectionsSectionServices :title="t('services.title')" />

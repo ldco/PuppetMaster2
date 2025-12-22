@@ -2,7 +2,7 @@
  * Database Schema
  *
  * SQLite schema using Drizzle ORM.
- * Tables: users, sessions, settings, portfolio_items, contact_submissions, translations
+ * Tables: users, sessions, settings, portfolios, portfolio_items, contact_submissions, translations, audit_logs
  */
 import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
 
@@ -73,23 +73,70 @@ export const settings = sqliteTable('settings', {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Portfolio items
+ * Portfolio types:
+ * - gallery: Collection of images, videos, and external links
+ * - case_study: Collection of detailed project case studies
+ */
+export const PORTFOLIO_TYPES = ['gallery', 'case_study'] as const
+export type PortfolioType = (typeof PORTFOLIO_TYPES)[number]
+
+/**
+ * Portfolio item types:
+ * - image: Uploaded image file
+ * - video: Uploaded video file
+ * - link: External URL (e.g., Behance, Dribbble)
+ * - case_study: Rich content project with full details
+ */
+export const PORTFOLIO_ITEM_TYPES = ['image', 'video', 'link', 'case_study'] as const
+export type PortfolioItemType = (typeof PORTFOLIO_ITEM_TYPES)[number]
+
+/**
+ * Portfolios - Collections of portfolio items
+ */
+export const portfolios = sqliteTable('portfolios', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: text('type', { enum: ['gallery', 'case_study'] }).notNull(),
+  coverImageUrl: text('cover_image_url'),
+  coverThumbnailUrl: text('cover_thumbnail_url'),
+  order: integer('order').default(0),
+  published: integer('published', { mode: 'boolean' }).default(false),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Portfolio items - Individual items within a portfolio
+ * Uses discriminated union pattern: itemType determines which fields are used
  */
 export const portfolioItems = sqliteTable('portfolio_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  slug: text('slug').notNull().unique(),
-  title: text('title').notNull(),
-  description: text('description'),
-  content: text('content'), // Rich text / markdown
-  imageUrl: text('image_url'),
-  thumbnailUrl: text('thumbnail_url'),
-  category: text('category'),
-  tags: text('tags'), // JSON array stored as text
+  portfolioId: integer('portfolio_id')
+    .notNull()
+    .references(() => portfolios.id, { onDelete: 'cascade' }),
+  itemType: text('item_type', { enum: ['image', 'video', 'link', 'case_study'] }).notNull(),
+
+  // Common fields
   order: integer('order').default(0),
-  published: integer('published', { mode: 'boolean' }).default(false),
-  publishedAt: integer('published_at', { mode: 'timestamp' }),
+  published: integer('published', { mode: 'boolean' }).default(true),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+
+  // Media fields (for gallery items: image, video, link)
+  mediaUrl: text('media_url'), // Image/video URL or external link
+  thumbnailUrl: text('thumbnail_url'), // Thumbnail for image/video
+  caption: text('caption'), // Brief caption for gallery items
+
+  // Case study fields (for case_study items)
+  slug: text('slug'), // Unique within portfolio
+  title: text('title'), // Case study title
+  description: text('description'), // Short description
+  content: text('content'), // Rich text / markdown
+  tags: text('tags'), // JSON array stored as text
+  category: text('category'), // Category label
+  publishedAt: integer('published_at', { mode: 'timestamp' })
 })
 
 /**
@@ -174,6 +221,8 @@ export type Session = typeof sessions.$inferSelect
 export type NewSession = typeof sessions.$inferInsert
 export type Setting = typeof settings.$inferSelect
 export type NewSetting = typeof settings.$inferInsert
+export type Portfolio = typeof portfolios.$inferSelect
+export type NewPortfolio = typeof portfolios.$inferInsert
 export type PortfolioItem = typeof portfolioItems.$inferSelect
 export type NewPortfolioItem = typeof portfolioItems.$inferInsert
 export type ContactSubmission = typeof contactSubmissions.$inferSelect

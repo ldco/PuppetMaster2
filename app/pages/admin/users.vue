@@ -17,6 +17,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useHead({
+  title: () => `${t('admin.navUsers')} | Admin`
+})
+
 const { confirm } = useConfirm()
 const { toast } = useToast()
 const { user: currentUser, canManageUsers, getAssignableRoles, isMaster } = useAuth()

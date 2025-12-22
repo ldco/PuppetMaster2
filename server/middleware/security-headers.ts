@@ -41,8 +41,8 @@ export default defineEventHandler(event => {
     // Styles: self + inline (needed for Vue scoped styles and dynamic styles) + Google Fonts
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 
-    // Images: self + data URIs + HTTPS sources (for external images)
-    "img-src 'self' data: https:",
+    // Images: self + data URIs + blob URIs (for upload previews) + HTTPS sources
+    "img-src 'self' data: blob: https:",
 
     // Fonts: self + Google Fonts
     "font-src 'self' https://fonts.gstatic.com",

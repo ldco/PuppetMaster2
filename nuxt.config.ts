@@ -145,7 +145,8 @@ export default defineNuxtConfig({
   // Fallbacks in fallbacks.ts provide minimal bootstrap translations
   i18n: {
     // Locales from config - ALL use the same loader.ts file
-    locales: config.locales.map(l => ({ ...l, file: 'loader.ts' })),
+    // preload: true ensures translations are available during hydration
+    locales: config.locales.map(l => ({ ...l, file: 'loader.ts', preload: true })),
     langDir: '.', // loader.ts is in i18n/ directory
     defaultLocale: config.defaultLocale,
     strategy: 'prefix_except_default',

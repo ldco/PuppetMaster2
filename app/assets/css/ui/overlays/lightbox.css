@@ -78,11 +78,49 @@
   outline-offset: 2px;
 }
 
-.lightbox-nav--prev {
+.lightbox-nav--prev,
+.lightbox-prev {
   inset-inline-start: var(--space-4);
 }
-.lightbox-nav--next {
+.lightbox-nav--next,
+.lightbox-next {
   inset-inline-end: var(--space-4);
+}
+
+/* Simple lightbox nav buttons (used by portfolio gallery) */
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(100% 0 0 / 10%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 2rem;
+  font-weight: 300;
+  transition:
+    background-color var(--transition-normal) ease,
+    transform var(--transition-normal) ease;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: oklch(100% 0 0 / 25%);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.lightbox-prev:focus-visible,
+.lightbox-next:focus-visible {
+  outline: 2px solid var(--i-focus-ring);
+  outline-offset: 2px;
 }
 
 .lightbox-nav svg {
@@ -149,6 +187,26 @@
   margin-block-start: var(--space-4);
   font-size: var(--text-sm);
   color: oklch(100% 0 0 / 50%);
+}
+
+/* Simple lightbox caption (used by portfolio gallery) */
+.lightbox-caption {
+  position: absolute;
+  inset-block-end: var(--space-6);
+  inset-inline: var(--space-4);
+  text-align: center;
+  color: white;
+  font-size: var(--text-base);
+  text-shadow: 0 2px 4px oklch(0% 0 0 / 50%);
+}
+
+/* Lightbox content image/video */
+.lightbox-content img,
+.lightbox-content video {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
 }
 
 /* Lightbox animations */
