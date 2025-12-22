@@ -2,10 +2,9 @@
  * i18n Translations API - GET
  *
  * Returns all translations for a specific locale from the database.
- * These override the fallback translations in the locale files.
+ * Uses in-memory cache for performance.
  */
-import { useDatabase, schema } from '../../database/client'
-import { eq } from 'drizzle-orm'
+import { translationCache } from '../../utils/translationCache'
 
 export default defineEventHandler(async event => {
   const locale = getRouterParam(event, 'locale')
@@ -14,33 +13,27 @@ export default defineEventHandler(async event => {
     throw createError({ statusCode: 400, message: 'Locale is required' })
   }
 
-  const db = useDatabase()
-
-  // Fetch all translations for this locale
-  const rows = db
-    .select({ key: schema.translations.key, value: schema.translations.value })
-    .from(schema.translations)
-    .where(eq(schema.translations.locale, locale))
-    .all()
+  // Get translations from cache (or DB if not cached)
+  const flatTranslations = translationCache.get(locale)
 
   // Convert to nested object format for i18n
   // e.g., { 'nav.home': 'Home' } -> { nav: { home: 'Home' } }
   const result: Record<string, any> = {}
 
-  for (const row of rows) {
-    const keys = row.key.split('.')
+  for (const [key, value] of Object.entries(flatTranslations)) {
+    const keys = key.split('.')
     let current = result
 
     for (let i = 0; i < keys.length - 1; i++) {
-      const key = keys[i]!
-      if (!current[key]) {
-        current[key] = {}
+      const k = keys[i]!
+      if (!current[k]) {
+        current[k] = {}
       }
-      current = current[key]
+      current = current[k]
     }
 
     const lastKey = keys[keys.length - 1]!
-    current[lastKey] = row.value
+    current[lastKey] = value
   }
 
   return result

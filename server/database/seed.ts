@@ -1,21 +1,38 @@
 /**
  * Database Seed Script
  *
- * Creates initial admin user, default settings, and CONTENT translations.
+ * Creates initial admin user, default settings, and translations.
  * Run with: npm run db:seed
  *
  * IMPORTANT: Settings are defined in puppet-master.config.ts
- * IMPORTANT: Only CONTENT translations go to database!
- *            System translations (nav, auth, admin, etc.) come from i18n/system.ts
+ * IMPORTANT: Translations are stored in database:
+ *            - System translations: seeded from i18n/system-seed.json, editable by master
+ *            - Content translations: seeded from i18n/content.ts, editable by admin+
  */
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { scryptSync, randomBytes } from 'crypto'
 import * as schema from './schema'
-import { mkdirSync, existsSync } from 'fs'
-import { dirname } from 'path'
+import { mkdirSync, existsSync, readFileSync } from 'fs'
+import { join } from 'path'
 import { getContentSeedData } from '../../i18n/content'
 import config from '../../app/puppet-master.config'
+
+// Load system translations from JSON seed file
+function getSystemSeedData(): Array<{ locale: string; key: string; value: string }> {
+  const seedPath = join(process.cwd(), 'i18n/system-seed.json')
+  try {
+    if (existsSync(seedPath)) {
+      const data = readFileSync(seedPath, 'utf-8')
+      return JSON.parse(data)
+    }
+    console.warn('   ⚠️  system-seed.json not found at:', seedPath)
+    return []
+  } catch (e) {
+    console.warn('   ⚠️  Failed to load system-seed.json:', e)
+    return []
+  }
+}
 
 const DB_PATH = process.env.DATABASE_URL || './data/sqlite.db'
 
@@ -142,8 +159,7 @@ async function seed() {
     'legal.address': '123 Main Street, Suite 100, New York, NY 10001',
     'legal.email': 'legal@example.com',
 
-    // Footer
-    'footer.ctaText': 'Get Started',
+    // Footer (ctaText is in translations as cta.footerButton)
     'footer.ctaUrl': '#contact',
     'footer.privacyUrl': '',
     'footer.termsUrl': '',
@@ -185,14 +201,19 @@ async function seed() {
   }
   console.log(`   ${settingsAdded} new settings added, existing values preserved.\n`)
 
-  // Seed CONTENT translations only - system translations come from i18n/system.ts
+  // Seed all translations
   // Uses raw SQL with INSERT OR IGNORE to preserve existing values
-  console.log('🌍 Syncing CONTENT translations (client-editable)...')
-  const translations = getContentSeedData()
-  let translationsAdded = 0
+  console.log('🌍 Syncing translations...')
 
+  const systemTranslations = getSystemSeedData()
+  const contentTranslations = getContentSeedData()
+  let systemAdded = 0
+  let contentAdded = 0
   const now = Date.now()
-  for (const t of translations) {
+
+  // Seed system translations (from JSON)
+  console.log('   📌 System translations (master-only)...')
+  for (const t of systemTranslations) {
     const result = sqlite
       .prepare(
         `
@@ -203,19 +224,28 @@ async function seed() {
       .run(t.locale, t.key, t.value, now)
 
     if (result.changes > 0) {
-      translationsAdded++
+      systemAdded++
     }
   }
+  console.log(`      ${systemAdded} new, ${systemTranslations.length - systemAdded} preserved`)
 
-  console.log(`   ${translationsAdded} new translations added`)
-  console.log(`   ${translations.length - translationsAdded} existing translations preserved`)
+  // Seed content translations
+  console.log('   📝 Content translations (admin-editable)...')
+  for (const t of contentTranslations) {
+    const result = sqlite
+      .prepare(
+        `
+      INSERT OR IGNORE INTO translations (locale, key, value, updated_at)
+      VALUES (?, ?, ?, ?)
+    `
+      )
+      .run(t.locale, t.key, t.value, now)
 
-  // Count per locale
-  const locales = [...new Set(translations.map(t => t.locale))]
-  for (const locale of locales) {
-    const count = translations.filter(t => t.locale === locale).length
-    console.log(`   ${locale}: ${count} keys in seed`)
+    if (result.changes > 0) {
+      contentAdded++
+    }
   }
+  console.log(`      ${contentAdded} new, ${contentTranslations.length - contentAdded} preserved`)
 
   // Seed default portfolio items - ONLY if none exist
   console.log('\n📁 Checking portfolio items...')

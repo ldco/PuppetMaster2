@@ -1,18 +1,23 @@
 /**
  * Admin Translations API - POST
  *
- * Create or update a CONTENT translation.
- * System translations (nav, auth, admin, etc.) cannot be modified.
+ * Create or update a translation.
+ * - Content translations: editable by admin+
+ * - System translations: editable by master only
  * Requires authentication.
  */
 import { useDatabase, schema } from '../../database/client'
 import { eq, and } from 'drizzle-orm'
 import { isSystemKey } from '../../../i18n/system'
+import { translationCache } from '../../utils/translationCache'
+import { syncSystemTranslationsToFile } from '../../utils/systemTranslationSync'
+import { hasRole } from '../../utils/roles'
+import type { UserRole } from '../../database/schema'
 
 export default defineEventHandler(async event => {
-  // Check authentication
-  const session = getCookie(event, 'auth_session')
-  if (!session) {
+  // Auth is handled by middleware - check user context
+  const user = event.context.user
+  if (!user) {
     throw createError({ statusCode: 401, message: 'Unauthorized' })
   }
 
@@ -23,9 +28,14 @@ export default defineEventHandler(async event => {
     throw createError({ statusCode: 400, message: 'locale, key, and value are required' })
   }
 
-  // Prevent editing system translations
+  // Check permissions for system translations
   if (isSystemKey(key)) {
-    throw createError({ statusCode: 403, message: 'System translations cannot be modified' })
+    if (!hasRole(user.role as UserRole, 'master')) {
+      throw createError({
+        statusCode: 403,
+        message: 'Only master users can edit system translations'
+      })
+    }
   }
 
   const db = useDatabase()
@@ -39,12 +49,22 @@ export default defineEventHandler(async event => {
     .all()
 
   const existingRow = existing[0]
+  const isSystem = isSystemKey(key)
+
   if (existingRow) {
     // Update existing
     db.update(schema.translations)
       .set({ value, updatedAt: new Date() })
       .where(eq(schema.translations.id, existingRow.id))
       .run()
+
+    // Invalidate cache for this locale
+    translationCache.invalidate(locale)
+
+    // Sync system translations to JSON file for new deployments
+    if (isSystem) {
+      syncSystemTranslationsToFile()
+    }
 
     return { success: true, action: 'updated', id: existingRow.id }
   } else {
@@ -54,6 +74,14 @@ export default defineEventHandler(async event => {
       .values({ locale, key, value })
       .returning({ id: schema.translations.id })
       .all()
+
+    // Invalidate cache for this locale
+    translationCache.invalidate(locale)
+
+    // Sync system translations to JSON file for new deployments
+    if (isSystem) {
+      syncSystemTranslationsToFile()
+    }
 
     const newRow = result[0]
     return { success: true, action: 'created', id: newRow?.id }

@@ -46,8 +46,7 @@ export interface SiteSettings {
     email: string | null // Legal email
   }
   footer: {
-    ctaText: string | null // CTA button text
-    ctaUrl: string | null // CTA button URL
+    ctaUrl: string | null // CTA button URL (text is in translations: cta.footerButton)
     privacyUrl: string | null // Privacy policy URL
     termsUrl: string | null // Terms of service URL
   }

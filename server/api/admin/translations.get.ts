@@ -1,16 +1,21 @@
 /**
  * Admin Translations API - GET
  *
- * Returns CONTENT translations grouped by locale for admin management.
- * System translations (nav, auth, admin, etc.) are hidden from client.
+ * Returns translations grouped by locale for admin management.
+ * - Content translations: visible to all admins
+ * - System translations: visible only to master users
  * Requires authentication.
  */
 import { useDatabase, schema } from '../../database/client'
 import { asc } from 'drizzle-orm'
 import { isSystemKey } from '../../../i18n/system'
+import { hasRole } from '../../utils/roles'
+import type { UserRole } from '../../database/schema'
 
 export default defineEventHandler(async event => {
   // Auth is handled by middleware for /api/admin/* routes
+  const user = event.context.user
+  const isMaster = user && hasRole(user.role as UserRole, 'master')
 
   const db = useDatabase()
 
@@ -21,31 +26,27 @@ export default defineEventHandler(async event => {
     .orderBy(asc(schema.translations.locale), asc(schema.translations.key))
     .all()
 
-  // Group by locale, filtering out system keys
-  const grouped: Record<string, Array<{ id: number; key: string; value: string }>> = {}
+  // Group by locale and type (system vs content)
+  const systemTranslations: Record<string, Array<{ id: number; key: string; value: string }>> = {}
+  const contentTranslations: Record<string, Array<{ id: number; key: string; value: string }>> = {}
 
   for (const row of rows) {
-    // Skip system translations - client cannot edit these
-    if (isSystemKey(row.key)) {
-      continue
-    }
+    const isSystem = isSystemKey(row.key)
+    const target = isSystem ? systemTranslations : contentTranslations
 
-    const localeGroup = (grouped[row.locale] ??= [])
+    const localeGroup = (target[row.locale] ??= [])
     localeGroup.push({
       id: row.id,
       key: row.key,
-      value: row.value
+      value: row.value ?? ''
     })
   }
 
-  console.log(
-    '[translations.get] Found',
-    Object.values(grouped).flat().length,
-    'content translations'
-  )
-
   return {
     locales: ['en', 'ru', 'he'], // Supported locales
-    translations: grouped
+    content: contentTranslations,
+    // Only include system translations for master users
+    system: isMaster ? systemTranslations : null,
+    canEditSystem: isMaster
   }
 })

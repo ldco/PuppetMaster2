@@ -52,8 +52,7 @@ const defaultSettings: SiteSettings = {
     email: null
   },
   footer: {
-    ctaText: null,
-    ctaUrl: null,
+    ctaUrl: null, // Text is in translations: cta.footerButton
     privacyUrl: null,
     termsUrl: null
   },

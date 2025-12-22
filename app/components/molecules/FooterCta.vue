@@ -3,18 +3,20 @@
  * FooterCta Molecule
  *
  * Config-driven CTA button for footer.
- * Uses settings from database (footer.ctaText, footer.ctaUrl).
- * ONLY shows if BOTH text AND url are set in database - no fallbacks!
+ * - Text: from translations (cta.footerButton) - supports i18n
+ * - URL: from settings (footer.ctaUrl) - language-independent
+ * ONLY shows if URL is set in database.
  */
 
+const { t } = useI18n()
 const { settings } = useSiteSettings()
 
-// CTA from settings - NO FALLBACKS
-const ctaText = computed(() => settings.value?.footer?.ctaText)
+// URL from settings, text from translations
 const ctaUrl = computed(() => settings.value?.footer?.ctaUrl)
+const ctaText = computed(() => t('cta.footerButton'))
 
-// Only show if BOTH text AND url exist in database
-const hasValidCta = computed(() => !!(ctaText.value && ctaUrl.value))
+// Only show if URL exists in database
+const hasValidCta = computed(() => !!ctaUrl.value)
 </script>
 
 <template>
