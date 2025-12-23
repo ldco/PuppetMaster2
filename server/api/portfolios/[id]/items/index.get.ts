@@ -64,9 +64,10 @@ export default defineEventHandler(async event => {
   }
 
   // Filter by item type
-  const validTypes = ['image', 'video', 'link', 'case_study']
-  if (query.type && validTypes.includes(query.type as string)) {
-    conditions.push(eq(schema.portfolioItems.itemType, query.type as string))
+  const validTypes = ['image', 'video', 'link', 'case_study'] as const
+  type ItemType = (typeof validTypes)[number]
+  if (query.type && validTypes.includes(query.type as ItemType)) {
+    conditions.push(eq(schema.portfolioItems.itemType, query.type as ItemType))
   }
 
   // Parse pagination params

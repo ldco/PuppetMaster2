@@ -41,8 +41,9 @@ export default defineEventHandler(async event => {
   let minLevel = 0
   if (query.level) {
     const levelStr = String(query.level).toLowerCase()
-    if (levelStr in LEVEL_VALUES) {
-      minLevel = LEVEL_VALUES[levelStr]
+    const levelValue = LEVEL_VALUES[levelStr]
+    if (levelValue !== undefined) {
+      minLevel = levelValue
     } else {
       const numLevel = parseInt(levelStr, 10)
       if (!isNaN(numLevel)) {

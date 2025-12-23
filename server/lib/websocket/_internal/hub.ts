@@ -17,18 +17,18 @@
  *   wsHub.broadcastToRoom('support', { type: 'message', ... })
  */
 import type { Peer } from 'crossws'
-import type { WSConnection, WSUserContext } from './_types'
-import { ROOM_CONFIG, WS_LIMITS } from './_types'
-import { hasRole } from '../roles'
-import type { UserRole } from '../../database/schema'
+import type { WSConnection, WSUserContext } from './types'
+import { ROOM_CONFIG, WS_LIMITS } from './types'
+import { hasRole } from '../../../utils/roles'
+import type { UserRole } from '../../../database/schema'
 import {
   createWSMessage,
   WS_MESSAGE_TYPES,
   type WSMessage,
   type WSSubscribedPayload,
   type WSErrorPayload
-} from '../../../types/websocket'
-import { logger } from '../logger'
+} from '../../../../types/websocket'
+import { logger } from '../../../utils/logger'
 
 /**
  * In-memory WebSocket connection hub

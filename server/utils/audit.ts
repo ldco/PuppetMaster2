@@ -29,7 +29,8 @@ interface AuditOptions {
 function getClientIp(event: H3Event): string | null {
   const forwarded = getHeader(event, 'x-forwarded-for')
   if (forwarded) {
-    return forwarded.split(',')[0].trim()
+    const firstIp = forwarded.split(',')[0]
+    return firstIp ? firstIp.trim() : null
   }
   const realIp = getHeader(event, 'x-real-ip')
   if (realIp) {
@@ -67,10 +68,10 @@ async function logAudit(
     })
   } catch (error: any) {
     // Don't throw on audit failures - log and continue
-    logger.error('Failed to log audit event', {
-      action,
-      error: error?.message || String(error)
-    })
+    logger.error(
+      { action, error: error?.message || String(error) },
+      'Failed to log audit event'
+    )
   }
 }
 

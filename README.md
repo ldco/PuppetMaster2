@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logos/circle_dark_en.svg" alt="Puppet Master" width="120" />
+  <img src="./public/logos/circle_dark_en.svg" alt="Puppet Master" width="120" />
 </p>
 
 <h1 align="center">Puppet Master</h1>

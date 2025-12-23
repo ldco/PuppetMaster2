@@ -90,9 +90,10 @@ export function transactionSync<T>(fn: (db: DrizzleDB) => T): T {
   try {
     return transaction()
   } catch (error: any) {
-    logger.error('Transaction failed', {
-      error: error?.message || String(error)
-    })
+    logger.error(
+      { error: error?.message || String(error) },
+      'Transaction failed'
+    )
     throw error
   }
 }

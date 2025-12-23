@@ -91,10 +91,11 @@ export function getRecentLogs(limit = 100, minLevel = 0): LogEntry[] {
  * Get buffer statistics
  */
 export function getBufferStats(): { size: number; maxSize: number; oldestEntry: string | null } {
+  const firstEntry = buffer[0]
   return {
     size: buffer.length,
     maxSize: MAX_BUFFER_SIZE,
-    oldestEntry: buffer.length > 0 ? buffer[0].time : null
+    oldestEntry: firstEntry ? firstEntry.time : null
   }
 }
 

@@ -13,6 +13,7 @@
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../../database/client'
+import type { NewPortfolioItem } from '../../../../database/schema'
 import { sanitizeHtml, escapeHtml } from '../../../../utils/sanitize'
 
 // Base schema for common fields
@@ -125,27 +126,35 @@ export default defineEventHandler(async event => {
   }
 
   // Build insert values based on item type
-  const insertValues: Record<string, unknown> = {
+  const baseValues = {
     portfolioId: id,
     itemType: data.itemType,
     order: data.order || 0,
     published: data.published ?? true
   }
 
+  let insertValues: NewPortfolioItem
+
   if (data.itemType === 'case_study') {
-    insertValues.slug = data.slug
-    insertValues.title = escapeHtml(data.title)
-    insertValues.description = data.description ? escapeHtml(data.description) : null
-    insertValues.content = data.content ? sanitizeHtml(data.content) : null
-    insertValues.tags = data.tags ? JSON.stringify(data.tags.map(t => escapeHtml(t))) : null
-    insertValues.category = data.category ? escapeHtml(data.category) : null
-    insertValues.mediaUrl = data.mediaUrl || null
-    insertValues.thumbnailUrl = data.thumbnailUrl || null
-    insertValues.publishedAt = data.published ? new Date() : null
+    insertValues = {
+      ...baseValues,
+      slug: data.slug,
+      title: escapeHtml(data.title),
+      description: data.description ? escapeHtml(data.description) : null,
+      content: data.content ? sanitizeHtml(data.content) : null,
+      tags: data.tags ? JSON.stringify(data.tags.map(t => escapeHtml(t))) : null,
+      category: data.category ? escapeHtml(data.category) : null,
+      mediaUrl: data.mediaUrl || null,
+      thumbnailUrl: data.thumbnailUrl || null,
+      publishedAt: data.published ? new Date() : null
+    }
   } else {
-    insertValues.mediaUrl = data.mediaUrl
-    insertValues.thumbnailUrl = data.thumbnailUrl || null
-    insertValues.caption = data.caption ? escapeHtml(data.caption) : null
+    insertValues = {
+      ...baseValues,
+      mediaUrl: data.mediaUrl,
+      thumbnailUrl: data.thumbnailUrl || null,
+      caption: data.caption ? escapeHtml(data.caption) : null
+    }
   }
 
   // Insert new item

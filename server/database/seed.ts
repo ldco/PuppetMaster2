@@ -14,7 +14,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { scryptSync, randomBytes } from 'crypto'
 import * as schema from './schema'
 import { mkdirSync, existsSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { getContentSeedData } from '../../i18n/content'
 import config from '../../app/puppet-master.config'
 
@@ -247,15 +247,39 @@ async function seed() {
   }
   console.log(`      ${contentAdded} new, ${contentTranslations.length - contentAdded} preserved`)
 
-  // Seed default portfolio items - ONLY if none exist
-  console.log('\n📁 Checking portfolio items...')
-  const existingPortfolio = db.select().from(schema.portfolioItems).all()
+  // Seed default portfolio and items - ONLY if none exist
+  console.log('\n📁 Checking portfolios and items...')
+  const existingPortfolios = db.select().from(schema.portfolios).all()
+  const existingPortfolioItems = db.select().from(schema.portfolioItems).all()
 
-  if (existingPortfolio.length === 0) {
+  // Create default portfolio if none exists
+  let defaultPortfolioId = existingPortfolios[0]?.id
+  if (!defaultPortfolioId) {
+    console.log('   Creating default portfolio...')
+    const result = db
+      .insert(schema.portfolios)
+      .values({
+        name: 'Main Portfolio',
+        slug: 'main',
+        type: 'case_study',
+        description: 'Default portfolio for case studies and projects',
+        published: true
+      })
+      .returning()
+      .get()
+    defaultPortfolioId = result.id
+    console.log('   ✓ Default portfolio created')
+  } else {
+    console.log(`   Portfolio exists (id: ${defaultPortfolioId}), skipping creation.`)
+  }
+
+  if (existingPortfolioItems.length === 0) {
     console.log('   Creating default portfolio items...')
 
     const portfolioItems = [
       {
+        portfolioId: defaultPortfolioId,
+        itemType: 'case_study' as const,
         slug: 'brand-identity-redesign',
         title: 'Brand Identity Redesign',
         description:
@@ -267,6 +291,8 @@ async function seed() {
         publishedAt: new Date()
       },
       {
+        portfolioId: defaultPortfolioId,
+        itemType: 'case_study' as const,
         slug: 'e-commerce-platform',
         title: 'E-Commerce Platform',
         description:
@@ -278,6 +304,8 @@ async function seed() {
         publishedAt: new Date()
       },
       {
+        portfolioId: defaultPortfolioId,
+        itemType: 'case_study' as const,
         slug: 'mobile-fitness-app',
         title: 'Mobile Fitness App',
         description:
@@ -289,6 +317,8 @@ async function seed() {
         publishedAt: new Date()
       },
       {
+        portfolioId: defaultPortfolioId,
+        itemType: 'case_study' as const,
         slug: 'corporate-website',
         title: 'Corporate Website',
         description:
@@ -306,7 +336,7 @@ async function seed() {
       console.log(`   ✓ ${item.title}`)
     }
   } else {
-    console.log(`   ${existingPortfolio.length} portfolio items exist, skipping.`)
+    console.log(`   ${existingPortfolioItems.length} portfolio items exist, skipping.`)
   }
 
   console.log('\n✅ Database sync complete! Existing values preserved.\n')

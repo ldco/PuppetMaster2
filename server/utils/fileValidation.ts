@@ -9,10 +9,19 @@
  */
 
 /**
+ * File signature type
+ */
+interface FileSignature {
+  signatures: Array<{ bytes: number[]; offset?: number }>
+  mime: string
+  multiCheck?: boolean
+}
+
+/**
  * Known file signatures (magic bytes)
  * Format: { signature: hex bytes, offset?: start position, mime: MIME type }
  */
-const FILE_SIGNATURES = {
+const FILE_SIGNATURES: Record<string, FileSignature> = {
   // Images
   jpeg: {
     signatures: [

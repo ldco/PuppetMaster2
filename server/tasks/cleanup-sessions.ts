@@ -31,10 +31,10 @@ export default defineTask({
 
       const duration = Date.now() - startTime
 
-      logger.info('Session cleanup completed', {
-        deleted: result.changes,
-        durationMs: duration
-      })
+      logger.info(
+        { deleted: result.changes, durationMs: duration },
+        'Session cleanup completed'
+      )
 
       return {
         result: 'success',
@@ -42,9 +42,10 @@ export default defineTask({
         durationMs: duration
       }
     } catch (error: any) {
-      logger.error('Session cleanup failed', {
-        error: error?.message || String(error)
-      })
+      logger.error(
+        { error: error?.message || String(error) },
+        'Session cleanup failed'
+      )
 
       return {
         result: 'error',

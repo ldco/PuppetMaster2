@@ -42,8 +42,6 @@ export default defineEventHandler(async event => {
         .where(eq(schema.portfolios.slug, idOrSlug))
         .get()
 
-  const portfolioId = portfolio?.id
-
   if (!portfolio) {
     throw createError({
       statusCode: 404,
@@ -61,10 +59,10 @@ export default defineEventHandler(async event => {
 
   // Get items if requested (default: true)
   const includeItems = query.includeItems !== 'false'
-  let items = []
+  let items: Array<Record<string, unknown>> = []
 
   if (includeItems) {
-    const itemConditions = [eq(schema.portfolioItems.portfolioId, portfolioId)]
+    const itemConditions = [eq(schema.portfolioItems.portfolioId, portfolio.id)]
 
     // Non-admin only sees published items
     if (!session?.userId) {
@@ -81,7 +79,7 @@ export default defineEventHandler(async event => {
     // Parse tags JSON for case study items
     items = items.map(item => ({
       ...item,
-      tags: item.tags ? JSON.parse(item.tags) : []
+      tags: item.tags ? JSON.parse(item.tags as string) : []
     }))
   }
 

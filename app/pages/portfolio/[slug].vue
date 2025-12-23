@@ -54,6 +54,7 @@ const lightboxIndex = ref(0)
 const galleryItems = computed(() =>
   portfolio.value?.items.filter(i => i.itemType === 'image' || i.itemType === 'video') || []
 )
+const currentLightboxItem = computed(() => galleryItems.value[lightboxIndex.value])
 
 function openLightbox(index: number) {
   lightboxIndex.value = index
@@ -218,15 +219,15 @@ function getItemIcon(type: string) {
         </button>
 
         <div class="lightbox-content">
-          <template v-if="galleryItems[lightboxIndex]">
+          <template v-if="currentLightboxItem">
             <img
-              v-if="galleryItems[lightboxIndex].itemType === 'image'"
-              :src="galleryItems[lightboxIndex].mediaUrl || ''"
-              :alt="galleryItems[lightboxIndex].caption || ''"
+              v-if="currentLightboxItem.itemType === 'image'"
+              :src="currentLightboxItem.mediaUrl || ''"
+              :alt="currentLightboxItem.caption || ''"
             />
             <video
-              v-else-if="galleryItems[lightboxIndex].itemType === 'video'"
-              :src="galleryItems[lightboxIndex].mediaUrl || ''"
+              v-else-if="currentLightboxItem.itemType === 'video'"
+              :src="currentLightboxItem.mediaUrl || ''"
               controls
               autoplay
             />
@@ -241,8 +242,8 @@ function getItemIcon(type: string) {
           &#8250;
         </button>
 
-        <div v-if="galleryItems[lightboxIndex]?.caption" class="lightbox-caption">
-          {{ galleryItems[lightboxIndex].caption }}
+        <div v-if="currentLightboxItem?.caption" class="lightbox-caption">
+          {{ currentLightboxItem.caption }}
         </div>
       </div>
     </Teleport>

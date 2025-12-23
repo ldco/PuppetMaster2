@@ -180,9 +180,11 @@ export function useCache(config: CacheConfig) {
   }
 
   // Cleanup on server shutdown (prevent memory leaks)
-  if (import.meta.hot) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hot = (import.meta as any).hot
+  if (hot) {
     // HMR cleanup (development)
-    import.meta.hot.dispose(() => {
+    hot.dispose(() => {
       stopCleanup()
     })
   }

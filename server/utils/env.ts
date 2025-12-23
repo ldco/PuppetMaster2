@@ -37,7 +37,7 @@ const envSchema = z.object({
 
   // Server
   HOST: z.string().default('0.0.0.0'),
-  PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default('3000'),
+  PORT: z.string().default('3000').transform(Number).pipe(z.number().min(1).max(65535)),
 
   // Database
   DATABASE_URL: z.string().min(1).default('/app/data/sqlite.db'),
@@ -90,12 +90,15 @@ export function validateEnv(): void {
   try {
     _env = envSchema.parse(process.env)
 
-    logger.info('Environment validated', {
-      nodeEnv: _env.NODE_ENV,
-      hasSmtp: !!_env.SMTP_HOST,
-      hasTelegram: !!_env.TELEGRAM_BOT_TOKEN,
-      hasExternalApi: !!_env.API_BASE_URL
-    })
+    logger.info(
+      {
+        nodeEnv: _env.NODE_ENV,
+        hasSmtp: !!_env.SMTP_HOST,
+        hasTelegram: !!_env.TELEGRAM_BOT_TOKEN,
+        hasExternalApi: !!_env.API_BASE_URL
+      },
+      'Environment validated'
+    )
 
     // Warn about missing optional but recommended variables
     if (_env.NODE_ENV === 'production') {
@@ -113,7 +116,7 @@ export function validateEnv(): void {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`)
-      logger.fatal('Environment validation failed', { issues })
+      logger.fatal({ issues }, 'Environment validation failed')
 
       // In production, exit immediately
       if (process.env.NODE_ENV === 'production') {

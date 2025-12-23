@@ -4,7 +4,7 @@
  * Types specific to server-side WebSocket handling.
  */
 import type { Peer } from 'crossws'
-import type { UserRole } from '../../database/schema'
+import type { UserRole } from '../../../database/schema'
 
 /**
  * Authenticated user context attached to WebSocket connection

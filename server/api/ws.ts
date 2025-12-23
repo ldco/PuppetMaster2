@@ -17,9 +17,7 @@
  *   - Some rooms require authentication (see ROOM_CONFIG)
  */
 import { defineWebSocketHandler } from 'h3'
-import { wsHub } from '../utils/websocket/hub'
-import { authenticateWebSocket } from '../utils/websocket/auth'
-import { WS_RATE_LIMIT } from '../utils/websocket/types'
+import { wsHub, authenticateWebSocket, WS_RATE_LIMIT } from '../lib/websocket'
 import {
   WS_MESSAGE_TYPES,
   createWSMessage,
@@ -41,7 +39,7 @@ export default defineWebSocketHandler({
   async open(peer) {
     try {
       // Authenticate from upgrade request
-      const request = peer.request
+      const request = peer.request as Request | undefined
       const user = request ? await authenticateWebSocket(request) : null
 
       // Add to hub

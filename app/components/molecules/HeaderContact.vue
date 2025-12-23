@@ -32,7 +32,10 @@ const { settings } = useSiteSettings()
 
 // Helper to get nested value from settings using dot notation key
 function getSettingValue(key: string): string | null {
-  const [group, field] = key.split('.')
+  const parts = key.split('.')
+  if (parts.length !== 2) return null
+  const [group, field] = parts
+  if (!group || !field) return null
   const groupData = settings.value?.[group as keyof typeof settings.value]
   if (!groupData || typeof groupData !== 'object') return null
   return (groupData as Record<string, string | null>)[field] || null
@@ -43,17 +46,19 @@ const contactItems = computed(() => {
   const items: Array<{ key: string; url: string; icon: Component; label: string }> = []
 
   // Get configured header contact items (max 2)
-  const configItems = config.headerContact?.items || ['contact.phone', 'social.telegram']
+  const defaultItems: string[] = ['contact.phone', 'social.telegram']
+  const configItems = config.headerContact?.items ?? defaultItems
 
-  for (const key of configItems.slice(0, 2)) {
+  for (const configKey of configItems.slice(0, 2)) {
+    const key: string = configKey
     const value = getSettingValue(key)
     if (!value) continue
 
     // Find setting definition for icon
     const settingDef = config.settings.find(s => s.key === key)
-    if (!settingDef?.icon) continue
+    if (!settingDef || !('icon' in settingDef) || !settingDef.icon) continue
 
-    const iconComponent = iconMap[settingDef.icon]
+    const iconComponent = iconMap[settingDef.icon as string]
     if (!iconComponent) continue
 
     // Build URL based on type
