@@ -7,6 +7,6 @@
  *   import { wsHub, authenticateWebSocket } from '../utils/websocket'
  */
 
-export { wsHub } from './hub'
-export { authenticateWebSocket, requireWSRole } from './auth'
-export * from './types'
+export { wsHub } from './_hub'
+export { authenticateWebSocket, requireWSRole } from './_auth'
+export * from './_types'

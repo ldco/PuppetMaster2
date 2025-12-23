@@ -15,7 +15,7 @@
  */
 import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
-import type { WSUserContext } from './types'
+import type { WSUserContext } from './_types'
 import { logger } from '../logger'
 
 /**
