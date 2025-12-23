@@ -90,6 +90,20 @@
   inset-inline-end: var(--space-2);
 }
 
+/* Preview grid - shows up to 4 item thumbnails in a 2x2 grid */
+.portfolio-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.portfolio-preview-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
  * MEDIA GRID - Gallery items grid
  * ═══════════════════════════════════════════════════════════════════════════

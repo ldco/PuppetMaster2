@@ -26,6 +26,11 @@ useHead({
 const { confirm } = useConfirm()
 const { toast } = useToast()
 
+interface PortfolioItem {
+  id: number
+  thumbnailUrl: string | null
+}
+
 interface Portfolio {
   id: number
   slug: string
@@ -36,16 +41,17 @@ interface Portfolio {
   coverThumbnailUrl: string | null
   published: boolean
   order: number
+  items?: PortfolioItem[]
 }
 
-// Fetch portfolios
+// Fetch portfolios with items for preview
 const headers = useRequestHeaders(['cookie'])
 const {
   data: portfolios,
   pending,
   refresh
 } = await useFetch<Portfolio[]>('/api/portfolios', {
-  query: { all: 'true' },
+  query: { all: 'true', includeItems: 'true' },
   headers
 })
 
@@ -222,11 +228,26 @@ function getTypeLabel(type: string) {
         class="portfolio-item card"
       >
         <div class="portfolio-item-image">
+          <!-- Show cover image if set -->
           <img
             v-if="portfolio.coverThumbnailUrl"
             :src="portfolio.coverThumbnailUrl"
             :alt="portfolio.name"
           />
+          <!-- Show item previews grid if no cover but has items -->
+          <div
+            v-else-if="portfolio.items?.length"
+            class="portfolio-preview-grid"
+          >
+            <img
+              v-for="item in portfolio.items.slice(0, 4)"
+              :key="item.id"
+              :src="item.thumbnailUrl || ''"
+              :alt="portfolio.name"
+              class="portfolio-preview-thumb"
+            />
+          </div>
+          <!-- Empty placeholder -->
           <div v-else class="portfolio-item-placeholder">
             <IconPhoto v-if="portfolio.type === 'gallery'" />
             <IconPresentation v-else />
