@@ -38,6 +38,9 @@ export function useDatabase(): DrizzleDB {
     // Enable WAL mode for better concurrency
     _sqlite.pragma('journal_mode = WAL')
 
+    // Set busy timeout to prevent "database is locked" errors (5 seconds)
+    _sqlite.pragma('busy_timeout = 5000')
+
     _db = drizzle(_sqlite, { schema })
   }
   return _db
@@ -89,9 +92,10 @@ export function transactionSync<T>(fn: (db: DrizzleDB) => T): T {
 
   try {
     return transaction()
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
     logger.error(
-      { error: error?.message || String(error) },
+      { error: message },
       'Transaction failed'
     )
     throw error

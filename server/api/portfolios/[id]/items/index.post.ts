@@ -15,6 +15,7 @@ import { eq, and } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../../database/client'
 import type { NewPortfolioItem } from '../../../../database/schema'
 import { sanitizeHtml, escapeHtml } from '../../../../utils/sanitize'
+import { logger } from '../../../../utils/logger'
 
 // Base schema for common fields
 const baseSchema = z.object({
@@ -169,12 +170,17 @@ export default defineEventHandler(async event => {
       }
     }
   } catch (dbError) {
-    console.error('Database insert error:', dbError)
-    console.error('Insert values:', JSON.stringify(insertValues, null, 2))
+    logger.error(
+      {
+        error: dbError instanceof Error ? dbError.message : String(dbError),
+        portfolioId: id,
+        itemType: insertValues.itemType
+      },
+      'Database insert error for portfolio item'
+    )
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to create portfolio item',
-      data: { error: dbError instanceof Error ? dbError.message : String(dbError) }
+      statusMessage: 'Failed to create portfolio item'
     })
   }
 })

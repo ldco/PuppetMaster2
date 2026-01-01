@@ -4,8 +4,13 @@
  * Tests for /api/auth/* endpoints using @nuxt/test-utils
  * These tests run against a real Nuxt server instance.
  */
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
+
+interface FetchError {
+  statusCode: number
+  data?: { message?: string }
+}
 
 describe('Auth API', async () => {
   await setup({
@@ -24,9 +29,10 @@ describe('Auth API', async () => {
           }
         })
         expect.fail('Should have thrown an error')
-      } catch (error: any) {
-        expect(error.statusCode).toBe(400)
-        expect(error.data?.message).toContain('Invalid')
+      } catch (error: unknown) {
+        const err = error as FetchError
+        expect(err.statusCode).toBe(400)
+        expect(err.data?.message).toContain('Invalid')
       }
     })
 
@@ -40,8 +46,9 @@ describe('Auth API', async () => {
           }
         })
         expect.fail('Should have thrown an error')
-      } catch (error: any) {
-        expect(error.statusCode).toBe(400)
+      } catch (error: unknown) {
+        const err = error as FetchError
+        expect(err.statusCode).toBe(400)
       }
     })
 
@@ -55,10 +62,11 @@ describe('Auth API', async () => {
           }
         })
         expect.fail('Should have thrown an error')
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Should NOT reveal that user doesn't exist
-        expect(error.statusCode).toBe(401)
-        expect(error.data?.message).toBe('Invalid email or password')
+        const err = error as FetchError
+        expect(err.statusCode).toBe(401)
+        expect(err.data?.message).toBe('Invalid email or password')
       }
     })
 
@@ -72,10 +80,11 @@ describe('Auth API', async () => {
           }
         })
         expect.fail('Should have thrown an error')
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Should NOT reveal that password is wrong specifically
-        expect(error.statusCode).toBe(401)
-        expect(error.data?.message).toBe('Invalid email or password')
+        const err = error as FetchError
+        expect(err.statusCode).toBe(401)
+        expect(err.data?.message).toBe('Invalid email or password')
       }
     })
 

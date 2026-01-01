@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { USER_ROLES, type UserRole } from '../../database/schema'
 import { hashPassword } from '../../utils/password'
-import { canManageUser, getAssignableRoles } from '../../utils/roles'
+import { getAssignableRoles } from '../../utils/roles'
 import { audit } from '../../utils/audit'
 
 const createUserSchema = z.object({

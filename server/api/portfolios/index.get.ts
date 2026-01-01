@@ -86,7 +86,7 @@ export default defineEventHandler(async event => {
     for (const item of allItems) {
       if (portfolioIds.includes(item.portfolioId)) {
         const existing = itemsByPortfolio.get(item.portfolioId) || []
-        // Parse tags JSON if present
+        // Parse tags JSON
         const parsedItem = {
           ...item,
           tags: item.tags ? JSON.parse(item.tags) : []

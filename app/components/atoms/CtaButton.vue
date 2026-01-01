@@ -3,6 +3,7 @@
  * CTA Button Atom
  *
  * Call-to-action button with multiple variants.
+ * Handles routes, anchors, and external links appropriately.
  */
 
 const props = defineProps<{
@@ -10,9 +11,9 @@ const props = defineProps<{
   variant?: 'primary' | 'secondary' | 'ghost' | 'outline'
   /** Button size */
   size?: 'sm' | 'md' | 'lg'
-  /** Link destination (makes it a NuxtLink) */
+  /** Link destination (route or anchor) */
   to?: string
-  /** External href (makes it an <a>) */
+  /** External href (makes it an <a> with target="_blank") */
   href?: string
   /** Disabled state */
   disabled?: boolean
@@ -32,6 +33,9 @@ const btnClasses = computed(() => [
   props.size ? `btn-${props.size}` : '',
   { 'btn-full': props.fullWidth }
 ])
+
+// Check if link is an anchor (starts with #)
+const isAnchor = computed(() => props.to?.startsWith('#'))
 </script>
 
 <template>
@@ -41,12 +45,17 @@ const btnClasses = computed(() => [
     .btn-sm, .btn-lg, .btn-full
   -->
 
-  <!-- Internal link: use NuxtLink -->
-  <NuxtLink v-if="to" :to="to" :class="btnClasses" @click="emit('click', $event)">
+  <!-- Anchor link: use plain <a> to avoid Vue Router warnings -->
+  <a v-if="to && isAnchor" :href="to" :class="btnClasses" @click="emit('click', $event)">
+    <slot />
+  </a>
+
+  <!-- Internal route: use NuxtLink -->
+  <NuxtLink v-else-if="to" :to="to" :class="btnClasses" @click="emit('click', $event)">
     <slot />
   </NuxtLink>
 
-  <!-- External link: use <a> -->
+  <!-- External link: use <a> with target="_blank" -->
   <a
     v-else-if="href"
     :href="href"

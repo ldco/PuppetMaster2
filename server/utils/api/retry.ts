@@ -36,18 +36,19 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
         }
 
         return result
-      } catch (error: any) {
-        lastError = error
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        const message = lastError.message
 
         // Don't retry if not retryable
         if (!isRetryable(error)) {
-          console.warn('[Retry] Non-retryable error:', error.message)
+          console.warn('[Retry] Non-retryable error:', message)
           throw error
         }
 
         // Don't retry on last attempt
         if (attempt === config.maxAttempts - 1) {
-          console.error(`[Retry] All ${config.maxAttempts} attempts failed for:`, error.message)
+          console.error(`[Retry] All ${config.maxAttempts} attempts failed for:`, message)
           break
         }
 
@@ -55,7 +56,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
         const delay = calculateDelay(attempt)
         console.warn(
           `[Retry] Attempt ${attempt + 1}/${config.maxAttempts} failed, retrying in ${delay}ms...`,
-          error.message
+          message
         )
         await sleep(delay)
       }
@@ -122,25 +123,29 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
   /**
    * Check if error is retryable
    */
-  function isRetryable(error: any): boolean {
+  function isRetryable(error: unknown): boolean {
+    if (!(error instanceof Error)) return false
+
     // Network errors are retryable
-    if (
-      error.name === 'FetchError' ||
-      error.name === 'AbortError' ||
-      error.code === 'ECONNREFUSED' ||
-      error.code === 'ETIMEDOUT'
-    ) {
+    if (error.name === 'FetchError' || error.name === 'AbortError') {
       return true
     }
 
-    // API errors with isRetryable flag
-    if (error.isRetryable !== undefined) {
-      return error.isRetryable
+    // Check for Node.js error codes
+    const nodeError = error as Error & { code?: string }
+    if (nodeError.code === 'ECONNREFUSED' || nodeError.code === 'ETIMEDOUT') {
+      return true
+    }
+
+    // API errors with isRetryable flag or status
+    const apiError = error as Error & { isRetryable?: boolean; status?: number }
+    if (apiError.isRetryable !== undefined) {
+      return apiError.isRetryable
     }
 
     // 5xx and 429 status codes are retryable
-    if (error.status) {
-      return error.status >= 500 || error.status === 429
+    if (apiError.status) {
+      return apiError.status >= 500 || apiError.status === 429
     }
 
     return false

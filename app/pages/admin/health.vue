@@ -13,6 +13,7 @@ import IconCheck from '~icons/tabler/check'
 import IconAlertTriangle from '~icons/tabler/alert-triangle'
 import IconX from '~icons/tabler/x'
 import IconCopy from '~icons/tabler/copy'
+import type { HealthCheck, HealthData, LogEntry, AuditLogEntry } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -27,48 +28,6 @@ useHead({
 
 const { toast } = useToast()
 const config = useRuntimeConfig()
-
-// Health data
-interface HealthCheck {
-  name: string
-  status: 'ok' | 'error' | 'warning'
-  latency?: number
-  message?: string
-  details?: Record<string, unknown>
-}
-
-interface HealthData {
-  status: 'ok' | 'degraded' | 'unhealthy'
-  timestamp: string
-  uptime: number
-  version: string
-  nodeVersion: string
-  environment: string
-  checks: HealthCheck[]
-  responseTime: number
-}
-
-interface LogEntry {
-  time: string
-  level: number
-  levelLabel: string
-  msg: string
-  context?: Record<string, unknown>
-}
-
-interface AuditLogEntry {
-  id: number
-  action: string
-  userId: number | null
-  targetUserId: number | null
-  actorName: string | null
-  actorEmail: string | null
-  ipAddress: string | null
-  userAgent: string | null
-  details: Record<string, unknown> | null
-  success: boolean
-  createdAt: string
-}
 
 // Auto-refresh toggle
 const autoRefresh = ref(true)

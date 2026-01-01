@@ -5,10 +5,12 @@
  * 1. Populates event.context.session and event.context.user for ALL /api/* routes (if logged in)
  * 2. ENFORCES auth for /api/admin/* routes (throws 401 if not logged in)
  * 3. ENFORCES role-based access for specific routes:
- *    - /api/admin/users/* requires admin+ role
+ *    - /api/admin/audit-logs, /api/admin/logs: MASTER only
+ *    - /api/admin/users, /api/admin/settings, /api/admin/translations: ADMIN+
+ *    - Other admin routes (contacts, stats, health): any authenticated user
  *
  * This allows endpoints to optionally check auth (event.context.session)
- * while admin routes are always protected.
+ * while admin routes are always protected with appropriate role levels.
  */
 import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../database/client'
@@ -86,13 +88,37 @@ export default defineEventHandler(async event => {
   event.context.user = user
 
   // Role-based route protection
-  // Users management requires admin+ role
-  if (path.startsWith('/api/admin/users')) {
-    if (!hasRole(user.role as UserRole, 'admin')) {
-      throw createError({
-        statusCode: 403,
-        message: 'Admin access required to manage users'
-      })
+  // All admin routes require at least editor role, but most require admin+
+  if (isAdminRoute) {
+    // Routes requiring MASTER role (security-sensitive)
+    const masterOnlyRoutes = ['/api/admin/audit-logs', '/api/admin/logs']
+
+    // Routes requiring ADMIN+ role
+    const adminRoutes = [
+      '/api/admin/users',
+      '/api/admin/settings',
+      '/api/admin/translations'
+    ]
+
+    // Check master-only routes
+    if (masterOnlyRoutes.some(route => path.startsWith(route))) {
+      if (!hasRole(user.role as UserRole, 'master')) {
+        throw createError({
+          statusCode: 403,
+          message: 'Master access required'
+        })
+      }
     }
+    // Check admin routes (users, settings, translations)
+    else if (adminRoutes.some(route => path.startsWith(route))) {
+      if (!hasRole(user.role as UserRole, 'admin')) {
+        throw createError({
+          statusCode: 403,
+          message: 'Admin access required'
+        })
+      }
+    }
+    // All other admin routes (contacts, stats, health) require at least editor
+    // (already enforced by isAdminRoute check above - user must be logged in)
   }
 })

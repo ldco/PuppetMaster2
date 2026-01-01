@@ -26,6 +26,7 @@ import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconLogout from '~icons/tabler/logout'
 import IconKey from '~icons/tabler/key'
+import IconCreditCard from '~icons/tabler/credit-card'
 
 // Icon mapping from config icon names to components
 const iconMap: Record<string, Component> = {
@@ -34,7 +35,8 @@ const iconMap: Record<string, Component> = {
   mail: IconMail,
   language: IconLanguage,
   users: IconUsers,
-  heartbeat: IconHeartbeat
+  heartbeat: IconHeartbeat,
+  'credit-card': IconCreditCard
 }
 
 const route = useRoute()

@@ -32,14 +32,22 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         // Google Fonts - Montserrat (matches logo design)
         // Only load weights we actually use: 400, 500, 600, 700, 900
+        // Preconnect for faster DNS/TLS handshake
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap'
-        }
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
+        // Font stylesheet is loaded via plugins/fonts.client.ts (CSP-compliant, non-render-blocking)
       ]
-    }
+    },
+    // Page transitions (SPA mode only - disabled in onepager mode)
+    // Transition name maps to CSS classes: page-{name}-enter-active, etc.
+    ...(config.features.pageTransitions && !config.features.onepager
+      ? {
+          pageTransition: {
+            name: `page-${config.features.pageTransitions}`,
+            mode: 'out-in'
+          }
+        }
+      : {})
   },
 
   // Modules
@@ -47,6 +55,8 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
     '@pinia/nuxt',
+    // Critical CSS inlining for faster FCP/LCP
+    '@nuxtjs/critters',
     // PWA module - conditionally loaded based on config.features.pwa
     ...(config.features.pwa ? ['@vite-pwa/nuxt'] : [])
   ],
@@ -167,6 +177,7 @@ export default defineNuxtConfig({
     // Compilation options
     compilation: {
       strictMessage: false
+      // Note: JIT mode is the default in vue-i18n@10+
     },
     // Vue I18n options
     vueI18n: './i18n/i18n.config.ts'
@@ -193,8 +204,51 @@ export default defineNuxtConfig({
         autoprefixer: {
           flexbox: 'no-2009' // Don't generate old flexbox syntax
         }
-      }
+      },
+      // PurgeCSS - remove unused CSS for smaller bundle size
+      // Only in production to speed up dev builds
+      ...(process.env.NODE_ENV === 'production'
+        ? {
+            '@fullhuman/postcss-purgecss': {
+              content: [
+                './app/**/*.vue',
+                './app/**/*.ts',
+                './components/**/*.vue',
+                './layouts/**/*.vue',
+                './pages/**/*.vue'
+              ],
+              // Preserve dynamic classes and CSS variables
+              safelist: {
+                standard: [
+                  /^dark/,
+                  /^light/,
+                  /^page-/,
+                  /^router-/,
+                  /^nuxt-/,
+                  /^v-/,
+                  /^hamburger/,
+                  /-enter/,
+                  /-leave/,
+                  /-active/,
+                  /data-/
+                ],
+                // Keep CSS custom properties
+                variables: [/^--/]
+              },
+              // Extract classes from Vue SFC
+              defaultExtractor: (content: string) => {
+                const contentWithoutStyleBlocks = content.replace(/<style[^]+?<\/style>/gi, '')
+                return contentWithoutStyleBlocks.match(/[\w-/:]+(?<!:)/g) || []
+              }
+            }
+          }
+        : {})
     }
+  },
+
+  // Experimental features
+  experimental: {
+    // Note: inlineStyles was removed in Nuxt 4 - CSS is optimized automatically
   },
 
   // Vite configuration
@@ -218,6 +272,26 @@ export default defineNuxtConfig({
     // Experimental features required for scheduled tasks
     experimental: {
       tasks: true
+    },
+    // Route rules for caching static assets
+    routeRules: {
+      // Static assets - long cache (1 year, immutable since they have hashed names)
+      '/_nuxt/**': {
+        headers: {
+          'Cache-Control': 'public, max-age=31536000, immutable'
+        }
+      },
+      // Favicons and static files
+      '/favicon.*': {
+        headers: {
+          'Cache-Control': 'public, max-age=86400'
+        }
+      },
+      '/apple-touch-icon.png': {
+        headers: {
+          'Cache-Control': 'public, max-age=86400'
+        }
+      }
     }
   },
 

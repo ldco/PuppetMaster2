@@ -12,6 +12,7 @@ import IconSearch from '~icons/tabler/search'
 import IconX from '~icons/tabler/x'
 import IconSettings from '~icons/tabler/settings'
 import IconFileText from '~icons/tabler/file-text'
+import type { Translation, TranslationsData } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -26,19 +27,6 @@ useHead({
 
 const { confirm } = useConfirm()
 const { toast } = useToast()
-
-interface Translation {
-  id: number
-  key: string
-  value: string
-}
-
-interface TranslationsData {
-  locales: string[]
-  content: Record<string, Translation[]>
-  system: Record<string, Translation[]> | null
-  canEditSystem: boolean
-}
 
 // Fetch translations - pass cookies for SSR auth
 const headers = useRequestHeaders(['cookie'])

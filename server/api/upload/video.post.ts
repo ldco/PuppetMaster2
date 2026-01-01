@@ -18,6 +18,8 @@ import ffmpegStatic from 'ffmpeg-static'
 import config from '../../../app/puppet-master.config'
 import { useFileStorage } from '../../utils/storage'
 import { validateVideoFile } from '../../utils/fileValidation'
+import { scanFileForViruses } from '../../utils/virusScanning'
+import { logger } from '../../utils/logger'
 
 // Set FFmpeg path
 if (ffmpegStatic) {
@@ -80,8 +82,17 @@ export default defineEventHandler(async event => {
     })
   }
 
-  // Use detected MIME type (from magic bytes) instead of client-provided
-  const detectedMime = validation.detectedMime!
+  // Note: detectedMime (validation.detectedMime) is available but not used
+  // since we always convert to the configured output format
+
+  // Scan for viruses
+  const scanResult = await scanFileForViruses(file.data, file.filename || 'video')
+  if (scanResult.isInfected) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `File rejected: ${scanResult.viruses?.join(', ') || 'Malware detected'}`
+    })
+  }
 
   // Ensure temp directory exists
   if (!existsSync(TEMP_DIR)) {
@@ -147,7 +158,7 @@ export default defineEventHandler(async event => {
       unlink(thumbPath).catch(() => {})
     ])
 
-    console.error('Video upload error:', error)
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Video upload error')
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to process video'

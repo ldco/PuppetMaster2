@@ -6,7 +6,7 @@ import type { CacheConfig, CacheEntry } from './types'
 
 export function useCache(config: CacheConfig) {
   // In-memory cache (Map for single-instance deployments)
-  const memoryCache = new Map<string, CacheEntry<any>>()
+  const memoryCache = new Map<string, CacheEntry<unknown>>()
 
   // Cleanup interval (remove expired entries every 5 minutes)
   const cleanupInterval = 5 * 60 * 1000

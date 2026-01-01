@@ -13,7 +13,7 @@
 
 export default defineI18nLocale(async locale => {
   try {
-    return await $fetch<Record<string, any>>(`/api/i18n/${locale}`)
+    return await $fetch<Record<string, unknown>>(`/api/i18n/${locale}`)
   } catch {
     console.warn(`[i18n] Failed to load translations for: ${locale}`)
     return {}

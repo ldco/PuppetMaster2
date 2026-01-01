@@ -18,18 +18,19 @@ export default defineEventHandler(async event => {
 
   // Convert to nested object format for i18n
   // e.g., { 'nav.home': 'Home' } -> { nav: { home: 'Home' } }
-  const result: Record<string, any> = {}
+  type NestedRecord = { [key: string]: string | NestedRecord }
+  const result: NestedRecord = {}
 
   for (const [key, value] of Object.entries(flatTranslations)) {
     const keys = key.split('.')
-    let current = result
+    let current: NestedRecord = result
 
     for (let i = 0; i < keys.length - 1; i++) {
       const k = keys[i]!
-      if (!current[k]) {
+      if (!current[k] || typeof current[k] === 'string') {
         current[k] = {}
       }
-      current = current[k]
+      current = current[k] as NestedRecord
     }
 
     const lastKey = keys[keys.length - 1]!

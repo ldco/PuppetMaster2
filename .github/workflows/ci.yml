@@ -135,65 +135,66 @@ jobs:
   # Automatically deploys on push to master
   # Uses Kamal for zero-downtime deployment
   #
-  # To enable:
-  # 1. Add secrets in GitHub repo settings
-  # 2. Uncomment the job below
-  #
-  # deploy:
-  #   name: Deploy
-  #   runs-on: ubuntu-latest
-  #   needs: [build, docker]
-  #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-  #   environment: production
-  #   concurrency:
-  #     group: production
-  #     cancel-in-progress: false
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup SSH
-  #       run: |
-  #         mkdir -p ~/.ssh
-  #         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
-  #         chmod 600 ~/.ssh/id_rsa
-  #         ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-  #
-  #     - name: Setup Ruby (for Kamal)
-  #       uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: '3.2'
-  #         bundler-cache: true
-  #
-  #     - name: Install Kamal
-  #       run: gem install kamal
-  #
-  #     - name: Deploy with Kamal
-  #       run: kamal deploy
-  #       env:
-  #         # Infrastructure
-  #         SERVER_IP: ${{ secrets.SERVER_IP }}
-  #         SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
-  #         ACME_EMAIL: ${{ secrets.ACME_EMAIL }}
-  #         # Registry
-  #         DOCKER_REGISTRY: ghcr.io
-  #         GITHUB_USERNAME: ${{ github.repository_owner }}
-  #         KAMAL_REGISTRY_USERNAME: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
-  #         KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-  #         # App secrets
-  #         DATABASE_URL: /app/data/sqlite.db
-  #         SMTP_HOST: ${{ secrets.SMTP_HOST }}
-  #         SMTP_PORT: ${{ secrets.SMTP_PORT }}
-  #         SMTP_USER: ${{ secrets.SMTP_USER }}
-  #         SMTP_PASS: ${{ secrets.SMTP_PASS }}
-  #         SMTP_FROM: ${{ secrets.SMTP_FROM }}
-  #         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  #         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-  #         UPTIME_KUMA_SUBDOMAIN: ${{ secrets.UPTIME_KUMA_SUBDOMAIN }}
-  #
-  #     - name: Verify deployment
-  #       run: |
-  #         echo "Waiting for deployment to stabilize..."
-  #         sleep 10
-  #         curl -sf https://${{ secrets.SITE_DOMAIN }}/api/health || exit 1
-  #         echo "Deployment successful!"
+  # Required secrets in GitHub repo settings:
+  # - DEPLOY_SSH_KEY, SERVER_IP, SITE_DOMAIN, ACME_EMAIL
+  # - KAMAL_REGISTRY_USERNAME, KAMAL_REGISTRY_PASSWORD
+  # - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM (optional)
+  # - TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID (optional)
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [build, docker]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    environment: production
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Setup Ruby (for Kamal)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install Kamal
+        run: gem install kamal
+
+      - name: Deploy with Kamal
+        run: kamal deploy
+        env:
+          # Infrastructure
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
+          ACME_EMAIL: ${{ secrets.ACME_EMAIL }}
+          # Registry
+          DOCKER_REGISTRY: ghcr.io
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+          KAMAL_REGISTRY_USERNAME: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+          # App secrets
+          DATABASE_URL: /app/data/sqlite.db
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          UPTIME_KUMA_SUBDOMAIN: ${{ secrets.UPTIME_KUMA_SUBDOMAIN }}
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          sleep 10
+          curl -sf https://${{ secrets.SITE_DOMAIN }}/api/health || exit 1
+          echo "Deployment successful!"

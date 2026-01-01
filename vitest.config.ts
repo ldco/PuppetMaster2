@@ -3,6 +3,10 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     environment: 'nuxt',
+    env: {
+      NODE_ENV: 'test',
+      NUXT_PUBLIC_DISABLE_RATE_LIMIT: 'true'
+    },
     environmentOptions: {
       nuxt: {
         domEnvironment: 'happy-dom'

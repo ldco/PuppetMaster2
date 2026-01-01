@@ -8,16 +8,7 @@
 import IconX from '~icons/tabler/x'
 import IconChevronLeft from '~icons/tabler/chevron-left'
 import IconChevronRight from '~icons/tabler/chevron-right'
-
-interface PortfolioItem {
-  id: number
-  slug: string
-  title: string
-  description: string | null
-  imageUrl: string | null
-  thumbnailUrl: string | null
-  category: string | null
-}
+import type { PortfolioItem } from '~/types'
 
 const props = defineProps<{
   items: PortfolioItem[]
@@ -102,9 +93,9 @@ watch(
           <Transition name="lightbox-slide" mode="out-in">
             <div :key="currentItem.id" class="lightbox-media">
               <img
-                v-if="currentItem.imageUrl"
-                :src="currentItem.imageUrl"
-                :alt="currentItem.title"
+                v-if="currentItem.mediaUrl"
+                :src="currentItem.mediaUrl"
+                :alt="currentItem.title || ''"
                 class="lightbox-image"
               />
             </div>

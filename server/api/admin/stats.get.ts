@@ -8,7 +8,7 @@
 import { useDatabase, schema } from '../../database/client'
 import { count, eq } from 'drizzle-orm'
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async _event => {
   const db = useDatabase()
 
   // Get portfolio count

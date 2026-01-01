@@ -88,14 +88,14 @@ export class APIClient {
   /**
    * POST request
    */
-  post<T>(path: string, body?: any, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
+  post<T>(path: string, body?: unknown, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
     return this.request<T>('POST', path, { ...options, body })
   }
 
   /**
    * PUT request
    */
-  put<T>(path: string, body?: any, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
+  put<T>(path: string, body?: unknown, options?: Omit<APIRequestOptions, 'body'>): Promise<T> {
     return this.request<T>('PUT', path, { ...options, body })
   }
 

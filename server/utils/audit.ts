@@ -19,7 +19,7 @@ import { logger } from './logger'
 interface AuditOptions {
   userId?: number | null // Actor performing the action
   targetUserId?: number | null // User affected by the action
-  details?: Record<string, any>
+  details?: Record<string, unknown>
   success?: boolean
 }
 
@@ -66,10 +66,11 @@ async function logAudit(
       details: options.details ? JSON.stringify(options.details) : null,
       success: options.success ?? true
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Don't throw on audit failures - log and continue
+    const message = error instanceof Error ? error.message : String(error)
     logger.error(
-      { action, error: error?.message || String(error) },
+      { action, error: message },
       'Failed to log audit event'
     )
   }
@@ -156,7 +157,7 @@ export const audit = {
     event: H3Event,
     actorId: number,
     targetUserId: number,
-    changes: Record<string, any>
+    changes: Record<string, unknown>
   ): Promise<void> {
     await logAudit(event, 'user_update', {
       userId: actorId,

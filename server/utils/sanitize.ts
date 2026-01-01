@@ -79,8 +79,8 @@ const ALLOWED_TAGS = [
   'small'
 ]
 
-// Attributes that are safe
-const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
+// Attributes that are safe (exported for use in advanced sanitization)
+export const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   '*': ['class', 'id', 'title'],
   a: ['href', 'target', 'rel'],
   img: ['src', 'alt', 'width', 'height', 'loading'],

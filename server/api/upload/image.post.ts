@@ -13,6 +13,8 @@
 import config from '../../../app/puppet-master.config'
 import { useFileStorage } from '../../utils/storage'
 import { validateImageFile } from '../../utils/fileValidation'
+import { scanFileForViruses } from '../../utils/virusScanning'
+import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async event => {
   // Check authentication
@@ -63,6 +65,15 @@ export default defineEventHandler(async event => {
   // Use detected MIME type (from magic bytes) instead of client-provided
   const mimeType = validation.detectedMime!
 
+  // Scan for viruses
+  const scanResult = await scanFileForViruses(file.data, file.filename || 'image')
+  if (scanResult.isInfected) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `File rejected: ${scanResult.viruses?.join(', ') || 'Malware detected'}`
+    })
+  }
+
   try {
     const storage = useFileStorage()
     const result = await storage.upload(file.data, {
@@ -76,7 +87,7 @@ export default defineEventHandler(async event => {
       ...result
     }
   } catch (error) {
-    console.error('Image upload error:', error)
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Image upload error')
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to process image'

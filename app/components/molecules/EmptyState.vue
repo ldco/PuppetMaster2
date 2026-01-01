@@ -71,11 +71,13 @@ function handleAction() {
 
 <template>
   <div class="empty-state" :class="[`empty-state--${variant}`]">
+    <!-- eslint-disable vue/no-v-html -- Safe: hardcoded internal SVGs only -->
     <div
       v-if="illustration !== 'custom'"
       class="empty-state__illustration"
       v-html="illustrationSvg"
     />
+    <!-- eslint-enable vue/no-v-html -->
     <slot v-else name="illustration" />
 
     <h3 class="empty-state__title">{{ title }}</h3>

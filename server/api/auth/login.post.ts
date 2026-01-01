@@ -26,17 +26,22 @@ import { loginSchema } from '../../utils/validation'
 
 export default defineEventHandler(async event => {
   // Rate limit check - 5 attempts per 15 minutes per IP
-  const clientIp = getClientIp(event)
+  // Skip if NUXT_PUBLIC_DISABLE_RATE_LIMIT is set (for testing)
+  const disableRateLimit = process.env.NUXT_PUBLIC_DISABLE_RATE_LIMIT === 'true'
 
-  if (!loginRateLimiter.checkRateLimit(clientIp)) {
-    throw createError({
-      statusCode: 429,
-      message: 'Too many login attempts. Please try again in 15 minutes.',
-      data: {
-        retryAfter: 15 * 60, // seconds
-        remaining: 0
-      }
-    })
+  if (!disableRateLimit) {
+    const clientIp = getClientIp(event)
+
+    if (!loginRateLimiter.checkRateLimit(clientIp)) {
+      throw createError({
+        statusCode: 429,
+        message: 'Too many login attempts. Please try again in 15 minutes.',
+        data: {
+          retryAfter: 15 * 60, // seconds
+          remaining: 0
+        }
+      })
+    }
   }
 
   const body = await readBody(event)
@@ -111,7 +116,13 @@ export default defineEventHandler(async event => {
   await resetFailedAttempts(user.id)
   await audit.login(event, user.id)
 
-  // Create session
+  // Delete any existing session (session fixation prevention)
+  const oldSessionId = getCookie(event, 'pm-session')
+  if (oldSessionId) {
+    db.delete(schema.sessions).where(eq(schema.sessions.id, oldSessionId)).run()
+  }
+
+  // Create new session
   const sessionId = generateSessionId()
   const expiresAt = new Date()
 

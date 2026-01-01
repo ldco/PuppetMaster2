@@ -339,6 +339,100 @@ async function seed() {
     console.log(`   ${existingPortfolioItems.length} portfolio items exist, skipping.`)
   }
 
+  // Seed default pricing tiers - ONLY if none exist
+  console.log('\n💰 Checking pricing tiers...')
+  const existingTiers = db.select().from(schema.pricingTiers).all()
+
+  if (existingTiers.length === 0) {
+    console.log('   Creating default pricing tiers...')
+
+    // Starter tier
+    const starterTier = db
+      .insert(schema.pricingTiers)
+      .values({
+        slug: 'starter',
+        name: 'Starter',
+        description: 'Perfect for small projects',
+        price: 0, // Free (in cents)
+        currency: 'USD',
+        period: 'month',
+        featured: false,
+        ctaText: 'Get Started',
+        ctaUrl: '/contact',
+        order: 0,
+        published: true
+      })
+      .returning()
+      .get()
+
+    db.insert(schema.pricingFeatures).values([
+      { tierId: starterTier.id, text: 'Up to 3 pages', included: true, order: 0 },
+      { tierId: starterTier.id, text: 'Basic blocks', included: true, order: 1 },
+      { tierId: starterTier.id, text: 'Community support', included: true, order: 2 },
+      { tierId: starterTier.id, text: 'Visual editor', included: false, order: 3 },
+      { tierId: starterTier.id, text: 'Custom modules', included: false, order: 4 }
+    ]).run()
+    console.log('   ✓ Starter tier created')
+
+    // Pro tier
+    const proTier = db
+      .insert(schema.pricingTiers)
+      .values({
+        slug: 'pro',
+        name: 'Pro',
+        description: 'For growing businesses',
+        price: 2900, // $29 in cents
+        currency: 'USD',
+        period: 'month',
+        featured: true,
+        ctaText: 'Start Free Trial',
+        ctaUrl: '/contact',
+        order: 1,
+        published: true
+      })
+      .returning()
+      .get()
+
+    db.insert(schema.pricingFeatures).values([
+      { tierId: proTier.id, text: 'Unlimited pages', included: true, order: 0 },
+      { tierId: proTier.id, text: 'All blocks', included: true, order: 1 },
+      { tierId: proTier.id, text: 'Priority support', included: true, order: 2 },
+      { tierId: proTier.id, text: 'Visual editor', included: true, order: 3 },
+      { tierId: proTier.id, text: 'Custom modules', included: false, order: 4 }
+    ]).run()
+    console.log('   ✓ Pro tier created (featured)')
+
+    // Enterprise tier
+    const enterpriseTier = db
+      .insert(schema.pricingTiers)
+      .values({
+        slug: 'enterprise',
+        name: 'Enterprise',
+        description: 'Custom solutions',
+        price: null, // Custom pricing
+        currency: 'USD',
+        period: 'month',
+        featured: false,
+        ctaText: 'Contact Sales',
+        ctaUrl: '/contact',
+        order: 2,
+        published: true
+      })
+      .returning()
+      .get()
+
+    db.insert(schema.pricingFeatures).values([
+      { tierId: enterpriseTier.id, text: 'Unlimited pages', included: true, order: 0 },
+      { tierId: enterpriseTier.id, text: 'All blocks', included: true, order: 1 },
+      { tierId: enterpriseTier.id, text: 'Dedicated support', included: true, order: 2 },
+      { tierId: enterpriseTier.id, text: 'Visual editor', included: true, order: 3 },
+      { tierId: enterpriseTier.id, text: 'Custom modules', included: true, order: 4 }
+    ]).run()
+    console.log('   ✓ Enterprise tier created')
+  } else {
+    console.log(`   ${existingTiers.length} pricing tiers exist, skipping.`)
+  }
+
   console.log('\n✅ Database sync complete! Existing values preserved.\n')
   sqlite.close()
 }

@@ -22,6 +22,7 @@ import IconMail from '~icons/tabler/mail'
 import IconLanguage from '~icons/tabler/language'
 import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
+import IconCreditCard from '~icons/tabler/credit-card'
 import IconDotsVertical from '~icons/tabler/dots-vertical'
 
 // Icon mapping from config icon names to components
@@ -31,7 +32,8 @@ const iconMap: Record<string, Component> = {
   mail: IconMail,
   language: IconLanguage,
   users: IconUsers,
-  heartbeat: IconHeartbeat
+  heartbeat: IconHeartbeat,
+  'credit-card': IconCreditCard
 }
 
 const { t } = useI18n()

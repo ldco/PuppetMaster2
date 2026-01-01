@@ -8,7 +8,7 @@
  */
 import { z } from 'zod'
 import { eq, and, inArray } from 'drizzle-orm'
-import { useDatabase, schema } from '../../../../database/client'
+import { useDatabase, schema, transactionSync } from '../../../../database/client'
 
 const reorderSchema = z.object({
   items: z.array(
@@ -94,14 +94,16 @@ export default defineEventHandler(async event => {
     })
   }
 
-  // Update orders in a transaction-like manner
+  // Update orders atomically in a transaction
   const now = new Date()
-  for (const item of items) {
-    db.update(schema.portfolioItems)
-      .set({ order: item.order, updatedAt: now })
-      .where(eq(schema.portfolioItems.id, item.id))
-      .run()
-  }
+  transactionSync(db => {
+    for (const item of items) {
+      db.update(schema.portfolioItems)
+        .set({ order: item.order, updatedAt: now })
+        .where(eq(schema.portfolioItems.id, item.id))
+        .run()
+    }
+  })
 
   return {
     success: true,

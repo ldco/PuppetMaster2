@@ -88,7 +88,7 @@ export const loginRateLimiter = createRateLimiter(5, 15 * 60 * 1000)
  * Get client IP from H3 event
  * Handles proxies (X-Forwarded-For, X-Real-IP)
  */
-export function getClientIp(event: any): string {
+export function getClientIp(event: { node?: { req?: { headers?: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } } } }): string {
   // Try X-Forwarded-For first (for proxies/load balancers)
   const forwardedFor = event.node?.req?.headers?.['x-forwarded-for']
   if (forwardedFor) {
@@ -103,7 +103,7 @@ export function getClientIp(event: any): string {
   // Try X-Real-IP (used by some proxies)
   const realIp = event.node?.req?.headers?.['x-real-ip']
   if (realIp) {
-    return typeof realIp === 'string' ? realIp : realIp[0]
+    return typeof realIp === 'string' ? realIp : (realIp[0] ?? 'unknown')
   }
 
   // Fall back to socket address

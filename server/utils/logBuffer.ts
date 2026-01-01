@@ -12,6 +12,8 @@
  * - ~50KB memory for 500 entries
  */
 
+import { Writable } from 'stream'
+
 export interface LogEntry {
   time: string
   level: number
@@ -33,8 +35,44 @@ const LEVEL_LABELS: Record<number, string> = {
 // Buffer configuration
 const MAX_BUFFER_SIZE = 500
 
+// PII and sensitive fields to exclude from logs
+const SENSITIVE_FIELDS = [
+  'password', 'passwd', 'secret', 'token', 'apiKey', 'api_key',
+  'authorization', 'auth', 'cookie', 'session', 'csrf',
+  'creditCard', 'credit_card', 'cardNumber', 'card_number', 'cvv', 'cvc',
+  'ssn', 'socialSecurity', 'social_security',
+  'email', 'phone', 'address', 'dob', 'dateOfBirth', 'date_of_birth',
+  'ip', 'ipAddress', 'ip_address', 'userAgent', 'user_agent',
+  'body', 'requestBody', 'request_body' // Request bodies may contain sensitive data
+]
+
 // The ring buffer
 const buffer: LogEntry[] = []
+
+/**
+ * Check if a field name is sensitive (case-insensitive)
+ */
+function isSensitiveField(fieldName: string): boolean {
+  const lowerField = fieldName.toLowerCase()
+  return SENSITIVE_FIELDS.some(sensitive => lowerField.includes(sensitive.toLowerCase()))
+}
+
+/**
+ * Recursively filter sensitive fields from an object
+ */
+function filterSensitiveData(obj: Record<string, unknown>): Record<string, unknown> {
+  const filtered: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (isSensitiveField(key)) {
+      filtered[key] = '[REDACTED]'
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      filtered[key] = filterSensitiveData(value as Record<string, unknown>)
+    } else {
+      filtered[key] = value
+    }
+  }
+  return filtered
+}
 
 /**
  * Add a log entry to the buffer
@@ -56,15 +94,18 @@ export function addLogEntry(entry: {
   delete context.version
   delete context.environment
 
+  // Filter out PII and sensitive data
+  const sanitizedContext = filterSensitiveData(context)
+
   // Only include context if it has fields
-  const hasContext = Object.keys(context).length > 0
+  const hasContext = Object.keys(sanitizedContext).length > 0
 
   const logEntry: LogEntry = {
     time: typeof time === 'number' ? new Date(time).toISOString() : String(time),
     level,
     levelLabel: LEVEL_LABELS[level] || 'unknown',
     msg: msg || '',
-    ...(hasContext && { context })
+    ...(hasContext && { context: sanitizedContext })
   }
 
   buffer.push(logEntry)
@@ -110,8 +151,6 @@ export function clearBuffer(): void {
  * Create a Pino destination stream that also writes to the buffer
  */
 export function createBufferDestination(): NodeJS.WritableStream {
-  const { Writable } = require('stream')
-
   return new Writable({
     write(chunk: Buffer, _encoding: string, callback: () => void) {
       try {

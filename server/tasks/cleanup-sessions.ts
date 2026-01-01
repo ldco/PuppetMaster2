@@ -41,15 +41,16 @@ export default defineTask({
         deleted: result.changes,
         durationMs: duration
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
       logger.error(
-        { error: error?.message || String(error) },
+        { error: message },
         'Session cleanup failed'
       )
 
       return {
         result: 'error',
-        error: error?.message || String(error)
+        error: message
       }
     }
   }

@@ -27,49 +27,9 @@ export default defineEventHandler(event => {
     headers.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   }
 
-  // Content Security Policy (CSP)
-  // Restricts sources for scripts, styles, images, etc.
-  const cspDirectives = [
-    // Default: only allow same-origin
-    "default-src 'self'",
-
-    // Scripts: self + inline (needed for Vue hydration) + eval (needed for Vue devtools in dev)
-    process.env.NODE_ENV === 'production'
-      ? "script-src 'self' 'unsafe-inline'"
-      : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-
-    // Styles: self + inline (needed for Vue scoped styles and dynamic styles) + Google Fonts
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-
-    // Images: self + data URIs + blob URIs (for upload previews) + HTTPS sources
-    "img-src 'self' data: blob: https:",
-
-    // Fonts: self + Google Fonts
-    "font-src 'self' https://fonts.gstatic.com",
-
-    // Connect (XHR, WebSocket, etc.): self only
-    "connect-src 'self'",
-
-    // Media (audio/video): self + HTTPS
-    "media-src 'self' https:",
-
-    // Object/embed: none (no Flash, Java, etc.)
-    "object-src 'none'",
-
-    // Frame ancestors: none (clickjacking protection, same as X-Frame-Options)
-    "frame-ancestors 'none'",
-
-    // Base URI: self only (prevents base tag hijacking)
-    "base-uri 'self'",
-
-    // Form action: self only
-    "form-action 'self'",
-
-    // Upgrade insecure requests in production
-    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : [])
-  ]
-
-  headers.setHeader('Content-Security-Policy', cspDirectives.join('; '))
+  // NOTE: Content Security Policy (CSP) is handled by server/plugins/csp-nonce.ts
+  // which injects nonces into inline scripts for improved security.
+  // The CSP header is set during render:response hook with the generated nonce.
 
   // Permissions Policy (formerly Feature-Policy)
   // Restricts access to browser features

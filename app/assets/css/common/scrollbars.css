@@ -23,8 +23,8 @@
 
   /* Colors - using semantic variables */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: color-mix(in oklch, var(--l-text) 20%, transparent);
-  --scrollbar-thumb-hover: color-mix(in oklch, var(--l-text) 40%, transparent);
+  --scrollbar-thumb: color-mix(in oklch, var(--t-primary) 20%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--t-primary) 40%, transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -101,7 +101,7 @@
 }
 
 .scrollbar-hover:hover {
-  --scrollbar-thumb: color-mix(in oklch, var(--l-text) 20%, transparent);
+  --scrollbar-thumb: color-mix(in oklch, var(--t-primary) 20%, transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -110,26 +110,26 @@
 
 /* Brand colored scrollbar */
 .scrollbar-brand {
-  --scrollbar-thumb: color-mix(in oklch, var(--d-brand) 60%, transparent);
-  --scrollbar-thumb-hover: var(--d-brand);
+  --scrollbar-thumb: color-mix(in oklch, var(--i-brand) 60%, transparent);
+  --scrollbar-thumb-hover: var(--i-brand);
 }
 
 /* Accent colored scrollbar */
 .scrollbar-accent {
-  --scrollbar-thumb: color-mix(in oklch, var(--d-accent) 60%, transparent);
-  --scrollbar-thumb-hover: var(--d-accent);
+  --scrollbar-thumb: color-mix(in oklch, var(--i-accent) 60%, transparent);
+  --scrollbar-thumb-hover: var(--i-accent);
 }
 
 /* Light scrollbar (for dark backgrounds) */
 .scrollbar-light {
-  --scrollbar-thumb: color-mix(in oklch, var(--d-white) 30%, transparent);
-  --scrollbar-thumb-hover: color-mix(in oklch, var(--d-white) 50%, transparent);
+  --scrollbar-thumb: color-mix(in oklch, var(--p-white) 30%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--p-white) 50%, transparent);
 }
 
 /* Dark scrollbar (for light backgrounds) */
 .scrollbar-dark {
-  --scrollbar-thumb: color-mix(in oklch, var(--d-black) 30%, transparent);
-  --scrollbar-thumb-hover: color-mix(in oklch, var(--d-black) 50%, transparent);
+  --scrollbar-thumb: color-mix(in oklch, var(--p-black) 30%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--p-black) 50%, transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════

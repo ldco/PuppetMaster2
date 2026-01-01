@@ -14,6 +14,7 @@ import IconPhoto from '~icons/tabler/photo'
 import IconVideo from '~icons/tabler/video'
 import IconLink from '~icons/tabler/link'
 import IconUpload from '~icons/tabler/upload'
+import type { PortfolioWithItems, PortfolioItem } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -30,35 +31,6 @@ const { confirm } = useConfirm()
 const { toast } = useToast()
 const route = useRoute()
 
-interface Portfolio {
-  id: number
-  slug: string
-  name: string
-  description: string | null
-  type: 'gallery' | 'case_study'
-  coverImageUrl: string | null
-  coverThumbnailUrl: string | null
-  published: boolean
-  items: PortfolioItem[]
-}
-
-interface PortfolioItem {
-  id: number
-  portfolioId: number
-  itemType: 'image' | 'video' | 'link' | 'case_study'
-  order: number
-  published: boolean
-  mediaUrl: string | null
-  thumbnailUrl: string | null
-  caption: string | null
-  slug: string | null
-  title: string | null
-  description: string | null
-  content: string | null
-  tags: string[]
-  category: string | null
-}
-
 // Use computed for reactive route params
 const portfolioId = computed(() => route.params.id as string)
 
@@ -68,7 +40,7 @@ const {
   data: portfolio,
   pending,
   refresh
-} = await useFetch<Portfolio>(() => `/api/portfolios/${portfolioId.value}`, {
+} = await useFetch<PortfolioWithItems>(() => `/api/portfolios/${portfolioId.value}`, {
   query: { includeItems: 'true' },
   headers,
   watch: [portfolioId]
@@ -149,16 +121,17 @@ function openEditItem(item: PortfolioItem) {
     caseStudyForm.description = item.description || ''
     caseStudyForm.content = item.content || ''
     caseStudyForm.category = item.category || ''
-    caseStudyForm.tags = item.tags?.join(', ') || ''
-    caseStudyForm.published = item.published
-    caseStudyForm.order = item.order
+    // tags is stored as JSON string in DB
+    caseStudyForm.tags = item.tags || ''
+    caseStudyForm.published = item.published ?? true
+    caseStudyForm.order = item.order ?? 0
     mediaPreview.value = item.thumbnailUrl || ''
   } else {
     galleryForm.itemType = item.itemType as 'image' | 'video' | 'link'
     galleryForm.mediaUrl = item.mediaUrl || ''
     galleryForm.caption = item.caption || ''
-    galleryForm.published = item.published
-    galleryForm.order = item.order
+    galleryForm.published = item.published ?? true
+    galleryForm.order = item.order ?? 0
     mediaPreview.value = item.thumbnailUrl || item.mediaUrl || ''
   }
 

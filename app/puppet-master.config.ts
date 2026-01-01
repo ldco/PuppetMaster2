@@ -3,6 +3,8 @@
  * Build-time configuration - changes require rebuild
  */
 
+import type { ModulesConfig } from './types/modules'
+
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * APPLICATION MODE - Primary configuration that affects entire app structure
@@ -47,10 +49,28 @@ const config = {
     // Website features (only apply when mode has website)
     multiLangs: true, // Multiple languages support
     doubleTheme: true, // Light/dark mode toggle
-    onepager: true, // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
+    onepager: false, // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
     interactiveHeader: true, // Header style changes on scroll
     hideHeaderOnScroll: false, // Hide header when scrolling down
     verticalNav: false, // true = icon sidebar, false = horizontal header
+
+    // Page transitions (SPA mode only - ignored in onepager mode)
+    // Animation options:
+    //   Basic: 'fade' | 'slide-left' | 'slide-up' | 'scale'
+    //   Fancy: 'zoom' | 'flip' | 'rotate' | 'blur' | 'bounce' | 'swipe'
+    //   Disabled: '' (empty string)
+    pageTransitions: 'zoom' as
+      | 'fade'
+      | 'slide-left'
+      | 'slide-up'
+      | 'scale'
+      | 'zoom'
+      | 'flip'
+      | 'rotate'
+      | 'blur'
+      | 'bounce'
+      | 'swipe'
+      | '',
 
     // Admin features (only apply when mode has admin)
     appVerticalNav: true, // App mode: true = vertical sidebar, false = horizontal nav
@@ -70,8 +90,136 @@ const config = {
     footerCta: true, // Show CTA button in footer
     footerLegalLinks: true, // Show legal links (Privacy, Terms)
     footerMadeWith: true, // Show "Made with Puppet Master" branding
-    backToTop: true // Show back-to-top button on scroll
+    backToTop: true, // Show back-to-top button on scroll
+
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MODULES - Pre-built, config-driven features
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Each module provides: database tables, API endpoints, admin UI, frontend pages.
+  // Enable modules per-project and customize their behavior via config.
+  //
+  // Available modules:
+  //   - portfolio: Project showcase with galleries and case studies
+  //   - pricing:   Pricing tiers with comparison table (config-driven)
+  //   - contact:   Contact form, map, and info display
+  //   - blog:      Blog posts with categories and tags (not implemented)
+  //   - team:      Team member profiles (not implemented)
+  //   - testimonials: Customer testimonials (not implemented)
+  //
+  // ═══════════════════════════════════════════════════════════════════════════
+  modules: {
+    portfolio: {
+      enabled: true,
+      config: {
+        layout: 'grid',
+        cardStyle: 'overlay',
+        showFilters: true,
+        showCaseStudies: true,
+        showGallery: true,
+        itemsPerPage: 12,
+        sortDefault: 'order',
+        showCategories: true,
+        showTechnologies: true
+      }
+    },
+    pricing: {
+      enabled: true,
+      config: {
+        tiers: [
+          {
+            id: 'starter',
+            name: 'Starter',
+            description: 'Perfect for small projects',
+            price: 0,
+            period: 'month',
+            currency: 'USD',
+            featured: false,
+            features: [
+              { text: 'Up to 3 pages', included: true },
+              { text: 'Basic blocks', included: true },
+              { text: 'Community support', included: true },
+              { text: 'Visual editor', included: false },
+              { text: 'Custom modules', included: false }
+            ],
+            cta: { text: 'Get Started', url: '/contact' }
+          },
+          {
+            id: 'pro',
+            name: 'Pro',
+            description: 'For growing businesses',
+            price: 29,
+            period: 'month',
+            currency: 'USD',
+            featured: true,
+            features: [
+              { text: 'Unlimited pages', included: true },
+              { text: 'All blocks', included: true },
+              { text: 'Priority support', included: true },
+              { text: 'Visual editor', included: true },
+              { text: 'Custom modules', included: false }
+            ],
+            cta: { text: 'Start Free Trial', url: '/contact' }
+          },
+          {
+            id: 'enterprise',
+            name: 'Enterprise',
+            description: 'Custom solutions',
+            price: null,
+            period: 'month',
+            currency: 'USD',
+            featured: false,
+            features: [
+              { text: 'Unlimited pages', included: true },
+              { text: 'All blocks', included: true },
+              { text: 'Dedicated support', included: true },
+              { text: 'Visual editor', included: true },
+              { text: 'Custom modules', included: true }
+            ],
+            cta: { text: 'Contact Sales', url: '/contact' }
+          }
+        ],
+        showComparison: true,
+        showToggle: true,
+        yearlyDiscount: 20,
+        currency: 'USD',
+        style: 'cards',
+        ctaStyle: 'button',
+        highlightFeatured: true,
+        showFAQ: false
+      }
+    },
+    contact: {
+      enabled: true,
+      config: {
+        showMap: false,
+        mapProvider: 'yandex',
+        showForm: true,
+        showInfo: true,
+        formFields: [
+          { name: 'name', type: 'text', label: 'Name', required: true },
+          { name: 'email', type: 'email', label: 'Email', required: true },
+          { name: 'message', type: 'textarea', label: 'Message', required: true }
+        ],
+        notifications: 'email',
+        showSocial: true
+      }
+    },
+    blog: {
+      enabled: false,
+      config: {}
+    },
+    team: {
+      enabled: false,
+      config: {}
+    },
+    testimonials: {
+      enabled: false,
+      config: {}
+    }
+  } as ModulesConfig,
 
   // ═══════════════════════════════════════════════════════════════════════════
   // HEADER CONTACT - Quick contact buttons in header (phone + messenger)
@@ -192,13 +340,68 @@ const config = {
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SECTIONS - Source of truth for website navigation and routing
+  // SECTIONS - Website navigation and routing (DRY Architecture)
   // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // This array controls:
+  //   1. Main navigation links (items with inNav: true)
+  //   2. Routes handled by [section].vue dynamic page
+  //   3. Onepager mode anchor targets (#about, #portfolio, etc.)
+  //
+  // ┌─────────────────────────────────────────────────────────────────────────┐
+  // │ HOW TO ADD A NEW SECTION (only 3 steps!)                               │
+  // ├─────────────────────────────────────────────────────────────────────────┤
+  // │ 1. Add entry here:  { id: 'history', inNav: true }                     │
+  // │ 2. Create component: app/components/sections/SectionHistory.vue        │
+  // │ 3. Add translations: nav.history, history.title, etc.                  │
+  // │                                                                         │
+  // │ That's it! SectionRenderer handles both onepager and SPA modes.        │
+  // │ Component naming: Section{PascalCase(id)} → SectionHistory             │
+  // └─────────────────────────────────────────────────────────────────────────┘
+  //
+  // ┌─────────────────────────────────────────────────────────────────────────┐
+  // │ SELF-CONTAINED SECTIONS                                                │
+  // ├─────────────────────────────────────────────────────────────────────────┤
+  // │ Each section component should be self-contained:                       │
+  // │   - Fetch its own title from i18n (or use title prop as override)      │
+  // │   - Fetch its own content from i18n or API                             │
+  // │   - Have sensible defaults for all content                             │
+  // │                                                                         │
+  // │ Example pattern:                                                        │
+  // │   const { t, te } = useI18n()                                          │
+  // │   const sectionTitle = computed(() =>                                  │
+  // │     te('history.title') ? t('history.title') : 'Our History'           │
+  // │   )                                                                    │
+  // └─────────────────────────────────────────────────────────────────────────┘
+  //
+  // ┌─────────────────────────────────────────────────────────────────────────┐
+  // │ CUSTOM PAGE (not a section)                                            │
+  // ├─────────────────────────────────────────────────────────────────────────┤
+  // │ Just create the file: app/pages/terms.vue → accessible at /terms       │
+  // │ No config changes needed. Link it from footer or elsewhere.            │
+  // │ Add to sections array only if you want it in navigation.               │
+  // └─────────────────────────────────────────────────────────────────────────┘
+  //
+  // ┌─────────────────────────────────────────────────────────────────────────┐
+  // │ ONEPAGER vs SPA MODE                                                   │
+  // ├─────────────────────────────────────────────────────────────────────────┤
+  // │ Onepager (features.onepager: true):                                    │
+  // │   - All sections rendered on index.vue via SectionRenderer             │
+  // │   - Nav links are anchors: #about, #portfolio                          │
+  // │   - Scrollspy highlights active section                                │
+  // │                                                                         │
+  // │ SPA mode (features.onepager: false):                                   │
+  // │   - Each section is a separate page: /about, /portfolio                │
+  // │   - Nav links are routes                                               │
+  // │   - [section].vue uses SectionRenderer for dynamic routing             │
+  // └─────────────────────────────────────────────────────────────────────────┘
+  //
   sections: [
     { id: 'home', inNav: true },
     { id: 'about', inNav: true },
     { id: 'portfolio', inNav: true },
     { id: 'services', inNav: true },
+    { id: 'pricing', inNav: true },
     { id: 'contact', inNav: true }
   ] as const,
 
@@ -220,6 +423,7 @@ const config = {
   adminSections: [
     { id: 'settings', icon: 'settings', label: 'settings', badge: false, roles: [] },
     { id: 'portfolios', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
+    { id: 'pricing', icon: 'credit-card', label: 'pricing', badge: false, roles: [] },
     { id: 'contacts', icon: 'mail', label: 'contacts', badge: true, roles: [] },
     { id: 'translations', icon: 'language', label: 'translations', badge: false, roles: [] },
     { id: 'users', icon: 'users', label: 'users', badge: false, roles: ['master', 'admin'] },

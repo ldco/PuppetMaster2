@@ -29,12 +29,22 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-export const contentTranslations: Record<string, Record<string, any>> = {
+export const contentTranslations: Record<string, Record<string, unknown>> = {
   en: {
     seo: {
       homeTitle: 'Puppet Master - Pure CSS Studio Toolkit',
       homeDescription:
-        'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
+        'A studio toolkit for creating stable, secure landing pages and portfolio sites.',
+      aboutTitle: 'About Us - Puppet Master',
+      aboutDescription: 'Learn more about our team and what drives us to create exceptional digital experiences.',
+      portfolioTitle: 'Our Work - Puppet Master',
+      portfolioDescription: 'Explore our portfolio of projects showcasing our expertise in web development and design.',
+      servicesTitle: 'Services - Puppet Master',
+      servicesDescription: 'Discover our range of services designed to help your business succeed online.',
+      pricingTitle: 'Pricing - Puppet Master',
+      pricingDescription: 'Choose the perfect plan for your needs. Flexible pricing for projects of all sizes.',
+      contactTitle: 'Contact Us - Puppet Master',
+      contactDescription: 'Get in touch with us for your next project. We would love to hear from you.'
     },
     hero: {
       title: 'Puppet Master',
@@ -55,6 +65,20 @@ export const contentTranslations: Record<string, Record<string, any>> = {
     },
     services: {
       title: 'Features'
+    },
+    pricing: {
+      title: 'Pricing',
+      monthly: 'Monthly',
+      yearly: 'Yearly',
+      savePercent: 'Save {percent}%',
+      mostPopular: 'Most Popular',
+      custom: 'Custom',
+      free: 'Free',
+      perMonth: '/mo',
+      perYear: '/yr',
+      oneTime: 'one-time',
+      getStarted: 'Get Started',
+      contactSales: 'Contact Sales'
     },
     contact: {
       title: 'Get in Touch',
@@ -78,7 +102,17 @@ export const contentTranslations: Record<string, Record<string, any>> = {
     seo: {
       homeTitle: 'Puppet Master - CSS инструментарий для студий',
       homeDescription:
-        'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов.'
+        'Инструментарий для создания стабильных и безопасных лендингов и портфолио сайтов.',
+      aboutTitle: 'О нас - Puppet Master',
+      aboutDescription: 'Узнайте больше о нашей команде и что движет нами в создании уникальных цифровых решений.',
+      portfolioTitle: 'Наши работы - Puppet Master',
+      portfolioDescription: 'Исследуйте наше портфолио проектов, демонстрирующих наш опыт в веб-разработке и дизайне.',
+      servicesTitle: 'Услуги - Puppet Master',
+      servicesDescription: 'Откройте для себя наш спектр услуг, созданных для успеха вашего бизнеса в интернете.',
+      pricingTitle: 'Цены - Puppet Master',
+      pricingDescription: 'Выберите подходящий тариф. Гибкое ценообразование для проектов любого масштаба.',
+      contactTitle: 'Контакты - Puppet Master',
+      contactDescription: 'Свяжитесь с нами для вашего следующего проекта. Мы будем рады услышать вас.'
     },
     hero: {
       title: 'Puppet Master',
@@ -99,6 +133,20 @@ export const contentTranslations: Record<string, Record<string, any>> = {
     },
     services: {
       title: 'Возможности'
+    },
+    pricing: {
+      title: 'Цены',
+      monthly: 'Ежемесячно',
+      yearly: 'Ежегодно',
+      savePercent: 'Скидка {percent}%',
+      mostPopular: 'Популярный',
+      custom: 'По запросу',
+      free: 'Бесплатно',
+      perMonth: '/мес',
+      perYear: '/год',
+      oneTime: 'разово',
+      getStarted: 'Начать',
+      contactSales: 'Связаться'
     },
     contact: {
       title: 'Связаться с нами',
@@ -121,7 +169,17 @@ export const contentTranslations: Record<string, Record<string, any>> = {
   he: {
     seo: {
       homeTitle: 'דף הבית',
-      homeDescription: 'ברוך הבא לאתרנו – פתרונות דיגיטליים מותאמים אישית'
+      homeDescription: 'ברוך הבא לאתרנו – פתרונות דיגיטליים מותאמים אישית',
+      aboutTitle: 'אודות - Puppet Master',
+      aboutDescription: 'למדו עוד על הצוות שלנו ומה מניע אותנו ליצור חוויות דיגיטליות יוצאות דופן.',
+      portfolioTitle: 'העבודות שלנו - Puppet Master',
+      portfolioDescription: 'חקרו את תיק העבודות שלנו המציג את המומחיות שלנו בפיתוח ועיצוב אתרים.',
+      servicesTitle: 'שירותים - Puppet Master',
+      servicesDescription: 'גלו את מגוון השירותים שלנו שנועדו לסייע לעסק שלכם להצליח באינטרנט.',
+      pricingTitle: 'מחירון - Puppet Master',
+      pricingDescription: 'בחרו את התוכנית המושלמת עבורכם. תמחור גמיש לפרויקטים בכל גודל.',
+      contactTitle: 'צור קשר - Puppet Master',
+      contactDescription: 'צרו איתנו קשר לפרויקט הבא שלכם. נשמח לשמוע מכם.'
     },
     hero: {
       title: 'ברוכים הבאים',
@@ -141,6 +199,20 @@ export const contentTranslations: Record<string, Record<string, any>> = {
     },
     services: {
       title: 'השירותים שלנו'
+    },
+    pricing: {
+      title: 'מחירון',
+      monthly: 'חודשי',
+      yearly: 'שנתי',
+      savePercent: 'חסכו {percent}%',
+      mostPopular: 'הכי פופולרי',
+      custom: 'בהתאמה אישית',
+      free: 'חינם',
+      perMonth: '/חודש',
+      perYear: '/שנה',
+      oneTime: 'תשלום חד פעמי',
+      getStarted: 'התחילו',
+      contactSales: 'צרו קשר'
     },
     contact: {
       title: 'צרו קשר',
@@ -165,7 +237,7 @@ export const contentTranslations: Record<string, Record<string, any>> = {
  * Flatten nested object to dot-notation keys
  */
 function flattenTranslations(
-  obj: Record<string, any>,
+  obj: Record<string, unknown>,
   prefix = ''
 ): Array<{ key: string; value: string }> {
   const result: Array<{ key: string; value: string }> = []
@@ -174,7 +246,7 @@ function flattenTranslations(
     const fullKey = prefix ? `${prefix}.${key}` : key
 
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      result.push(...flattenTranslations(value, fullKey))
+      result.push(...flattenTranslations(value as Record<string, unknown>, fullKey))
     } else {
       result.push({ key: fullKey, value: String(value) })
     }

@@ -14,3 +14,30 @@ export type { ConfirmOptions, ConfirmState } from './confirm'
 
 // Data types
 export type { SiteSettings } from './settings'
+
+// Content types
+export {
+  PORTFOLIO_TYPES,
+  PORTFOLIO_ITEM_TYPES
+} from './content'
+export type {
+  DateLike,
+  PortfolioType,
+  PortfolioItemType,
+  Portfolio,
+  PortfolioItem,
+  PortfolioWithItems,
+  ContactSubmission
+} from './content'
+
+// Admin types
+export type {
+  Translation,
+  TranslationsData,
+  HealthStatus,
+  CheckStatus,
+  HealthCheck,
+  HealthData,
+  LogEntry,
+  AuditLogEntry
+} from './admin'

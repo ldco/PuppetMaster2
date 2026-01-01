@@ -101,8 +101,9 @@ export function useAuth() {
       }
 
       return { success: true }
-    } catch (error: any) {
-      const message = error?.data?.message || error?.message || 'Login failed'
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string }; message?: string }
+      const message = err?.data?.message || err?.message || 'Login failed'
       return { success: false, error: message }
     } finally {
       isLoading.value = false

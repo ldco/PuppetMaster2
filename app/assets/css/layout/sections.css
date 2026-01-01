@@ -251,3 +251,22 @@
   width: calc(var(--icon-2xl) * 2);
   height: calc(var(--icon-2xl) * 2);
 }
+
+/* ==========================================================================
+   PORTFOLIO SECTION STYLES
+   ========================================================================== */
+
+/* Portfolio section title for multiple portfolios */
+.portfolio-section-title {
+  font-size: var(--text-xl);
+  margin-block-start: var(--space-8);
+  margin-block-end: var(--space-4);
+}
+
+.portfolio-section-title:first-of-type {
+  margin-block-start: 0;
+}
+
+.portfolio-items-grid {
+  margin-block-end: var(--space-6);
+}

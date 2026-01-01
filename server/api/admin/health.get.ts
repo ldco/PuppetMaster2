@@ -16,6 +16,7 @@ import { useDatabase, schema } from '../../database/client'
 import { requireMaster } from '../../utils/roles'
 import { getBufferStats } from '../../utils/logBuffer'
 import type { UserRole } from '../../database/schema'
+import { sql } from 'drizzle-orm'
 
 interface HealthCheck {
   name: string
@@ -39,11 +40,13 @@ export default defineEventHandler(async event => {
   try {
     const db = useDatabase()
 
-    // Check connection
-    const userCount = db.select().from(schema.users).all().length
+    // Check connection using COUNT(*) instead of loading all rows
+    const userCountResult = db.select({ count: sql<number>`count(*)` }).from(schema.users).get()
+    const userCount = userCountResult?.count ?? 0
 
-    // Get audit log count
-    const auditCount = db.select().from(schema.auditLogs).all().length
+    // Get audit log count using COUNT(*)
+    const auditCountResult = db.select({ count: sql<number>`count(*)` }).from(schema.auditLogs).get()
+    const auditCount = auditCountResult?.count ?? 0
 
     checks.push({
       name: 'database',

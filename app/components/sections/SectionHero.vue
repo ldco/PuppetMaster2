@@ -48,7 +48,7 @@ defineProps<{
   -->
   <section id="home" class="section section-hero section-hero--center">
     <div class="container">
-      <div class="hero-logo">
+      <div v-reveal="'scale'" class="hero-logo">
         <slot name="logo">
           <!-- Render BOTH logos, CSS shows correct one based on theme class -->
           <img
@@ -67,31 +67,26 @@ defineProps<{
           />
         </slot>
       </div>
-      <p class="hero-subtitle">
-        <slot name="subtitle">
-          {{
-            subtitle ??
-            'A studio toolkit for creating stable, secure landing pages and portfolio sites.'
-          }}
-        </slot>
+      <p v-if="subtitle" v-reveal="{ animation: 'fade-up', delay: 100 }" class="hero-subtitle">
+        <slot name="subtitle">{{ subtitle }}</slot>
       </p>
-      <div class="hero-actions">
+      <div v-if="primaryCta || secondaryCta" v-reveal="{ animation: 'fade-up', delay: 200 }" class="hero-actions">
         <slot name="actions">
           <AtomsCtaButton
-            v-if="primaryCta || primaryLink"
-            :to="primaryLink ?? '#about'"
+            v-if="primaryCta && primaryLink"
+            :to="primaryLink"
             variant="primary"
             size="lg"
           >
-            {{ primaryCta ?? 'Get Started' }}
+            {{ primaryCta }}
           </AtomsCtaButton>
           <AtomsCtaButton
-            v-if="secondaryCta || secondaryLink"
-            :to="secondaryLink ?? '#portfolio'"
+            v-if="secondaryCta && secondaryLink"
+            :to="secondaryLink"
             variant="outline"
             size="lg"
           >
-            {{ secondaryCta ?? 'View Work' }}
+            {{ secondaryCta }}
           </AtomsCtaButton>
         </slot>
       </div>

@@ -3,61 +3,46 @@
  * Services Section
  *
  * Feature cards showcasing services or benefits.
+ * Self-contained: fetches services from i18n if not provided.
  */
 
-interface Service {
+export interface Service {
   id: string
   icon: string
   title: string
   description: string
 }
 
-defineProps<{
-  /** Section title */
+const { t, te, tm } = useI18n()
+
+const props = defineProps<{
+  /** Section title (or use #title slot) */
   title?: string
-  /** Services list */
+  /** Services list (or use default slot for custom content) */
   services?: Service[]
 }>()
 
-// Placeholder services for demo
-const demoServices: Service[] = [
-  {
-    id: '1',
-    icon: '🎨',
-    title: 'Pure CSS System',
-    description: 'No Tailwind. Clean, semantic CSS with @layer, color-mix(), and light-dark().'
-  },
-  {
-    id: '2',
-    icon: '🌍',
-    title: 'i18n + RTL',
-    description: 'Multi-language support with automatic RTL layout for Hebrew, Arabic, etc.'
-  },
-  {
-    id: '3',
-    icon: '🌓',
-    title: 'Dark Mode',
-    description: 'Automatic dark/light mode with system preference detection.'
-  },
-  {
-    id: '4',
-    icon: '⚙️',
-    title: 'Feature Toggles',
-    description: 'Enable/disable features at build time for each project.'
-  },
-  {
-    id: '5',
-    icon: '💾',
-    title: 'SQLite + Drizzle',
-    description: 'Simple, file-based database with type-safe ORM.'
-  },
-  {
-    id: '6',
-    icon: '🚀',
-    title: 'Docker + Kamal',
-    description: 'Zero-downtime deployment to any VPS.'
-  }
-]
+// Self-contained: fetch title from i18n if not provided
+const sectionTitle = computed(() => {
+  if (te('services.title')) return t('services.title')
+  if (te('nav.services')) return t('nav.services')
+  return ''
+})
+
+// Self-contained: fetch services from i18n if not provided
+const i18nServices = computed(() => {
+  if (!te('services.items')) return []
+  const items = tm('services.items') as Array<{ icon: string; title: string; description: string }>
+  return items.map((item, index) => ({
+    id: `service-${index}`,
+    icon: item.icon || '✨',
+    title: item.title || '',
+    description: item.description || ''
+  }))
+})
+
+const servicesData = computed(() => props.services || i18nServices.value)
+const hasServices = computed(() => servicesData.value.length > 0)
 </script>
 
 <template>
@@ -69,15 +54,19 @@ const demoServices: Service[] = [
   -->
   <section id="services" class="section">
     <div class="container">
-      <h2 class="section-title section-title--center">
-        <slot name="title">{{ title ?? 'What We Offer' }}</slot>
+      <h2 v-if="title || sectionTitle || $slots.title" v-reveal class="section-title section-title--center">
+        <slot name="title">{{ title ?? sectionTitle }}</slot>
       </h2>
-      <div class="section-grid-auto">
-        <article v-for="service in services ?? demoServices" :key="service.id" class="service-card">
+      <!-- Use services prop if provided, otherwise use i18n services -->
+      <div v-if="hasServices" class="section-grid-auto" data-reveal-stagger>
+        <article v-for="service in servicesData" :key="service.id" v-reveal="'scale'" class="service-card">
           <div class="service-card-icon">{{ service.icon }}</div>
           <h3 class="service-card-title">{{ service.title }}</h3>
           <p class="service-card-description">{{ service.description }}</p>
         </article>
+      </div>
+      <div v-else class="section-grid-auto" data-reveal-stagger>
+        <slot />
       </div>
     </div>
   </section>

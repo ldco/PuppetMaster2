@@ -3,40 +3,26 @@
  * Portfolio Section
  *
  * Shows ALL portfolios with their items.
- * Each portfolio is displayed with its name and items grid.
+ * Self-contained: fetches title from i18n if not provided.
  */
+import type { PortfolioWithItems, PortfolioItem } from '~/types'
 
-interface PortfolioItem {
-  id: number
-  portfolioId: number
-  itemType: 'image' | 'video' | 'link' | 'case_study'
-  slug: string | null
-  title: string | null
-  description: string | null
-  mediaUrl: string | null
-  thumbnailUrl: string | null
-  caption: string | null
-  category: string | null
-  tags: string[]
-  published: boolean
-}
-
-interface Portfolio {
-  id: number
-  slug: string
-  name: string
-  description: string | null
-  type: 'gallery' | 'case_study'
-  items: PortfolioItem[]
-}
+const { t, te } = useI18n()
 
 const props = defineProps<{
   /** Section title */
   title?: string
 }>()
 
+// Self-contained: fetch title from i18n if not provided
+const sectionTitle = computed(() => {
+  if (te('portfolio.title')) return t('portfolio.title')
+  if (te('nav.portfolio')) return t('nav.portfolio')
+  return 'Our Work'
+})
+
 // Fetch ALL portfolios with their items
-const { data: portfoliosData } = await useFetch<Portfolio[]>('/api/portfolios', {
+const { data: portfoliosData } = await useFetch<PortfolioWithItems[]>('/api/portfolios', {
   key: 'portfolio-section-all',
   query: { includeItems: 'true' }
 })
@@ -71,25 +57,26 @@ function navigateLightbox(index: number) {
 <template>
   <section id="portfolio" class="section">
     <div class="container">
-      <h2 class="section-title section-title--center">
-        <slot name="title">{{ title ?? 'Our Work' }}</slot>
+      <h2 v-reveal class="section-title section-title--center">
+        <slot name="title">{{ title ?? sectionTitle }}</slot>
       </h2>
 
       <!-- Show message if no portfolios -->
-      <p v-if="!portfolios.length" class="text-center text-secondary">No portfolio items yet.</p>
+      <p v-if="!portfolios.length" v-reveal class="text-center text-secondary">No portfolio items yet.</p>
 
       <!-- Loop through each portfolio -->
       <template v-for="portfolio in portfolios" :key="portfolio.id">
         <!-- Portfolio header (only show if multiple portfolios) -->
-        <h3 v-if="portfolios.length > 1" class="portfolio-section-title">
+        <h3 v-if="portfolios.length > 1" v-reveal class="portfolio-section-title">
           {{ portfolio.name }}
         </h3>
 
         <!-- Portfolio items grid -->
-        <div v-if="portfolio.items?.length" class="section-grid-auto section-grid-auto--lg portfolio-items-grid">
+        <div v-if="portfolio.items?.length" class="section-grid-auto section-grid-auto--lg portfolio-items-grid" data-reveal-stagger="fast">
           <article
             v-for="item in portfolio.items"
             :key="item.id"
+            v-reveal="'scale'"
             class="portfolio-card portfolio-card--clickable"
             @click="openLightbox(item)"
           >
@@ -159,20 +146,4 @@ function navigateLightbox(index: number) {
     </div>
   </Teleport>
 </template>
-
-<style>
-/* Portfolio section title for multiple portfolios */
-.portfolio-section-title {
-  font-size: var(--text-xl);
-  margin-block-start: var(--space-8);
-  margin-block-end: var(--space-4);
-}
-
-.portfolio-section-title:first-of-type {
-  margin-block-start: 0;
-}
-
-.portfolio-items-grid {
-  margin-block-end: var(--space-6);
-}
-</style>
+<!-- Styles in app/assets/css/layout/sections.css -->

@@ -95,3 +95,13 @@ Desktop.ini
 # TYPESCRIPT
 # ══════════════════════════════════════════════════════════════
 *.tsbuildinfo
+
+# ══════════════════════════════════════════════════════════════
+# CLAUDE CODE
+# ══════════════════════════════════════════════════════════════
+.claude.json
+.claude/settings.local.json
+.claude-data/sessions/
+.claude-data/tasks/
+.rag/
+temp/

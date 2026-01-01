@@ -8,6 +8,7 @@
 import IconTrash from '~icons/tabler/trash'
 import IconMail from '~icons/tabler/mail'
 import IconMailOpened from '~icons/tabler/mail-opened'
+import type { ContactSubmission } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -25,17 +26,6 @@ const { toast } = useToast()
 
 // Shared unread count for nav badge
 const { decrementUnread, incrementUnread, fetchUnreadCount } = useUnreadCount()
-
-interface ContactSubmission {
-  id: number
-  name: string
-  email: string
-  phone: string | null
-  subject: string | null
-  message: string
-  read: boolean
-  createdAt: number
-}
 
 // Fetch contacts - pass cookies for SSR auth
 const headers = useRequestHeaders(['cookie'])
@@ -123,7 +113,8 @@ function selectMessage(item: ContactSubmission) {
   }
 }
 
-function formatDate(timestamp: number) {
+function formatDate(timestamp: string | number | Date | null | undefined) {
+  if (!timestamp) return ''
   return new Date(timestamp).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',

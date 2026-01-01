@@ -24,6 +24,9 @@
 @import './portfolio-grid.css';
 @import './health.css';
 
+/* Module styles */
+@import './pricing.css';
+
 /* Loading states */
 @import './loading-placeholders.css';
 

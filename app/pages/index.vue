@@ -1,13 +1,33 @@
 <!--
-  Home Page (One-Pager Mode)
+  Home Page
 
-  Renders all sections in sequence for scroll-based navigation.
-  Each section has an id matching the nav links from config.sections.
-  All text comes from i18n translations - editable via Admin Panel.
+  In onepager mode: Renders ALL sections for scroll-based navigation.
+  In SPA mode: Renders ONLY hero - other sections have their own routes.
+
+  Sections are rendered dynamically from config.sections.
+  Each section component fetches its own content from i18n.
 -->
 
 <script setup lang="ts">
+import config from '~/puppet-master.config'
+
 const { t } = useI18n()
+const localePath = useLocalePath()
+
+const isOnepager = config.features.onepager
+
+// Get link based on mode (anchor for onepager, route for SPA)
+const getSectionLink = (sectionId: string) => {
+  if (isOnepager) {
+    return `#${sectionId}`
+  }
+  return localePath(`/${sectionId}`)
+}
+
+// Get sections to render (excluding 'home' which is the hero)
+const sectionsToRender = computed(() =>
+  config.sections.filter(s => s.id !== 'home')
+)
 
 // Page meta with translations
 useHead({
@@ -18,29 +38,22 @@ useHead({
 
 <template>
   <div>
-    <!-- Hero Section -->
+    <!-- Hero Section (always shown, has special props) -->
     <SectionsSectionHero
       :subtitle="t('hero.subtitle')"
       :primary-cta="t('hero.primaryCta')"
-      primary-link="#services"
+      :primary-link="getSectionLink('services')"
       :secondary-cta="t('hero.secondaryCta')"
-      secondary-link="#portfolio"
+      :secondary-link="getSectionLink('portfolio')"
     />
 
-    <!-- About Section -->
-    <SectionsSectionAbout>
-      <template #title>{{ t('about.title') }}</template>
-      <p>{{ t('about.paragraph1') }}</p>
-      <p style="margin-top: var(--space-4)">{{ t('about.paragraph2') }}</p>
-    </SectionsSectionAbout>
-
-    <!-- Portfolio Section -->
-    <SectionsSectionPortfolio :title="t('portfolio.title')" portfolio-slug="portfolio" />
-
-    <!-- Services Section -->
-    <SectionsSectionServices :title="t('services.title')" />
-
-    <!-- Contact Section -->
-    <SectionsSectionContact :title="t('contact.title')" show-info />
+    <!-- Other sections rendered dynamically (only in onepager mode) -->
+    <template v-if="isOnepager">
+      <OrganismsSectionRenderer
+        v-for="section in sectionsToRender"
+        :key="section.id"
+        :section-id="section.id"
+      />
+    </template>
   </div>
 </template>

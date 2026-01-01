@@ -12,7 +12,7 @@
  * Installation:
  * npm install -D axe-core
  */
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 interface A11yViolation {
   id: string
@@ -46,7 +46,7 @@ export function useA11y(options?: { runOnMount?: boolean; element?: HTMLElement 
     let axe
     try {
       axe = await import('axe-core')
-    } catch (e) {
+    } catch {
       console.warn('[A11y] axe-core not installed. Run: npm install -D axe-core')
       return
     }

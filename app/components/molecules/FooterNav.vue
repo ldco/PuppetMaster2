@@ -10,6 +10,9 @@ import config from '~/puppet-master.config'
 const { t } = useI18n()
 const localePath = useLocalePath()
 
+// Check if onepager mode
+const isOnepager = config.features.onepager
+
 // Get sections that should appear in navigation
 const navSections = computed(() => config.sections.filter(section => section.inNav))
 
@@ -18,7 +21,7 @@ const navLinks = computed(() =>
   navSections.value.map(section => ({
     id: section.id,
     label: t(`nav.${section.id}`),
-    href: config.features.onepager
+    href: isOnepager
       ? `#${section.id}`
       : localePath(`/${section.id === 'home' ? '' : section.id}`)
   }))
@@ -28,8 +31,17 @@ const navLinks = computed(() =>
 <template>
   <!-- Horizontal inline navigation -->
   <nav v-if="navLinks.length > 0" class="footer-nav-inline">
-    <NuxtLink v-for="link in navLinks" :key="link.id" :to="link.href">
-      {{ link.label }}
-    </NuxtLink>
+    <!-- Anchor links: use plain <a> to avoid Vue Router warnings -->
+    <template v-if="isOnepager">
+      <a v-for="link in navLinks" :key="link.id" :href="link.href">
+        {{ link.label }}
+      </a>
+    </template>
+    <!-- Route links: use NuxtLink for client-side navigation -->
+    <template v-else>
+      <NuxtLink v-for="link in navLinks" :key="link.id" :to="link.href">
+        {{ link.label }}
+      </NuxtLink>
+    </template>
   </nav>
 </template>

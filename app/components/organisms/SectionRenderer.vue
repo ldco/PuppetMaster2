@@ -1,0 +1,54 @@
+<script setup lang="ts">
+/**
+ * Section Renderer
+ *
+ * Dynamically renders section components based on section ID.
+ * Uses lazy component imports for SSR compatibility.
+ *
+ * This enables DRY section management - just add to config.sections
+ * and create the component, no need to edit index.vue or [section].vue.
+ */
+
+const props = defineProps<{
+  /** Section ID from config (e.g., 'about', 'portfolio') */
+  sectionId: string
+}>()
+
+const { t, te } = useI18n()
+
+// Map section IDs to lazy-loaded components
+// Nuxt auto-imports these as LazySectionsSection{Name}
+const sectionComponents: Record<string, ReturnType<typeof defineAsyncComponent>> = {
+  about: defineAsyncComponent(() => import('~/components/sections/SectionAbout.vue')),
+  portfolio: defineAsyncComponent(() => import('~/components/sections/SectionPortfolio.vue')),
+  services: defineAsyncComponent(() => import('~/components/sections/SectionServices.vue')),
+  pricing: defineAsyncComponent(() => import('~/components/sections/SectionPricing.vue')),
+  contact: defineAsyncComponent(() => import('~/components/sections/SectionContact.vue'))
+}
+
+// Get title from i18n (fallback to nav label)
+const sectionTitle = computed(() => {
+  const titleKey = `${props.sectionId}.title`
+  const navKey = `nav.${props.sectionId}`
+  return te(titleKey) ? t(titleKey) : te(navKey) ? t(navKey) : ''
+})
+
+// Get the component for this section
+const SectionComponent = computed(() => sectionComponents[props.sectionId])
+const componentExists = computed(() => !!SectionComponent.value)
+</script>
+
+<template>
+  <component
+    v-if="componentExists"
+    :is="SectionComponent"
+    :title="sectionTitle"
+  />
+  <section v-else :id="sectionId" class="section">
+    <div class="container">
+      <p class="text-center text-secondary">
+        Section component not found: {{ sectionId }}
+      </p>
+    </div>
+  </section>
+</template>

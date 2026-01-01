@@ -26,6 +26,9 @@ import config from '~/puppet-master.config'
 const { t } = useI18n()
 const showBackToTop = config.features.backToTop
 
+// Activate scroll reveal animations (enabled in onepager mode)
+useReveal({ enabled: config.features.onepager })
+
 // Feature classes for CSS targeting
 const layoutClasses = computed(() => ({
   layout: true,

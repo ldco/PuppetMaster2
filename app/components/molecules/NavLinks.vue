@@ -19,6 +19,7 @@ defineProps<{
 }>()
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 
 const emit = defineEmits<{
   navigate: []
@@ -51,12 +52,12 @@ const navLinks = computed(() => {
       }))
   }
 
-  // For SPA: page routes
+  // For SPA: page routes (use localePath for i18n)
   return sections
     .filter((s: Section) => s.inNav)
     .map((s: Section) => ({
       id: s.id,
-      to: `/${s.id === 'home' ? '' : s.id}`,
+      to: localePath(`/${s.id === 'home' ? '' : s.id}`),
       label: t(`nav.${s.id}`),
       isAnchor: false
     }))

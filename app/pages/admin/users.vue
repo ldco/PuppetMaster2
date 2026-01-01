@@ -10,6 +10,7 @@ import IconPlus from '~icons/tabler/plus'
 import IconEdit from '~icons/tabler/edit'
 import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
+import type { User } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -29,14 +30,6 @@ const { user: currentUser, canManageUsers, getAssignableRoles, isMaster } = useA
 // Redirect if user can't manage users
 if (!canManageUsers.value) {
   navigateTo('/admin')
-}
-
-interface User {
-  id: number
-  email: string
-  name: string | null
-  role: 'master' | 'admin' | 'editor'
-  createdAt: Date
 }
 
 // Fetch users
@@ -147,7 +140,8 @@ async function deleteUser(user: User) {
   }
 }
 
-function formatDate(date: Date | string) {
+function formatDate(date: Date | string | number | null | undefined) {
+  if (!date) return ''
   return new Date(date).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',

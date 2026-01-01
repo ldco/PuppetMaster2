@@ -47,6 +47,12 @@ export function useConfig() {
     // Admin features
     appVerticalNav: config.features.appVerticalNav,
 
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MODULES - Pre-built features
+    // ═══════════════════════════════════════════════════════════════════════
+    modules: config.modules,
+
     // ═══════════════════════════════════════════════════════════════════════
     // DATA - Locales, colors, sections, logo
     // ═══════════════════════════════════════════════════════════════════════

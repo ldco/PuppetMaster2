@@ -36,12 +36,13 @@ export default defineEventHandler(async event => {
       status: 'ok',
       latency: Date.now() - dbStart
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     overallStatus = 'unhealthy'
+    const message = error instanceof Error ? error.message : 'Database connection failed'
     checks.push({
       name: 'database',
       status: 'error',
-      message: error.message || 'Database connection failed'
+      message
     })
   }
 

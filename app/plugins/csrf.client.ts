@@ -14,15 +14,15 @@ export default defineNuxtPlugin(() => {
   // Override global fetch to add CSRF token
   const originalFetch = globalThis.$fetch
 
-  globalThis.$fetch = ((input: any, options: any = {}) => {
-    const method = (options.method || 'GET').toUpperCase()
+  globalThis.$fetch = ((input: string | Request, options: Record<string, unknown> = {}) => {
+    const method = String(options.method || 'GET').toUpperCase()
 
     // Only add CSRF header for state-changing methods
     if (CSRF_METHODS.includes(method)) {
       const token = getToken()
       if (token) {
         options.headers = {
-          ...options.headers,
+          ...(options.headers as Record<string, string> || {}),
           [getHeaderName()]: token
         }
       }

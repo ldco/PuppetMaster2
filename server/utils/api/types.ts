@@ -68,7 +68,7 @@ export interface APIClientConfig {
  * API request options
  */
 export interface APIRequestOptions {
-  body?: any
+  body?: unknown
   query?: Record<string, string | number | boolean>
   headers?: Record<string, string>
   cache?: {

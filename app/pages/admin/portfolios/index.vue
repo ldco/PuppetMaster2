@@ -11,6 +11,7 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconPhoto from '~icons/tabler/photo'
 import IconPresentation from '~icons/tabler/presentation'
+import type { Portfolio, PortfolioWithItems } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -26,31 +27,13 @@ useHead({
 const { confirm } = useConfirm()
 const { toast } = useToast()
 
-interface PortfolioItem {
-  id: number
-  thumbnailUrl: string | null
-}
-
-interface Portfolio {
-  id: number
-  slug: string
-  name: string
-  description: string | null
-  type: 'gallery' | 'case_study'
-  coverImageUrl: string | null
-  coverThumbnailUrl: string | null
-  published: boolean
-  order: number
-  items?: PortfolioItem[]
-}
-
 // Fetch portfolios with items for preview
 const headers = useRequestHeaders(['cookie'])
 const {
   data: portfolios,
   pending,
   refresh
-} = await useFetch<Portfolio[]>('/api/portfolios', {
+} = await useFetch<PortfolioWithItems[]>('/api/portfolios', {
   query: { all: 'true', includeItems: 'true' },
   headers
 })
@@ -95,8 +78,8 @@ function openEdit(portfolio: Portfolio) {
   form.name = portfolio.name
   form.description = portfolio.description || ''
   form.type = portfolio.type
-  form.published = portfolio.published
-  form.order = portfolio.order
+  form.published = portfolio.published ?? false
+  form.order = portfolio.order ?? 0
   imagePreview.value = portfolio.coverThumbnailUrl || ''
   showModal.value = true
 }

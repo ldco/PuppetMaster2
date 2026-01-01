@@ -3,7 +3,6 @@ import {
   loginSchema,
   contactSchema,
   createUserSchema,
-  updateUserSchema,
   portfolioItemSchema,
   validateInput
 } from '../../../server/utils/validation'

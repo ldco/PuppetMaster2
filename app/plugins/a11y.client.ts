@@ -43,7 +43,7 @@ export default defineNuxtPlugin(() => {
         } else {
           console.log('%c[A11y] Page passes WCAG 2.1 AA checks', 'color: #188038')
         }
-      } catch (e) {
+      } catch {
         // axe-core not installed, silently skip
       }
     })

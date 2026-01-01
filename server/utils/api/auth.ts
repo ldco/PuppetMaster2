@@ -77,8 +77,9 @@ export function useAuthManager(config: AuthConfig) {
       tokenExpiresAt = new Date(Date.now() + data.expires_in * 1000)
 
       console.log(`[AuthManager] Token refreshed, expires at: ${tokenExpiresAt.toISOString()}`)
-    } catch (error: any) {
-      console.error('[AuthManager] Token refresh error:', error.message)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('[AuthManager] Token refresh error:', message)
       throw error
     }
   }

@@ -5,7 +5,7 @@
  * Uses @nuxt/test-utils with Playwright under the hood.
  */
 import { describe, it, expect } from 'vitest'
-import { setup, createPage, url } from '@nuxt/test-utils/e2e'
+import { setup, createPage } from '@nuxt/test-utils/e2e'
 
 describe('Auth Flow E2E', async () => {
   await setup({
