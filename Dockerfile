@@ -10,6 +10,8 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
+#test
+
 FROM node:20-alpine AS deps
 
 WORKDIR /app
