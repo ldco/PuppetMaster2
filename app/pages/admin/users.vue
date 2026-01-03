@@ -14,7 +14,8 @@ import type { User } from '~/types'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()
@@ -42,7 +43,6 @@ const users = computed(() => data.value?.users || [])
 // Modal state
 const showModal = ref(false)
 const editingUser = ref<User | null>(null)
-const formError = ref('')
 const saving = ref(false)
 
 // Form data
@@ -61,7 +61,6 @@ function openCreateModal() {
   form.password = ''
   form.name = ''
   form.role = 'editor'
-  formError.value = ''
   showModal.value = true
 }
 
@@ -71,7 +70,6 @@ function openEditModal(user: User) {
   form.password = ''
   form.name = user.name || ''
   form.role = user.role
-  formError.value = ''
   showModal.value = true
 }
 
@@ -81,7 +79,6 @@ function closeModal() {
 }
 
 async function saveUser() {
-  formError.value = ''
   saving.value = true
 
   try {
@@ -111,9 +108,10 @@ async function saveUser() {
       })
     }
     closeModal()
+    toast.success(t('common.saved'))
     await refresh()
   } catch (e: any) {
-    formError.value = e.data?.message || 'Failed to save user'
+    toast.error(e.data?.message || 'Failed to save user')
   } finally {
     saving.value = false
   }
@@ -230,15 +228,14 @@ const roleBadgeClass: Record<string, string> = {
     <Teleport to="body">
       <div v-if="showModal" class="modal-backdrop" @click.self="closeModal">
         <div class="modal">
-          <div class="modal-header">
-            <h2>{{ editingUser ? t('admin.editUser') : t('admin.addUser') }}</h2>
-            <button class="btn btn-icon btn-ghost" @click="closeModal">
+          <header class="modal-header">
+            <h2>{{ editingUser ? t('common.edit') : t('admin.addItem') }}</h2>
+            <button class="btn btn-ghost btn-sm" @click="closeModal">
               <IconX />
             </button>
-          </div>
-          <form class="modal-body" @submit.prevent="saveUser">
-            <div v-if="formError" class="form-error">{{ formError }}</div>
+          </header>
 
+          <form class="modal-body" @submit.prevent="saveUser">
             <div class="form-group">
               <label for="email" class="form-label">{{ t('admin.email') }} *</label>
               <input id="email" v-model="form.email" type="email" class="input" required />
@@ -272,16 +269,21 @@ const roleBadgeClass: Record<string, string> = {
                 </option>
               </select>
             </div>
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="closeModal">
-                {{ t('common.cancel') }}
-              </button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
-                {{ saving ? t('common.saving') : t('common.save') }}
-              </button>
-            </div>
           </form>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeModal">
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="saving"
+              @click="saveUser"
+            >
+              {{ saving ? t('common.saving') : t('common.save') }}
+            </button>
+          </footer>
         </div>
       </div>
     </Teleport>

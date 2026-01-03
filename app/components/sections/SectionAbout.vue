@@ -2,65 +2,81 @@
 /**
  * About Section
  *
- * About/intro content with image and text.
- * Self-contained: fetches content from i18n (about.title, about.paragraph1, etc.)
- * Uses Tabler icons via unplugin-icons.
+ * Clean about section with optional image.
+ *
+ * CSS: ui/content/about.css
+ * Classes: .about-section, .about-content, .about-visual, .about-text, .about-stats
  */
-import IconCamera from '~icons/tabler/camera'
 
 defineProps<{
   /** Section title (overrides i18n) */
   title?: string
   /** Image URL */
   image?: string
-  /** Image alt text */
-  imageAlt?: string
-  /** Reverse layout (image on right) */
-  reversed?: boolean
+  /** Show stats */
+  showStats?: boolean
 }>()
 
 const { t, te } = useI18n()
 
 // Get content from i18n
-const aboutTitle = computed(() => te('about.title') ? t('about.title') : '')
+const sectionTitle = computed(() => {
+  if (te('about.title')) return t('about.title')
+  if (te('nav.about')) return t('nav.about')
+  return ''
+})
+
 const paragraph1 = computed(() => te('about.paragraph1') ? t('about.paragraph1') : '')
 const paragraph2 = computed(() => te('about.paragraph2') ? t('about.paragraph2') : '')
-const hasI18nContent = computed(() => paragraph1.value || paragraph2.value)
+
+// Stats from i18n
+const stats = computed(() => {
+  const items = []
+  for (let i = 1; i <= 4; i++) {
+    const numKey = `about.stat${i}.number`
+    const labelKey = `about.stat${i}.label`
+    if (te(numKey) && te(labelKey)) {
+      items.push({
+        number: t(numKey),
+        label: t(labelKey)
+      })
+    }
+  }
+  return items
+})
 </script>
 
 <template>
-  <!--
-    Uses global classes from:
-    - layout/sections.css (.section, .section-grid-2col, .section-image, .image-placeholder)
-    - typography/base.css (.section-title, .text-lg, .text-secondary)
-  -->
-  <section id="about" class="section">
+  <section id="about" class="section about-section">
     <div class="container">
-      <div class="section-grid-2col" :class="{ 'section-grid-2col--reversed': reversed }">
-        <div>
-          <h2 v-if="title || aboutTitle || $slots.title" v-reveal class="section-title">
-            <slot name="title">{{ title || aboutTitle }}</slot>
-          </h2>
-          <div v-reveal="{ delay: 100 }" class="text-lg text-secondary">
-            <!-- Use slot if provided, otherwise use i18n content -->
-            <slot>
-              <template v-if="hasI18nContent">
-                <p>{{ paragraph1 }}</p>
-                <p v-if="paragraph2" style="margin-top: var(--space-4)">{{ paragraph2 }}</p>
-              </template>
-            </slot>
-          </div>
-        </div>
-        <div v-reveal="{ animation: reversed ? 'fade-right' : 'fade-left', delay: 200 }" class="section-image">
-          <slot name="image">
-            <div class="image-placeholder">
-              <IconCamera />
+      <h2 v-if="title || sectionTitle" v-reveal class="section-title section-title--center">
+        {{ title || sectionTitle }}
+      </h2>
+
+      <div class="section-body">
+        <div class="about-grid" :class="{ 'about-grid--no-image': !image }">
+          <!-- Content side -->
+          <div class="about-content" :class="{ 'about-content--centered': !image }" v-reveal>
+            <p v-if="paragraph1" class="about-content__lead">{{ paragraph1 }}</p>
+            <p v-if="paragraph2" class="about-content__body">{{ paragraph2 }}</p>
+
+            <!-- Stats row -->
+            <div v-if="showStats && stats.length" class="about-stats">
+              <div v-for="stat in stats" :key="stat.label" class="about-stat">
+                <div class="about-stat__number">{{ stat.number }}</div>
+                <div class="about-stat__label">{{ stat.label }}</div>
+              </div>
             </div>
-          </slot>
+          </div>
+
+          <!-- Visual side - only show if image is provided -->
+          <div v-if="image" class="about-visual" v-reveal="{ animation: 'fade-up', delay: 150 }">
+            <div class="about-image">
+              <img :src="image" alt="" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 </template>
-
-<!-- No scoped styles needed - all styles come from global CSS -->

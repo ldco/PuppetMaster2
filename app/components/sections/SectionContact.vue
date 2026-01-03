@@ -105,7 +105,8 @@ async function handleSubmit() {
         <slot name="title">{{ title ?? sectionTitle }}</slot>
       </h2>
 
-      <div class="contact-grid">
+      <div class="section-body">
+        <div class="contact-grid">
         <form v-reveal="{ delay: 100 }" class="contact-form" @submit.prevent="handleSubmit">
           <div class="form-group">
             <label class="form-label" for="contact-name">{{ t('contact.nameLabel') }}</label>
@@ -177,6 +178,7 @@ async function handleSubmit() {
         <aside v-if="props.showInfo" v-reveal="{ animation: 'fade-left', delay: 200 }" class="contact-sidebar">
           <MoleculesContactInfo :show-map="showMap" />
         </aside>
+        </div>
       </div>
     </div>
   </section>

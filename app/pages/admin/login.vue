@@ -18,7 +18,8 @@ import IconEye from '~icons/tabler/eye'
 import IconEyeOff from '~icons/tabler/eye-off'
 
 definePageMeta({
-  layout: 'blank'
+  layout: 'blank',
+  pageTransition: false
 })
 
 const { t } = useI18n()

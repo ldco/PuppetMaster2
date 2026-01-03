@@ -3,6 +3,7 @@
  *
  * Creates a new item in a portfolio.
  * Requires admin authentication.
+ * Supports multiple locales for translatable fields.
  *
  * Supports different item types:
  * - image: Uploaded image (mediaUrl, thumbnailUrl, caption)
@@ -16,6 +17,14 @@ import { useDatabase, schema } from '../../../../database/client'
 import type { NewPortfolioItem } from '../../../../database/schema'
 import { sanitizeHtml, escapeHtml } from '../../../../utils/sanitize'
 import { logger } from '../../../../utils/logger'
+
+// Translation schema for case study items
+const itemTranslationSchema = z.object({
+  title: z.string().max(200).nullable().optional(),
+  description: z.string().max(1000).nullable().optional(),
+  content: z.string().nullable().optional(),
+  category: z.string().max(50).nullable().optional()
+})
 
 // Base schema for common fields
 const baseSchema = z.object({
@@ -46,7 +55,8 @@ const caseStudySchema = baseSchema.extend({
   tags: z.array(z.string()).optional(),
   category: z.string().max(50).optional().nullable(),
   mediaUrl: z.string().optional().nullable(), // Cover image
-  thumbnailUrl: z.string().optional().nullable()
+  thumbnailUrl: z.string().optional().nullable(),
+  translations: z.record(itemTranslationSchema).optional()
 })
 
 // Union schema
@@ -135,8 +145,10 @@ export default defineEventHandler(async event => {
   }
 
   let insertValues: NewPortfolioItem
+  let translations: Record<string, { title?: string | null; description?: string | null; content?: string | null; category?: string | null }> | undefined
 
   if (data.itemType === 'case_study') {
+    translations = data.translations
     insertValues = {
       ...baseValues,
       slug: data.slug,
@@ -160,13 +172,66 @@ export default defineEventHandler(async event => {
 
   // Insert new item
   try {
-    const newItem = db.insert(schema.portfolioItems).values(insertValues).returning().get()
+    const insertResult = db.insert(schema.portfolioItems).values(insertValues).run()
+    const itemId = Number(insertResult.lastInsertRowid)
+
+    // Store translations for case study items
+    if (data.itemType === 'case_study' && translations) {
+      const translationValues = []
+
+      for (const [locale, trans] of Object.entries(translations)) {
+        if (trans.title) {
+          translationValues.push({
+            locale,
+            key: `portfolio_item.${itemId}.title`,
+            value: escapeHtml(trans.title)
+          })
+        }
+
+        if (trans.description) {
+          translationValues.push({
+            locale,
+            key: `portfolio_item.${itemId}.description`,
+            value: escapeHtml(trans.description)
+          })
+        }
+
+        if (trans.content) {
+          translationValues.push({
+            locale,
+            key: `portfolio_item.${itemId}.content`,
+            value: sanitizeHtml(trans.content)
+          })
+        }
+
+        if (trans.category) {
+          translationValues.push({
+            locale,
+            key: `portfolio_item.${itemId}.category`,
+            value: escapeHtml(trans.category)
+          })
+        }
+      }
+
+      if (translationValues.length > 0) {
+        db.insert(schema.translations)
+          .values(translationValues)
+          .run()
+      }
+    }
+
+    // Fetch the created item
+    const newItem = db
+      .select()
+      .from(schema.portfolioItems)
+      .where(eq(schema.portfolioItems.id, itemId))
+      .get()
 
     return {
       success: true,
       item: {
         ...newItem,
-        tags: newItem.tags ? JSON.parse(newItem.tags) : []
+        tags: newItem?.tags ? JSON.parse(newItem.tags) : []
       }
     }
   } catch (dbError) {

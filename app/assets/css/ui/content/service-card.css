@@ -2,22 +2,19 @@
  * Service Card Component
  *
  * Feature/service cards with icon, title, description.
- * Bordered cards with hover effects.
  */
 
 .service-card {
-  background: var(--l-bg);
+  background: var(--l-bg-elevated);
   padding: var(--space-6);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--l-border);
-  transition:
-    border-color var(--transition-slow) ease,
-    box-shadow var(--transition-slow) ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .service-card:hover {
-  border-color: var(--i-brand);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px oklch(0 0 0 / 0.12);
 }
 
 .service-card:focus-visible {
@@ -37,6 +34,6 @@
 }
 
 .service-card-description {
-  color: var(--t-secondary);
-  line-height: 1.6;
+  color: var(--l-text-secondary);
+  line-height: var(--leading-relaxed);
 }

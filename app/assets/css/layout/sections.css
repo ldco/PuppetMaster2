@@ -1,72 +1,69 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * SECTION STYLES - FULLSCREEN SECTIONS FOR ONE-PAGER
+ * SECTION STYLES - PAGE SECTIONS
  * ═══════════════════════════════════════════════════════════════════════════
  *
- * Base styles for fullscreen sections used in one-page layouts.
+ * Base styles for page sections (SPA mode default, onepager optional).
  *
  * Quick Reference:
  * ───────────────────────────────────────────────────────────────────────────
- * CLASS             | PURPOSE
+ * CLASS               | PURPOSE
  * ───────────────────────────────────────────────────────────────────────────
- * .section          | Base fullscreen section (min-height: 100dvh, centered)
- * .section-hero     | Hero/first section (accounts for header height)
- * .section-auto     | Section with auto height (content-based)
+ * .section            | Base section (content flows from top)
+ * .section-hero       | Hero/first section (extra padding for header)
+ * .section-fullscreen | Fullscreen section for onepager (100dvh, centered)
  * ───────────────────────────────────────────────────────────────────────────
- *
- * ┌─────────────────────────────────────────────────────────────────────────┐
- * │ DX: VERTICAL ALIGNMENT                                                  │
- * ├─────────────────────────────────────────────────────────────────────────┤
- * │                                                                         │
- * │  All sections use flexbox for VERTICAL CENTERING by default.            │
- * │  Content is centered within the available viewport height.              │
- * │                                                                         │
- * │  To adjust alignment per-section:                                       │
- * │    .section-align-start { justify-content: flex-start; }                │
- * │    .section-align-end   { justify-content: flex-end; }                  │
- * │                                                                         │
- * └─────────────────────────────────────────────────────────────────────────┘
  *
  * NOTE: scroll-padding-top is set on html in reset.css to account for
  * sticky header when navigating to anchor links (#about, #contact, etc.)
  */
 
 /* ==========================================================================
-   BASE SECTION - Fullscreen & vertically centered
-   ==========================================================================
-
-   ┌─────────────────────────────────────────────────────────────────────────┐
-   │ DX: SECTION VERTICAL ALIGNMENT                                          │
-   ├─────────────────────────────────────────────────────────────────────────┤
-   │ Sections are 100dvh tall with content vertically centered.              │
-   │ NO extra padding for header - the scroll-padding on <html> handles      │
-   │ anchor navigation offset.                                               │
-   │                                                                         │
-   │ If content appears too high/low, adjust:                                │
-   │   --space-8 (padding)                                                   │
-   │   Or use .section-align-start / .section-align-end utilities            │
-   └─────────────────────────────────────────────────────────────────────────┘
-   */
+   BASE SECTION - Content flows from top
+   ========================================================================== */
 
 .section {
-  /* Full viewport height - header is fixed overlay */
+  /* Full viewport height to push footer down */
   min-height: 100dvh;
 
-  /* Flexbox for vertical centering */
+  /* Flexbox for layout */
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 
-  /* Symmetric padding */
-  padding-block: var(--space-8);
+  /* Padding with space for header at top */
+  padding-block-start: calc(var(--header-height, 72px) + var(--space-12));
+  padding-block-end: var(--space-16);
 
-  /* Scroll to screen top - section top aligns with screen top (behind header) */
+  /* Scroll to screen top */
   scroll-margin-top: 0;
 }
 
-/* The container inside section gets the content width constraint */
+/* Container fills available space */
 .section > .container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Title stays at top */
+.section > .container > .section-title {
+  flex-shrink: 0;
+}
+
+/* Content body fills remaining space and centers content */
+.section-body {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Ensure direct children take full width */
+.section-body > * {
   width: 100%;
 }
 
@@ -83,14 +80,10 @@
   padding-block-start: calc(var(--header-height, 72px) + var(--space-8));
 }
 
-/* ==========================================================================
-   AUTO HEIGHT SECTION - Content-based height
-   ========================================================================== */
-
-.section-auto {
-  min-height: auto;
-  justify-content: flex-start; /* Don't center, let content flow naturally */
-  padding-block: var(--space-16);
+/* Legacy alias - kept for backwards compatibility */
+.section-auto,
+.section-fullscreen {
+  /* Same as default .section now - content flows from top */
 }
 
 /* ==========================================================================
@@ -147,6 +140,11 @@
   align-items: center;
 }
 
+/* Hero container centers content vertically */
+.section-hero--center > .container {
+  justify-content: center;
+}
+
 /* Hero logo container */
 .hero-logo {
   display: flex;
@@ -184,6 +182,48 @@
 }
 
 /* ==========================================================================
+   HERO BACKGROUND - Simple subtle gradient
+   ========================================================================== */
+
+.section-hero {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 30% 70%, var(--c-brand-alpha) 0%, transparent 50%),
+    var(--l-bg);
+}
+
+/* ==========================================================================
+   HERO TYPOGRAPHY
+   ========================================================================== */
+
+.hero-title {
+  font-size: clamp(var(--text-3xl), 8vw, var(--text-6xl));
+  font-weight: var(--font-black);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+  color: var(--l-text);
+}
+
+.hero-subtitle {
+  font-size: clamp(var(--text-lg), 2.5vw, var(--text-xl));
+  color: var(--l-text-secondary);
+  max-width: 600px;
+  margin-inline: auto;
+  line-height: var(--leading-relaxed);
+}
+
+/* ==========================================================================
+   LEGACY: Decoration containers (keep for backwards compat, but empty)
+   ========================================================================== */
+
+.hero-decorations,
+.hero-blob,
+.hero-shape,
+.hero-dots {
+  display: none;
+}
+
+/* ==========================================================================
    SECTION GRIDS - Common layout patterns
    ========================================================================== */
 
@@ -209,13 +249,14 @@
 /* Auto-fit grid (for cards, portfolio items, services) */
 .section-grid-auto {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: var(--gap-lg);
+  justify-content: center;
 }
 
 /* Larger min-width for portfolio items */
 .section-grid-auto--lg {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
 }
 
 /* ==========================================================================

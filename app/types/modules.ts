@@ -12,7 +12,16 @@
 /**
  * Available module IDs
  */
-export type ModuleId = 'portfolio' | 'pricing' | 'contact' | 'blog' | 'team' | 'testimonials'
+export type ModuleId =
+  | 'portfolio'
+  | 'pricing'
+  | 'contact'
+  | 'blog'
+  | 'team'
+  | 'testimonials'
+  | 'features'
+  | 'clients'
+  | 'faq'
 
 /**
  * Module definition - describes what a module provides
@@ -188,7 +197,7 @@ export const contactModuleDefaults: ContactModuleConfig = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// BLOG MODULE CONFIG (Future)
+// BLOG MODULE CONFIG
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface BlogModuleConfig {
@@ -200,14 +209,16 @@ export interface BlogModuleConfig {
   showTags: boolean
   /** Show author info */
   showAuthor: boolean
-  /** Enable comments */
-  showComments: boolean
-  /** Comment system */
-  commentSystem: 'native' | 'disqus' | 'none'
   /** Show reading time */
   showReadingTime: boolean
-  /** Show table of contents */
-  showToc: boolean
+  /** Show view count */
+  showViewCount: boolean
+  /** Excerpt length in characters */
+  excerptLength: number
+  /** Display layout */
+  layout: 'grid' | 'list'
+  /** Number of latest posts to show in section preview */
+  latestPostsCount: number
 }
 
 export const blogModuleDefaults: BlogModuleConfig = {
@@ -215,66 +226,148 @@ export const blogModuleDefaults: BlogModuleConfig = {
   showCategories: true,
   showTags: true,
   showAuthor: true,
-  showComments: false,
-  commentSystem: 'none',
   showReadingTime: true,
-  showToc: true
+  showViewCount: false,
+  excerptLength: 160,
+  layout: 'grid',
+  latestPostsCount: 3
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TEAM MODULE CONFIG (Future)
+// TEAM MODULE CONFIG
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface TeamModuleConfig {
   /** Display layout */
-  layout: 'grid' | 'list' | 'cards'
+  layout: 'grid' | 'list' | 'carousel'
+  /** Card visual style */
+  cardStyle: 'minimal' | 'detailed' | 'photo-focus'
   /** Show social links */
   showSocial: boolean
   /** Show bio */
   showBio: boolean
+  /** Show email */
+  showEmail: boolean
+  /** Show phone */
+  showPhone: boolean
   /** Group by department */
   groupByDepartment: boolean
-  /** Show role/position */
-  showRole: boolean
-  /** Card style */
-  cardStyle: 'minimal' | 'detailed' | 'avatar-only'
+  /** Grid columns on desktop */
+  columnsDesktop: number
+  /** Grid columns on mobile */
+  columnsMobile: number
 }
 
 export const teamModuleDefaults: TeamModuleConfig = {
   layout: 'grid',
+  cardStyle: 'detailed',
   showSocial: true,
   showBio: true,
+  showEmail: false,
+  showPhone: false,
   groupByDepartment: false,
-  showRole: true,
-  cardStyle: 'detailed'
+  columnsDesktop: 4,
+  columnsMobile: 2
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TESTIMONIALS MODULE CONFIG (Future)
+// TESTIMONIALS MODULE CONFIG
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface TestimonialsModuleConfig {
   /** Display layout */
-  layout: 'carousel' | 'grid' | 'masonry' | 'list'
+  layout: 'carousel' | 'grid' | 'masonry'
   /** Show star rating */
   showRating: boolean
-  /** Show avatar */
-  showAvatar: boolean
+  /** Show avatar/photo */
+  showPhoto: boolean
   /** Show company/org */
   showCompany: boolean
   /** Auto-play carousel */
   autoPlay: boolean
-  /** Items per view (for carousel) */
-  itemsPerView: number
+  /** Auto-play interval in ms */
+  autoPlayInterval: number
 }
 
 export const testimonialsModuleDefaults: TestimonialsModuleConfig = {
   layout: 'carousel',
   showRating: true,
-  showAvatar: true,
+  showPhoto: true,
   showCompany: true,
-  autoPlay: true,
-  itemsPerView: 3
+  autoPlay: false,
+  autoPlayInterval: 5000
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FEATURES MODULE CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface FeaturesModuleConfig {
+  /** Display layout */
+  layout: 'grid' | 'list'
+  /** Card style */
+  cardStyle: 'icon-top' | 'icon-left'
+  /** Show category labels */
+  showCategory: boolean
+  /** Grid columns on desktop */
+  columnsDesktop: number
+  /** Grid columns on mobile */
+  columnsMobile: number
+}
+
+export const featuresModuleDefaults: FeaturesModuleConfig = {
+  layout: 'grid',
+  cardStyle: 'icon-top',
+  showCategory: false,
+  columnsDesktop: 3,
+  columnsMobile: 1
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLIENTS MODULE CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface ClientsModuleConfig {
+  /** Display layout */
+  layout: 'strip' | 'grid' | 'carousel'
+  /** Show client names */
+  showNames: boolean
+  /** Grayscale logos by default */
+  grayscale: boolean
+  /** Color on hover */
+  hoverColor: boolean
+  /** Filter by categories */
+  categories: Array<'client' | 'sponsor' | 'partner'>
+}
+
+export const clientsModuleDefaults: ClientsModuleConfig = {
+  layout: 'strip',
+  showNames: false,
+  grayscale: true,
+  hoverColor: true,
+  categories: ['client', 'sponsor', 'partner']
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FAQ MODULE CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface FaqModuleConfig {
+  /** Display layout */
+  layout: 'accordion' | 'list'
+  /** Show category grouping */
+  showCategories: boolean
+  /** Expand first item by default */
+  expandFirst: boolean
+  /** Allow multiple items open */
+  allowMultipleOpen: boolean
+}
+
+export const faqModuleDefaults: FaqModuleConfig = {
+  layout: 'accordion',
+  showCategories: false,
+  expandFirst: true,
+  allowMultipleOpen: false
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -290,10 +383,8 @@ export const MODULE_REGISTRY: Record<ModuleId, ModuleDefinition> = {
     name: 'Portfolio',
     description: 'Project showcase with galleries and case studies',
     version: '1.0.0',
-    tables: ['portfolios', 'portfolioImages', 'caseStudies'],
-    adminSections: [
-      { id: 'portfolios', icon: 'photo', label: 'portfolio', roles: [] }
-    ],
+    tables: ['portfolios', 'portfolio_items'],
+    adminSections: [{ id: 'portfolios', icon: 'photo', label: 'portfolio', roles: [] }],
     routes: ['/portfolio', '/portfolio/[slug]'],
     defaultConfig: portfolioModuleDefaults,
     implemented: true
@@ -304,8 +395,8 @@ export const MODULE_REGISTRY: Record<ModuleId, ModuleDefinition> = {
     name: 'Pricing',
     description: 'Pricing tiers with comparison table',
     version: '1.0.0',
-    tables: [], // Config-driven, no database tables
-    adminSections: [], // Managed via config
+    tables: ['pricing_tiers', 'pricing_features'],
+    adminSections: [{ id: 'pricing', icon: 'credit-card', label: 'pricing', roles: [] }],
     routes: ['/pricing'],
     defaultConfig: pricingModuleDefaults,
     implemented: true
@@ -316,10 +407,8 @@ export const MODULE_REGISTRY: Record<ModuleId, ModuleDefinition> = {
     name: 'Contact',
     description: 'Contact form, map, and info display',
     version: '1.0.0',
-    tables: ['contacts'],
-    adminSections: [
-      { id: 'contacts', icon: 'mail', label: 'contacts', roles: [] }
-    ],
+    tables: ['contact_submissions'],
+    adminSections: [{ id: 'contacts', icon: 'mail', label: 'contacts', roles: [] }],
     routes: ['/contact'],
     defaultConfig: contactModuleDefaults,
     implemented: true
@@ -328,43 +417,73 @@ export const MODULE_REGISTRY: Record<ModuleId, ModuleDefinition> = {
   blog: {
     id: 'blog',
     name: 'Blog',
-    description: 'Blog posts with categories and tags',
-    version: '0.1.0',
-    tables: ['posts', 'postCategories', 'postTags'],
-    adminSections: [
-      { id: 'blog', icon: 'article', label: 'blog', roles: [] }
-    ],
-    routes: ['/blog', '/blog/[slug]', '/blog/category/[category]'],
+    description: 'Blog posts with categories, tags, and media',
+    version: '1.0.0',
+    tables: ['blog_posts', 'blog_categories', 'blog_tags', 'blog_post_tags', 'blog_media'],
+    adminSections: [{ id: 'blog', icon: 'article', label: 'blog', roles: [] }],
+    routes: ['/blog', '/blog/[slug]'],
     defaultConfig: blogModuleDefaults,
-    implemented: false
+    implemented: true
   },
 
   team: {
     id: 'team',
     name: 'Team',
-    description: 'Team member profiles',
-    version: '0.1.0',
-    tables: ['teamMembers', 'departments'],
-    adminSections: [
-      { id: 'team', icon: 'users-group', label: 'team', roles: [] }
-    ],
-    routes: ['/team', '/team/[slug]'],
+    description: 'Team member profiles with photos and social links',
+    version: '1.0.0',
+    tables: ['team_members', 'team_member_translations'],
+    adminSections: [{ id: 'team', icon: 'users-group', label: 'team', roles: [] }],
+    routes: [],
     defaultConfig: teamModuleDefaults,
-    implemented: false
+    implemented: true
   },
 
   testimonials: {
     id: 'testimonials',
     name: 'Testimonials',
     description: 'Customer testimonials and reviews',
-    version: '0.1.0',
-    tables: ['testimonials'],
-    adminSections: [
-      { id: 'testimonials', icon: 'quote', label: 'testimonials', roles: [] }
-    ],
+    version: '1.0.0',
+    tables: ['testimonials', 'testimonial_translations'],
+    adminSections: [{ id: 'testimonials', icon: 'quote', label: 'testimonials', roles: [] }],
     routes: [],
     defaultConfig: testimonialsModuleDefaults,
-    implemented: false
+    implemented: true
+  },
+
+  features: {
+    id: 'features',
+    name: 'Features',
+    description: 'Feature cards with icons and descriptions',
+    version: '1.0.0',
+    tables: ['features', 'feature_translations'],
+    adminSections: [{ id: 'features', icon: 'sparkles', label: 'features', roles: [] }],
+    routes: [],
+    defaultConfig: featuresModuleDefaults,
+    implemented: true
+  },
+
+  clients: {
+    id: 'clients',
+    name: 'Clients',
+    description: 'Client, sponsor, and partner logos',
+    version: '1.0.0',
+    tables: ['clients'],
+    adminSections: [{ id: 'clients', icon: 'building', label: 'clients', roles: [] }],
+    routes: [],
+    defaultConfig: clientsModuleDefaults,
+    implemented: true
+  },
+
+  faq: {
+    id: 'faq',
+    name: 'FAQ',
+    description: 'Frequently asked questions with accordion',
+    version: '1.0.0',
+    tables: ['faq_items', 'faq_item_translations'],
+    adminSections: [{ id: 'faq', icon: 'help-circle', label: 'faq', roles: [] }],
+    routes: [],
+    defaultConfig: faqModuleDefaults,
+    implemented: true
   }
 }
 
@@ -382,6 +501,9 @@ export interface ModuleConfigMap {
   blog: BlogModuleConfig
   team: TeamModuleConfig
   testimonials: TestimonialsModuleConfig
+  features: FeaturesModuleConfig
+  clients: ClientsModuleConfig
+  faq: FaqModuleConfig
 }
 
 /**

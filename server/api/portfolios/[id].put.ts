@@ -3,6 +3,7 @@
  *
  * Updates a portfolio.
  * Requires admin authentication.
+ * Supports multiple locales for name/description.
  */
 import { z } from 'zod'
 import { eq, and, ne } from 'drizzle-orm'
@@ -23,7 +24,11 @@ const updateSchema = z.object({
   coverImageUrl: z.string().optional().nullable(),
   coverThumbnailUrl: z.string().optional().nullable(),
   order: z.number().int().optional(),
-  published: z.boolean().optional()
+  published: z.boolean().optional(),
+  translations: z.record(z.object({
+    name: z.string().max(200).nullable().optional(),
+    description: z.string().max(1000).nullable().optional()
+  })).optional()
 })
 
 export default defineEventHandler(async event => {
@@ -75,7 +80,7 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const data = result.data
+  const { translations, ...data } = result.data
 
   // Check if new slug conflicts with another portfolio
   if (data.slug && data.slug !== existing.slug) {
@@ -115,6 +120,50 @@ export default defineEventHandler(async event => {
     .where(eq(schema.portfolios.id, portfolioId))
     .returning()
     .get()
+
+  // Update translations in centralized table
+  if (translations) {
+    for (const [locale, trans] of Object.entries(translations)) {
+      const nameKey = `portfolio.${portfolioId}.name`
+      const descKey = `portfolio.${portfolioId}.description`
+
+      // Upsert name
+      const existingName = db
+        .select()
+        .from(schema.translations)
+        .where(and(eq(schema.translations.key, nameKey), eq(schema.translations.locale, locale)))
+        .get()
+
+      if (existingName) {
+        db.update(schema.translations)
+          .set({ value: trans.name ? escapeHtml(trans.name) : '', updatedAt: new Date() })
+          .where(eq(schema.translations.id, existingName.id))
+          .run()
+      } else if (trans.name) {
+        db.insert(schema.translations)
+          .values({ locale, key: nameKey, value: escapeHtml(trans.name) })
+          .run()
+      }
+
+      // Upsert description
+      const existingDesc = db
+        .select()
+        .from(schema.translations)
+        .where(and(eq(schema.translations.key, descKey), eq(schema.translations.locale, locale)))
+        .get()
+
+      if (existingDesc) {
+        db.update(schema.translations)
+          .set({ value: trans.description ? escapeHtml(trans.description) : '', updatedAt: new Date() })
+          .where(eq(schema.translations.id, existingDesc.id))
+          .run()
+      } else if (trans.description) {
+        db.insert(schema.translations)
+          .values({ locale, key: descKey, value: escapeHtml(trans.description) })
+          .run()
+      }
+    }
+  }
 
   return {
     success: true,

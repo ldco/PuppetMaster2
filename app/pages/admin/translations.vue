@@ -5,6 +5,13 @@
  * Manage all text content across languages.
  * - Content translations: editable by admin+
  * - System translations: editable by master only (separate section)
+ *
+ * CSS Dependencies (see CSS-COMPONENT-MAP.md):
+ * - ui/overlays/modal.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
+ * - ui/forms/inputs.css: .input, .form-group, .form-label
+ * - ui/forms/search.css: .search-input
+ * - ui/content/data-table.css: .data-table
+ * - ui/admin/pages.css: .section-toggle, .section-toggle-btn
  */
 import IconPlus from '~icons/tabler/plus'
 import IconTrash from '~icons/tabler/trash'
@@ -16,7 +23,8 @@ import type { Translation, TranslationsData } from '~/types'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()
@@ -39,6 +47,7 @@ const {
 })
 
 const locales = computed(() => data.value?.locales || ['en', 'ru', 'he'])
+const localeNames = computed(() => data.value?.localeNames || { en: 'English', ru: 'Русский', he: 'עברית' })
 const contentTranslations = computed(() => data.value?.content || {})
 const systemTranslations = computed(() => data.value?.system || {})
 const canEditSystem = computed(() => data.value?.canEditSystem || false)
@@ -78,45 +87,68 @@ const systemCount = computed(() => {
 // Add/Edit modal
 const showModal = ref(false)
 const editingId = ref<number | null>(null)
+const editingLocale = ref<string | null>(null)
 const form = reactive({
   key: '',
-  value: ''
+  values: {} as Record<string, string>  // All locale values
 })
 
 function openAdd() {
   editingId.value = null
+  editingLocale.value = null
   form.key = ''
-  form.value = ''
+  // Initialize empty values for all locales
+  form.values = {}
+  for (const loc of locales.value) {
+    form.values[loc] = ''
+  }
   showModal.value = true
 }
 
 function openEdit(item: Translation) {
   editingId.value = item.id
+  editingLocale.value = activeLocale.value
   form.key = item.key
-  form.value = item.value
+  // For editing, only show the current locale's value
+  form.values = { [activeLocale.value]: item.value }
   showModal.value = true
 }
 
 const saving = ref(false)
-const saveError = ref('')
 
 async function saveTranslation() {
   saving.value = true
-  saveError.value = ''
   try {
-    await $fetch('/api/admin/translations', {
-      method: 'POST',
-      body: {
-        locale: activeLocale.value,
-        key: form.key,
-        value: form.value
+    if (editingId.value && editingLocale.value) {
+      // Editing single locale
+      await $fetch('/api/admin/translations', {
+        method: 'POST',
+        body: {
+          locale: editingLocale.value,
+          key: form.key,
+          value: form.values[editingLocale.value]
+        }
+      })
+    } else {
+      // Adding new - save all locales that have values
+      for (const loc of locales.value) {
+        if (form.values[loc]?.trim()) {
+          await $fetch('/api/admin/translations', {
+            method: 'POST',
+            body: {
+              locale: loc,
+              key: form.key,
+              value: form.values[loc]
+            }
+          })
+        }
       }
-    })
+    }
     showModal.value = false
     await refresh()
     toast.success(t('common.success'))
   } catch (e: any) {
-    saveError.value = e.data?.message || 'Failed to save'
+    toast.error(e.data?.message || 'Failed to save')
   } finally {
     saving.value = false
   }
@@ -144,11 +176,6 @@ async function deleteTranslation(item: Translation) {
   }
 }
 
-const localeNames: Record<string, string> = {
-  en: 'English',
-  ru: 'Русский',
-  he: 'עברית'
-}
 </script>
 
 <template>
@@ -192,7 +219,7 @@ const localeNames: Record<string, string> = {
     </div>
 
     <!-- Locale tabs -->
-    <div class="tabs tabs--underline">
+    <div class="tabs tabs--underline mb-6">
       <button
         v-for="loc in locales"
         :key="loc"
@@ -267,20 +294,19 @@ const localeNames: Record<string, string> = {
     <Teleport to="body">
       <div v-if="showModal" class="modal-backdrop" @click.self="showModal = false">
         <div class="modal">
-          <div class="modal-header">
+          <header class="modal-header">
             <h2>
-              {{ editingId ? t('common.edit') : t('admin.addTranslation') }}
+              {{ editingId ? t('common.edit') : t('admin.addItem') }}
               <span v-if="!editingId && canEditSystem" class="modal-section-badge" :class="activeSection">
                 {{ activeSection === 'system' ? t('admin.translationsSystem') : t('admin.translationsContent') }}
               </span>
             </h2>
-            <button type="button" class="btn btn-icon btn-ghost" @click="showModal = false">
+            <button class="btn btn-ghost btn-sm" @click="showModal = false">
               <IconX />
             </button>
-          </div>
-          <form @submit.prevent="saveTranslation" class="modal-body">
-            <div v-if="saveError" class="form-error">{{ saveError }}</div>
+          </header>
 
+          <form class="modal-body" @submit.prevent="saveTranslation">
             <!-- Section info for new translations -->
             <div v-if="!editingId && activeSection === 'system'" class="form-info form-info--system">
               <strong>{{ t('admin.translationsAddingToSystem') }}</strong>
@@ -303,131 +329,42 @@ const localeNames: Record<string, string> = {
               <small class="form-hint">Use dot notation: section.key</small>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">{{ t('admin.translationValue') }}</label>
-              <textarea v-model="form.value" class="input" rows="3" required dir="auto"></textarea>
+            <!-- When editing: show single locale -->
+            <div v-if="editingId && editingLocale" class="form-group">
+              <label class="form-label">{{ localeNames[editingLocale] || editingLocale }}</label>
+              <textarea v-model="form.values[editingLocale]" class="input" rows="3" required dir="auto"></textarea>
             </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="showModal = false">
-                {{ t('common.cancel') }}
-              </button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
-                {{ saving ? t('common.saving') : t('common.save') }}
-              </button>
-            </div>
+            <!-- When adding: show ALL locales -->
+            <template v-else>
+              <div v-for="loc in locales" :key="loc" class="form-group">
+                <label class="form-label">{{ localeNames[loc] || loc }}</label>
+                <textarea
+                  v-model="form.values[loc]"
+                  class="input"
+                  rows="2"
+                  :dir="loc === 'he' ? 'rtl' : 'ltr'"
+                  :placeholder="`${localeNames[loc]} value`"
+                ></textarea>
+              </div>
+            </template>
           </form>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showModal = false">
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="saving"
+              @click="saveTranslation"
+            >
+              {{ saving ? t('common.saving') : t('common.save') }}
+            </button>
+          </footer>
         </div>
       </div>
     </Teleport>
   </div>
 </template>
-
-<style>
-/* Section toggle - Content/System switcher */
-.section-toggle {
-  display: flex;
-  gap: var(--space-2);
-  margin-block-end: var(--space-4);
-}
-
-.section-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.section-toggle-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-text);
-}
-
-.section-toggle-btn.is-active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-}
-
-.section-toggle-count {
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-full);
-  background: rgba(0, 0, 0, 0.1);
-  font-size: var(--text-xs);
-}
-
-.section-toggle-btn.is-active .section-toggle-count {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Alert for system translations */
-.alert--warning {
-  padding: var(--space-3) var(--space-4);
-  margin-block-end: var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-warning-bg, #fef3cd);
-  border: 1px solid var(--color-warning-border, #ffc107);
-  color: var(--color-warning-text, #856404);
-  font-size: var(--text-sm);
-}
-
-/* Modal section badge */
-.modal-section-badge {
-  display: inline-block;
-  margin-inline-start: var(--space-2);
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  vertical-align: middle;
-}
-
-.modal-section-badge.content {
-  background: var(--color-primary-light, #e3f2fd);
-  color: var(--color-primary, #1976d2);
-}
-
-.modal-section-badge.system {
-  background: var(--color-warning-bg, #fff3cd);
-  color: var(--color-warning-text, #856404);
-}
-
-/* Form info boxes */
-.form-info {
-  padding: var(--space-2) var(--space-3);
-  margin-block-end: var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.form-info code {
-  padding: 0.125rem 0.25rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-tertiary, rgba(0, 0, 0, 0.05));
-  font-size: var(--text-xs);
-}
-
-.form-info--system {
-  background: var(--color-warning-bg, #fff3cd);
-  border-color: var(--color-warning-border, #ffc107);
-  color: var(--color-warning-text, #856404);
-}
-</style>
-
-<!--
-  Uses global CSS classes:
-  - ui/content/tabs.css: .tabs, .tabs--underline, .tab, .tab-badge
-  - ui/forms/search.css: .search-bar, .search-icon
-  - ui/content/data-table.css: .data-table
-  - ui/overlays/modal.css: .modal-backdrop, .modal, .modal-header, .modal-body, .modal-footer
--->

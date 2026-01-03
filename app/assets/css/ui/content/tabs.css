@@ -115,3 +115,24 @@
   border-block-end: 2px solid var(--i-brand);
   margin-block-end: -1px; /* Overlap container border */
 }
+
+/* ══════════════════════════════════════════════════════════
+ * TAB INDICATORS - Small dot/icon showing status
+ * Used for: missing translations, unsaved changes, etc.
+ * ══════════════════════════════════════════════════════════ */
+
+.tab__indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--i-success);
+  flex-shrink: 0;
+}
+
+.tab__indicator--warning {
+  background: var(--i-warning);
+}
+
+.tab__indicator--error {
+  background: var(--i-error);
+}

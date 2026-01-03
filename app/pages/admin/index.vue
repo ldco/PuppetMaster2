@@ -7,7 +7,8 @@
  */
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 // Redirect to settings on mount

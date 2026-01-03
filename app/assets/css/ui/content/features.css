@@ -1,0 +1,283 @@
+/**
+ * Features Section Styles
+ *
+ * Clean cards with icon, title, description.
+ */
+
+/* ==========================================================================
+   FEATURES SECTION CONTAINER
+   ========================================================================== */
+
+.features-section {
+  /* Simple container - no decorative backgrounds */
+}
+
+.features-loading {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--l-text-secondary);
+}
+
+/* ==========================================================================
+   FEATURES GRID
+   ========================================================================== */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--gap-lg);
+  justify-content: center;
+}
+
+/* Bento layout for exactly 6 features */
+@media (--tablet) {
+  .features-grid--bento {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  /* First card spans 2 columns */
+  .features-grid--bento .feature-card:first-child {
+    grid-column: span 2;
+  }
+
+  /* Last card spans 2 columns */
+  .features-grid--bento .feature-card:last-child {
+    grid-column: span 2;
+  }
+}
+
+/* ==========================================================================
+   FEATURE CARD - Unified Style (Icon Left by Default)
+   ========================================================================== */
+
+.feature-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  text-align: left;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--l-bg-elevated);
+  border: 1px solid var(--l-border);
+  border-radius: var(--radius-xl);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px oklch(0 0 0 / 0.12);
+  border-color: var(--c-brand-alpha);
+}
+
+.feature-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   FEATURE ICON
+   ========================================================================== */
+
+.feature-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: var(--c-brand-alpha);
+  color: var(--c-brand);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.feature-card:hover .feature-card__icon {
+  background: var(--c-brand);
+  color: var(--c-brand-contrast, white);
+  transform: scale(1.05);
+}
+
+.feature-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ==========================================================================
+   FEATURE CONTENT
+   ========================================================================== */
+
+.feature-card__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  margin: 0;
+  margin-block-end: var(--space-2);
+  color: var(--l-text);
+  transition: color 0.2s ease;
+}
+
+.feature-card:hover .feature-card__title {
+  color: var(--c-brand);
+}
+
+.feature-card__description {
+  font-size: var(--text-sm);
+  color: var(--l-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* Number badge (optional) */
+.feature-card__number {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--c-brand);
+  background: var(--c-brand-alpha);
+  border-radius: var(--radius-full);
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   CENTERED LAYOUT (Optional)
+   ========================================================================== */
+
+.features-grid--centered .feature-card {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.features-grid--centered .feature-card__icon {
+  margin-block-end: var(--space-5);
+  width: 64px;
+  height: 64px;
+}
+
+.features-grid--centered .feature-card__icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* ==========================================================================
+   IMAGE-BASED CARDS
+   ========================================================================== */
+
+.features-grid--images {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap-md);
+}
+
+@media (--tablet) {
+  .features-grid--images {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card--image {
+  flex-direction: column;
+  padding: 0;
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card--image:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -8px oklch(0 0 0 / 0.15);
+}
+
+.feature-card__image {
+  position: absolute;
+  inset: 0;
+}
+
+.feature-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.feature-card__img--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.feature-card--image:hover .feature-card__img--default {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.feature-card--image:hover .feature-card__img--hover {
+  opacity: 1;
+}
+
+/* Content overlay on image cards */
+.feature-card--image .feature-card__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-6);
+  background: linear-gradient(transparent, oklch(0 0 0 / 0.75));
+  color: white;
+  z-index: 2;
+}
+
+.feature-card--image .feature-card__title {
+  color: white;
+  font-size: var(--text-xl);
+  margin-block-end: var(--space-2);
+}
+
+.feature-card--image:hover .feature-card__title {
+  color: white;
+}
+
+.feature-card--image .feature-card__description {
+  color: oklch(0.9 0 0);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (--phone) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: var(--space-5);
+  }
+
+  .feature-card__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .feature-card__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .feature-card__title {
+    font-size: var(--text-base);
+  }
+
+  .feature-card__description {
+    font-size: var(--text-xs);
+  }
+}

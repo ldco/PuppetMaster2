@@ -23,6 +23,7 @@ export interface Translation {
  */
 export interface TranslationsData {
   locales: string[]
+  localeNames: Record<string, string>
   content: Record<string, Translation[]>
   system: Record<string, Translation[]> | null
   canEditSystem: boolean

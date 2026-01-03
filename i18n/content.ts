@@ -80,6 +80,28 @@ export const contentTranslations: Record<string, Record<string, unknown>> = {
       getStarted: 'Get Started',
       contactSales: 'Contact Sales'
     },
+    team: {
+      title: 'Our Team',
+      noMembers: 'No team members yet.'
+    },
+    testimonials: {
+      title: 'What Our Clients Say'
+    },
+    features: {
+      title: 'Features'
+    },
+    clients: {
+      title: 'Trusted By'
+    },
+    faq: {
+      title: 'Frequently Asked Questions'
+    },
+    blog: {
+      title: 'Latest Posts',
+      readMore: 'Read More',
+      noPosts: 'No posts yet.',
+      minRead: 'min read'
+    },
     contact: {
       title: 'Get in Touch',
       nameLabel: 'Name',
@@ -148,6 +170,28 @@ export const contentTranslations: Record<string, Record<string, unknown>> = {
       getStarted: 'Начать',
       contactSales: 'Связаться'
     },
+    team: {
+      title: 'Наша команда',
+      noMembers: 'Пока нет участников.'
+    },
+    testimonials: {
+      title: 'Отзывы клиентов'
+    },
+    features: {
+      title: 'Возможности'
+    },
+    clients: {
+      title: 'Нам доверяют'
+    },
+    faq: {
+      title: 'Часто задаваемые вопросы'
+    },
+    blog: {
+      title: 'Последние публикации',
+      readMore: 'Читать далее',
+      noPosts: 'Пока нет публикаций.',
+      minRead: 'мин чтения'
+    },
     contact: {
       title: 'Связаться с нами',
       nameLabel: 'Имя',
@@ -213,6 +257,28 @@ export const contentTranslations: Record<string, Record<string, unknown>> = {
       oneTime: 'תשלום חד פעמי',
       getStarted: 'התחילו',
       contactSales: 'צרו קשר'
+    },
+    team: {
+      title: 'הצוות שלנו',
+      noMembers: 'אין עדיין חברי צוות.'
+    },
+    testimonials: {
+      title: 'מה הלקוחות אומרים'
+    },
+    features: {
+      title: 'יכולות'
+    },
+    clients: {
+      title: 'סומכים עלינו'
+    },
+    faq: {
+      title: 'שאלות נפוצות'
+    },
+    blog: {
+      title: 'פוסטים אחרונים',
+      readMore: 'קראו עוד',
+      noPosts: 'אין עדיין פוסטים.',
+      minRead: 'דקות קריאה'
     },
     contact: {
       title: 'צרו קשר',

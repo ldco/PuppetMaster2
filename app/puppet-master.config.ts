@@ -102,12 +102,15 @@ const config = {
   // Enable modules per-project and customize their behavior via config.
   //
   // Available modules:
-  //   - portfolio: Project showcase with galleries and case studies
-  //   - pricing:   Pricing tiers with comparison table (config-driven)
-  //   - contact:   Contact form, map, and info display
-  //   - blog:      Blog posts with categories and tags (not implemented)
-  //   - team:      Team member profiles (not implemented)
-  //   - testimonials: Customer testimonials (not implemented)
+  //   - portfolio:    Project showcase with galleries and case studies
+  //   - pricing:      Pricing tiers with comparison table
+  //   - contact:      Contact form, map, and info display
+  //   - blog:         Blog posts with categories, tags, and media
+  //   - team:         Team member profiles with photos and social links
+  //   - testimonials: Customer testimonials and reviews
+  //   - features:     Feature cards with icons (replaces services)
+  //   - clients:      Client/sponsor/partner logos
+  //   - faq:          Frequently asked questions accordion
   //
   // ═══════════════════════════════════════════════════════════════════════════
   modules: {
@@ -208,16 +211,72 @@ const config = {
       }
     },
     blog: {
-      enabled: false,
-      config: {}
+      enabled: true,
+      config: {
+        postsPerPage: 10,
+        showCategories: true,
+        showTags: true,
+        showAuthor: true,
+        showReadingTime: true,
+        showViewCount: false,
+        excerptLength: 160,
+        layout: 'grid',
+        latestPostsCount: 3
+      }
     },
     team: {
-      enabled: false,
-      config: {}
+      enabled: true,
+      config: {
+        layout: 'grid',
+        cardStyle: 'detailed',
+        showSocial: true,
+        showBio: true,
+        showEmail: false,
+        showPhone: false,
+        groupByDepartment: false,
+        columnsDesktop: 4,
+        columnsMobile: 2
+      }
     },
     testimonials: {
-      enabled: false,
-      config: {}
+      enabled: true,
+      config: {
+        layout: 'carousel',
+        showRating: true,
+        showPhoto: true,
+        showCompany: true,
+        autoPlay: false,
+        autoPlayInterval: 5000
+      }
+    },
+    features: {
+      enabled: true,
+      config: {
+        layout: 'grid',
+        cardStyle: 'icon-top',
+        showCategory: false,
+        columnsDesktop: 3,
+        columnsMobile: 1
+      }
+    },
+    clients: {
+      enabled: true,
+      config: {
+        layout: 'strip',
+        showNames: false,
+        grayscale: true,
+        hoverColor: true,
+        categories: ['client', 'sponsor', 'partner']
+      }
+    },
+    faq: {
+      enabled: true,
+      config: {
+        layout: 'accordion',
+        showCategories: false,
+        expandFirst: true,
+        allowMultipleOpen: false
+      }
     }
   } as ModulesConfig,
 
@@ -400,7 +459,12 @@ const config = {
     { id: 'home', inNav: true },
     { id: 'about', inNav: true },
     { id: 'portfolio', inNav: true },
-    { id: 'services', inNav: true },
+    { id: 'features', inNav: true },
+    { id: 'team', inNav: true },
+    { id: 'testimonials', inNav: true },
+    { id: 'blog', inNav: true },
+    { id: 'faq', inNav: true },
+    { id: 'clients', inNav: true },
     { id: 'pricing', inNav: true },
     { id: 'contact', inNav: true }
   ] as const,
@@ -423,6 +487,12 @@ const config = {
   adminSections: [
     { id: 'settings', icon: 'settings', label: 'settings', badge: false, roles: [] },
     { id: 'portfolios', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
+    { id: 'blog', icon: 'article', label: 'blog', badge: false, roles: [] },
+    { id: 'team', icon: 'users-group', label: 'team', badge: false, roles: [] },
+    { id: 'features', icon: 'sparkles', label: 'features', badge: false, roles: [] },
+    { id: 'testimonials', icon: 'quote', label: 'testimonials', badge: false, roles: [] },
+    { id: 'clients', icon: 'building', label: 'clients', badge: false, roles: [] },
+    { id: 'faq', icon: 'help-circle', label: 'faq', badge: false, roles: [] },
     { id: 'pricing', icon: 'credit-card', label: 'pricing', badge: false, roles: [] },
     { id: 'contacts', icon: 'mail', label: 'contacts', badge: true, roles: [] },
     { id: 'translations', icon: 'language', label: 'translations', badge: false, roles: [] },

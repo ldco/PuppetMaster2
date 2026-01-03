@@ -17,7 +17,8 @@ import type { HealthCheck, HealthData, LogEntry, AuditLogEntry } from '~/types'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()

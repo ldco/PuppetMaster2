@@ -9,4 +9,5 @@
 @import './overlays/index.css';
 @import './content/index.css';
 @import './layouts/index.css';
+@import './admin/pages.css';
 @import './hamburger.css';

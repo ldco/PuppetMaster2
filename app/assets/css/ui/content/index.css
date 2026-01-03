@@ -25,7 +25,15 @@
 @import './health.css';
 
 /* Module styles */
+@import './about.css';
 @import './pricing.css';
+@import './team.css';
+@import './blog.css';
+@import './clients.css';
+@import './features.css';
+@import './testimonials.css';
+@import './faq.css';
+@import './contact.css';
 
 /* Loading states */
 @import './loading-placeholders.css';

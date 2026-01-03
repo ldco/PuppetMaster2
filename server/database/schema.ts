@@ -2,7 +2,10 @@
  * Database Schema
  *
  * SQLite schema using Drizzle ORM.
- * Tables: users, sessions, settings, portfolios, portfolio_items, contact_submissions, translations, audit_logs
+ * Tables: users, sessions, settings, portfolios, portfolio_items, contact_submissions,
+ *         pricing_tiers, pricing_features, translations, audit_logs,
+ *         team_members, blog_posts, blog_categories, blog_tags, blog_media,
+ *         clients, features, testimonials, faq_items
  */
 import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-core'
 
@@ -259,6 +262,351 @@ export const pricingFeatureTranslations = sqliteTable(
 )
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TEAM
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Team members
+ */
+export const teamMembers = sqliteTable(
+  'team_members',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    slug: text('slug').notNull().unique(),
+    name: text('name').notNull(),
+    position: text('position'),
+    bio: text('bio'),
+    photoUrl: text('photo_url'),
+    hoverPhotoUrl: text('hover_photo_url'), // Photo shown on hover
+    email: text('email'),
+    phone: text('phone'),
+    department: text('department'),
+    socialLinks: text('social_links'), // JSON: {linkedin, twitter, github, etc.}
+    published: integer('published', { mode: 'boolean' }).default(true),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('team_members_published_idx').on(table.published)]
+)
+
+/**
+ * Team member translations
+ */
+export const teamMemberTranslations = sqliteTable(
+  'team_member_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    memberId: integer('member_id')
+      .notNull()
+      .references(() => teamMembers.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    position: text('position'),
+    bio: text('bio'),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.memberId, table.locale),
+    index('team_member_translations_member_idx').on(table.memberId)
+  ]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BLOG
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Blog categories
+ */
+export const blogCategories = sqliteTable('blog_categories', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug').notNull().unique(),
+  order: integer('order').default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Blog category translations
+ */
+export const blogCategoryTranslations = sqliteTable(
+  'blog_category_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    categoryId: integer('category_id')
+      .notNull()
+      .references(() => blogCategories.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    name: text('name').notNull(),
+    description: text('description'),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.categoryId, table.locale),
+    index('blog_category_translations_category_idx').on(table.categoryId)
+  ]
+)
+
+/**
+ * Blog tags
+ */
+export const blogTags = sqliteTable('blog_tags', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Blog posts
+ */
+export const blogPosts = sqliteTable(
+  'blog_posts',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    slug: text('slug').notNull().unique(),
+    authorId: integer('author_id').references(() => users.id, { onDelete: 'set null' }),
+    categoryId: integer('category_id').references(() => blogCategories.id, { onDelete: 'set null' }),
+    coverImageUrl: text('cover_image_url'),
+    coverImageAlt: text('cover_image_alt'),
+    published: integer('published', { mode: 'boolean' }).default(false),
+    publishedAt: integer('published_at', { mode: 'timestamp' }),
+    readingTimeMinutes: integer('reading_time_minutes'),
+    viewCount: integer('view_count').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    index('blog_posts_published_idx').on(table.published),
+    index('blog_posts_author_idx').on(table.authorId),
+    index('blog_posts_category_idx').on(table.categoryId)
+  ]
+)
+
+/**
+ * Blog post translations
+ */
+export const blogPostTranslations = sqliteTable(
+  'blog_post_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    postId: integer('post_id')
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    title: text('title').notNull(),
+    excerpt: text('excerpt'),
+    content: text('content'), // Markdown
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.postId, table.locale),
+    index('blog_post_translations_post_idx').on(table.postId)
+  ]
+)
+
+/**
+ * Blog post tags (many-to-many)
+ */
+export const blogPostTags = sqliteTable(
+  'blog_post_tags',
+  {
+    postId: integer('post_id')
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: 'cascade' }),
+    tagId: integer('tag_id')
+      .notNull()
+      .references(() => blogTags.id, { onDelete: 'cascade' }),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    index('blog_post_tags_post_idx').on(table.postId),
+    index('blog_post_tags_tag_idx').on(table.tagId)
+  ]
+)
+
+/**
+ * Blog media (images & videos in content)
+ */
+export const blogMedia = sqliteTable(
+  'blog_media',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    postId: integer('post_id')
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: 'cascade' }),
+    type: text('type', { enum: ['image', 'video'] }).notNull(),
+    url: text('url').notNull(),
+    thumbnailUrl: text('thumbnail_url'),
+    alt: text('alt'),
+    width: integer('width'),
+    height: integer('height'),
+    sizeBytes: integer('size_bytes'),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('blog_media_post_idx').on(table.postId)]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENTS / SPONSORS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Client categories
+ */
+export const CLIENT_CATEGORIES = ['client', 'sponsor', 'partner'] as const
+export type ClientCategory = (typeof CLIENT_CATEGORIES)[number]
+
+/**
+ * Clients / Sponsors / Partners
+ */
+export const clients = sqliteTable(
+  'clients',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    logoUrl: text('logo_url').notNull(),
+    websiteUrl: text('website_url'),
+    category: text('category', { enum: ['client', 'sponsor', 'partner'] }).default('client'),
+    featured: integer('featured', { mode: 'boolean' }).default(false),
+    published: integer('published', { mode: 'boolean' }).default(true),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('clients_published_idx').on(table.published)]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURES
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Features (replaces services section)
+ */
+export const features = sqliteTable(
+  'features',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    slug: text('slug').notNull().unique(),
+    icon: text('icon').notNull(), // Tabler icon name (fallback when no image)
+    imageUrl: text('image_url'), // Feature image
+    hoverImageUrl: text('hover_image_url'), // Image shown on hover
+    category: text('category'),
+    published: integer('published', { mode: 'boolean' }).default(true),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('features_published_idx').on(table.published)]
+)
+
+/**
+ * Feature translations
+ */
+export const featureTranslations = sqliteTable(
+  'feature_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    featureId: integer('feature_id')
+      .notNull()
+      .references(() => features.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.featureId, table.locale),
+    index('feature_translations_feature_idx').on(table.featureId)
+  ]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TESTIMONIALS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Testimonials
+ */
+export const testimonials = sqliteTable(
+  'testimonials',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    authorName: text('author_name').notNull(),
+    authorTitle: text('author_title'),
+    authorCompany: text('author_company'),
+    authorPhotoUrl: text('author_photo_url'),
+    rating: integer('rating'), // 1-5 stars, optional
+    featured: integer('featured', { mode: 'boolean' }).default(false),
+    published: integer('published', { mode: 'boolean' }).default(true),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('testimonials_published_idx').on(table.published)]
+)
+
+/**
+ * Testimonial translations
+ */
+export const testimonialTranslations = sqliteTable(
+  'testimonial_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    testimonialId: integer('testimonial_id')
+      .notNull()
+      .references(() => testimonials.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    quote: text('quote').notNull(),
+    authorTitle: text('author_title'),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.testimonialId, table.locale),
+    index('testimonial_translations_testimonial_idx').on(table.testimonialId)
+  ]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FAQ
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * FAQ items
+ */
+export const faqItems = sqliteTable(
+  'faq_items',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    slug: text('slug').notNull().unique(),
+    category: text('category'),
+    published: integer('published', { mode: 'boolean' }).default(true),
+    order: integer('order').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('faq_items_published_idx').on(table.published)]
+)
+
+/**
+ * FAQ item translations
+ */
+export const faqItemTranslations = sqliteTable(
+  'faq_item_translations',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    faqItemId: integer('faq_item_id')
+      .notNull()
+      .references(() => faqItems.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    question: text('question').notNull(),
+    answer: text('answer').notNull(), // Markdown supported
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [
+    unique().on(table.faqItemId, table.locale),
+    index('faq_item_translations_faq_idx').on(table.faqItemId)
+  ]
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TRANSLATIONS (Database-driven i18n)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -349,3 +697,47 @@ export type PricingTierTranslation = typeof pricingTierTranslations.$inferSelect
 export type NewPricingTierTranslation = typeof pricingTierTranslations.$inferInsert
 export type PricingFeatureTranslation = typeof pricingFeatureTranslations.$inferSelect
 export type NewPricingFeatureTranslation = typeof pricingFeatureTranslations.$inferInsert
+
+// Team
+export type TeamMember = typeof teamMembers.$inferSelect
+export type NewTeamMember = typeof teamMembers.$inferInsert
+export type TeamMemberTranslation = typeof teamMemberTranslations.$inferSelect
+export type NewTeamMemberTranslation = typeof teamMemberTranslations.$inferInsert
+
+// Blog
+export type BlogCategory = typeof blogCategories.$inferSelect
+export type NewBlogCategory = typeof blogCategories.$inferInsert
+export type BlogCategoryTranslation = typeof blogCategoryTranslations.$inferSelect
+export type NewBlogCategoryTranslation = typeof blogCategoryTranslations.$inferInsert
+export type BlogTag = typeof blogTags.$inferSelect
+export type NewBlogTag = typeof blogTags.$inferInsert
+export type BlogPost = typeof blogPosts.$inferSelect
+export type NewBlogPost = typeof blogPosts.$inferInsert
+export type BlogPostTranslation = typeof blogPostTranslations.$inferSelect
+export type NewBlogPostTranslation = typeof blogPostTranslations.$inferInsert
+export type BlogPostTag = typeof blogPostTags.$inferSelect
+export type NewBlogPostTag = typeof blogPostTags.$inferInsert
+export type BlogMediaItem = typeof blogMedia.$inferSelect
+export type NewBlogMediaItem = typeof blogMedia.$inferInsert
+
+// Clients
+export type Client = typeof clients.$inferSelect
+export type NewClient = typeof clients.$inferInsert
+
+// Features
+export type Feature = typeof features.$inferSelect
+export type NewFeature = typeof features.$inferInsert
+export type FeatureTranslation = typeof featureTranslations.$inferSelect
+export type NewFeatureTranslation = typeof featureTranslations.$inferInsert
+
+// Testimonials
+export type Testimonial = typeof testimonials.$inferSelect
+export type NewTestimonial = typeof testimonials.$inferInsert
+export type TestimonialTranslation = typeof testimonialTranslations.$inferSelect
+export type NewTestimonialTranslation = typeof testimonialTranslations.$inferInsert
+
+// FAQ
+export type FaqItem = typeof faqItems.$inferSelect
+export type NewFaqItem = typeof faqItems.$inferInsert
+export type FaqItemTranslation = typeof faqItemTranslations.$inferSelect
+export type NewFaqItemTranslation = typeof faqItemTranslations.$inferInsert

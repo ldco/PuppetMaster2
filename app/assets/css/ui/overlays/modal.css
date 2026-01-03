@@ -97,6 +97,63 @@
   padding: var(--space-6);
 }
 
+/* ══════════════════════════════════════════════════════════
+ * MODAL FORM SPACING - Consistent gaps between form elements
+ * ══════════════════════════════════════════════════════════ */
+
+/* Stack all direct children with consistent gap */
+form.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Two-column grid for side-by-side fields */
+.form-row--2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* When form-row is combined with 2col, remove the margin (parent gap handles it) */
+.form-row.form-row--2col {
+  margin-block-start: 0;
+}
+
+/* Single column on small screens */
+@media (max-width: 480px) {
+  .form-row--2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reset margins for DIRECT children only - parent gap handles spacing */
+form.modal-body > .form-group {
+  margin-block-start: 0;
+}
+
+form.modal-body > .form-row {
+  margin-block-start: 0;
+}
+
+/* Reset margins inside 2-column grids - grid gap handles spacing */
+form.modal-body .form-row--2col > .form-group {
+  margin-block-start: 0;
+}
+
+/* Nested containers (like language tab wrappers) need their own gap */
+form.modal-body > div:not(.form-row):not(.form-row--2col):not(.form-group):not(.tabs):not(.form-divider) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Reset margins inside those nested containers too */
+form.modal-body > div:not(.form-row):not(.form-row--2col):not(.form-group):not(.tabs):not(.form-divider) > .form-group {
+  margin-block-start: 0;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;

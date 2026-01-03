@@ -21,9 +21,14 @@ const { t, te } = useI18n()
 const sectionComponents: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   about: defineAsyncComponent(() => import('~/components/sections/SectionAbout.vue')),
   portfolio: defineAsyncComponent(() => import('~/components/sections/SectionPortfolio.vue')),
-  services: defineAsyncComponent(() => import('~/components/sections/SectionServices.vue')),
   pricing: defineAsyncComponent(() => import('~/components/sections/SectionPricing.vue')),
-  contact: defineAsyncComponent(() => import('~/components/sections/SectionContact.vue'))
+  contact: defineAsyncComponent(() => import('~/components/sections/SectionContact.vue')),
+  team: defineAsyncComponent(() => import('~/components/sections/SectionTeam.vue')),
+  testimonials: defineAsyncComponent(() => import('~/components/sections/SectionTestimonials.vue')),
+  features: defineAsyncComponent(() => import('~/components/sections/SectionFeatures.vue')),
+  clients: defineAsyncComponent(() => import('~/components/sections/SectionClients.vue')),
+  faq: defineAsyncComponent(() => import('~/components/sections/SectionFaq.vue')),
+  blog: defineAsyncComponent(() => import('~/components/sections/SectionBlog.vue'))
 }
 
 // Get title from i18n (fallback to nav label)

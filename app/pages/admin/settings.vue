@@ -9,10 +9,12 @@ import config from '~/puppet-master.config'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()
+const { toast } = useToast()
 
 useHead({
   title: () => `${t('admin.navSettings')} | Admin`
@@ -70,24 +72,19 @@ function getInputType(type: string): string {
 }
 
 const saving = ref(false)
-const saveSuccess = ref(false)
-const saveError = ref('')
 
 async function saveSettings() {
   saving.value = true
-  saveSuccess.value = false
-  saveError.value = ''
 
   try {
     await $fetch('/api/admin/settings', {
       method: 'PUT',
       body: form
     })
-    saveSuccess.value = true
+    toast.success(t('admin.settingsSaved'))
     await refresh()
-    setTimeout(() => (saveSuccess.value = false), 3000)
   } catch (e: any) {
-    saveError.value = e.data?.message || 'Failed to save settings'
+    toast.error(e.data?.message || 'Failed to save settings')
   } finally {
     saving.value = false
   }
@@ -136,8 +133,6 @@ async function saveSettings() {
 
       <!-- Save Button -->
       <div class="form-actions">
-        <div v-if="saveSuccess" class="form-success">{{ t('admin.settingsSaved') }}</div>
-        <div v-if="saveError" class="form-error">{{ saveError }}</div>
         <button type="submit" class="btn btn-primary" :disabled="saving">
           {{ saving ? t('common.saving') : t('common.save') }}
         </button>

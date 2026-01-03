@@ -47,6 +47,23 @@ defineProps<{
     - typography/base.css (.hero-subtitle)
   -->
   <section id="home" class="section section-hero section-hero--center">
+    <!-- Floating decorations for candy effect -->
+    <div class="hero-decorations" aria-hidden="true">
+      <!-- Animated blobs -->
+      <div class="hero-blob hero-blob--1" />
+      <div class="hero-blob hero-blob--2" />
+      <div class="hero-blob hero-blob--3" />
+      <!-- Geometric shapes -->
+      <div class="hero-shape hero-shape--circle" />
+      <div class="hero-shape hero-shape--square" />
+      <div class="hero-shape hero-shape--triangle" />
+      <!-- Floating dots -->
+      <div class="hero-dots hero-dots--1" />
+      <div class="hero-dots hero-dots--2" />
+      <div class="hero-dots hero-dots--3" />
+      <div class="hero-dots hero-dots--4" />
+    </div>
+
     <div class="container">
       <div v-reveal="'scale'" class="hero-logo">
         <slot name="logo">

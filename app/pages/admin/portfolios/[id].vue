@@ -4,6 +4,14 @@
  *
  * Manages items within a portfolio.
  * Different UI for gallery (media grid) vs case_study (project cards).
+ * Supports multiple locales for case study translatable fields.
+ *
+ * CSS Dependencies (see CSS-COMPONENT-MAP.md):
+ * - ui/overlays/modal.css: .modal-backdrop, .modal, .modal--lg, .modal-header, .modal-body, .modal-footer
+ * - ui/forms/inputs.css: .input, .form-group, .form-label, .form-row--2col, .form-checkbox
+ * - ui/content/cards.css: .card, .card-body, .card-actions
+ * - ui/content/portfolio-grid.css: .media-grid, .media-item, .media-item-*, .upload-area, .type-selector
+ * - ui/content/tabs.css: .tabs, .tabs--underline, .tab, .is-active, .tab__indicator
  */
 import IconPlus from '~icons/tabler/plus'
 import IconEdit from '~icons/tabler/pencil'
@@ -11,14 +19,32 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconArrowLeft from '~icons/tabler/arrow-left'
 import IconPhoto from '~icons/tabler/photo'
+import IconPhotoOff from '~icons/tabler/photo-off'
 import IconVideo from '~icons/tabler/video'
 import IconLink from '~icons/tabler/link'
 import IconUpload from '~icons/tabler/upload'
 import type { PortfolioWithItems, PortfolioItem } from '~/types'
+import config from '~/puppet-master.config'
+
+interface ItemTranslation {
+  title: string | null
+  description: string | null
+  content: string | null
+  category: string | null
+}
+
+interface PortfolioItemWithTranslations extends PortfolioItem {
+  translations?: Record<string, ItemTranslation>
+}
+
+interface PortfolioWithItemTranslations extends PortfolioWithItems {
+  items?: PortfolioItemWithTranslations[]
+}
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()
@@ -31,6 +57,9 @@ const { confirm } = useConfirm()
 const { toast } = useToast()
 const route = useRoute()
 
+// Available locales from config
+const locales = config.locales.map(l => l.code)
+
 // Use computed for reactive route params
 const portfolioId = computed(() => route.params.id as string)
 
@@ -40,7 +69,7 @@ const {
   data: portfolio,
   pending,
   refresh
-} = await useFetch<PortfolioWithItems>(() => `/api/portfolios/${portfolioId.value}`, {
+} = await useFetch<PortfolioWithItemTranslations>(() => `/api/portfolios/${portfolioId.value}`, {
   query: { includeItems: 'true' },
   headers,
   watch: [portfolioId]
@@ -48,7 +77,17 @@ const {
 
 // Modal state
 const showItemModal = ref(false)
-const editingItem = ref<PortfolioItem | null>(null)
+const editingItem = ref<PortfolioItemWithTranslations | null>(null)
+const activeLocale = ref(locales[0] || 'en')
+
+// Create empty translations structure for all locales
+function createEmptyItemTranslations(): Record<string, { title: string; description: string; content: string; category: string }> {
+  const translations: Record<string, { title: string; description: string; content: string; category: string }> = {}
+  for (const locale of locales) {
+    translations[locale] = { title: '', description: '', content: '', category: '' }
+  }
+  return translations
+}
 
 // Form for gallery items
 const galleryForm = reactive({
@@ -67,8 +106,10 @@ const caseStudyForm = reactive({
   content: '',
   category: '',
   tags: '',
+  coverUrl: '',
   published: true,
-  order: 0
+  order: 0,
+  translations: createEmptyItemTranslations()
 })
 
 // Image/video upload state
@@ -94,8 +135,11 @@ function resetForms() {
   caseStudyForm.content = ''
   caseStudyForm.category = ''
   caseStudyForm.tags = ''
+  caseStudyForm.coverUrl = ''
   caseStudyForm.published = true
   caseStudyForm.order = 0
+  caseStudyForm.translations = createEmptyItemTranslations()
+  activeLocale.value = locales[0] || 'en'
 
   mediaFile.value = null
   mediaPreview.value = ''
@@ -111,7 +155,7 @@ function openAddItem() {
   showItemModal.value = true
 }
 
-function openEditItem(item: PortfolioItem) {
+function openEditItem(item: PortfolioItemWithTranslations) {
   editingItem.value = item
   resetForms()
 
@@ -123,9 +167,30 @@ function openEditItem(item: PortfolioItem) {
     caseStudyForm.category = item.category || ''
     // tags is stored as JSON string in DB
     caseStudyForm.tags = item.tags || ''
+    caseStudyForm.coverUrl = item.thumbnailUrl || item.mediaUrl || ''
     caseStudyForm.published = item.published ?? true
     caseStudyForm.order = item.order ?? 0
-    mediaPreview.value = item.thumbnailUrl || ''
+
+    // Load translations for all locales
+    caseStudyForm.translations = createEmptyItemTranslations()
+    for (const locale of locales) {
+      const trans = item.translations?.[locale]
+      if (trans) {
+        caseStudyForm.translations[locale] = {
+          title: trans.title || '',
+          description: trans.description || '',
+          content: trans.content || '',
+          category: trans.category || ''
+        }
+      }
+    }
+
+    // Find first locale with content
+    const localeWithContent = locales.find(locale => {
+      const trans = item.translations?.[locale]
+      return trans?.title
+    })
+    activeLocale.value = localeWithContent || locales[0] || 'en'
   } else {
     galleryForm.itemType = item.itemType as 'image' | 'video' | 'link'
     galleryForm.mediaUrl = item.mediaUrl || ''
@@ -152,6 +217,33 @@ function handleMediaSelect(e: Event) {
   }
 }
 
+// Upload cover image for case study
+const uploadingCover = ref(false)
+async function handleCoverUpload(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  uploadingCover.value = true
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const result = await $fetch<{ url: string; thumbnailUrl: string }>('/api/upload/image', {
+      method: 'POST',
+      body: formData
+    })
+
+    caseStudyForm.coverUrl = result.thumbnailUrl || result.url
+    toast.success(t('common.uploaded'))
+  } catch (err: any) {
+    toast.error(err.data?.message || t('common.error'))
+  } finally {
+    uploadingCover.value = false
+    input.value = ''
+  }
+}
+
 // Auto-generate slug from title
 function generateSlug() {
   if (!editingItem.value && caseStudyForm.title && !caseStudyForm.slug) {
@@ -163,11 +255,9 @@ function generateSlug() {
 }
 
 const saving = ref(false)
-const error = ref('')
 
 async function saveItem() {
   saving.value = true
-  error.value = ''
 
   try {
     const isGallery = portfolio.value?.type === 'gallery'
@@ -178,14 +268,14 @@ async function saveItem() {
       // For link, need a URL
       if (galleryForm.itemType === 'link') {
         if (!galleryForm.mediaUrl) {
-          error.value = t('validation.required')
+          toast.error(t('validation.required'))
           saving.value = false
           return
         }
       } else {
         // image or video: need file for new items, or existing URL for edits
         if (!mediaFile.value && !galleryForm.mediaUrl && !editingItem.value?.mediaUrl) {
-          error.value = t('validation.required')
+          toast.error(t('validation.required'))
           saving.value = false
           return
         }
@@ -222,28 +312,7 @@ async function saveItem() {
         order: galleryForm.order
       }
     } else {
-      // Case study
-      let mediaUrl = editingItem.value?.mediaUrl || null
-      let thumbnailUrl = editingItem.value?.thumbnailUrl || null
-
-      // Upload cover image if file selected
-      if (mediaFile.value) {
-        uploading.value = true
-        const formData = new FormData()
-        formData.append('image', mediaFile.value)
-
-        const uploadResult = await $fetch<{ url: string; thumbnailUrl: string }>(
-          '/api/upload/image',
-          {
-            method: 'POST',
-            body: formData
-          }
-        )
-        mediaUrl = uploadResult.url
-        thumbnailUrl = uploadResult.thumbnailUrl
-        uploading.value = false
-      }
-
+      // Case study - coverUrl already uploaded via handleCoverUpload
       payload = {
         itemType: 'case_study',
         slug: caseStudyForm.slug,
@@ -257,10 +326,11 @@ async function saveItem() {
               .map(t => t.trim())
               .filter(Boolean)
           : [],
-        mediaUrl: mediaUrl || undefined,
-        thumbnailUrl: thumbnailUrl || undefined,
+        mediaUrl: caseStudyForm.coverUrl || undefined,
+        thumbnailUrl: caseStudyForm.coverUrl || undefined,
         published: caseStudyForm.published,
-        order: caseStudyForm.order
+        order: caseStudyForm.order,
+        translations: caseStudyForm.translations
       }
     }
 
@@ -277,10 +347,11 @@ async function saveItem() {
     }
 
     showItemModal.value = false
+    toast.success(t('common.saved'))
     await refresh()
   } catch (e: any) {
     console.error('Item save error:', e)
-    error.value = e.data?.statusMessage || e.data?.message || e.message || 'Failed to save'
+    toast.error(e.data?.statusMessage || e.data?.message || e.message || 'Failed to save')
   } finally {
     saving.value = false
     uploading.value = false
@@ -317,6 +388,46 @@ function getItemTypeIcon(type: string) {
     default:
       return IconPhoto
   }
+}
+
+// Track failed images
+const failedImages = ref(new Set<number>())
+
+function onImageError(itemId: number) {
+  failedImages.value.add(itemId)
+}
+
+function hasValidImage(item: PortfolioItem) {
+  const url = item.thumbnailUrl || item.mediaUrl
+  return url && !failedImages.value.has(item.id)
+}
+
+// Translation helpers
+function getLocaleName(code: string): string {
+  const locale = config.locales.find(l => l.code === code)
+  return locale?.name || code.toUpperCase()
+}
+
+function hasItemTranslation(item: PortfolioItemWithTranslations, locale: string): boolean {
+  // Default locale content is in the base fields (title, description, etc.)
+  const defaultLocale = config.defaultLocale || 'en'
+  if (locale === defaultLocale) {
+    return !!(item.title || item.translations?.[locale]?.title)
+  }
+  return !!(item.translations?.[locale]?.title)
+}
+
+function hasAllItemTranslations(item: PortfolioItemWithTranslations): boolean {
+  return locales.every(locale => hasItemTranslation(item, locale))
+}
+
+function getMissingItemTranslations(item: PortfolioItemWithTranslations): string[] {
+  return locales.filter(locale => !hasItemTranslation(item, locale))
+}
+
+function formLocaleHasContent(locale: string): boolean {
+  const trans = caseStudyForm.translations[locale]
+  return !!(trans?.title)
 }
 </script>
 
@@ -361,30 +472,27 @@ function getItemTypeIcon(type: string) {
       <div v-for="item in portfolio.items" :key="item.id" class="media-item card">
         <div class="media-item-preview">
           <img
-            v-if="item.thumbnailUrl || item.mediaUrl"
-            :src="item.thumbnailUrl || item.mediaUrl || ''"
+            v-if="hasValidImage(item)"
+            :src="(item.thumbnailUrl || item.mediaUrl)!"
             :alt="item.caption || ''"
+            @error="onImageError(item.id)"
           />
           <div v-else class="media-item-placeholder">
-            <component :is="getItemTypeIcon(item.itemType)" />
+            <IconPhotoOff v-if="failedImages.has(item.id)" />
+            <component v-else :is="getItemTypeIcon(item.itemType)" />
           </div>
           <span v-if="!item.published" class="badge badge-warning status-badge">Draft</span>
           <span class="badge badge-secondary type-badge">{{ item.itemType }}</span>
         </div>
         <div v-if="item.caption" class="media-item-caption">{{ item.caption }}</div>
-        <div class="media-item-actions">
-          <button
-            class="btn btn-icon btn-ghost"
-            @click="openEditItem(item)"
-            :title="t('common.edit')"
-          >
-            <IconEdit />
+        <div class="card-actions">
+          <button class="btn btn-sm btn-secondary" @click="openEditItem(item)">
+            <IconEdit /> {{ t('common.edit') }}
           </button>
           <button
-            class="btn btn-icon btn-ghost btn-danger"
+            class="btn btn-sm btn-ghost text-error"
             @click="deleteItem(item)"
             :disabled="deleting === item.id"
-            :title="t('common.delete')"
           >
             <IconTrash />
           </button>
@@ -396,27 +504,36 @@ function getItemTypeIcon(type: string) {
     <div v-else class="portfolio-grid">
       <div v-for="item in portfolio.items" :key="item.id" class="portfolio-item card">
         <div class="portfolio-item-image">
-          <img v-if="item.thumbnailUrl" :src="item.thumbnailUrl" :alt="item.title || ''" />
-          <div v-else class="portfolio-item-placeholder"></div>
+          <img
+            v-if="hasValidImage(item)"
+            :src="item.thumbnailUrl!"
+            :alt="item.title || ''"
+            @error="onImageError(item.id)"
+          />
+          <div v-else class="portfolio-item-placeholder">
+            <IconPhotoOff v-if="failedImages.has(item.id)" />
+            <IconPhoto v-else />
+          </div>
           <span v-if="!item.published" class="badge badge-warning status-badge">Draft</span>
         </div>
         <div class="portfolio-item-info">
           <h3 class="portfolio-item-title">{{ item.title }}</h3>
           <p v-if="item.category" class="portfolio-item-category">{{ item.category }}</p>
+          <!-- Translation status -->
+          <div v-if="!hasAllItemTranslations(item)" class="mt-1">
+            <span class="text-warning text-xs">
+              {{ t('admin.missingTranslations') }}: {{ getMissingItemTranslations(item).map(l => l.toUpperCase()).join(', ') }}
+            </span>
+          </div>
         </div>
-        <div class="portfolio-item-actions">
-          <button
-            class="btn btn-icon btn-ghost"
-            @click="openEditItem(item)"
-            :title="t('common.edit')"
-          >
-            <IconEdit />
+        <div class="card-actions">
+          <button class="btn btn-sm btn-secondary" @click="openEditItem(item)">
+            <IconEdit /> {{ t('common.edit') }}
           </button>
           <button
-            class="btn btn-icon btn-ghost btn-danger"
+            class="btn btn-sm btn-ghost text-error"
             @click="deleteItem(item)"
             :disabled="deleting === item.id"
-            :title="t('common.delete')"
           >
             <IconTrash />
           </button>
@@ -427,19 +544,15 @@ function getItemTypeIcon(type: string) {
     <!-- Item Modal -->
     <Teleport to="body">
       <div v-if="showItemModal" class="modal-backdrop" @click.self="showItemModal = false">
-        <div class="modal modal-lg">
-          <div class="modal-header">
-            <h2>
-              {{ editingItem ? t('common.edit') : t('common.create') }}
-              {{ portfolio?.type === 'gallery' ? t('admin.mediaItem') : t('admin.caseStudy') }}
-            </h2>
-            <button type="button" class="btn btn-icon btn-ghost" @click="showItemModal = false">
+        <div class="modal modal--lg">
+          <header class="modal-header">
+            <h2>{{ editingItem ? t('common.edit') : t('admin.addItem') }}</h2>
+            <button class="btn btn-ghost btn-sm" @click="showItemModal = false">
               <IconX />
             </button>
-          </div>
-          <form @submit.prevent="saveItem" class="modal-body">
-            <div v-if="error" class="form-error">{{ error }}</div>
+          </header>
 
+          <form class="modal-body" @submit.prevent="saveItem">
             <!-- Gallery item form -->
             <template v-if="portfolio?.type === 'gallery'">
               <!-- Type selector (for new items) -->
@@ -517,13 +630,14 @@ function getItemTypeIcon(type: string) {
                 <input v-model="galleryForm.caption" type="text" class="input" />
               </div>
 
-              <div class="form-grid">
+              <div class="form-row form-row--2col">
                 <div class="form-group">
                   <label class="form-label">{{ t('admin.order') }}</label>
-                  <input v-model.number="galleryForm.order" type="number" class="input" />
+                  <input v-model.number="galleryForm.order" type="number" class="input" min="0" />
                 </div>
                 <div class="form-group">
-                  <label class="checkbox">
+                  <label class="form-label">{{ t('admin.status') }}</label>
+                  <label class="form-checkbox">
                     <input v-model="galleryForm.published" type="checkbox" />
                     <span>{{ t('admin.published') }}</span>
                   </label>
@@ -536,13 +650,31 @@ function getItemTypeIcon(type: string) {
               <!-- Cover image -->
               <div class="form-group">
                 <label class="form-label">{{ t('admin.coverImage') }}</label>
-                <div class="image-upload">
-                  <img v-if="mediaPreview" :src="mediaPreview" class="image-preview" />
-                  <input type="file" accept="image/*" @change="handleMediaSelect" />
+                <div class="input-row">
+                  <input
+                    v-model="caseStudyForm.coverUrl"
+                    type="text"
+                    class="input"
+                    placeholder="https://..."
+                  />
+                  <label class="btn btn-secondary">
+                    <IconUpload />
+                    <input
+                      ref="fileInput"
+                      type="file"
+                      accept="image/*"
+                      class="sr-only"
+                      @change="handleCoverUpload"
+                    />
+                  </label>
+                </div>
+                <div v-if="caseStudyForm.coverUrl" class="mt-2">
+                  <img :src="caseStudyForm.coverUrl" alt="Preview" class="image-preview" />
                 </div>
               </div>
 
-              <div class="form-grid">
+              <!-- Non-translatable fields -->
+              <div class="form-row form-row--2col">
                 <div class="form-group">
                   <label class="form-label">{{ t('admin.itemTitle') }} *</label>
                   <input
@@ -569,7 +701,7 @@ function getItemTypeIcon(type: string) {
                 </div>
                 <div class="form-group">
                   <label class="form-label">{{ t('admin.order') }}</label>
-                  <input v-model.number="caseStudyForm.order" type="number" class="input" />
+                  <input v-model.number="caseStudyForm.order" type="number" class="input" min="0" />
                 </div>
               </div>
 
@@ -594,22 +726,90 @@ function getItemTypeIcon(type: string) {
               </div>
 
               <div class="form-group">
-                <label class="checkbox">
+                <label class="form-checkbox">
                   <input v-model="caseStudyForm.published" type="checkbox" />
                   <span>{{ t('admin.published') }}</span>
                 </label>
               </div>
-            </template>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="showItemModal = false">
-                {{ t('common.cancel') }}
-              </button>
-              <button type="submit" class="btn btn-primary" :disabled="saving || uploading">
-                {{ uploading ? t('common.uploading') : saving ? t('common.saving') : t('common.save') }}
-              </button>
-            </div>
+              <!-- Language tabs for translatable content -->
+              <div class="form-divider">
+                <span>{{ t('admin.translations') }}</span>
+              </div>
+
+              <div class="tabs tabs--underline mb-4">
+                <button
+                  v-for="locale in locales"
+                  :key="locale"
+                  type="button"
+                  class="tab"
+                  :class="{ 'is-active': activeLocale === locale }"
+                  @click="activeLocale = locale"
+                >
+                  {{ getLocaleName(locale) }}
+                  <span
+                    v-if="!formLocaleHasContent(locale)"
+                    class="tab__indicator tab__indicator--warning"
+                    :title="t('admin.missingTranslations')"
+                  ></span>
+                </button>
+              </div>
+
+              <!-- Translation fields for active locale -->
+              <div v-for="locale in locales" v-show="activeLocale === locale" :key="locale">
+                <div class="form-group">
+                  <label class="form-label">{{ t('admin.itemTitle') }} ({{ getLocaleName(locale) }})</label>
+                  <input
+                    v-model="caseStudyForm.translations[locale].title"
+                    type="text"
+                    class="input"
+                    @blur="generateSlug"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">{{ t('admin.description') }} ({{ getLocaleName(locale) }})</label>
+                  <textarea
+                    v-model="caseStudyForm.translations[locale].description"
+                    class="input"
+                    rows="2"
+                  ></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">{{ t('admin.content') }} ({{ getLocaleName(locale) }})</label>
+                  <textarea
+                    v-model="caseStudyForm.translations[locale].content"
+                    class="input"
+                    rows="4"
+                  ></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">{{ t('admin.category') }} ({{ getLocaleName(locale) }})</label>
+                  <input
+                    v-model="caseStudyForm.translations[locale].category"
+                    type="text"
+                    class="input"
+                  />
+                </div>
+              </div>
+            </template>
           </form>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showItemModal = false">
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="saving || uploading || uploadingCover"
+              @click="saveItem"
+            >
+              {{ (uploading || uploadingCover) ? t('common.uploading') : saving ? t('common.saving') : t('common.save') }}
+            </button>
+          </footer>
         </div>
       </div>
     </Teleport>

@@ -1,8 +1,11 @@
 /**
  * GET /api/admin/pricing
  * Get all pricing tiers with translations (including unpublished) for admin
+ * Content stored in centralized translations table with key patterns:
+ *   - pricing.tier.{id}.{field}
+ *   - pricing.feature.{id}.text
  */
-import { asc, eq } from 'drizzle-orm'
+import { asc, eq, like } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 
 export default defineEventHandler(async () => {
@@ -14,10 +17,11 @@ export default defineEventHandler(async () => {
     .from(schema.pricingTiers)
     .orderBy(asc(schema.pricingTiers.order))
 
-  // Get all tier translations
-  const allTierTranslations = await db
+  // Get all translations from centralized table
+  const allTranslations = await db
     .select()
-    .from(schema.pricingTierTranslations)
+    .from(schema.translations)
+    .where(like(schema.translations.key, 'pricing.%'))
 
   // Get features and feature translations for each tier
   const tiersWithFeatures = await Promise.all(
@@ -28,54 +32,51 @@ export default defineEventHandler(async () => {
         .where(eq(schema.pricingFeatures.tierId, tier.id))
         .orderBy(asc(schema.pricingFeatures.order))
 
-      // Get translations for these features
-      const featureIds = features.map(f => f.id)
-      let featureTranslations: typeof schema.pricingFeatureTranslations.$inferSelect[] = []
+      // Get tier translations grouped by locale
+      const tierTranslations: Record<string, { name: string | null; description: string | null; ctaText: string | null }> = {}
 
-      if (featureIds.length > 0) {
-        // Get all feature translations and filter to this tier's features
-        const allTranslations = await db
-          .select()
-          .from(schema.pricingFeatureTranslations)
+      const nameKey = `pricing.tier.${tier.id}.name`
+      const descKey = `pricing.tier.${tier.id}.description`
+      const ctaKey = `pricing.tier.${tier.id}.ctaText`
 
-        featureTranslations = allTranslations.filter(t =>
-          featureIds.includes(t.featureId)
-        )
+      // Find all locales that have tier translations
+      const tierTrans = allTranslations.filter(t => t.key.startsWith(`pricing.tier.${tier.id}.`))
+      const tierLocales = [...new Set(tierTrans.map(t => t.locale))]
+
+      for (const locale of tierLocales) {
+        const name = allTranslations.find(t => t.key === nameKey && t.locale === locale)
+        const desc = allTranslations.find(t => t.key === descKey && t.locale === locale)
+        const cta = allTranslations.find(t => t.key === ctaKey && t.locale === locale)
+
+        tierTranslations[locale] = {
+          name: name?.value || null,
+          description: desc?.value || null,
+          ctaText: cta?.value || null
+        }
       }
 
-      // Group feature translations by featureId
-      const featureTranslationsByFeature = featureTranslations.reduce<
-        Record<number, Record<string, string | null>>
-      >((acc, t) => {
-        if (!acc[t.featureId]) acc[t.featureId] = {}
-        acc[t.featureId]![t.locale] = t.text
-        return acc
-      }, {})
+      // Get feature translations grouped by featureId and locale
+      const featuresWithTranslations = features.map(f => {
+        const featureTextKey = `pricing.feature.${f.id}.text`
+        const featureTrans = allTranslations.filter(t => t.key === featureTextKey)
 
-      // Group tier translations by locale
-      const tierTranslations = allTierTranslations
-        .filter(t => t.tierId === tier.id)
-        .reduce(
-          (acc, t) => {
-            acc[t.locale] = {
-              name: t.name,
-              description: t.description,
-              ctaText: t.ctaText
-            }
-            return acc
-          },
-          {} as Record<string, { name: string | null; description: string | null; ctaText: string | null }>
-        )
+        const translations: Record<string, string | null> = {}
+        for (const ft of featureTrans) {
+          translations[ft.locale] = ft.value
+        }
+
+        return {
+          ...f,
+          translations
+        }
+      })
 
       return {
         ...tier,
         // Convert price from cents to dollars for display
         price: tier.price !== null ? tier.price / 100 : null,
         translations: tierTranslations,
-        features: features.map(f => ({
-          ...f,
-          translations: featureTranslationsByFeature[f.id] || {}
-        }))
+        features: featuresWithTranslations
       }
     })
   )

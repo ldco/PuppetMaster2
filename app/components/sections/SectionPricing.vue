@@ -4,6 +4,9 @@
  *
  * Displays pricing tiers from module config.
  * Self-contained: fetches title from i18n if not provided.
+ *
+ * CSS: ui/content/pricing.css
+ * Classes: .pricing-grid, .pricing-card, .pricing-card--featured, .pricing-header, .pricing-price, .pricing-features
  */
 
 const { t, te } = useI18n()
@@ -33,7 +36,9 @@ const sectionTitle = computed(() => {
       <h2 v-if="title || sectionTitle || $slots.title" v-reveal class="section-title section-title--center">
         <slot name="title">{{ title ?? sectionTitle }}</slot>
       </h2>
-      <OrganismsPricingTiers />
+      <div class="section-body">
+        <OrganismsPricingTiers />
+      </div>
     </div>
   </section>
 </template>

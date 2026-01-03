@@ -3,6 +3,7 @@
  *
  * Creates a new portfolio.
  * Requires admin authentication.
+ * Supports multiple locales for name/description.
  */
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
@@ -22,7 +23,11 @@ const createSchema = z.object({
   coverImageUrl: z.string().optional().nullable(),
   coverThumbnailUrl: z.string().optional().nullable(),
   order: z.number().int().optional(),
-  published: z.boolean().optional()
+  published: z.boolean().optional(),
+  translations: z.record(z.object({
+    name: z.string().max(200).nullable().optional(),
+    description: z.string().max(1000).nullable().optional()
+  })).optional()
 })
 
 export default defineEventHandler(async event => {
@@ -47,7 +52,7 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const data = result.data
+  const { translations, ...data } = result.data
   const db = useDatabase()
 
   // Check if slug already exists
@@ -65,7 +70,7 @@ export default defineEventHandler(async event => {
   }
 
   // Insert new portfolio
-  const newPortfolio = db
+  const insertResult = db
     .insert(schema.portfolios)
     .values({
       slug: data.slug,
@@ -77,7 +82,44 @@ export default defineEventHandler(async event => {
       order: data.order || 0,
       published: data.published || false
     })
-    .returning()
+    .run()
+
+  const portfolioId = Number(insertResult.lastInsertRowid)
+
+  // Store translations in centralized table
+  if (translations) {
+    const translationValues = []
+
+    for (const [locale, trans] of Object.entries(translations)) {
+      if (trans.name) {
+        translationValues.push({
+          locale,
+          key: `portfolio.${portfolioId}.name`,
+          value: escapeHtml(trans.name)
+        })
+      }
+
+      if (trans.description) {
+        translationValues.push({
+          locale,
+          key: `portfolio.${portfolioId}.description`,
+          value: escapeHtml(trans.description)
+        })
+      }
+    }
+
+    if (translationValues.length > 0) {
+      db.insert(schema.translations)
+        .values(translationValues)
+        .run()
+    }
+  }
+
+  // Fetch the created portfolio
+  const newPortfolio = db
+    .select()
+    .from(schema.portfolios)
+    .where(eq(schema.portfolios.id, portfolioId))
     .get()
 
   return {

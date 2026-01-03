@@ -11,6 +11,7 @@ import { asc } from 'drizzle-orm'
 import { isSystemKey } from '../../../i18n/system'
 import { hasRole } from '../../utils/roles'
 import type { UserRole } from '../../database/schema'
+import config from '~/puppet-master.config'
 
 export default defineEventHandler(async event => {
   // Auth is handled by middleware for /api/admin/* routes
@@ -42,8 +43,12 @@ export default defineEventHandler(async event => {
     })
   }
 
+  // Get locale codes from config
+  const locales = config.locales.map(l => l.code)
+
   return {
-    locales: ['en', 'ru', 'he'], // Supported locales
+    locales,
+    localeNames: Object.fromEntries(config.locales.map(l => [l.code, l.name])),
     content: contentTranslations,
     // Only include system translations for master users
     system: isMaster ? systemTranslations : null,

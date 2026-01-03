@@ -61,11 +61,12 @@ function navigateLightbox(index: number) {
         <slot name="title">{{ title ?? sectionTitle }}</slot>
       </h2>
 
-      <!-- Show message if no portfolios -->
-      <p v-if="!portfolios.length" v-reveal class="text-center text-secondary">No portfolio items yet.</p>
+      <div class="section-body">
+        <!-- Show message if no portfolios -->
+        <p v-if="!portfolios.length" v-reveal class="text-center text-secondary">{{ t('portfolio.noItems') }}</p>
 
-      <!-- Loop through each portfolio -->
-      <template v-for="portfolio in portfolios" :key="portfolio.id">
+        <!-- Loop through each portfolio -->
+        <template v-for="portfolio in portfolios" :key="portfolio.id">
         <!-- Portfolio header (only show if multiple portfolios) -->
         <h3 v-if="portfolios.length > 1" v-reveal class="portfolio-section-title">
           {{ portfolio.name }}
@@ -102,6 +103,7 @@ function navigateLightbox(index: number) {
           </article>
         </div>
       </template>
+      </div>
     </div>
   </section>
 

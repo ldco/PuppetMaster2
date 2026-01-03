@@ -2,8 +2,15 @@
 /**
  * Admin Pricing Page
  *
- * Manage pricing tiers and their features with multi-language support.
- * Uses existing CSS: .card, .btn, .input, .badge, .page-header, .pricing-card
+ * Manage pricing tiers and their features with unified multi-language support.
+ * All languages are equal - editable in the same modal with tabs.
+ *
+ * CSS Dependencies (see CSS-COMPONENT-MAP.md):
+ * - ui/overlays/modal.css: .modal-backdrop, .modal, .modal--lg, .modal-header, .modal-body, .modal-footer
+ * - ui/forms/inputs.css: .input, .form-group, .form-label, .form-row--2col, .form-checkbox, .form-divider
+ * - ui/content/tabs.css: .tabs, .tabs--underline, .tab, .is-active, .tab__indicator
+ * - ui/content/cards.css: .card, .card-body, .card-actions
+ * - ui/content/pricing.css: .pricing-card, .pricing-card--featured
  */
 import IconPlus from '~icons/tabler/plus'
 import IconEdit from '~icons/tabler/pencil'
@@ -11,27 +18,27 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconGripVertical from '~icons/tabler/grip-vertical'
 import IconCheck from '~icons/tabler/check'
-import IconLanguage from '~icons/tabler/language'
 import config from '~/puppet-master.config'
 
-// Tier type from API (with translations)
+interface PricingTranslation {
+  name: string | null
+  description: string | null
+  ctaText: string | null
+}
+
 interface PricingTier {
   id: number
   slug: string
-  name: string
-  description: string | null
   price: number | null
   currency: string | null
   period: 'month' | 'year' | 'one-time' | null
   featured: boolean | null
-  ctaText: string | null
   ctaUrl: string | null
   order: number | null
   published: boolean | null
-  translations: Record<string, { name: string | null; description: string | null; ctaText: string | null }>
+  translations: Record<string, PricingTranslation>
   features: Array<{
     id: number
-    text: string
     included: boolean | null
     order: number | null
     translations: Record<string, string | null>
@@ -40,7 +47,8 @@ interface PricingTier {
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth'
+  middleware: 'auth',
+  pageTransition: false
 })
 
 const { t } = useI18n()
@@ -54,7 +62,6 @@ const { toast } = useToast()
 
 // Available locales from config
 const locales = config.locales.map(l => l.code)
-const defaultLocale = config.defaultLocale || 'en'
 
 // Fetch tiers
 const headers = useRequestHeaders(['cookie'])
@@ -62,53 +69,67 @@ const {
   data: tiers,
   pending,
   refresh
-} = await useFetch<PricingTier[]>('/api/admin/pricing', {
-  headers
-})
+} = await useFetch<PricingTier[]>('/api/admin/pricing', { headers })
 
 // Modal state
 const showModal = ref(false)
-const showTranslateModal = ref(false)
 const editingTier = ref<PricingTier | null>(null)
 const saving = ref(false)
-const selectedLocale = ref('')
+const activeLocale = ref(locales[0] || 'en')
+
+interface TierTranslationForm {
+  name: string
+  description: string
+  ctaText: string
+}
+
+interface FeatureForm {
+  id?: number
+  included: boolean
+  translations: Record<string, string>
+}
+
+function createEmptyTierTranslations(): Record<string, TierTranslationForm> {
+  const translations: Record<string, TierTranslationForm> = {}
+  for (const locale of locales) {
+    translations[locale] = { name: '', description: '', ctaText: '' }
+  }
+  return translations
+}
+
+function createEmptyFeatureTranslations(): Record<string, string> {
+  const translations: Record<string, string> = {}
+  for (const locale of locales) {
+    translations[locale] = ''
+  }
+  return translations
+}
 
 const form = reactive({
   slug: '',
-  name: '',
-  description: '',
   price: null as number | null,
   currency: 'USD',
   period: 'month' as 'month' | 'year' | 'one-time',
   featured: false,
-  ctaText: '',
   ctaUrl: '/contact',
   order: 0,
   published: true,
-  features: [] as Array<{ id?: number; text: string; included: boolean }>
-})
-
-// Translation form
-const translationForm = reactive({
-  name: '',
-  description: '',
-  ctaText: '',
-  features: [] as Array<{ featureId: number; text: string }>
+  translations: createEmptyTierTranslations(),
+  features: [] as FeatureForm[]
 })
 
 function resetForm() {
   form.slug = ''
-  form.name = ''
-  form.description = ''
   form.price = null
   form.currency = 'USD'
   form.period = 'month'
   form.featured = false
-  form.ctaText = ''
   form.ctaUrl = '/contact'
   form.order = 0
   form.published = true
+  form.translations = createEmptyTierTranslations()
   form.features = []
+  activeLocale.value = locales[0] || 'en'
 }
 
 function openCreate() {
@@ -120,54 +141,61 @@ function openCreate() {
 function openEdit(tier: PricingTier) {
   editingTier.value = tier
   form.slug = tier.slug
-  form.name = tier.name
-  form.description = tier.description || ''
-  form.price = tier.price
+  form.price = tier.price !== null ? tier.price / 100 : null // Convert cents to dollars
   form.currency = tier.currency || 'USD'
   form.period = tier.period || 'month'
   form.featured = tier.featured || false
-  form.ctaText = tier.ctaText || ''
   form.ctaUrl = tier.ctaUrl || '/contact'
   form.order = tier.order || 0
   form.published = tier.published ?? true
+
+  // Load tier translations
+  form.translations = createEmptyTierTranslations()
+  for (const locale of locales) {
+    const trans = tier.translations?.[locale]
+    if (trans) {
+      form.translations[locale] = {
+        name: trans.name || '',
+        description: trans.description || '',
+        ctaText: trans.ctaText || ''
+      }
+    }
+  }
+
+  // Load features with translations
   form.features = (tier.features || []).map(f => ({
     id: f.id,
-    text: f.text,
-    included: f.included ?? true
+    included: f.included ?? true,
+    translations: locales.reduce((acc, locale) => {
+      acc[locale] = f.translations?.[locale] || ''
+      return acc
+    }, {} as Record<string, string>)
   }))
+
+  // Find first locale with content
+  const localeWithContent = locales.find(locale => tier.translations?.[locale]?.name)
+  activeLocale.value = localeWithContent || locales[0] || 'en'
+
   showModal.value = true
 }
 
-function openTranslate(tier: PricingTier, locale: string) {
-  editingTier.value = tier
-  selectedLocale.value = locale
-
-  // Load existing translations for this locale
-  const tierTrans = tier.translations?.[locale]
-  translationForm.name = tierTrans?.name || ''
-  translationForm.description = tierTrans?.description || ''
-  translationForm.ctaText = tierTrans?.ctaText || ''
-  translationForm.features = (tier.features || []).map(f => ({
-    featureId: f.id,
-    text: f.translations?.[locale] || ''
-  }))
-
-  showTranslateModal.value = true
-}
-
-// Auto-generate slug from name
 function generateSlug() {
-  if (!editingTier.value && form.name && !form.slug) {
-    form.slug = form.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
+  if (!editingTier.value && !form.slug) {
+    for (const locale of locales) {
+      const name = form.translations[locale]?.name
+      if (name) {
+        form.slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        break
+      }
+    }
   }
 }
 
-// Feature management
 function addFeature() {
-  form.features.push({ text: '', included: true })
+  form.features.push({
+    included: true,
+    translations: createEmptyFeatureTranslations()
+  })
 }
 
 function removeFeature(index: number) {
@@ -179,10 +207,24 @@ async function saveTier() {
 
   try {
     const payload = {
-      ...form,
-      features: form.features
-        .filter(f => f.text.trim())
-        .map((f, i) => ({ ...f, order: i }))
+      slug: form.slug,
+      price: form.price,
+      currency: form.currency,
+      period: form.period,
+      featured: form.featured,
+      ctaUrl: form.ctaUrl,
+      order: form.order,
+      published: form.published,
+      translations: form.translations,
+      features: form.features.filter(f => {
+        // Keep feature if it has text in any locale
+        return Object.values(f.translations).some(t => t.trim())
+      }).map((f, i) => ({
+        id: f.id,
+        included: f.included,
+        order: i,
+        translations: f.translations
+      }))
     }
 
     if (editingTier.value) {
@@ -190,15 +232,13 @@ async function saveTier() {
         method: 'PUT',
         body: payload
       })
-      toast.success(t('common.saved'))
     } else {
       await $fetch('/api/admin/pricing', {
         method: 'POST',
         body: payload
       })
-      toast.success(t('common.saved'))
     }
-
+    toast.success(t('common.saved'))
     showModal.value = false
     refresh()
   } catch (e: unknown) {
@@ -228,59 +268,57 @@ async function deleteTier(tier: PricingTier) {
   }
 }
 
-// Format price for display
 function formatPrice(tier: PricingTier): string {
   if (tier.price === null) return t('pricing.custom')
   if (tier.price === 0) return t('pricing.free')
   const symbols: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', RUB: '₽', ILS: '₪' }
   const symbol = symbols[tier.currency || 'USD'] || tier.currency
-  return `${symbol}${tier.price}`
+  return `${symbol}${tier.price / 100}`
 }
 
-// Get locale name
 function getLocaleName(code: string): string {
   const locale = config.locales.find(l => l.code === code)
   return locale?.name || code.toUpperCase()
 }
 
-// Check if tier has translation for a locale
+function getTierName(tier: PricingTier): string {
+  for (const locale of locales) {
+    const name = tier.translations?.[locale]?.name
+    if (name) return name
+  }
+  return tier.slug
+}
+
+function getTierDescription(tier: PricingTier): string {
+  for (const locale of locales) {
+    const desc = tier.translations?.[locale]?.description
+    if (desc) return desc
+  }
+  return ''
+}
+
+function getFeatureText(feature: { translations: Record<string, string | null> }): string {
+  for (const locale of locales) {
+    const text = feature.translations?.[locale]
+    if (text) return text
+  }
+  return ''
+}
+
 function hasTranslation(tier: PricingTier, locale: string): boolean {
   return !!(tier.translations?.[locale]?.name)
 }
 
-// Get non-default locales that need translation
-const translationLocales = computed(() => locales.filter(l => l !== defaultLocale))
+function hasAllTranslations(tier: PricingTier): boolean {
+  return locales.every(locale => hasTranslation(tier, locale))
+}
 
-// Save translation
-async function saveTranslation() {
-  if (!editingTier.value) return
-  saving.value = true
+function getMissingTranslations(tier: PricingTier): string[] {
+  return locales.filter(locale => !hasTranslation(tier, locale))
+}
 
-  try {
-    await $fetch(`/api/admin/pricing/${editingTier.value.id}/translations`, {
-      method: 'PUT',
-      body: {
-        locale: selectedLocale.value,
-        tier: {
-          name: translationForm.name || null,
-          description: translationForm.description || null,
-          ctaText: translationForm.ctaText || null
-        },
-        features: translationForm.features.map(f => ({
-          featureId: f.featureId,
-          text: f.text || null
-        }))
-      }
-    })
-    toast.success(t('common.saved'))
-    showTranslateModal.value = false
-    refresh()
-  } catch (e: unknown) {
-    const error = e as { data?: { message?: string } }
-    toast.error(error.data?.message || t('common.error'))
-  } finally {
-    saving.value = false
-  }
+function formLocaleHasContent(locale: string): boolean {
+  return !!(form.translations[locale]?.name)
 }
 </script>
 
@@ -294,15 +332,12 @@ async function saveTranslation() {
       </button>
     </div>
 
-    <!-- Loading -->
     <div v-if="pending" class="loading-state">{{ t('common.loading') }}</div>
 
-    <!-- Empty state -->
     <div v-else-if="!tiers?.length" class="empty-state">
       <p>{{ t('admin.noItems') }}</p>
     </div>
 
-    <!-- Tiers grid -->
     <div v-else class="pricing-tiers__grid">
       <div
         v-for="tier in tiers"
@@ -310,32 +345,19 @@ async function saveTranslation() {
         class="pricing-card"
         :class="{ 'pricing-card--featured': tier.featured }"
       >
-        <!-- Featured badge -->
-        <span v-if="tier.featured" class="pricing-card__badge">
-          {{ t('admin.featured') }}
-        </span>
+        <span v-if="tier.featured" class="pricing-card__badge">{{ t('admin.featured') }}</span>
 
-        <!-- Status badge (top right) -->
-        <span
-          class="badge pricing-card__status"
-          :class="tier.published ? 'badge-success' : 'badge-warning'"
-        >
+        <span class="badge pricing-card__status" :class="tier.published ? 'badge-success' : 'badge-warning'">
           {{ tier.published ? t('admin.published') : t('common.draft') }}
         </span>
 
-        <!-- Header -->
         <div class="pricing-card__header">
-          <h3 class="pricing-card__name">{{ tier.name }}</h3>
-          <p v-if="tier.description" class="pricing-card__description">
-            {{ tier.description }}
-          </p>
+          <h3 class="pricing-card__name">{{ getTierName(tier) }}</h3>
+          <p v-if="getTierDescription(tier)" class="pricing-card__description">{{ getTierDescription(tier) }}</p>
         </div>
 
-        <!-- Price -->
         <div class="pricing-card__price">
-          <span v-if="tier.price === null" class="pricing-card__price-custom">
-            {{ t('pricing.custom') }}
-          </span>
+          <span v-if="tier.price === null" class="pricing-card__price-custom">{{ t('pricing.custom') }}</span>
           <template v-else>
             <span class="pricing-card__price-value">{{ formatPrice(tier) }}</span>
             <span v-if="tier.period !== 'one-time'" class="pricing-card__price-period">
@@ -344,43 +366,27 @@ async function saveTranslation() {
           </template>
         </div>
 
-        <!-- Features -->
         <ul class="pricing-card__features">
-          <li
-            v-for="feature in tier.features?.slice(0, 4)"
-            :key="feature.id"
-            class="pricing-card__feature"
-            :class="{ 'pricing-card__feature--excluded': !feature.included }"
-          >
+          <li v-for="feature in tier.features?.slice(0, 4)" :key="feature.id" class="pricing-card__feature"
+              :class="{ 'pricing-card__feature--excluded': !feature.included }">
             <span class="pricing-card__feature-icon">
-              <IconCheck v-if="feature.included" />
-              <IconX v-else />
+              <IconCheck v-if="feature.included" /><IconX v-else />
             </span>
-            <span class="pricing-card__feature-text">{{ feature.text }}</span>
+            <span class="pricing-card__feature-text">{{ getFeatureText(feature) }}</span>
           </li>
           <li v-if="(tier.features?.length || 0) > 4" class="pricing-card__feature">
             <span class="pricing-card__feature-icon" />
-            <span class="pricing-card__feature-text text-secondary">
-              +{{ (tier.features?.length || 0) - 4 }} {{ t('common.more') }}
-            </span>
+            <span class="pricing-card__feature-text text-secondary">+{{ (tier.features?.length || 0) - 4 }} {{ t('common.more') }}</span>
           </li>
         </ul>
 
         <!-- Translation status -->
-        <div v-if="translationLocales.length > 0" class="pricing-card__translations">
-          <button
-            v-for="locale in translationLocales"
-            :key="locale"
-            class="btn btn-xs"
-            :class="hasTranslation(tier, locale) ? 'btn-success' : 'btn-ghost'"
-            :title="`${getLocaleName(locale)}: ${hasTranslation(tier, locale) ? t('admin.translated') : t('admin.notTranslated')}`"
-            @click="openTranslate(tier, locale)"
-          >
-            {{ locale.toUpperCase() }}
-          </button>
+        <div v-if="!hasAllTranslations(tier)" class="mt-2">
+          <span class="text-warning text-sm">
+            {{ t('admin.missingTranslations') }}: {{ getMissingTranslations(tier).map(l => l.toUpperCase()).join(', ') }}
+          </span>
         </div>
 
-        <!-- Actions -->
         <div class="pricing-card__actions">
           <button class="btn btn-sm btn-secondary" @click="openEdit(tier)">
             <IconEdit /> {{ t('common.edit') }}
@@ -392,53 +398,26 @@ async function saveTranslation() {
       </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- Edit Modal with Language Tabs -->
     <Teleport to="body">
       <div v-if="showModal" class="modal-backdrop" @click.self="showModal = false">
         <div class="modal modal--lg">
           <header class="modal-header">
             <h2>{{ editingTier ? t('common.edit') : t('admin.addItem') }}</h2>
-            <button class="btn btn-ghost btn-sm" @click="showModal = false">
-              <IconX />
-            </button>
+            <button class="btn btn-ghost btn-sm" @click="showModal = false"><IconX /></button>
           </header>
 
           <form class="modal-body" @submit.prevent="saveTier">
+            <!-- Non-translatable fields -->
             <div class="form-row form-row--2col">
               <div class="form-group">
-                <label class="form-label" for="tier-name">{{ t('admin.name') }} *</label>
-                <input
-                  id="tier-name"
-                  v-model="form.name"
-                  type="text"
-                  class="input"
-                  required
-                  @blur="generateSlug"
-                />
-              </div>
-
-              <div class="form-group">
                 <label class="form-label" for="tier-slug">{{ t('admin.slug') }} *</label>
-                <input
-                  id="tier-slug"
-                  v-model="form.slug"
-                  type="text"
-                  class="input"
-                  required
-                  pattern="[a-z0-9-]+"
-                />
+                <input id="tier-slug" v-model="form.slug" type="text" class="input" required pattern="[a-z0-9-]+" />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="tier-price">{{ t('admin.price') }}</label>
-                <input
-                  id="tier-price"
-                  v-model.number="form.price"
-                  type="number"
-                  class="input"
-                  min="0"
-                  step="0.01"
-                />
+                <input id="tier-price" v-model.number="form.price" type="number" class="input" min="0" step="0.01" />
               </div>
 
               <div class="form-group">
@@ -462,188 +441,82 @@ async function saveTranslation() {
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="tier-order">{{ t('admin.order') }}</label>
-                <input
-                  id="tier-order"
-                  v-model.number="form.order"
-                  type="number"
-                  class="input"
-                  min="0"
-                />
+                <label class="form-label" for="tier-cta-url">{{ t('admin.ctaUrl') }}</label>
+                <input id="tier-cta-url" v-model="form.ctaUrl" type="text" class="input" />
               </div>
-            </div>
 
-            <div class="form-group">
-              <label class="form-label" for="tier-description">{{ t('admin.description') }}</label>
-              <textarea
-                id="tier-description"
-                v-model="form.description"
-                class="input"
-                rows="2"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="tier-cta-text">{{ t('admin.ctaText') }}</label>
-              <input
-                id="tier-cta-text"
-                v-model="form.ctaText"
-                type="text"
-                class="input"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="tier-cta-url">{{ t('admin.ctaUrl') }}</label>
-              <input
-                id="tier-cta-url"
-                v-model="form.ctaUrl"
-                type="text"
-                class="input"
-              />
+              <div class="form-group">
+                <label class="form-label" for="tier-order">{{ t('admin.order') }}</label>
+                <input id="tier-order" v-model.number="form.order" type="number" class="input" min="0" />
+              </div>
             </div>
 
             <div class="form-row">
               <label class="form-checkbox">
-                <input v-model="form.featured" type="checkbox" />
-                <span>{{ t('admin.featured') }}</span>
+                <input v-model="form.featured" type="checkbox" /><span>{{ t('admin.featured') }}</span>
               </label>
               <label class="form-checkbox">
-                <input v-model="form.published" type="checkbox" />
-                <span>{{ t('admin.published') }}</span>
+                <input v-model="form.published" type="checkbox" /><span>{{ t('admin.published') }}</span>
               </label>
             </div>
 
-            <!-- Features -->
-            <div class="form-group">
-              <div class="form-group-header">
-                <label class="form-label">{{ t('admin.features') }}</label>
-                <button type="button" class="btn btn-sm btn-ghost" @click="addFeature">
-                  <IconPlus /> {{ t('admin.addItem') }}
-                </button>
+            <!-- Language tabs for translatable content -->
+            <div class="form-divider"><span>{{ t('admin.content') }}</span></div>
+
+            <div class="tabs tabs--underline mb-4">
+              <button v-for="locale in locales" :key="locale" type="button" class="tab"
+                      :class="{ 'is-active': activeLocale === locale }" @click="activeLocale = locale">
+                {{ getLocaleName(locale) }}
+                <span v-if="!formLocaleHasContent(locale)" class="tab__indicator tab__indicator--warning"
+                      :title="t('admin.missingTranslations')"></span>
+              </button>
+            </div>
+
+            <!-- Tier translation fields per locale -->
+            <div v-for="locale in locales" v-show="activeLocale === locale" :key="locale">
+              <div class="form-group">
+                <label class="form-label">{{ t('admin.name') }}</label>
+                <input v-model="form.translations[locale].name" type="text" class="input" @blur="generateSlug" />
               </div>
 
-              <div v-if="!form.features.length" class="text-secondary text-sm">
-                {{ t('admin.noItems') }}
+              <div class="form-group">
+                <label class="form-label">{{ t('admin.description') }}</label>
+                <textarea v-model="form.translations[locale].description" class="input" rows="2"></textarea>
               </div>
 
-              <div v-for="(feature, index) in form.features" :key="index" class="input-row">
-                <button type="button" class="btn btn-ghost btn-sm">
-                  <IconGripVertical />
-                </button>
-                <input
-                  v-model="feature.text"
-                  type="text"
-                  class="input"
-                />
-                <label class="form-checkbox">
-                  <input v-model="feature.included" type="checkbox" />
-                  <span>{{ t('admin.included') }}</span>
-                </label>
-                <button type="button" class="btn btn-ghost btn-sm text-error" @click="removeFeature(index)">
-                  <IconTrash />
-                </button>
+              <div class="form-group">
+                <label class="form-label">{{ t('admin.ctaText') }}</label>
+                <input v-model="form.translations[locale].ctaText" type="text" class="input" />
               </div>
-            </div>
-          </form>
 
-          <footer class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showModal = false">
-              {{ t('common.cancel') }}
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="saving"
-              @click="saveTier"
-            >
-              {{ saving ? t('common.saving') : t('common.save') }}
-            </button>
-          </footer>
-        </div>
-      </div>
-    </Teleport>
-
-    <!-- Translation Modal -->
-    <Teleport to="body">
-      <div v-if="showTranslateModal" class="modal-backdrop" @click.self="showTranslateModal = false">
-        <div class="modal modal--lg">
-          <header class="modal-header">
-            <h2>
-              <IconLanguage class="icon" />
-              {{ t('admin.translate') }}: {{ getLocaleName(selectedLocale) }}
-            </h2>
-            <button class="btn btn-ghost btn-sm" @click="showTranslateModal = false">
-              <IconX />
-            </button>
-          </header>
-
-          <form class="modal-body" @submit.prevent="saveTranslation">
-            <!-- Original values shown as reference -->
-            <p class="text-secondary text-sm mb-4">
-              {{ t('admin.translateHint', { locale: getLocaleName(defaultLocale) }) }}
-            </p>
-
-            <div class="form-group">
-              <label class="form-label">{{ t('admin.name') }}</label>
-              <div class="text-secondary text-sm mb-1">{{ editingTier?.name }}</div>
-              <input
-                v-model="translationForm.name"
-                type="text"
-                class="input"
-                :placeholder="editingTier?.name || ''"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">{{ t('admin.description') }}</label>
-              <div class="text-secondary text-sm mb-1">{{ editingTier?.description || '-' }}</div>
-              <textarea
-                v-model="translationForm.description"
-                class="input"
-                rows="2"
-                :placeholder="editingTier?.description || ''"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">{{ t('admin.ctaText') }}</label>
-              <div class="text-secondary text-sm mb-1">{{ editingTier?.ctaText || '-' }}</div>
-              <input
-                v-model="translationForm.ctaText"
-                type="text"
-                class="input"
-                :placeholder="editingTier?.ctaText || ''"
-              />
-            </div>
-
-            <!-- Feature translations -->
-            <div class="form-group">
-              <label class="form-label">{{ t('admin.features') }}</label>
-              <div v-for="(feature, index) in translationForm.features" :key="feature.featureId" class="mb-3">
-                <div class="text-secondary text-sm mb-1">
-                  {{ editingTier?.features?.find(f => f.id === feature.featureId)?.text || '-' }}
+              <!-- Features for this locale -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <span class="form-section-title">{{ t('admin.features') }}</span>
+                  <button type="button" class="btn-add-inline" @click="addFeature">
+                    <IconPlus /> {{ t('admin.addItem') }}
+                  </button>
                 </div>
-                <input
-                  v-model="feature.text"
-                  type="text"
-                  class="input"
-                  :placeholder="editingTier?.features?.find(f => f.id === feature.featureId)?.text || ''"
-                />
+
+                <div v-if="!form.features.length" class="text-secondary text-sm">{{ t('admin.noItems') }}</div>
+
+                <div v-for="(feature, index) in form.features" :key="index" class="input-row mb-2">
+                  <button type="button" class="btn btn-ghost btn-sm"><IconGripVertical /></button>
+                  <input v-model="feature.translations[locale]" type="text" class="input" />
+                  <label class="form-checkbox">
+                    <input v-model="feature.included" type="checkbox" /><span>{{ t('admin.included') }}</span>
+                  </label>
+                  <button type="button" class="btn btn-ghost btn-sm text-error" @click="removeFeature(index)">
+                    <IconTrash />
+                  </button>
+                </div>
               </div>
             </div>
           </form>
 
           <footer class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showTranslateModal = false">
-              {{ t('common.cancel') }}
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="saving"
-              @click="saveTranslation"
-            >
+            <button type="button" class="btn btn-secondary" @click="showModal = false">{{ t('common.cancel') }}</button>
+            <button type="submit" class="btn btn-primary" :disabled="saving" @click="saveTier">
               {{ saving ? t('common.saving') : t('common.save') }}
             </button>
           </footer>
