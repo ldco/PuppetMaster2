@@ -334,3 +334,79 @@
   transform: translateY(0);
   pointer-events: auto;
 }
+
+/* ═══════════════════════════════════════════════════════════
+ * ADAPTIVE NAVIGATION
+ *
+ * Smart detection of nav overflow:
+ * - When nav items fit: show full nav, hide hamburger
+ * - When nav items overflow: hide nav, show hamburger
+ *
+ * Works via useAdaptiveNav composable which detects overflow
+ * and adds .header--nav-collapsed class to the header.
+ * ═══════════════════════════════════════════════════════════ */
+
+/* Hamburger button container */
+.header-hamburger {
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile: always show hamburger */
+@media (--below-desktop) {
+  .header-hamburger {
+    display: flex;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  .header-actions {
+    display: none;
+  }
+
+  /* Center logo on mobile */
+  .header-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Desktop: adaptive behavior */
+@media (--desktop) {
+  /* Default: hide hamburger, show nav */
+  .header-hamburger {
+    display: none;
+  }
+
+  .header-nav {
+    display: flex;
+  }
+
+  .header-actions {
+    display: flex;
+  }
+
+  /* When nav is collapsed (overflow detected): show hamburger, hide nav */
+  .header-hamburger.is-visible,
+  .header--nav-collapsed .header-hamburger {
+    display: flex;
+  }
+
+  .header--nav-collapsed .header-nav {
+    display: none;
+  }
+
+  .header--nav-collapsed .header-actions {
+    display: none;
+  }
+
+  /* Collapsed: center logo like mobile */
+  .header--nav-collapsed .header-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

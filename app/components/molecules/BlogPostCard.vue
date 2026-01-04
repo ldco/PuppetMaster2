@@ -6,6 +6,7 @@
  */
 import IconClock from '~icons/tabler/clock'
 import IconEye from '~icons/tabler/eye'
+import IconPhoto from '~icons/tabler/photo'
 
 interface BlogPostData {
   id: number
@@ -51,7 +52,9 @@ function formatDate(date: Date | string | null): string {
         :alt="post.coverImageAlt || post.title"
         loading="lazy"
       />
-      <div v-else class="blog-card__image-placeholder" />
+      <div v-else class="blog-card__image-placeholder">
+        <IconPhoto />
+      </div>
     </NuxtLink>
 
     <!-- Content -->

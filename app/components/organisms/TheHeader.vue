@@ -3,9 +3,12 @@
  * TheHeader Organism
  *
  * Main site header with responsive behavior.
- * Desktop: Full nav visible
+ * Desktop: Full nav visible (unless items overflow)
  * Mobile: Hamburger menu with overlay navigation
  * Uses Tabler icons via unplugin-icons.
+ *
+ * Smart adaptive nav: Detects when nav items don't fit
+ * and automatically switches to hamburger menu.
  */
 import config from '~/puppet-master.config'
 import IconX from '~icons/tabler/x'
@@ -13,6 +16,9 @@ import IconX from '~icons/tabler/x'
 const { t } = useI18n()
 const isMenuOpen = ref(false)
 const showMenu = ref(false)
+
+// Adaptive nav - detects overflow and collapses to hamburger
+const { headerRef, navRef, isCollapsed } = useAdaptiveNav()
 
 // Scroll behavior - ONLY in onepager mode!
 // hideOnScroll respects config.features.hideHeaderOnScroll
@@ -40,15 +46,17 @@ function closeMenu() {
 
 <template>
   <header
+    ref="headerRef"
     class="header"
     :class="{
       'header--scrolled': isScrolled,
-      'header--hidden': isHidden
+      'header--hidden': isHidden,
+      'header--nav-collapsed': isCollapsed
     }"
   >
     <div class="header-inner container">
-      <!-- Mobile: Hamburger (left) -->
-      <div class="mobile-only">
+      <!-- Hamburger: shown on mobile OR when nav overflows on desktop -->
+      <div class="header-hamburger" :class="{ 'is-visible': isCollapsed }">
         <AtomsHamburgerIcon
           :is-open="isMenuOpen"
           :label="isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')"
@@ -59,11 +67,13 @@ function closeMenu() {
       <!-- Logo (center on mobile, left on desktop) -->
       <AtomsLogo class="header-logo" />
 
-      <!-- Desktop: Navigation (center) -->
-      <MoleculesNavLinks class="desktop-only" />
+      <!-- Desktop: Navigation (center) - hidden when collapsed -->
+      <nav ref="navRef" class="header-nav">
+        <MoleculesNavLinks />
+      </nav>
 
       <!-- Desktop: Actions (right) -->
-      <MoleculesHeaderActions class="desktop-only" />
+      <MoleculesHeaderActions class="header-actions" />
 
       <!-- Mobile: Contact buttons (right, opposite to hamburger) -->
       <MoleculesHeaderContact v-if="config.headerContact?.enabled" class="mobile-only" />

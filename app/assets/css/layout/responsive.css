@@ -35,12 +35,11 @@
  * MOBILE FIRST - Default styles (< 640px)
  * ══════════════════════════════════════════════════════════ */
 
-/* Navigation: hidden by default (mobile), shown on desktop */
-.header-nav {
-  display: none;
-}
+/* NOTE: .header-nav, .header-hamburger, .header-actions visibility
+ * is now controlled by skeleton/header.css with adaptive nav support.
+ * This allows smart detection of overflow on desktop. */
 
-/* Mobile menu button: shown by default, hidden on desktop */
+/* Mobile menu button (legacy): shown by default, hidden on desktop */
 .mobile-menu-btn {
   display: flex;
 }
@@ -95,12 +94,10 @@
  * ══════════════════════════════════════════════════════════ */
 
 @media (--desktop) {
-  /* Show desktop navigation */
-  .header-nav {
-    display: flex;
-  }
+  /* NOTE: .header-nav visibility is controlled by skeleton/header.css
+   * with adaptive nav support (hides when items overflow) */
 
-  /* Hide mobile menu button */
+  /* Hide mobile menu button (legacy) */
   .mobile-menu-btn {
     display: none;
   }

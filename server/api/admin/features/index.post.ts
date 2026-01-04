@@ -11,7 +11,6 @@ import { useDatabase, schema } from '../../../database/client'
 
 const createFeatureSchema = z.object({
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/),
-  icon: z.string().max(50).nullish(),
   imageUrl: z.string().max(500).nullish(),
   hoverImageUrl: z.string().max(500).nullish(),
   order: z.number().int().min(0).default(0),
@@ -53,7 +52,6 @@ export default defineEventHandler(async event => {
     .insert(schema.features)
     .values({
       slug: data.slug,
-      icon: data.icon || 'star',
       imageUrl: data.imageUrl || null,
       hoverImageUrl: data.hoverImageUrl || null,
       order: data.order,

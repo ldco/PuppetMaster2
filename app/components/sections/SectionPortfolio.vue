@@ -6,6 +6,7 @@
  * Self-contained: fetches title from i18n if not provided.
  */
 import type { PortfolioWithItems, PortfolioItem } from '~/types'
+import IconPhoto from '~icons/tabler/photo'
 
 const { t, te } = useI18n()
 
@@ -88,7 +89,9 @@ function navigateLightbox(index: number) {
                 :alt="item.title || item.caption || ''"
                 loading="lazy"
               />
-              <div v-else class="image-placeholder">🎨</div>
+              <div v-else class="content-card-placeholder">
+                <IconPhoto />
+              </div>
             </div>
             <div class="portfolio-card-info">
               <span v-if="item.category" class="portfolio-card-category">

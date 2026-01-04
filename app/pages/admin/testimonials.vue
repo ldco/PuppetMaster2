@@ -20,6 +20,7 @@ import IconUpload from '~icons/tabler/upload'
 import IconStar from '~icons/tabler/star'
 import IconStarFilled from '~icons/tabler/star-filled'
 import config from '~/puppet-master.config'
+import AppImage from '~/components/atoms/AppImage.vue'
 
 interface TestimonialTranslation {
   quote: string | null
@@ -281,8 +282,13 @@ async function uploadPhoto(event: Event) {
           <div class="testimonials-admin-item">
             <p class="testimonials-admin-item__quote">"{{ getTestimonialQuote(testimonial) }}"</p>
             <div class="testimonials-admin-item__author">
-              <div v-if="testimonial.authorPhotoUrl" class="testimonials-admin-item__photo">
-                <img :src="testimonial.authorPhotoUrl" :alt="testimonial.authorName" />
+              <div class="testimonials-admin-item__photo">
+                <AppImage
+                  :src="testimonial.authorPhotoUrl"
+                  :alt="testimonial.authorName"
+                  fallback="initials"
+                  :initials="testimonial.authorName.charAt(0)"
+                />
               </div>
               <div class="testimonials-admin-item__info">
                 <span class="testimonials-admin-item__name">{{ testimonial.authorName }}</span>
@@ -403,7 +409,7 @@ async function uploadPhoto(event: Event) {
                 </label>
               </div>
               <div v-if="form.authorPhoto" class="mt-2">
-                <img :src="form.authorPhoto" alt="Preview" class="testimonials-admin-photo-preview" />
+                <AppImage :src="form.authorPhoto" alt="Preview" class="testimonials-admin-photo-preview" />
               </div>
             </div>
 

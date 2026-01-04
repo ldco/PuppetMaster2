@@ -2,51 +2,17 @@
 /**
  * Features Section
  *
- * Displays feature cards with icons, titles, and descriptions.
- * Uses icon map pattern for dynamic icon rendering.
+ * Displays feature cards with images (and hover images).
+ * Cards show an image that swaps on hover for interactive effect.
  *
  * CSS: ui/content/features.css
- * Classes: .features-grid, .feature-card, .feature-icon, .feature-title, .feature-description
+ * Classes: .features-grid, .feature-card, .feature-card__image, .feature-card__content
  */
-
-// Import feature icons
-import IconDeviceMobile from '~icons/tabler/device-mobile'
-import IconRocket from '~icons/tabler/rocket'
-import IconSearch from '~icons/tabler/search'
-import IconShieldCheck from '~icons/tabler/shield-check'
-import IconChartBar from '~icons/tabler/chart-bar'
-import IconHeadset from '~icons/tabler/headset'
-import IconStar from '~icons/tabler/star'
-import IconBolt from '~icons/tabler/bolt'
-import IconLock from '~icons/tabler/lock'
-import IconCloud from '~icons/tabler/cloud'
-import IconCode from '~icons/tabler/code'
-import IconPalette from '~icons/tabler/palette'
-import IconSettings from '~icons/tabler/settings'
-import IconHeart from '~icons/tabler/heart'
-
-// Icon map: database icon name → component
-const iconMap: Record<string, Component> = {
-  'device-mobile': IconDeviceMobile,
-  'rocket': IconRocket,
-  'search': IconSearch,
-  'shield-check': IconShieldCheck,
-  'chart-bar': IconChartBar,
-  'headset': IconHeadset,
-  'star': IconStar,
-  'bolt': IconBolt,
-  'lock': IconLock,
-  'cloud': IconCloud,
-  'code': IconCode,
-  'palette': IconPalette,
-  'settings': IconSettings,
-  'heart': IconHeart
-}
+import IconPhoto from '~icons/tabler/photo'
 
 interface FeatureData {
   id: number
   slug: string
-  icon: string
   imageUrl: string | null
   hoverImageUrl: string | null
   category: string | null
@@ -76,14 +42,15 @@ const { data: features, pending } = await useFetch<FeatureData[]>('/api/features
   watch: [locale]
 })
 
-// Check if any feature has images - use image-based layout
-const hasImages = computed(() => {
-  return features.value?.some(f => f.imageUrl) ?? false
-})
+// Track failed images
+const failedImages = ref(new Set<number>())
 
-// Get icon component for a feature
-function getIcon(iconName: string): Component {
-  return iconMap[iconName] || IconStar
+function onImageError(featureId: number) {
+  failedImages.value.add(featureId)
+}
+
+function hasValidImage(feature: FeatureData): boolean {
+  return !!(feature.imageUrl && !failedImages.value.has(feature.id))
 }
 </script>
 
@@ -102,75 +69,42 @@ function getIcon(iconName: string): Component {
         <div
           v-else
           class="features-grid"
-          :class="{
-            'features-grid--bento': bento && features.length === 6 && !hasImages,
-            'features-grid--images': hasImages
-          }"
+          :class="{ 'features-grid--bento': bento && features.length === 6 }"
           v-reveal
         >
-          <!-- Image-based cards -->
-          <template v-if="hasImages">
-            <div
-              v-for="feature in features"
-              :key="feature.id"
-              class="feature-card"
-              :class="{ 'feature-card--image': feature.imageUrl }"
-            >
-              <!-- Image version -->
-              <template v-if="feature.imageUrl">
-                <div class="feature-card__image">
-                  <img
-                    :src="feature.imageUrl"
-                    :alt="feature.title"
-                    class="feature-card__img feature-card__img--default"
-                  />
-                  <img
-                    v-if="feature.hoverImageUrl"
-                    :src="feature.hoverImageUrl"
-                    :alt="feature.title"
-                    class="feature-card__img feature-card__img--hover"
-                  />
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">{{ feature.title }}</h3>
-                  <p v-if="feature.description" class="feature-card__description">
-                    {{ feature.description }}
-                  </p>
-                </div>
+          <div
+            v-for="feature in features"
+            :key="feature.id"
+            class="feature-card"
+          >
+            <!-- Image -->
+            <div class="feature-card__image">
+              <template v-if="hasValidImage(feature)">
+                <img
+                  :src="feature.imageUrl!"
+                  :alt="feature.title"
+                  class="feature-card__img feature-card__img--default"
+                  @error="onImageError(feature.id)"
+                />
+                <img
+                  v-if="feature.hoverImageUrl"
+                  :src="feature.hoverImageUrl"
+                  :alt="feature.title"
+                  class="feature-card__img feature-card__img--hover"
+                />
               </template>
-              <!-- Icon fallback -->
-              <template v-else>
-                <div class="feature-card__icon">
-                  <component :is="getIcon(feature.icon)" />
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">{{ feature.title }}</h3>
-                  <p v-if="feature.description" class="feature-card__description">
-                    {{ feature.description }}
-                  </p>
-                </div>
-              </template>
-            </div>
-          </template>
-
-          <!-- Icon-based cards (default) -->
-          <template v-else>
-            <div
-              v-for="feature in features"
-              :key="feature.id"
-              class="feature-card"
-            >
-              <div class="feature-card__icon">
-                <component :is="getIcon(feature.icon)" />
-              </div>
-              <div class="feature-card__content">
-                <h3 class="feature-card__title">{{ feature.title }}</h3>
-                <p v-if="feature.description" class="feature-card__description">
-                  {{ feature.description }}
-                </p>
+              <div v-else class="content-card-placeholder">
+                <IconPhoto />
               </div>
             </div>
-          </template>
+            <!-- Content overlay -->
+            <div class="feature-card__content">
+              <h3 class="feature-card__title">{{ feature.title }}</h3>
+              <p v-if="feature.description" class="feature-card__description">
+                {{ feature.description }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

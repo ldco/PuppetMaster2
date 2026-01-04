@@ -4,6 +4,9 @@
  * Reusable content display components.
  */
 
+/* Base patterns - MUST be first, provides CSS custom properties */
+@import './content-card.css';
+
 @import './cards.css';
 @import './badges.css';
 @import './avatars.css';

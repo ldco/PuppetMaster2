@@ -18,6 +18,7 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconUpload from '~icons/tabler/upload'
 import config from '~/puppet-master.config'
+import AppImage from '~/components/atoms/AppImage.vue'
 
 interface TeamTranslation {
   position: string | null
@@ -348,10 +349,12 @@ async function uploadHoverPhoto(event: Event) {
         <div class="card-body">
           <div class="team-admin-card__header">
             <div class="team-admin-card__photo">
-              <img v-if="member.photoUrl" :src="member.photoUrl" :alt="member.name" />
-              <div v-else class="team-admin-card__photo-placeholder">
-                {{ member.name.charAt(0) }}
-              </div>
+              <AppImage
+                :src="member.photoUrl"
+                :alt="member.name"
+                fallback="initials"
+                :initials="member.name.charAt(0)"
+              />
             </div>
             <div class="team-admin-card__info">
               <h3 class="team-admin-card__name">{{ member.name }}</h3>
@@ -440,7 +443,7 @@ async function uploadHoverPhoto(event: Event) {
                   </label>
                 </div>
                 <div v-if="form.photoUrl" class="mt-2">
-                  <img :src="form.photoUrl" alt="Preview" class="team-admin-card__photo-preview" />
+                  <AppImage :src="form.photoUrl" alt="Preview" class="team-admin-card__photo-preview" />
                 </div>
               </div>
 
@@ -454,7 +457,7 @@ async function uploadHoverPhoto(event: Event) {
                   </label>
                 </div>
                 <div v-if="form.hoverPhotoUrl" class="mt-2">
-                  <img :src="form.hoverPhotoUrl" alt="Hover Preview" class="team-admin-card__photo-preview" />
+                  <AppImage :src="form.hoverPhotoUrl" alt="Hover Preview" class="team-admin-card__photo-preview" />
                 </div>
               </div>
             </div>

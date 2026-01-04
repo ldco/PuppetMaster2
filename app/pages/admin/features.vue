@@ -18,6 +18,7 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconUpload from '~icons/tabler/upload'
 import config from '~/puppet-master.config'
+import AppImage from '~/components/atoms/AppImage.vue'
 
 interface FeatureTranslation {
   title: string | null
@@ -27,7 +28,6 @@ interface FeatureTranslation {
 interface Feature {
   id: number
   slug: string
-  icon: string | null
   imageUrl: string | null
   hoverImageUrl: string | null
   order: number
@@ -78,7 +78,6 @@ function createEmptyTranslations(): Record<string, { title: string; description:
 
 const form = reactive({
   slug: '',
-  icon: '',
   imageUrl: '',
   hoverImageUrl: '',
   order: 0,
@@ -88,7 +87,6 @@ const form = reactive({
 
 function resetForm() {
   form.slug = ''
-  form.icon = ''
   form.imageUrl = ''
   form.hoverImageUrl = ''
   form.order = 0
@@ -106,7 +104,6 @@ function openCreate() {
 function openEdit(feature: Feature) {
   editingFeature.value = feature
   form.slug = feature.slug
-  form.icon = feature.icon || ''
   form.imageUrl = feature.imageUrl || ''
   form.hoverImageUrl = feature.hoverImageUrl || ''
   form.order = feature.order
@@ -156,7 +153,6 @@ async function saveFeature() {
   try {
     const payload = {
       slug: form.slug,
-      icon: form.icon || null,
       imageUrl: form.imageUrl || null,
       hoverImageUrl: form.hoverImageUrl || null,
       order: form.order,
@@ -330,13 +326,13 @@ async function uploadHoverImage(event: Event) {
             {{ getFeatureDescription(feature) }}
           </p>
           <div class="features-admin-item__meta">
-            <span class="badge badge-secondary">{{ feature.icon || 'star' }}</span>
             <span
               class="badge"
               :class="feature.published ? 'badge-success' : 'badge-warning'"
             >
               {{ feature.published ? t('admin.published') : t('common.draft') }}
             </span>
+            <span v-if="!feature.imageUrl" class="badge badge-warning">{{ t('admin.noImage') }}</span>
           </div>
 
           <!-- Translation status -->
@@ -385,18 +381,6 @@ async function uploadHoverImage(event: Event) {
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="feature-icon">{{ t('admin.icon') }}</label>
-                <input
-                  id="feature-icon"
-                  v-model="form.icon"
-                  type="text"
-                  class="input"
-                  placeholder="tabler:star"
-                />
-                <p class="form-hint">{{ t('admin.iconHint') }}</p>
-              </div>
-
-              <div class="form-group">
                 <label class="form-label" for="feature-order">{{ t('admin.order') }}</label>
                 <input
                   id="feature-order"
@@ -439,7 +423,7 @@ async function uploadHoverImage(event: Event) {
                   </label>
                 </div>
                 <div v-if="form.imageUrl" class="mt-2">
-                  <img :src="form.imageUrl" alt="Preview" class="image-preview" />
+                  <AppImage :src="form.imageUrl" alt="Preview" class="image-preview" />
                 </div>
               </div>
 
@@ -464,7 +448,7 @@ async function uploadHoverImage(event: Event) {
                   </label>
                 </div>
                 <div v-if="form.hoverImageUrl" class="mt-2">
-                  <img :src="form.hoverImageUrl" alt="Hover Preview" class="image-preview" />
+                  <AppImage :src="form.hoverImageUrl" alt="Hover Preview" class="image-preview" />
                 </div>
               </div>
             </div>

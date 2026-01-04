@@ -16,7 +16,7 @@ import IconTrash from '~icons/tabler/trash'
 import IconX from '~icons/tabler/x'
 import IconUpload from '~icons/tabler/upload'
 import IconExternalLink from '~icons/tabler/external-link'
-import IconPhotoOff from '~icons/tabler/photo-off'
+import AppImage from '~/components/atoms/AppImage.vue'
 
 interface Client {
   id: number
@@ -184,16 +184,6 @@ async function uploadLogo(event: Event) {
   }
 }
 
-// Track failed images
-const failedImages = ref(new Set<number>())
-
-function onImageError(clientId: number) {
-  failedImages.value.add(clientId)
-}
-
-function hasValidLogo(client: Client): boolean {
-  return !!(client.logoUrl && !failedImages.value.has(client.id))
-}
 </script>
 
 <template>
@@ -217,14 +207,12 @@ function hasValidLogo(client: Client): boolean {
         <div class="card-body">
           <div class="clients-admin-card__header">
             <div class="clients-admin-card__logo">
-              <img
-                v-if="hasValidLogo(client)"
-                :src="client.logoUrl!"
+              <AppImage
+                :src="client.logoUrl"
                 :alt="client.name"
-                @error="onImageError(client.id)"
+                fallback="initials"
+                :initials="client.name.charAt(0)"
               />
-              <IconPhotoOff v-else-if="client.logoUrl && failedImages.has(client.id)" class="icon-lg text-error" />
-              <span v-else class="text-secondary">{{ client.name.charAt(0) }}</span>
             </div>
             <div class="clients-admin-card__info">
               <h3 class="clients-admin-card__name">{{ client.name }}</h3>
@@ -346,7 +334,7 @@ function hasValidLogo(client: Client): boolean {
                 </label>
               </div>
               <div v-if="form.logoUrl" class="mt-2">
-                <img :src="form.logoUrl" alt="Preview" class="clients-admin-logo-preview" />
+                <AppImage :src="form.logoUrl" alt="Preview" class="clients-admin-logo-preview" />
               </div>
             </div>
 

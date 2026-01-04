@@ -11,7 +11,6 @@ import { useDatabase, schema } from '../../../database/client'
 
 const updateFeatureSchema = z.object({
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/).optional(),
-  icon: z.string().max(50).nullish(),
   imageUrl: z.string().max(500).nullish(),
   hoverImageUrl: z.string().max(500).nullish(),
   order: z.number().int().min(0).optional(),
@@ -71,7 +70,6 @@ export default defineEventHandler(async event => {
   const updateValues: Record<string, unknown> = {}
 
   if (data.slug !== undefined) updateValues.slug = data.slug
-  if (data.icon !== undefined) updateValues.icon = data.icon || 'star'
   if (data.imageUrl !== undefined) updateValues.imageUrl = data.imageUrl
   if (data.hoverImageUrl !== undefined) updateValues.hoverImageUrl = data.hoverImageUrl
   if (data.order !== undefined) updateValues.order = data.order

@@ -22,6 +22,7 @@ import IconCalendar from '~icons/tabler/calendar'
 import IconTag from '~icons/tabler/tag'
 import IconFolder from '~icons/tabler/folder'
 import config from '~/puppet-master.config'
+import AppImage from '~/components/atoms/AppImage.vue'
 
 interface BlogCategory {
   id: number
@@ -553,7 +554,7 @@ async function uploadCoverImage(event: Event) {
           <div class="card-body">
             <div class="blog-admin-item__header">
               <div v-if="post.coverImage" class="blog-admin-item__cover">
-                <img :src="post.coverImage" :alt="getPostTitle(post)" />
+                <AppImage :src="post.coverImage" :alt="getPostTitle(post)" />
               </div>
               <div class="blog-admin-item__info">
                 <h3 class="blog-admin-item__title">{{ getPostTitle(post) }}</h3>
@@ -762,7 +763,7 @@ async function uploadCoverImage(event: Event) {
                 </label>
               </div>
               <div v-if="postForm.coverImage" class="mt-2">
-                <img :src="postForm.coverImage" alt="Preview" class="blog-admin-cover-preview" />
+                <AppImage :src="postForm.coverImage" alt="Preview" class="blog-admin-cover-preview" />
               </div>
             </div>
 

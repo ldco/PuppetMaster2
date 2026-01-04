@@ -488,8 +488,7 @@ export const features = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     slug: text('slug').notNull().unique(),
-    icon: text('icon').notNull(), // Tabler icon name (fallback when no image)
-    imageUrl: text('image_url'), // Feature image
+    imageUrl: text('image_url'), // Feature image (required for display)
     hoverImageUrl: text('hover_image_url'), // Image shown on hover
     category: text('category'),
     published: integer('published', { mode: 'boolean' }).default(true),

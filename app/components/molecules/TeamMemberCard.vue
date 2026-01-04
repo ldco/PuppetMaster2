@@ -68,7 +68,7 @@ const socialLinksArray = computed(() => {
         class="team-card__img team-card__img--hover"
         loading="lazy"
       />
-      <div v-if="!member.photoUrl" class="team-card__photo-placeholder">
+      <div v-if="!member.photoUrl" class="team-card__photo-placeholder team-card__photo-placeholder--initials">
         {{ member.name.charAt(0) }}
       </div>
     </div>
