@@ -174,11 +174,11 @@
   }
 }
 
-/* Nav visibility controlled in responsive.css (hidden mobile, shown desktop) */
-/* DO NOT set display here - let responsive.css control it! */
+/* Nav visibility controlled in adaptive nav section below */
 .header-nav {
   align-items: center;
   gap: var(--space-6);
+  overflow: hidden; /* Clip overflow while JS detects and collapses */
 }
 
 .header-actions {

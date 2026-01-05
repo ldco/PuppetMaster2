@@ -104,7 +104,8 @@
   );
 }
 
-/* Placeholder - Uses shared content-card-placeholder pattern */
+/* Placeholder - Extends .content-card-placeholder from content-card.css
+ * Team cards use initials (first letter of name) instead of icon */
 .team-card__photo-placeholder {
   display: flex;
   flex-direction: column;
@@ -114,13 +115,10 @@
   height: 100%;
   background: var(--content-card-bg-sunken);
   color: var(--l-text-secondary);
-}
-
-/* Initials variant for team cards */
-.team-card__photo-placeholder--initials {
+  /* Initials style */
   font-size: var(--text-5xl);
   font-weight: var(--font-bold);
-  opacity: 0.5;
+  opacity: var(--content-card-placeholder-opacity);
   text-transform: uppercase;
 }
 

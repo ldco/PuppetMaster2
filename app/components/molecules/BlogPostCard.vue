@@ -52,7 +52,7 @@ function formatDate(date: Date | string | null): string {
         :alt="post.coverImageAlt || post.title"
         loading="lazy"
       />
-      <div v-else class="blog-card__image-placeholder">
+      <div v-else class="content-card-placeholder">
         <IconPhoto />
       </div>
     </NuxtLink>

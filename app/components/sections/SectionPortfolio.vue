@@ -80,6 +80,7 @@ function navigateLightbox(index: number) {
             :key="item.id"
             v-reveal="'scale'"
             class="portfolio-card portfolio-card--clickable"
+            :class="{ 'portfolio-card--info-visible': portfolio.type === 'case_study' }"
             @click="openLightbox(item)"
           >
             <div class="portfolio-card-image">

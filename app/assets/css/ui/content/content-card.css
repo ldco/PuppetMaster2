@@ -83,6 +83,8 @@
   width: var(--content-card-placeholder-icon);
   height: var(--content-card-placeholder-icon);
   opacity: var(--content-card-placeholder-opacity);
+  /* Override link color inheritance - SVG uses currentColor */
+  color: var(--l-text-secondary);
 }
 
 /**

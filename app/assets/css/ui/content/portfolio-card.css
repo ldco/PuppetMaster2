@@ -151,21 +151,10 @@ body.lightbox-open .portfolio-card:hover {
   color: var(--l-text-secondary);
 }
 
-/* Placeholder for missing image */
-.portfolio-card-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--l-bg-sunken);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--l-text-secondary);
-}
-
-.portfolio-card-placeholder svg {
-  width: 64px;
-  height: 64px;
-  opacity: 0.3;
+/* Use shared .content-card-placeholder class from content-card.css */
+.portfolio-card-image .content-card-placeholder {
+  position: absolute;
+  inset: 0;
 }
 
 /* ==========================================================================
