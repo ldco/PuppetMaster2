@@ -9,10 +9,10 @@ Branch: master | Updated: 2026-01-09
 
 ## Completed (This Session)
 - Created PM Claude command system (`.claude/commands/pm-*.md`)
-- Implemented `/pm init` — Greenfield setup wizard
-- Implemented `/pm migrate` — Brownfield import with full project decomposition
-- Implemented `/pm status` — Configuration overview
-- Implemented `/pm start` — Database + dev server
+- Implemented `/pm-init` — Greenfield setup wizard
+- Implemented `/pm-migrate` — Brownfield import with full project decomposition
+- Implemented `/pm-status` — Configuration overview
+- Implemented `/pm-start` — Database + dev server
 - Created `./import/` folder for Brownfield imports
 - Updated CLAUDE.md with PM commands documentation
 - Created comprehensive mapping system for migrations
@@ -35,15 +35,15 @@ Branch: master | Updated: 2026-01-09
 ### Commands (in `.claude/commands/`)
 | File | Command | Purpose |
 |------|---------|---------|
-| pm-init.md | `/pm init` | Greenfield wizard — mode, features, modules |
-| pm-migrate.md | `/pm migrate` | Brownfield — decompose, map, plan |
-| pm-status.md | `/pm status` | Show current config state |
-| pm-start.md | `/pm start` | db:push + db:seed + rundev |
-| pm-contribute.md | `/pm contribute` | Export fix/feature as contribution doc |
-| pm-apply.md | `/pm apply` | Apply contribution doc to PM framework |
+| pm-init.md | `/pm-init` | Greenfield wizard — mode, features, modules |
+| pm-migrate.md | `/pm-migrate` | Brownfield — decompose, map, plan |
+| pm-status.md | `/pm-status` | Show current config state |
+| pm-start.md | `/pm-start` | db:push + db:seed + rundev |
+| pm-contribute.md | `/pm-contribute` | Export fix/feature as contribution doc |
+| pm-apply.md | `/pm-apply` | Apply contribution doc to PM framework |
 
 ### Migration System
-`/pm migrate` decomposes imported projects into 7 domains:
+`/pm-migrate` decomposes imported projects into 7 domains:
 1. FRONTEND (Pages, Components, Layouts, Composables)
 2. BACKEND (API routes, Middleware, Utilities)
 3. DATABASE (Schema, Migrations, Seeds)
@@ -55,9 +55,9 @@ Branch: master | Updated: 2026-01-09
 Each item gets an action: PM_EXISTS, PM_NATIVE, CREATE, REWRITE, PROXY, KEEP, COPY, CONVERT, MERGE, SKIP
 
 ### Workflows
-- **Greenfield**: `/init` → `/pm init` → `/pm start`
-- **Brownfield**: `/init` → copy to `./import/` → `/pm migrate` → `/pm start`
-- **Contributing**: (client) `/pm contribute` → copy `.pm-contribution.md` to PM → (PM) `/pm apply`
+- **Greenfield**: `/init` → `/pm-init` → `/pm-start`
+- **Brownfield**: `/init` → copy to `./import/` → `/pm-migrate` → `/pm-start`
+- **Contributing**: (client) `/pm-contribute` → copy `.pm-contribution.md` to PM → (PM) `/pm-apply`
 
 ## Key Decisions
 - Using SQLite with Drizzle ORM for simplicity

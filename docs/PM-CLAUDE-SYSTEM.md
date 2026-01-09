@@ -4,7 +4,7 @@ This document describes the Claude AI integration for Puppet Master — a config
 
 ## Overview
 
-Puppet Master includes a set of Claude commands (`/pm *`) that guide developers through project setup and migration. These commands are NOT automated scripts — Claude itself performs the analysis, asks questions, and creates files by following detailed instructions.
+Puppet Master includes a set of Claude commands (`/pm-*`) that guide developers through project setup and migration. These commands are NOT automated scripts — Claude itself performs the analysis, asks questions, and creates files by following detailed instructions.
 
 ## The Puppet Master Architect Role
 
@@ -13,13 +13,13 @@ When working on PM projects, Claude acts as **Puppet Master Architect** — a sp
 1. **Understands PM deeply** — knows the config system, modules, atomic design, CSS layers
 2. **Guides workflows** — Greenfield (new projects) and Brownfield (imports)
 3. **Uses expert personas** — via `/as` command (nuxt, vue, node, security, ux, devops)
-4. **Executes PM commands** — `/pm init`, `/pm migrate`, `/pm status`, `/pm start`
+4. **Executes PM commands** — `/pm-init`, `/pm-migrate`, `/pm-status`, `/pm-start`
 
 ## Commands
 
 All PM commands are defined in `.claude/commands/` and ship with the framework.
 
-### `/pm init` — Greenfield Setup
+### `/pm-init` — Greenfield Setup
 
 **Purpose**: Guided wizard for new Puppet Master projects.
 
@@ -31,13 +31,13 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 5. Ask: Languages (if multilingual enabled)
 6. Ask: Data source (database, api, hybrid)
 7. Update `puppet-master.config.ts`
-8. Offer to run `/pm start`
+8. Offer to run `/pm-start`
 
 **Flags**:
 - `--minimal` — Use smart defaults, skip questions
 - `--reset` — Reset config to factory defaults
 
-### `/pm migrate` — Brownfield Import
+### `/pm-migrate` — Brownfield Import
 
 **Purpose**: Import and migrate existing projects into Puppet Master.
 
@@ -57,7 +57,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 - `--analyze` — Analysis + mapping only, no changes
 - `--resume` — Continue from saved state
 
-### `/pm status` — Configuration Overview
+### `/pm-status` — Configuration Overview
 
 **Purpose**: Display current Puppet Master configuration state.
 
@@ -76,7 +76,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 - `--modules` — Show module details only
 - `--db` — Show database details
 
-### `/pm start` — Initialize & Start
+### `/pm-start` — Initialize & Start
 
 **Purpose**: Set up database and start development server.
 
@@ -97,7 +97,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 
 ## Migration System
 
-The `/pm migrate` command implements a comprehensive project decomposition and mapping system.
+The `/pm-migrate` command implements a comprehensive project decomposition and mapping system.
 
 ### Project Decomposition
 
@@ -186,10 +186,10 @@ claude  # or your Claude interface
 /init
 
 # 4. PM-specific setup (asks questions)
-/pm init
+/pm-init
 
 # 5. Initialize and start
-/pm start
+/pm-start
 ```
 
 ### Brownfield (Import Existing)
@@ -209,10 +209,10 @@ claude
 /init
 
 # 5. Analyze and plan migration
-/pm migrate
+/pm-migrate
 
 # 6. Initialize and start
-/pm start
+/pm-start
 
 # 7. Work through migration plan
 # Ask Claude: "Help me migrate the Header component"
@@ -227,7 +227,7 @@ When working on a client project and you fix a bug or add a feature that should 
 # In CLIENT PROJECT (after fixing/improving PM base code)
 
 # 1. Export the contribution
-/pm contribute
+/pm-contribute
 
 # 2. Answer questions about the fix/feature
 #    - Type (bugfix, feature, enhancement)
@@ -241,13 +241,13 @@ cp .pm-contribution.md ~/puppet-master/
 # In PM FRAMEWORK REPO
 
 # 4. Apply the contribution
-/pm apply
+/pm-apply
 
 # 5. Review changes, test, then commit
 /commit "feat: description from contribution"
 ```
 
-### `/pm contribute` — Export Contribution
+### `/pm-contribute` — Export Contribution
 
 **Purpose**: Generate a contribution document from client project fixes/features.
 
@@ -260,7 +260,7 @@ cp .pm-contribution.md ~/puppet-master/
 - Dependencies and breaking changes
 - Testing instructions
 
-### `/pm apply` — Apply Contribution
+### `/pm-apply` — Apply Contribution
 
 **Purpose**: Read contribution document and implement changes in PM framework.
 
@@ -281,7 +281,7 @@ cp .pm-contribution.md ~/puppet-master/
 
 ### Application Modes
 
-PM supports 4 modes (configured via `/pm init` or `/pm migrate`):
+PM supports 4 modes (configured via `/pm-init` or `/pm-migrate`):
 
 | Mode | Website | Login Button | Admin Access |
 |------|---------|--------------|--------------|
@@ -343,7 +343,7 @@ PM supports 3 data source modes:
 
 1. **Always read CLAUDE.md first** — Contains critical rules
 2. **Check .claude-data/context.md** — Session state and history
-3. **Use /pm commands** — Don't manually edit config unless necessary
+3. **Use /pm-* commands** — Don't manually edit config unless necessary
 4. **Follow atomic design** — Place components in correct folders
 5. **Use global CSS** — No scoped styles in components
 
@@ -385,12 +385,12 @@ Ensure `.claude/commands/` exists and contains the pm-*.md files.
 
 ### Migration stuck
 
-Use `/pm migrate --resume` to continue from saved state.
+Use `/pm-migrate --resume` to continue from saved state.
 
 ### Config issues
 
-Use `/pm status` to see current config, or check `puppet-master.config.ts` directly.
+Use `/pm-status` to see current config, or check `puppet-master.config.ts` directly.
 
 ### Database issues
 
-Use `/pm start --fresh` to reset database completely.
+Use `/pm-start --fresh` to reset database completely.

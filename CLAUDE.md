@@ -34,12 +34,12 @@ Project-specific commands in `.claude/commands/`:
 
 | Command | Purpose |
 |---------|---------|
-| `/pm init` | Guided setup wizard — asks about mode, features, modules, locales |
-| `/pm migrate` | Import existing project — analyzes, maps, creates migration plan |
-| `/pm status` | Show current config — mode, modules, features, database state |
-| `/pm start` | Initialize database + start dev server |
-| `/pm contribute` | Export fix/feature as contribution doc (for client projects) |
-| `/pm apply` | Apply contribution doc to PM framework |
+| `/pm-init` | Guided setup wizard — asks about mode, features, modules, locales |
+| `/pm-migrate` | Import existing project — analyzes, maps, creates migration plan |
+| `/pm-status` | Show current config — mode, modules, features, database state |
+| `/pm-start` | Initialize database + start dev server |
+| `/pm-contribute` | Export fix/feature as contribution doc (for client projects) |
+| `/pm-apply` | Apply contribution doc to PM framework |
 
 ### Workflows
 
@@ -48,8 +48,8 @@ Project-specific commands in `.claude/commands/`:
 git clone puppet-master my-project
 cd my-project
 /init                    # General Claude setup
-/pm init                 # PM setup wizard
-/pm start                # Database + dev server
+/pm-init                 # PM setup wizard
+/pm-start                # Database + dev server
 ```
 
 **Brownfield (Import Existing):**
@@ -58,23 +58,23 @@ git clone puppet-master my-project
 cd my-project
 cp -r ~/old-project ./import/
 /init                    # General Claude setup
-/pm migrate              # Analyze + map + plan
-/pm start                # Database + dev server
+/pm-migrate              # Analyze + map + plan
+/pm-start                # Database + dev server
 ```
 
 **Contributing Back to PM** (from client project):
 ```
 # In client project - after fixing/adding something to PM base
-/pm contribute           # Generates .pm-contribution.md
+/pm-contribute           # Generates .pm-contribution.md
 cp .pm-contribution.md ~/puppet-master/
 
 # In PM framework repo
-/pm apply                # Reads and implements the contribution
+/pm-apply                # Reads and implements the contribution
 ```
 
 ### Migration System
 
-`/pm migrate` decomposes projects into 7 domains and maps EVERY item:
+`/pm-migrate` decomposes projects into 7 domains and maps EVERY item:
 
 1. **FRONTEND** — Pages, Components, Layouts, Composables
 2. **BACKEND** — API routes, Middleware, Server utilities
