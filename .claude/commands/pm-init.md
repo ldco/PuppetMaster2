@@ -1,22 +1,249 @@
-# /pm init — Initialize Puppet Master Project
+# /pm-init — Initialize Puppet Master Project
 
 **ACTION REQUIRED: Execute all steps below. Do NOT just describe — actually run commands, read files, and update configurations.**
 
-Guided setup wizard for new Puppet Master projects. Asks questions to configure `puppet-master.config.ts`.
+Guided setup wizard for new Puppet Master projects. Analyzes requirements or asks questions to configure `puppet-master.config.ts`.
 
 ## Usage
 
 ```
-/pm init                # Full guided setup
-/pm init --minimal      # Quick setup with defaults
-/pm init --reset        # Reset config to defaults
+/pm-init                # Smart setup (detects PROJECT.md or asks questions)
+/pm-init --minimal      # Quick setup with defaults
+/pm-init --reset        # Reset config to defaults
 ```
 
 ---
 
 ## EXECUTE These Steps
 
-### Step 0: Check Current State
+### Step 0: Check Import Folder State
+
+**First, check what's in the `./import/` folder:**
+
+```
+Glob: import/**/*
+```
+
+**Determine the state:**
+
+1. **Has code files** (package.json, src/, pages/, components/, etc.):
+   ```
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         📦 CODE DETECTED IN IMPORT FOLDER
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   You have existing code in ./import/. This looks like a Brownfield migration.
+
+   Run /pm-migrate instead to:
+     • Decompose the existing project
+     • Map to PM capabilities
+     • Create a migration plan
+
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
+   **Stop here — user should run `/pm-migrate`.**
+
+2. **Has code AND PROJECT.md filled**:
+   ```
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         ⚠️  CONFLICTING STATE
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   The import folder contains BOTH code and a PROJECT.md specification.
+   Please choose one approach:
+
+   OPTION A: Migrate existing code (Brownfield)
+   ────────────────────────────────────────────
+   Remove or rename PROJECT.md, then run /pm-migrate
+
+   OPTION B: Build new project from spec (Greenfield)
+   ──────────────────────────────────────────────────
+   Remove the code files, keep PROJECT.md, then run /pm-init again
+
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
+   **Stop here — user needs to resolve the conflict.**
+
+3. **Has PROJECT.md with content** (sections filled out):
+   → **GREENFIELD WITH ANALYSIS** — Skip to Step 0G
+
+4. **Has empty PROJECT.md or nothing** (just template/gitkeep):
+   → **GREENFIELD WITH WIZARD** — Continue to Step 1
+
+---
+
+## Step 0G: Greenfield with PROJECT.md Analysis
+
+**If PROJECT.md exists and is filled out, analyze requirements instead of asking questions.**
+
+### 0G.1 Read and Parse PROJECT.md
+
+Read `import/PROJECT.md` completely. Extract:
+
+- Project name and description
+- Target users
+- Application type (app-only, website-app, website-admin, website-only)
+- Pages/sections needed (checked items)
+- Features requested (checked items)
+- Content modules needed (checked items)
+- Design preferences (colors, typography, style)
+- Data requirements
+- External integrations
+- Technical requirements
+- Special requirements
+
+### 0G.2 Display Requirements Summary
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    🌱 GREENFIELD PROJECT ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Project: {name}
+Client:  {client}
+Type:    {mode}
+
+REQUIREMENTS DETECTED
+─────────────────────────────────────────────────────────────────────────────
+  Pages/Sections: {list}
+  Features:       {list}
+  Modules:        {list}
+  Languages:      {list or "English only"}
+  Integrations:   {list or "None"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 0G.3 Map Requirements to PM Capabilities
+
+Create a mapping table showing what PM provides vs what needs to be built:
+
+```
+CAPABILITY MAPPING
+─────────────────────────────────────────────────────────────────────────────
+| Requirement          | PM Status     | Action       | Notes              |
+|─────────────────────|───────────────|──────────────|────────────────────|
+| Hero section        | PM_EXISTS     | Configure    | SectionHero        |
+| About page          | PM_EXISTS     | Configure    | SectionAbout       |
+| Blog                | PM_EXISTS     | Enable       | Blog module        |
+| Custom booking      | NOT_IN_PM     | CREATE       | New feature        |
+| Stripe payments     | NOT_IN_PM     | INTEGRATE    | Add library        |
+| Dark mode           | PM_EXISTS     | Enable       | Built-in           |
+| German language     | PM_EXISTS     | Configure    | Add locale         |
+...
+```
+
+**Status values:**
+- `PM_EXISTS` — PM has this, just configure/enable
+- `PM_NATIVE` — Use PM's showcase implementation
+- `NOT_IN_PM` — Needs to be built or integrated
+- `PARTIAL` — PM has basics, needs extension
+
+**Action values:**
+- `Configure` — Just update config
+- `Enable` — Turn on existing module
+- `CREATE` — Build new component/feature
+- `INTEGRATE` — Add external library/service
+- `EXTEND` — Extend existing PM feature
+
+### 0G.4 Identify Gaps and Suggest Solutions
+
+For each `NOT_IN_PM` or `PARTIAL` item, suggest:
+
+```
+IMPLEMENTATION PLAN
+─────────────────────────────────────────────────────────────────────────────
+
+1. CUSTOM BOOKING SYSTEM (CREATE)
+   Approach: Create new module with calendar component
+   Effort: Medium
+   Libraries: @fullcalendar/vue3 or build custom
+   Files to create:
+   - app/components/organisms/BookingCalendar.vue
+   - server/api/bookings/[...].ts
+   - server/database/schema additions
+
+2. STRIPE PAYMENTS (INTEGRATE)
+   Approach: Add Stripe SDK, create checkout flow
+   Effort: Medium
+   Libraries: @stripe/stripe-js, stripe (server)
+   Files to create:
+   - server/api/payments/create-session.ts
+   - app/components/molecules/PaymentButton.vue
+...
+```
+
+### 0G.5 Ask Clarifying Questions
+
+Use AskUserQuestion for any unclear requirements:
+
+```
+I have some questions about your project:
+
+1. For the booking system, do you need:
+   ○ Simple date picker (select available dates)
+   ○ Full calendar with time slots
+   ○ Integration with external calendar (Google, etc.)
+
+2. For payments, which provider?
+   ○ Stripe (Recommended)
+   ○ PayPal
+   ○ Both
+   ○ Other
+```
+
+### 0G.6 Generate Implementation Plan
+
+Create `.claude-data/implementation-plan.md` with:
+
+```markdown
+# Implementation Plan: {Project Name}
+
+## Overview
+- Type: {mode}
+- Generated: {date}
+
+## Phase 1: Configuration
+1. Set application mode to {mode}
+2. Enable features: {list}
+3. Enable modules: {list}
+4. Configure languages: {list}
+5. Set color palette
+
+## Phase 2: PM Native Setup
+{List of sections/pages that just need configuration}
+
+## Phase 3: Custom Development
+{List of features to build, with detailed steps}
+
+## Phase 4: Integrations
+{External services to connect}
+
+## Phase 5: Content & Launch
+{Data seeding, testing, deployment}
+
+## Checklist
+- [ ] Phase 1 complete
+- [ ] Phase 2 complete
+...
+```
+
+### 0G.7 Update Configuration
+
+Based on analysis, update `puppet-master.config.ts`:
+- Set mode
+- Enable detected features
+- Enable detected modules
+- Set locales if multilingual
+- Set color tokens if provided
+
+**Skip to Step 7 (Summary).**
+
+---
+
+## Step 0W: Check Current Config State
+
+**For wizard mode, check existing config:**
 
 Read current config to understand existing setup:
 
@@ -27,7 +254,7 @@ cat app/puppet-master.config.ts 2>/dev/null | head -50
 If config exists and has customizations, warn:
 ```
 ⚠️  Existing configuration detected.
-    Running /pm init will modify your puppet-master.config.ts
+    Running /pm-init will modify your puppet-master.config.ts
 
     Current mode: {detected_mode}
     Modules enabled: {count}
@@ -37,7 +264,7 @@ If config exists and has customizations, warn:
 
 ---
 
-### Step 1: Application Mode
+## Step 1: Application Mode
 
 Ask user to select application mode:
 

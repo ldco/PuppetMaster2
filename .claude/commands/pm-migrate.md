@@ -1,4 +1,4 @@
-# /pm migrate — Import Existing Project into Puppet Master
+# /pm-migrate — Import Existing Code into Puppet Master
 
 **You are the migration tool.** Follow these instructions to:
 1. DECOMPOSE the entire imported project into pieces
@@ -6,14 +6,16 @@
 3. ASK the user what they want for each major area
 4. CREATE a comprehensive migration plan with full mappings
 
+This is for **Brownfield** (existing code) migrations only. For new projects, use `/pm-init`.
+
 This is NOT automated scripting — YOU (Claude) perform the analysis, ask questions, and guide the migration.
 
 ## Usage
 
 ```
-/pm migrate                 # Full migration workflow
-/pm migrate --analyze       # Analysis + mapping only (no changes)
-/pm migrate --resume        # Continue from saved state
+/pm-migrate                 # Full migration workflow
+/pm-migrate --analyze       # Analysis + mapping only (no changes)
+/pm-migrate --resume        # Continue from saved state
 ```
 
 ---
@@ -57,42 +59,32 @@ This is NOT automated scripting — YOU (Claude) perform the analysis, ask quest
 
 ---
 
-## PHASE 1: Detect Mode (Greenfield vs Brownfield)
+## PHASE 1: Verify Code Exists in Import Folder
 
-**Check what's in the import folder:**
+**Check if import folder has code to migrate:**
 
 ```
 Glob: import/**/*
 ```
 
-**Determine the mode:**
+**Check for code indicators:** package.json, src/, pages/, components/, app/, nuxt.config.*, etc.
 
-1. **If only `import/PROJECT.md` exists (and maybe `.gitkeep`)** → **GREENFIELD MODE**
-   - User wants to build a NEW project
-   - Analyze PROJECT.md requirements
-   - Map requirements to PM capabilities
-   - Skip to PHASE 1G (Greenfield Analysis)
-
-2. **If actual code exists** (package.json, src/, pages/, etc.) → **BROWNFIELD MODE**
-   - User wants to IMPORT an existing project
-   - Decompose the codebase
-   - Continue to PHASE 2 (Brownfield Decomposition)
-
-3. **If empty or only `.gitkeep`**, display:
+**If no code found**, display:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         📁 IMPORT FOLDER READY
+                         📁 NO CODE TO MIGRATE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Choose your path:
+/pm-migrate is for importing EXISTING code into Puppet Master.
 
-  GREENFIELD (New Project)
-  ────────────────────────
-  Edit ./import/PROJECT.md with your project requirements,
-  then run /pm-migrate again.
+If you want to:
 
-  BROWNFIELD (Import Existing)
-  ────────────────────────────
+  START A NEW PROJECT
+  ───────────────────
+  Run /pm-init instead (optionally fill ./import/PROJECT.md first)
+
+  MIGRATE EXISTING CODE
+  ─────────────────────
   Copy your existing project to the import folder:
     cp -r ~/your-project/* ./import/
   Then run /pm-migrate again.
@@ -100,178 +92,23 @@ Choose your path:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Stop here if nothing actionable.**
+**Stop here if no code.**
 
----
-
-## PHASE 1G: Greenfield Analysis (PROJECT.md)
-
-**If PROJECT.md exists and is filled out, analyze requirements:**
-
-### 1G.1 Read and Parse PROJECT.md
-
-Read `import/PROJECT.md` completely. Extract:
-
-- Project name and description
-- Target users
-- Application type (app-only, website-app, website-admin, website-only)
-- Pages/sections needed
-- Features requested
-- Content modules needed
-- Design preferences (colors, typography, style)
-- Data requirements
-- External integrations
-- Technical requirements
-- Special requirements
-
-### 1G.2 Display Requirements Summary
-
+**If only PROJECT.md exists** (no code):
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    🌱 GREENFIELD PROJECT ANALYSIS
+                         🌱 GREENFIELD DETECTED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Project: {name}
-Type:    {mode}
-Client:  {client}
+You have a PROJECT.md specification but no code.
+This is a Greenfield project — run /pm-init instead.
 
-REQUIREMENTS DETECTED
-─────────────────────────────────────────────────────────────────────────────
-  Pages/Sections: {list}
-  Features:       {list}
-  Modules:        {list}
-  Languages:      {list or "English only"}
-  Integrations:   {list or "None"}
+/pm-init will analyze your PROJECT.md and create an implementation plan.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### 1G.3 Map Requirements to PM Capabilities
-
-Create a mapping table showing what PM provides vs what needs to be built:
-
-```
-CAPABILITY MAPPING
-─────────────────────────────────────────────────────────────────────────────
-| Requirement          | PM Status     | Action       | Notes              |
-|─────────────────────|───────────────|──────────────|────────────────────|
-| Hero section        | PM_EXISTS     | Configure    | SectionHero        |
-| About page          | PM_EXISTS     | Configure    | SectionAbout       |
-| Blog                | PM_EXISTS     | Enable       | Blog module        |
-| Custom booking      | NOT_IN_PM     | CREATE       | New feature        |
-| Stripe payments     | NOT_IN_PM     | INTEGRATE    | Add library        |
-| Dark mode           | PM_EXISTS     | Enable       | Built-in           |
-| German language     | PM_EXISTS     | Configure    | Add locale         |
-...
-```
-
-**Status values:**
-- `PM_EXISTS` — PM has this, just configure/enable
-- `PM_NATIVE` — Use PM's showcase implementation
-- `NOT_IN_PM` — Needs to be built or integrated
-- `PARTIAL` — PM has basics, needs extension
-
-**Action values:**
-- `Configure` — Just update config
-- `Enable` — Turn on existing module
-- `CREATE` — Build new component/feature
-- `INTEGRATE` — Add external library/service
-- `EXTEND` — Extend existing PM feature
-
-### 1G.4 Identify Gaps and Suggest Solutions
-
-For each `NOT_IN_PM` or `PARTIAL` item, suggest:
-
-```
-IMPLEMENTATION PLAN
-─────────────────────────────────────────────────────────────────────────────
-
-1. CUSTOM BOOKING SYSTEM (CREATE)
-   Approach: Create new module with calendar component
-   Effort: Medium
-   Libraries: @fullcalendar/vue3 or build custom
-   Files to create:
-   - app/components/organisms/BookingCalendar.vue
-   - server/api/bookings/[...].ts
-   - server/database/schema additions
-
-2. STRIPE PAYMENTS (INTEGRATE)
-   Approach: Add Stripe SDK, create checkout flow
-   Effort: Medium
-   Libraries: @stripe/stripe-js, stripe (server)
-   Files to create:
-   - server/api/payments/create-session.ts
-   - app/components/molecules/PaymentButton.vue
-...
-```
-
-### 1G.5 Ask Clarifying Questions
-
-Use AskUserQuestion for any unclear requirements:
-
-```
-I have some questions about your project:
-
-1. For the booking system, do you need:
-   ○ Simple date picker (select available dates)
-   ○ Full calendar with time slots
-   ○ Integration with external calendar (Google, etc.)
-
-2. For payments, which provider?
-   ○ Stripe (Recommended)
-   ○ PayPal
-   ○ Both
-   ○ Other
-
-3. ...
-```
-
-### 1G.6 Generate Implementation Plan
-
-Create `.claude-data/migration-plan.md` with:
-
-```markdown
-# Implementation Plan: {Project Name}
-
-## Overview
-- Type: {mode}
-- Generated: {date}
-
-## Phase 1: Configuration
-1. Set application mode to {mode}
-2. Enable features: {list}
-3. Enable modules: {list}
-4. Configure languages: {list}
-5. Set color palette
-
-## Phase 2: PM Native Setup
-{List of sections/pages that just need configuration}
-
-## Phase 3: Custom Development
-{List of features to build, with detailed steps}
-
-## Phase 4: Integrations
-{External services to connect}
-
-## Phase 5: Content & Launch
-{Data seeding, testing, deployment}
-
-## Checklist
-- [ ] Phase 1 complete
-- [ ] Phase 2 complete
-...
-```
-
-### 1G.7 Update Configuration
-
-Based on analysis, update `puppet-master.config.ts`:
-- Set mode
-- Enable detected features
-- Enable detected modules
-- Set locales if multilingual
-- Set color tokens if provided
-
-**Skip to PHASE 8 (Summary)** — Brownfield phases don't apply.
+**Stop here — redirect to /pm-init.**
 
 ---
 

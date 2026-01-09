@@ -55,10 +55,18 @@ Branch: master | Updated: 2026-01-09
 Each item gets an action: PM_EXISTS, PM_NATIVE, CREATE, REWRITE, PROXY, KEEP, COPY, CONVERT, MERGE, SKIP
 
 ### Workflows
-- **Greenfield**: `/init` → edit `./import/PROJECT.md` → `/pm-migrate` → `/pm-start` (offered automatically)
-- **Brownfield**: `/init` → copy code to `./import/` → `/pm-migrate` → `/pm-start` (offered automatically)
-- **Quick Start**: `/init` → `/pm-init` → `/pm-start`
+- **Greenfield (with spec)**: `/init` → fill `./import/PROJECT.md` → `/pm-init` → `/pm-start`
+- **Greenfield (quick)**: `/init` → `/pm-init` (wizard) → `/pm-start`
+- **Brownfield**: `/init` → copy code to `./import/` → `/pm-migrate` → `/pm-start`
 - **Contributing**: (client) `/pm-contribute` → copy `.pm-contribution.md` to PM → (PM) `/pm-apply`
+
+### Command Routing
+- `/pm-init` — Smart entry for NEW projects (checks import folder):
+  - Code found → redirects to `/pm-migrate`
+  - PROJECT.md filled → analyzes and creates plan
+  - Nothing/empty → runs wizard
+  - Both code + PROJECT.md → shows conflict error
+- `/pm-migrate` — ONLY for Brownfield (code imports)
 
 ## Key Decisions
 - Using SQLite with Drizzle ORM for simplicity

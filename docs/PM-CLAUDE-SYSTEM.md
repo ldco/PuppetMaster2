@@ -19,11 +19,17 @@ When working on PM projects, Claude acts as **Puppet Master Architect** — a sp
 
 All PM commands are defined in `.claude/commands/` and ship with the framework.
 
-### `/pm-init` — Greenfield Setup
+### `/pm-init` — Smart Project Setup
 
-**Purpose**: Guided wizard for new Puppet Master projects.
+**Purpose**: Smart entry point for new Puppet Master projects. Checks import folder and routes accordingly.
 
-**Steps**:
+**Import Folder Detection**:
+1. **Code files found** → Tells user to run `/pm-migrate` instead
+2. **PROJECT.md filled** → Analyzes spec, maps to PM capabilities, creates plan
+3. **Empty/nothing** → Runs interactive wizard
+4. **Both code + PROJECT.md** → Shows conflict error
+
+**Wizard Steps** (when no PROJECT.md):
 1. Check current config state
 2. Ask: Application mode (app-only, website-app, website-admin, website-only)
 3. Ask: Features (multilingual, darkMode, PWA, contact notifications)
@@ -33,20 +39,34 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 7. Update `puppet-master.config.ts`
 8. Offer to run `/pm-start`
 
+**Analysis Steps** (when PROJECT.md filled):
+1. Parse PROJECT.md requirements
+2. Map to PM capabilities (PM_EXISTS, PM_NATIVE, NOT_IN_PM, PARTIAL)
+3. Identify gaps and suggest solutions
+4. Ask clarifying questions
+5. Generate implementation plan (`.claude-data/implementation-plan.md`)
+6. Update configuration
+7. Offer to run `/pm-start`
+
 **Flags**:
 - `--minimal` — Use smart defaults, skip questions
 - `--reset` — Reset config to factory defaults
 
 ### `/pm-migrate` — Brownfield Import
 
-**Purpose**: Import and migrate existing projects into Puppet Master.
+**Purpose**: Import and migrate existing **code** into Puppet Master. For new projects, use `/pm-init`.
 
-**Prerequisites**: Copy existing project to `./import/` folder.
+**Prerequisites**: Copy existing project code to `./import/` folder.
+
+**Routing**:
+- No code found → Redirects to `/pm-init`
+- Only PROJECT.md (no code) → Redirects to `/pm-init`
+- Code exists → Proceeds with migration
 
 **Steps**:
-1. Verify `./import/` exists and has content
-2. Deep analysis — decompose entire project
-3. Create mapping tables for all 7 domains
+1. Verify `./import/` has code (package.json, src/, etc.)
+2. Deep analysis — decompose entire project into 7 domains
+3. Create mapping tables for all domains
 4. Ask strategy questions
 5. Generate migration plan (`.claude-data/migration-plan.md`)
 6. Update configuration
@@ -172,7 +192,7 @@ Output is saved to `.claude-data/migration-plan.md` containing:
 
 ## Workflows
 
-### Greenfield (New Project with Analysis)
+### Greenfield (New Project with Spec)
 
 Use this when you want PM to analyze your requirements and create an implementation plan.
 
@@ -191,10 +211,11 @@ claude
 # Open ./import/PROJECT.md and fill in your requirements
 
 # 5. Analyze requirements and create plan
-/pm-migrate
+/pm-init
 # Claude will:
-#   - Parse PROJECT.md
-#   - Map requirements to PM capabilities
+#   - Detect PROJECT.md is filled
+#   - Parse requirements
+#   - Map to PM capabilities
 #   - Identify gaps and suggest solutions
 #   - Ask clarifying questions
 #   - Generate implementation plan
@@ -214,11 +235,11 @@ git clone <puppet-master-repo> my-project
 cd my-project
 claude
 /init
-/pm-init      # Quick wizard with questions
+/pm-init      # Detects empty import, runs wizard
 /pm-start     # Database + dev server
 ```
 
-### Brownfield (Import Existing)
+### Brownfield (Import Existing Code)
 
 ```bash
 # 1. Clone Puppet Master
@@ -237,7 +258,7 @@ claude
 # 5. Analyze and plan migration
 /pm-migrate
 # Claude will:
-#   - Detect code (Brownfield mode)
+#   - Detect code in import folder
 #   - Decompose into 7 domains
 #   - Create comprehensive mapping tables
 #   - Ask strategy questions
@@ -256,9 +277,14 @@ The import folder serves dual purposes:
 1. **Greenfield**: Contains `PROJECT.md` — a specification document describing what you want to build
 2. **Brownfield**: Contains actual code from an existing project to migrate
 
-`/pm-migrate` automatically detects which mode based on contents:
-- Only `PROJECT.md` present → Greenfield analysis
-- Code files present (package.json, src/, etc.) → Brownfield decomposition
+**Command routing based on contents:**
+
+| Import Folder State | `/pm-init` | `/pm-migrate` |
+|---------------------|------------|---------------|
+| Empty/nothing | Runs wizard | Redirects to `/pm-init` |
+| PROJECT.md filled | Analyzes spec, creates plan | Redirects to `/pm-init` |
+| Code files | Redirects to `/pm-migrate` | Runs migration |
+| Code + PROJECT.md | Shows conflict error | — |
 
 ### Contributing Back to PM
 
