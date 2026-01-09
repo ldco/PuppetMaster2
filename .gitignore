@@ -105,3 +105,6 @@ Desktop.ini
 .claude-data/tasks/
 .rag/
 temp/
+
+# Claude Token Monitor data
+.claude-monitor/
