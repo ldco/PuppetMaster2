@@ -55,8 +55,9 @@ Branch: master | Updated: 2026-01-09
 Each item gets an action: PM_EXISTS, PM_NATIVE, CREATE, REWRITE, PROXY, KEEP, COPY, CONVERT, MERGE, SKIP
 
 ### Workflows
-- **Greenfield**: `/init` → `/pm-init` → `/pm-start`
-- **Brownfield**: `/init` → copy to `./import/` → `/pm-migrate` → `/pm-start`
+- **Greenfield**: `/init` → edit `./import/PROJECT.md` → `/pm-migrate` → `/pm-start` (offered automatically)
+- **Brownfield**: `/init` → copy code to `./import/` → `/pm-migrate` → `/pm-start` (offered automatically)
+- **Quick Start**: `/init` → `/pm-init` → `/pm-start`
 - **Contributing**: (client) `/pm-contribute` → copy `.pm-contribution.md` to PM → (PM) `/pm-apply`
 
 ## Key Decisions

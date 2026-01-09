@@ -57,33 +57,225 @@ This is NOT automated scripting — YOU (Claude) perform the analysis, ask quest
 
 ---
 
-## PHASE 1: Verify Import Exists
+## PHASE 1: Detect Mode (Greenfield vs Brownfield)
 
-**Check if import folder has content:**
+**Check what's in the import folder:**
 
 ```
 Glob: import/**/*
 ```
 
-**If empty or missing**, display:
+**Determine the mode:**
+
+1. **If only `import/PROJECT.md` exists (and maybe `.gitkeep`)** → **GREENFIELD MODE**
+   - User wants to build a NEW project
+   - Analyze PROJECT.md requirements
+   - Map requirements to PM capabilities
+   - Skip to PHASE 1G (Greenfield Analysis)
+
+2. **If actual code exists** (package.json, src/, pages/, etc.) → **BROWNFIELD MODE**
+   - User wants to IMPORT an existing project
+   - Decompose the codebase
+   - Continue to PHASE 2 (Brownfield Decomposition)
+
+3. **If empty or only `.gitkeep`**, display:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ⚠️  NO PROJECT TO IMPORT
+                         📁 IMPORT FOLDER READY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Copy your existing project to the import folder:
+Choose your path:
 
-  cp -r ~/your-project ./import/
+  GREENFIELD (New Project)
+  ────────────────────────
+  Edit ./import/PROJECT.md with your project requirements,
+  then run /pm-migrate again.
 
-Then run /pm migrate again.
+  BROWNFIELD (Import Existing)
+  ────────────────────────────
+  Copy your existing project to the import folder:
+    cp -r ~/your-project/* ./import/
+  Then run /pm-migrate again.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Stop here if no import.**
+**Stop here if nothing actionable.**
 
 ---
 
-## PHASE 2: Complete Project Decomposition
+## PHASE 1G: Greenfield Analysis (PROJECT.md)
+
+**If PROJECT.md exists and is filled out, analyze requirements:**
+
+### 1G.1 Read and Parse PROJECT.md
+
+Read `import/PROJECT.md` completely. Extract:
+
+- Project name and description
+- Target users
+- Application type (app-only, website-app, website-admin, website-only)
+- Pages/sections needed
+- Features requested
+- Content modules needed
+- Design preferences (colors, typography, style)
+- Data requirements
+- External integrations
+- Technical requirements
+- Special requirements
+
+### 1G.2 Display Requirements Summary
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    🌱 GREENFIELD PROJECT ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Project: {name}
+Type:    {mode}
+Client:  {client}
+
+REQUIREMENTS DETECTED
+─────────────────────────────────────────────────────────────────────────────
+  Pages/Sections: {list}
+  Features:       {list}
+  Modules:        {list}
+  Languages:      {list or "English only"}
+  Integrations:   {list or "None"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 1G.3 Map Requirements to PM Capabilities
+
+Create a mapping table showing what PM provides vs what needs to be built:
+
+```
+CAPABILITY MAPPING
+─────────────────────────────────────────────────────────────────────────────
+| Requirement          | PM Status     | Action       | Notes              |
+|─────────────────────|───────────────|──────────────|────────────────────|
+| Hero section        | PM_EXISTS     | Configure    | SectionHero        |
+| About page          | PM_EXISTS     | Configure    | SectionAbout       |
+| Blog                | PM_EXISTS     | Enable       | Blog module        |
+| Custom booking      | NOT_IN_PM     | CREATE       | New feature        |
+| Stripe payments     | NOT_IN_PM     | INTEGRATE    | Add library        |
+| Dark mode           | PM_EXISTS     | Enable       | Built-in           |
+| German language     | PM_EXISTS     | Configure    | Add locale         |
+...
+```
+
+**Status values:**
+- `PM_EXISTS` — PM has this, just configure/enable
+- `PM_NATIVE` — Use PM's showcase implementation
+- `NOT_IN_PM` — Needs to be built or integrated
+- `PARTIAL` — PM has basics, needs extension
+
+**Action values:**
+- `Configure` — Just update config
+- `Enable` — Turn on existing module
+- `CREATE` — Build new component/feature
+- `INTEGRATE` — Add external library/service
+- `EXTEND` — Extend existing PM feature
+
+### 1G.4 Identify Gaps and Suggest Solutions
+
+For each `NOT_IN_PM` or `PARTIAL` item, suggest:
+
+```
+IMPLEMENTATION PLAN
+─────────────────────────────────────────────────────────────────────────────
+
+1. CUSTOM BOOKING SYSTEM (CREATE)
+   Approach: Create new module with calendar component
+   Effort: Medium
+   Libraries: @fullcalendar/vue3 or build custom
+   Files to create:
+   - app/components/organisms/BookingCalendar.vue
+   - server/api/bookings/[...].ts
+   - server/database/schema additions
+
+2. STRIPE PAYMENTS (INTEGRATE)
+   Approach: Add Stripe SDK, create checkout flow
+   Effort: Medium
+   Libraries: @stripe/stripe-js, stripe (server)
+   Files to create:
+   - server/api/payments/create-session.ts
+   - app/components/molecules/PaymentButton.vue
+...
+```
+
+### 1G.5 Ask Clarifying Questions
+
+Use AskUserQuestion for any unclear requirements:
+
+```
+I have some questions about your project:
+
+1. For the booking system, do you need:
+   ○ Simple date picker (select available dates)
+   ○ Full calendar with time slots
+   ○ Integration with external calendar (Google, etc.)
+
+2. For payments, which provider?
+   ○ Stripe (Recommended)
+   ○ PayPal
+   ○ Both
+   ○ Other
+
+3. ...
+```
+
+### 1G.6 Generate Implementation Plan
+
+Create `.claude-data/migration-plan.md` with:
+
+```markdown
+# Implementation Plan: {Project Name}
+
+## Overview
+- Type: {mode}
+- Generated: {date}
+
+## Phase 1: Configuration
+1. Set application mode to {mode}
+2. Enable features: {list}
+3. Enable modules: {list}
+4. Configure languages: {list}
+5. Set color palette
+
+## Phase 2: PM Native Setup
+{List of sections/pages that just need configuration}
+
+## Phase 3: Custom Development
+{List of features to build, with detailed steps}
+
+## Phase 4: Integrations
+{External services to connect}
+
+## Phase 5: Content & Launch
+{Data seeding, testing, deployment}
+
+## Checklist
+- [ ] Phase 1 complete
+- [ ] Phase 2 complete
+...
+```
+
+### 1G.7 Update Configuration
+
+Based on analysis, update `puppet-master.config.ts`:
+- Set mode
+- Enable detected features
+- Enable detected modules
+- Set locales if multilingual
+- Set color tokens if provided
+
+**Skip to PHASE 8 (Summary)** — Brownfield phases don't apply.
+
+---
+
+## PHASE 2: Brownfield Project Decomposition
 
 **You must analyze EVERYTHING. Read files, understand the ENTIRE project.**
 
@@ -955,7 +1147,7 @@ Use Edit tool to set:
 
 ## PHASE 8: Summary & Next Steps
 
-**Display comprehensive summary with mapping counts:**
+**For BROWNFIELD, display comprehensive summary with mapping counts:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -981,16 +1173,66 @@ STRATEGY
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Migration plan saved to: .claude-data/migration-plan.md
-
-Next:
-  1. Run /pm start
-  2. Read migration plan
-  3. Ask: "Help me migrate the Header component"
-     Ask: "Set up the API proxy"
-     Ask: "Import translations to database"
+Plan saved to: .claude-data/migration-plan.md
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**For GREENFIELD, display simpler summary:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    ✅ PROJECT ANALYSIS COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Project: {name}
+Mode:    {mode}
+
+CAPABILITY SUMMARY
+─────────────────────────────────────────────────────────────────────────────
+  PM Native:    {X} features ready to use
+  To Build:     {Y} custom features
+  Integrations: {Z} external services
+
+Configuration updated: puppet-master.config.ts
+Plan saved to: .claude-data/migration-plan.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 8.1 Offer to Start
+
+**Use AskUserQuestion:**
+
+```
+Ready to initialize the project?
+
+○ Yes, run /pm-start now (Recommended)
+  Set up database and start dev server
+
+○ No, I want to review the plan first
+  You can run /pm-start later
+
+○ No, I need to make changes first
+  Edit config or plan, then run /pm-start
+```
+
+**If user selects "Yes":**
+- Inform them: "Starting project initialization..."
+- Run `/pm-start` logic (or instruct user to run it)
+
+**If user selects "No":**
+- Display next steps:
+```
+Next Steps:
+  1. Review: .claude-data/migration-plan.md
+  2. Adjust: puppet-master.config.ts (if needed)
+  3. Start:  /pm-start
+
+After starting, ask me:
+  "Help me build the booking feature"
+  "Set up the API proxy"
+  "Create the custom dashboard"
 ```
 
 ---

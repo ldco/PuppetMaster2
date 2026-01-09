@@ -172,7 +172,9 @@ Output is saved to `.claude-data/migration-plan.md` containing:
 
 ## Workflows
 
-### Greenfield (New Project)
+### Greenfield (New Project with Analysis)
+
+Use this when you want PM to analyze your requirements and create an implementation plan.
 
 ```bash
 # 1. Clone Puppet Master
@@ -180,16 +182,40 @@ git clone <puppet-master-repo> my-project
 cd my-project
 
 # 2. Start Claude session
-claude  # or your Claude interface
+claude
 
 # 3. General Claude setup
 /init
 
-# 4. PM-specific setup (asks questions)
-/pm-init
+# 4. Edit the project specification
+# Open ./import/PROJECT.md and fill in your requirements
 
-# 5. Initialize and start
-/pm-start
+# 5. Analyze requirements and create plan
+/pm-migrate
+# Claude will:
+#   - Parse PROJECT.md
+#   - Map requirements to PM capabilities
+#   - Identify gaps and suggest solutions
+#   - Ask clarifying questions
+#   - Generate implementation plan
+#   - Offer to run /pm-start
+
+# 6. Work through implementation plan
+# Ask Claude: "Help me build the booking feature"
+# Ask Claude: "Set up the Stripe integration"
+```
+
+### Greenfield (Quick Start)
+
+Use this for simple projects where you just want to configure and go.
+
+```bash
+git clone <puppet-master-repo> my-project
+cd my-project
+claude
+/init
+/pm-init      # Quick wizard with questions
+/pm-start     # Database + dev server
 ```
 
 ### Brownfield (Import Existing)
@@ -200,7 +226,7 @@ git clone <puppet-master-repo> my-project
 cd my-project
 
 # 2. Copy existing project to import folder
-cp -r ~/existing-project ./import/
+cp -r ~/existing-project/* ./import/
 
 # 3. Start Claude session
 claude
@@ -210,14 +236,29 @@ claude
 
 # 5. Analyze and plan migration
 /pm-migrate
+# Claude will:
+#   - Detect code (Brownfield mode)
+#   - Decompose into 7 domains
+#   - Create comprehensive mapping tables
+#   - Ask strategy questions
+#   - Generate migration plan
+#   - Offer to run /pm-start
 
-# 6. Initialize and start
-/pm-start
-
-# 7. Work through migration plan
+# 6. Work through migration plan
 # Ask Claude: "Help me migrate the Header component"
 # Ask Claude: "Set up the API proxy for /api/posts"
 ```
+
+### The `./import/` Folder
+
+The import folder serves dual purposes:
+
+1. **Greenfield**: Contains `PROJECT.md` — a specification document describing what you want to build
+2. **Brownfield**: Contains actual code from an existing project to migrate
+
+`/pm-migrate` automatically detects which mode based on contents:
+- Only `PROJECT.md` present → Greenfield analysis
+- Code files present (package.json, src/, etc.) → Brownfield decomposition
 
 ### Contributing Back to PM
 

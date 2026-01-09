@@ -48,18 +48,24 @@ Project-specific commands in `.claude/commands/`:
 git clone puppet-master my-project
 cd my-project
 /init                    # General Claude setup
-/pm-init                 # PM setup wizard
-/pm-start                # Database + dev server
+# Edit ./import/PROJECT.md with requirements
+/pm-migrate              # Analyze requirements + plan
+# /pm-start offered automatically
 ```
 
 **Brownfield (Import Existing):**
 ```
 git clone puppet-master my-project
 cd my-project
-cp -r ~/old-project ./import/
+cp -r ~/old-project/* ./import/
 /init                    # General Claude setup
 /pm-migrate              # Analyze + map + plan
-/pm-start                # Database + dev server
+# /pm-start offered automatically
+```
+
+**Quick Start (defaults):**
+```
+/init → /pm-init → /pm-start
 ```
 
 **Contributing Back to PM** (from client project):
