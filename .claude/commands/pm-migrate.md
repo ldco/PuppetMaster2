@@ -59,6 +59,47 @@ This is NOT automated scripting — YOU (Claude) perform the analysis, ask quest
 
 ---
 
+## Two-Level Architecture Understanding
+
+**CRITICAL: Before analyzing, understand PM's architecture.**
+
+See `docs/PM-ARCHITECTURE.md` for full details.
+
+### Level 1: System Entities (What)
+
+The project being migrated may have:
+
+| Entity | Purpose | PM Equivalent |
+|--------|---------|---------------|
+| **Website** | Public pages | Website UX (default layout) |
+| **App** | User features | App UX (sidebar/minimal layout) |
+| **Admin** | Content management | App UX with admin sections |
+
+**Identify which entities the import has!**
+
+### Level 2: UX Paradigms (How)
+
+PM has TWO UX paradigms, not three:
+
+```
+Website UX               App UX
+─────────────           ─────────────────────────
+• Horizontal header     • Sidebar (desktop)
+• Page-based            • Bottom nav (mobile)
+• For visitors          • For ALL logged-in users
+                        • Both users AND admins
+```
+
+**"Admin panel" is NOT a separate UX — it's App UX with admin sections visible!**
+
+### Common Migration Mistakes
+
+1. **Creating separate "admin layout"** — Wrong! Use App UX, filter sections by role
+2. **Confusing layout with role** — Layout = where nav goes, Role = what nav shows
+3. **Missing admin in website-app** — If migrating SaaS, ask about content management
+
+---
+
 ## PHASE 1: Verify Code Exists in Import Folder
 
 **Check if import folder has code to migrate:**
@@ -816,26 +857,63 @@ Data strategy:
   - Most complex option
 ```
 
-### Question 5: PM Mode
+### Question 5: Project Entities
+
+**Ask about entities, not just mode:**
 
 ```
-Based on your project structure, select PM mode:
+Your project appears to have:
+- Public website: {yes/no}
+- User application: {yes/no}
+- Admin/content management: {detected/unknown}
 
-○ website-admin
-  Public site + hidden admin at /admin
-  Best for: Content sites, portfolios, blogs
+Confirm which entities you need:
 
-○ website-app
-  Public site + visible login
-  Best for: SaaS, member sites
+☐ Public Website
+  Marketing pages, landing page, info pages
+  → Visitors see without logging in
 
-○ app-only
-  Login is entry point, no public site
-  Best for: Dashboards, internal tools
+☐ User Application
+  Features users log in to use (dashboard, tracker, etc.)
+  → Authenticated user experience
 
-○ website-only
-  Static site, no authentication
-  Best for: Marketing sites, landing pages
+☐ Content Management
+  Admin panel to manage website/app content
+  → Editors and admins manage content
+```
+
+**Derive mode from selection:**
+
+| Selection | PM Mode |
+|-----------|---------|
+| App only | `app-only` |
+| Website + App | `website-app` |
+| Website + Admin | `website-admin` |
+| Website only | `website-only` |
+| Website + App + Admin | `website-app` (with /admin/*) |
+
+### Question 6: App UX Preferences
+
+**Only ask if App or Admin entities were selected:**
+
+```
+For authenticated users (app and/or admin), which visual style?
+
+○ Sidebar (Recommended for many features)
+  Desktop: Vertical sidebar | Mobile: Bottom navigation
+  → Best for: 3+ features, admin panels, dashboards
+
+○ Minimal Header
+  Horizontal header with minimal navigation
+  → Best for: Single-feature apps, simple tools
+
+○ Full Header
+  Horizontal header with dropdown menus
+  → Best for: Apps with grouped features
+
+NOTE: Both regular users AND admins use the same UX paradigm.
+      The layout defines WHERE navigation goes.
+      User ROLE defines WHAT navigation shows.
 ```
 
 ---

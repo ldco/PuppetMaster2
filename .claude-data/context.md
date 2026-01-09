@@ -5,9 +5,14 @@ Branch: master | Updated: 2026-01-09
 
 ## Active Tasks
 - PM Claude System implementation complete
+- Architecture redesign documented (modular entities + flexible RBAC)
+- **TODO**: Implement new config structure (entities + admin modules with per-model roles)
 - Ready for testing from fresh git clone
 
 ## Completed (This Session)
+- Architecture redesign: modular entities + flexible RBAC (docs/PM-ARCHITECTURE.md)
+- Documented three-category admin module system (System, Website Content, App Data)
+- Documented per-model role configuration with master-only role assignment
 - Created PM Claude command system (`.claude/commands/pm-*.md`)
 - Implemented `/pm-init` — Greenfield setup wizard
 - Implemented `/pm-migrate` — Brownfield import with full project decomposition
@@ -24,7 +29,41 @@ Branch: master | Updated: 2026-01-09
 - 2025-12-28: Full Codebase Audit - Grade: A
 
 ## Architecture Notes
-- **4 Application Modes**: app-only, website-app, website-admin, website-only
+
+See `docs/PM-ARCHITECTURE.md` for full details.
+
+### Two-Level Architecture
+- **Level 1: System Entities** — Website, App (what exists) + Admin (management layer)
+- **Level 2: UX Paradigms** — Website UX, App UX (how things look)
+
+### Key Insight
+Admin panel is NOT a third UX paradigm — it's App UX with admin sections visible!
+
+| Concept | Definition |
+|---------|------------|
+| **Website UX** | Horizontal header, page-based (for visitors) |
+| **App UX** | Sidebar/bottom nav, feature-based (for ALL logged-in users) |
+| **Layout** | Visual style within a UX paradigm |
+| **Role** | What navigation sections user sees |
+
+### Modular Entity Configuration (replaces fixed modes)
+```typescript
+entities: { website: boolean, app: boolean }
+admin: { enabled: boolean, system: {...}, websiteModules: {...}, appModules: {...} }
+```
+
+### Admin Module Categories
+1. **System** (PM provides, universal): users, roles, translations, settings, health, logs
+2. **Website Content** (PM provides): sections, blog, portfolio, team, testimonials, faq, clients, pricing
+3. **App Data** (custom per project): developer builds
+
+### RBAC
+- Role hierarchy: master → admin → editor → user
+- Role assignment is ALWAYS master-only (hardcoded)
+- Each module has configurable roles array
+- Master configures per-model role access
+
+### Other Architecture
 - **Dual Data Source**: SQLite OR external REST API (hybrid mode available)
 - **RBAC**: Master (developer), Admin (client), Editor (employee)
 - **Pure CSS**: 5-layer system with OKLCH colors, light-dark() function

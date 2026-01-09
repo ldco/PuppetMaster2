@@ -264,43 +264,64 @@ If config exists and has customizations, warn:
 
 ---
 
-## Step 1: Application Mode
+## Step 1: Project Entities
 
-Ask user to select application mode:
+**First, understand WHAT the project needs (entities), then derive the mode.**
+
+Display architecture overview:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                          PUPPET MASTER SETUP
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Step 1/5: Application Mode
+Step 1/6: Project Entities
 
-What type of project are you building?
+PM projects can have THREE entities:
 
-  1. app-only
-     Dashboard, SaaS, internal tool
-     → No public website, login is the entry point
+  WEBSITE    Public pages (marketing, landing, info)
+             → Visitors see this without logging in
 
-  2. website-app
-     Public site + user login area
-     → Marketing site with visible login button
+  APP        User features (dashboard, tracker, tools)
+             → Users log in to access their features
 
-  3. website-admin
-     Public site + hidden admin panel
-     → Client manages content via /admin (not visible to visitors)
-
-  4. website-only
-     Static marketing site
-     → No authentication, no admin panel
+  ADMIN      Content management layer
+             → Editors/admins manage website and/or app content
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Use AskUserQuestion tool with options:
-- `app-only` — Dashboard, SaaS, internal tool
-- `website-app` — Public site + user login area
-- `website-admin` — Public site + hidden admin (Recommended for client sites)
-- `website-only` — Static marketing site
+**Ask about each entity:**
+
+Use AskUserQuestion with multiSelect: true:
+- **Public Website** — Marketing pages, landing page, about, contact
+- **User Application** — Features users log in to use (dashboard, tracker, etc.)
+- **Content Management** — Admin panel to manage content (Recommended)
+
+**Derive mode from selection:**
+
+| Selection | Mode |
+|-----------|------|
+| App only | `app-only` |
+| Website + App | `website-app` |
+| Website + Admin | `website-admin` |
+| Website only | `website-only` |
+| Website + App + Admin | `website-app` (admin at /admin/*) |
+| App + Admin | `app-only` (admin sections integrated) |
+
+**If Website + App selected, ask follow-up:**
+
+```
+You have both a public website AND a user application.
+
+How should the login button appear?
+
+  1. Visible — Login button in website header
+     → Users see and click to access app
+
+  2. Hidden — No login button, users access /login directly
+     → For apps where users already know the URL
+```
 
 Store selection for config generation.
 
@@ -311,7 +332,7 @@ Store selection for config generation.
 Based on mode, ask about features:
 
 ```
-Step 2/5: Features
+Step 2/7: Features
 
 Enable features for your project:
 
@@ -341,7 +362,7 @@ Use AskUserQuestion with multiSelect: true for:
 Ask which content modules to enable:
 
 ```
-Step 3/5: Content Modules
+Step 3/7: Content Modules
 
 Which content sections do you need?
 
@@ -379,7 +400,7 @@ Use AskUserQuestion with multiSelect: true.
 If user selected multilingual in Step 2:
 
 ```
-Step 4/5: Languages
+Step 4/7: Languages
 
 Which languages do you need?
 
@@ -402,12 +423,60 @@ If multilingual NOT enabled, skip to Step 5.
 
 ---
 
-### Step 5: Data Source
+### Step 5: App UX Preferences (if App or Admin enabled)
+
+**Only ask if user selected User Application or Content Management.**
+
+```
+Step 5/7: App UX Preferences
+
+How should the authenticated area look?
+
+PM has TWO UX paradigms:
+- Website UX: Horizontal header, page-based (for public pages)
+- App UX: Sidebar/bottom nav, feature-based (for logged-in users)
+
+For your APP features, which visual style?
+
+  1. Sidebar (Recommended for many features)
+     Desktop: Vertical sidebar | Mobile: Bottom navigation
+     → Best for 3+ features, admin panels
+
+  2. Minimal Header
+     Horizontal header with minimal nav
+     → Best for single-feature apps, simple dashboards
+
+  3. Full Header
+     Horizontal header with dropdown menus
+     → Best for apps with grouped features
+```
+
+Use AskUserQuestion with options:
+- Sidebar — Vertical sidebar (desktop) + bottom nav (mobile)
+- Minimal Header — Simple horizontal header
+- Full Header — Horizontal with dropdowns
+
+**Important clarification:**
+```
+NOTE: Both regular users AND admins use App UX.
+The layout defines WHERE navigation goes.
+User ROLE defines WHAT navigation shows.
+
+Example with Sidebar layout:
+- Regular user sees: Dashboard, Settings
+- Admin sees: Dashboard, Settings, Content, Users
+```
+
+Store selection for layout configuration.
+
+---
+
+### Step 6: Data Source
 
 Ask about data source strategy:
 
 ```
-Step 5/5: Data Source
+Step 6/7: Data Source
 
 Where will your content come from?
 
@@ -425,7 +494,7 @@ Use AskUserQuestion with options.
 
 ---
 
-### Step 6: Generate Configuration
+### Step 7: Generate Configuration
 
 Based on collected answers, update `puppet-master.config.ts`:
 
