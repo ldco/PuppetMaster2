@@ -1,13 +1,14 @@
 /**
  * Authentication Types
  *
- * User roles hierarchy:
- * - master: Developer/agency who builds the site (full access)
+ * User roles hierarchy (each inherits from roles below):
+ * - master: Developer/agency who builds the site (full access, can assign roles)
  * - admin: Client who owns the site (can manage content + users except master)
  * - editor: Client's employees (can only edit content)
+ * - user: End users of the app (app features only, no admin access)
  */
 
-export type UserRole = 'master' | 'admin' | 'editor'
+export type UserRole = 'master' | 'admin' | 'editor' | 'user'
 
 export interface User {
   id: number

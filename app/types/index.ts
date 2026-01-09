@@ -41,3 +41,23 @@ export type {
   LogEntry,
   AuditLogEntry
 } from './admin'
+
+// Config types (modular entity architecture)
+export {
+  ROLE_HIERARCHY,
+  canAccess,
+  defaultSystemModules,
+  defaultWebsiteModules,
+  defaultAdminConfig,
+  getAdminSections,
+  filterSectionsByRole
+} from './config'
+export type {
+  EntitiesConfig,
+  AdminModuleConfig,
+  SystemModulesConfig,
+  WebsiteModulesConfig,
+  AppModulesConfig,
+  AdminConfig,
+  AdminSection
+} from './config'

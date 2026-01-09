@@ -1,55 +1,61 @@
 /**
  * Puppet Master Configuration
  * Build-time configuration - changes require rebuild
+ *
+ * Architecture: See docs/PM-ARCHITECTURE.md for full documentation
  */
 
 import type { ModulesConfig } from './types/modules'
+import type { EntitiesConfig, AdminConfig, AdminSection } from './types/config'
+import { getAdminSections, filterSectionsByRole } from './types/config'
+import type { UserRole } from './types/auth'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * APPLICATION MODE - Primary configuration that affects entire app structure
+ * ENTITIES - What exists in your project (modular architecture)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * Two visual modes exist:
- *   - Website: Traditional site UX (hamburger menu on mobile)
- *   - App: Application UX (bottom nav on mobile, vertical header default)
- *   - Admin: Always uses App visual mode (it's an application interface)
+ * Two UX paradigms exist:
+ *   - Website UX: Horizontal header, page-based (for public visitors)
+ *   - App UX: Sidebar/bottom nav, feature-based (for ALL logged-in users)
  *
- * ┌─────────────────┬─────────┬──────────────┬─────────────────┬─────────────┐
- * │ Mode            │ Website │ Login Button │ Admin Access    │ Visual Mode │
- * ├─────────────────┼─────────┼──────────────┼─────────────────┼─────────────┤
- * │ app-only        │ ❌      │ N/A          │ / → /login      │ App         │
- * │ website-app     │ ✅      │ ✅ Visible   │ /login route    │ App primary │
- * │ website-admin   │ ✅      │ ❌ Hidden    │ /admin (secret) │ Website     │
- * │ website-only    │ ✅      │ ❌ None      │ ❌ No admin     │ Website     │
- * └─────────────────┴─────────┴──────────────┴─────────────────┴─────────────┘
+ * Admin panel uses App UX - it's NOT a third paradigm!
+ * Layout = where nav goes, Role = what nav shows.
  *
- * Use Cases:
- *   - app-only:      SaaS dashboard, internal tools, no public landing page
- *   - website-app:   Product with marketing site + user login (e.g., Notion, Figma)
- *   - website-admin: Portfolio/agency site with hidden CMS (current default)
- *   - website-only:  Static site, no admin needed (pure marketing/portfolio)
+ * ┌──────────────┬──────────────────┬─────────────────────────────────────────┐
+ * │ Entity       │ UX Paradigm      │ Purpose                                 │
+ * ├──────────────┼──────────────────┼─────────────────────────────────────────┤
+ * │ Website      │ Website UX       │ Public marketing, landing, info pages   │
+ * │ App          │ App UX           │ User-facing features (dashboard, etc.)  │
+ * │ Admin        │ App UX           │ Content management (role-based access)  │
+ * └──────────────┴──────────────────┴─────────────────────────────────────────┘
  *
- * NOTE: 'onepager' toggle only affects the website portion (not app-only mode).
- *       The app/admin portions always use SPA with route navigation.
+ * Derived behaviors:
+ *   website: false, app: true  → / redirects to /login (app-only)
+ *   website: true, app: true   → public site + user app
+ *   website: true, app: false  → public site only
+ *
+ * Admin is always available when admin.enabled: true (accessed at /admin)
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-export type AppMode = 'app-only' | 'website-app' | 'website-admin' | 'website-only'
 
 const config = {
   // ═══════════════════════════════════════════════════════════════════════════
-  // MODE - Choose your application structure
+  // ENTITIES - What exists in your project
   // ═══════════════════════════════════════════════════════════════════════════
-  mode: 'website-admin' as AppMode,
+  entities: {
+    website: true, // Public marketing pages (Website UX)
+    app: false // User-facing application (App UX)
+  } as EntitiesConfig,
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FEATURE TOGGLES - Fine-tune behavior within the chosen mode
+  // FEATURE TOGGLES - Fine-tune behavior for website and app entities
   // ═══════════════════════════════════════════════════════════════════════════
   features: {
-    // Website features (only apply when mode has website)
+    // Website features (only apply when entities.website: true)
     multiLangs: true, // Multiple languages support
     doubleTheme: true, // Light/dark mode toggle
-    onepager: false, // Website mode: Onepager (scroll nav) vs SPA (route nav). Ignored in app modes.
+    onepager: false, // Website: Onepager (scroll nav) vs SPA (route nav). Only for website entity.
     interactiveHeader: true, // Header style changes on scroll
     hideHeaderOnScroll: false, // Hide header when scrolling down
     verticalNav: false, // true = icon sidebar, false = horizontal header
@@ -72,8 +78,8 @@ const config = {
       | 'swipe'
       | '',
 
-    // Admin features (only apply when mode has admin)
-    appVerticalNav: true, // App mode: true = vertical sidebar, false = horizontal nav
+    // App/Admin features (only apply when entities.app: true or admin.enabled: true)
+    appVerticalNav: true, // App UX: true = vertical sidebar, false = horizontal nav
 
     // PWA (Progressive Web App) support
     // Enables: installable app, offline support, service worker caching
@@ -470,35 +476,60 @@ const config = {
   ] as const,
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // ADMIN SECTIONS - Source of truth for admin panel navigation
+  // ADMIN - Content management configuration with per-module RBAC
   // ═══════════════════════════════════════════════════════════════════════════
   //
-  // Each section defines:
-  //   id      - Route name (maps to /admin/{id})
-  //   icon    - Tabler icon name (without 'tabler:' prefix)
-  //   label   - i18n key suffix (full key: admin.{label})
-  //   badge   - Show unread count badge (e.g., for contacts inbox)
-  //   roles   - Array of roles that can access this section (empty = all)
-  //             Available roles: 'master', 'admin', 'editor'
+  // Three categories of admin modules:
+  //   1. SYSTEM — PM provides, universal (users, roles, translations, settings, health, logs)
+  //   2. WEBSITE CONTENT — PM provides (sections, blog, portfolio, team, etc.)
+  //   3. APP DATA — Developer builds custom admin pages per project
   //
-  // Usage in admin.vue and AppBottomNav.vue:
-  //   const adminSections = config.adminSections.filter(s => canAccess(s.roles))
+  // Each module has:
+  //   enabled — Show/hide in admin panel
+  //   roles   — Which roles can access (empty = all authenticated)
+  //
+  // Role hierarchy: master → admin → editor → user
+  // Role assignment is ALWAYS master-only (hardcoded for security)
+  //
+  // Usage in admin components:
+  //   const sections = getAdminSections(config.admin)
+  //   const userSections = filterSectionsByRole(sections, user.role)
   // ═══════════════════════════════════════════════════════════════════════════
-  adminSections: [
-    { id: 'settings', icon: 'settings', label: 'settings', badge: false, roles: [] },
-    { id: 'portfolios', icon: 'photo', label: 'portfolio', badge: false, roles: [] },
-    { id: 'blog', icon: 'article', label: 'blog', badge: false, roles: [] },
-    { id: 'team', icon: 'users-group', label: 'team', badge: false, roles: [] },
-    { id: 'features', icon: 'sparkles', label: 'features', badge: false, roles: [] },
-    { id: 'testimonials', icon: 'quote', label: 'testimonials', badge: false, roles: [] },
-    { id: 'clients', icon: 'building', label: 'clients', badge: false, roles: [] },
-    { id: 'faq', icon: 'help-circle', label: 'faq', badge: false, roles: [] },
-    { id: 'pricing', icon: 'credit-card', label: 'pricing', badge: false, roles: [] },
-    { id: 'contacts', icon: 'mail', label: 'contacts', badge: true, roles: [] },
-    { id: 'translations', icon: 'language', label: 'translations', badge: false, roles: [] },
-    { id: 'users', icon: 'users', label: 'users', badge: false, roles: ['master', 'admin'] },
-    { id: 'health', icon: 'heartbeat', label: 'health', badge: false, roles: ['master'] }
-  ] as const,
+  admin: {
+    enabled: true,
+
+    // System modules (PM provides, universal)
+    system: {
+      users: { enabled: true, roles: ['master', 'admin'] },
+      roles: { enabled: true, roles: ['master'] }, // ALWAYS master-only
+      translations: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      settings: { enabled: true, roles: ['master', 'admin'] },
+      health: { enabled: true, roles: ['master'] },
+      logs: { enabled: false, roles: ['master'] }
+    },
+
+    // Website content modules (PM provides)
+    websiteModules: {
+      sections: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      blog: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      portfolio: { enabled: true, roles: ['master', 'admin'] },
+      team: { enabled: true, roles: ['master', 'admin'] },
+      testimonials: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      faq: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      clients: { enabled: true, roles: ['master', 'admin'] },
+      pricing: { enabled: true, roles: ['master', 'admin'] },
+      features: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      contacts: { enabled: true, roles: ['master', 'admin'] }
+    },
+
+    // App data modules (developer builds custom)
+    // Add your custom admin modules here
+    appModules: {
+      // Example:
+      // products: { enabled: true, roles: ['master', 'admin'] },
+      // orders: { enabled: true, roles: ['master', 'admin', 'editor'] },
+    }
+  } as AdminConfig,
 
   // ═══════════════════════════════════════════════════════════════════════════
   // LANGUAGE & THEME DEFAULTS
@@ -780,25 +811,30 @@ const config = {
   // COMPUTED HELPERS - Convenient access to derived values
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // Mode-based helpers
+  // Entity-based helpers (replaces old mode system)
   get hasWebsite(): boolean {
-    return this.mode !== 'app-only'
+    return this.entities.website
+  },
+
+  get hasApp(): boolean {
+    return this.entities.app
   },
 
   get hasAdmin(): boolean {
-    return this.mode !== 'website-only'
+    return this.admin.enabled
   },
 
   get hasLoginButton(): boolean {
-    return this.mode === 'website-app'
+    // Show login button when both website and app exist
+    return this.entities.website && this.entities.app
   },
 
-  get isAppPrimary(): boolean {
-    return this.mode === 'app-only' || this.mode === 'website-app'
+  get isAppOnly(): boolean {
+    return !this.entities.website && this.entities.app
   },
 
-  get isWebsitePrimary(): boolean {
-    return this.mode === 'website-admin' || this.mode === 'website-only'
+  get isWebsiteOnly(): boolean {
+    return this.entities.website && !this.entities.app && !this.admin.enabled
   },
 
   // Feature helpers
@@ -810,7 +846,7 @@ const config = {
     return this.features.doubleTheme
   },
 
-  // Combined helpers (mode + features)
+  // Combined helpers (entities + features)
   get useOnepager(): boolean {
     // Onepager applies to the website portion (when it exists)
     return this.hasWebsite && this.features.onepager
@@ -818,6 +854,15 @@ const config = {
 
   get useInteractiveHeader(): boolean {
     return this.hasWebsite && this.features.interactiveHeader
+  },
+
+  // Admin section helpers
+  getAdminSections(): AdminSection[] {
+    return getAdminSections(this.admin)
+  },
+
+  getAdminSectionsForRole(role: UserRole): AdminSection[] {
+    return filterSectionsByRole(this.getAdminSections(), role)
   }
 }
 

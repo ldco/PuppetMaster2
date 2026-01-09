@@ -7,7 +7,7 @@
  * @example
  * ```vue
  * <script setup>
- * const { hasWebsite, hasAdmin, hasLoginButton } = useConfig()
+ * const { hasWebsite, hasAdmin, hasApp } = useConfig()
  * </script>
  *
  * <template>
@@ -16,21 +16,28 @@
  * ```
  */
 import config from '~/puppet-master.config'
-import type { AppMode } from '~/puppet-master.config'
 
 export function useConfig() {
   return {
     // ═══════════════════════════════════════════════════════════════════════
-    // MODE - Primary app structure
+    // ENTITIES - What exists in the project
     // ═══════════════════════════════════════════════════════════════════════
-    mode: config.mode as AppMode,
+    entities: config.entities,
 
-    // Mode-derived booleans (for conditional rendering)
-    hasWebsite: config.hasWebsite, // Has public website (all except app-only)
-    hasAdmin: config.hasAdmin, // Has admin panel (all except website-only)
-    hasLoginButton: config.hasLoginButton, // Show login button in header (website-app only)
-    isAppPrimary: config.isAppPrimary, // Admin is the main app (app-only, website-app)
-    isWebsitePrimary: config.isWebsitePrimary, // Website is the main app (website-admin, website-only)
+    // Entity-derived booleans (for conditional rendering)
+    hasWebsite: config.hasWebsite, // Has public website
+    hasApp: config.hasApp, // Has user application
+    hasAdmin: config.hasAdmin, // Has admin panel
+    hasLoginButton: config.hasLoginButton, // Show login button in header
+    isAppOnly: config.isAppOnly, // No website, only app
+    isWebsiteOnly: config.isWebsiteOnly, // Website only, no app/admin
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ADMIN - Module configuration with RBAC
+    // ═══════════════════════════════════════════════════════════════════════
+    admin: config.admin,
+    getAdminSections: config.getAdminSections.bind(config),
+    getAdminSectionsForRole: config.getAdminSectionsForRole.bind(config),
 
     // ═══════════════════════════════════════════════════════════════════════
     // FEATURES - Fine-tuned behavior toggles
@@ -44,12 +51,12 @@ export function useConfig() {
     hasInteractiveHeader: config.useInteractiveHeader, // Combined: hasWebsite && interactiveHeader
     hideHeaderOnScroll: config.features.hideHeaderOnScroll,
 
-    // Admin features
+    // App/Admin features
     appVerticalNav: config.features.appVerticalNav,
 
 
     // ═══════════════════════════════════════════════════════════════════════
-    // MODULES - Pre-built features
+    // MODULES - Pre-built features (content modules)
     // ═══════════════════════════════════════════════════════════════════════
     modules: config.modules,
 

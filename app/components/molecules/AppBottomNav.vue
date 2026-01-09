@@ -8,7 +8,8 @@
  * MAX_VISIBLE_ITEMS: 5 (Material Design recommendation)
  * When items exceed 5, shows 4 items + "More" button with overflow menu.
  *
- * Navigation is config-driven via config.adminSections in puppet-master.config.ts
+ * Navigation is config-driven via config.admin in puppet-master.config.ts
+ * Uses getAdminSectionsForRole() to filter sections by user's role.
  *
  * Uses global CSS:
  * - skeleton/bottom-nav.css: .bottom-nav, .bottom-nav-item, .bottom-nav-label
@@ -24,6 +25,16 @@ import IconUsers from '~icons/tabler/users'
 import IconHeartbeat from '~icons/tabler/heartbeat'
 import IconCreditCard from '~icons/tabler/credit-card'
 import IconDotsVertical from '~icons/tabler/dots-vertical'
+import IconArticle from '~icons/tabler/article'
+import IconUsersGroup from '~icons/tabler/users-group'
+import IconSparkles from '~icons/tabler/sparkles'
+import IconQuote from '~icons/tabler/quote'
+import IconBuilding from '~icons/tabler/building'
+import IconHelpCircle from '~icons/tabler/help-circle'
+import IconShield from '~icons/tabler/shield'
+import IconList from '~icons/tabler/list'
+import IconLayout from '~icons/tabler/layout'
+import IconDatabase from '~icons/tabler/database'
 
 // Icon mapping from config icon names to components
 const iconMap: Record<string, Component> = {
@@ -33,12 +44,22 @@ const iconMap: Record<string, Component> = {
   language: IconLanguage,
   users: IconUsers,
   heartbeat: IconHeartbeat,
-  'credit-card': IconCreditCard
+  'credit-card': IconCreditCard,
+  article: IconArticle,
+  'users-group': IconUsersGroup,
+  sparkles: IconSparkles,
+  quote: IconQuote,
+  building: IconBuilding,
+  'help-circle': IconHelpCircle,
+  shield: IconShield,
+  list: IconList,
+  layout: IconLayout,
+  database: IconDatabase
 }
 
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { hasRole } = useAuth()
+const { user } = useAuth()
 const { unreadCount } = useUnreadCount()
 
 // Maximum items to show directly (Material Design: 3-5, we use 5)
@@ -47,24 +68,22 @@ const MAX_VISIBLE_ITEMS = 5
 // State for overflow menu
 const showMoreMenu = ref(false)
 
-// Check if user can access a section based on roles
-function canAccessSection(roles: readonly string[]): boolean {
-  if (roles.length === 0) return true
-  return roles.some(role => hasRole(role as 'master' | 'admin' | 'editor'))
-}
+// Get admin sections filtered by user's role
+const adminSections = computed(() => {
+  if (!user.value) return []
+  return config.getAdminSectionsForRole(user.value.role)
+})
 
 // Config-driven navigation items - filtered by role access
 // Uses short single-word labels (admin.navXxx) for compact bottom nav display
 const allNavItems = computed(() => {
-  return config.adminSections
-    .filter(section => canAccessSection(section.roles))
-    .map(section => ({
-      to: localePath(`/admin/${section.id}`),
-      // Use short nav labels for bottom nav (admin.navSettings, admin.navPortfolio, etc.)
-      label: `admin.nav${section.label.charAt(0).toUpperCase() + section.label.slice(1)}`,
-      icon: iconMap[section.icon] || IconSettings,
-      badge: section.badge
-    }))
+  return adminSections.value.map(section => ({
+    to: localePath(`/admin/${section.id}`),
+    // Use short nav labels for bottom nav (admin.navSettings, admin.navPortfolio, etc.)
+    label: `admin.nav${section.label.charAt(0).toUpperCase() + section.label.slice(1)}`,
+    icon: iconMap[section.icon] || IconSettings,
+    badge: section.badge
+  }))
 })
 
 // Split items into visible and overflow

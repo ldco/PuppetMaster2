@@ -7,7 +7,8 @@
  * - Tablet portrait (600-839px): Navigation rail (narrow sidebar)
  * - Tablet landscape / Desktop (≥ 840px): Full sidebar
  *
- * Navigation is config-driven via config.adminSections in puppet-master.config.ts
+ * Navigation is config-driven via config.admin in puppet-master.config.ts
+ * Uses getAdminSectionsForRole() to filter sections by user's role.
  *
  * Uses existing CSS system:
  * - layout/page.css: .layout-admin responsive styles
@@ -33,6 +34,10 @@ import IconSparkles from '~icons/tabler/sparkles'
 import IconQuote from '~icons/tabler/quote'
 import IconBuilding from '~icons/tabler/building'
 import IconHelpCircle from '~icons/tabler/help-circle'
+import IconShield from '~icons/tabler/shield'
+import IconList from '~icons/tabler/list'
+import IconLayout from '~icons/tabler/layout'
+import IconDatabase from '~icons/tabler/database'
 
 // Icon mapping from config icon names to components
 const iconMap: Record<string, Component> = {
@@ -48,7 +53,11 @@ const iconMap: Record<string, Component> = {
   sparkles: IconSparkles,
   quote: IconQuote,
   building: IconBuilding,
-  'help-circle': IconHelpCircle
+  'help-circle': IconHelpCircle,
+  shield: IconShield,
+  list: IconList,
+  layout: IconLayout,
+  database: IconDatabase
 }
 
 const route = useRoute()
@@ -72,19 +81,17 @@ function toggleMobileUserMenu() {
   mobileUserMenuOpen.value = !mobileUserMenuOpen.value
 }
 
-// Check if user can access a section based on roles
-function canAccessSection(roles: readonly string[]): boolean {
-  // Empty roles array means all users can access
-  if (roles.length === 0) return true
-  // Check if user has any of the required roles
-  return roles.some(role => hasRole(role as 'master' | 'admin' | 'editor'))
-}
+// Get admin sections filtered by user's role
+const adminSections = computed(() => {
+  if (!user.value) return []
+  return config.getAdminSectionsForRole(user.value.role)
+})
 
 // Get current page title based on route name (works with any locale prefix)
 const currentPageTitle = computed(() => {
   const name = route.name?.toString() ?? ''
   // Try to match from config first
-  for (const section of config.adminSections) {
+  for (const section of adminSections.value) {
     if (name.startsWith(`admin-${section.id}`)) {
       return t(`admin.${section.label}`)
     }
@@ -123,14 +130,12 @@ onUnmounted(() => {
 
 // Config-driven admin links - filtered by role access
 const adminLinks = computed(() => {
-  return config.adminSections
-    .filter(section => canAccessSection(section.roles))
-    .map(section => ({
-      to: localePath(`/admin/${section.id}`),
-      label: `admin.${section.label}`,
-      icon: iconMap[section.icon] || IconSettings,
-      badge: section.badge
-    }))
+  return adminSections.value.map(section => ({
+    to: localePath(`/admin/${section.id}`),
+    label: `admin.${section.label}`,
+    icon: iconMap[section.icon] || IconSettings,
+    badge: section.badge
+  }))
 })
 
 async function handleLogout() {

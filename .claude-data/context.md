@@ -5,11 +5,17 @@ Branch: master | Updated: 2026-01-09
 
 ## Active Tasks
 - PM Claude System implementation complete
-- Architecture redesign documented (modular entities + flexible RBAC)
-- **TODO**: Implement new config structure (entities + admin modules with per-model roles)
+- Modular entity architecture IMPLEMENTED (entities + admin modules with per-model RBAC)
 - Ready for testing from fresh git clone
 
 ## Completed (This Session)
+- Implemented modular entity configuration (replaces fixed modes)
+- Created config.ts types with EntitiesConfig, AdminConfig, RBAC helpers
+- Updated puppet-master.config.ts with entities + admin structure
+- Updated useConfig composable with new entity-based helpers
+- Updated admin layout and bottom nav to use getAdminSectionsForRole()
+- Updated app-mode middleware for entity-based routing
+- Added 'user' role to UserRole type for app users
 - Architecture redesign: modular entities + flexible RBAC (docs/PM-ARCHITECTURE.md)
 - Documented three-category admin module system (System, Website Content, App Data)
 - Documented per-model role configuration with master-only role assignment
