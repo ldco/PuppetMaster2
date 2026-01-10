@@ -14,13 +14,62 @@ import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-co
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * User roles hierarchy:
+ * User roles hierarchy (legacy - for backward compatibility):
  * - master: Developer/agency who builds the site (full access)
  * - admin: Client who owns the site (can manage content + users except master)
  * - editor: Client's employees (can only edit content)
  */
 export const USER_ROLES = ['master', 'admin', 'editor'] as const
 export type UserRole = (typeof USER_ROLES)[number]
+
+/**
+ * Admin page IDs - each admin page is a permission
+ * Simple model: if page is true, user sees it in nav
+ */
+export const ADMIN_PAGE_IDS = [
+  // System pages
+  'users',
+  'roles',
+  'translations',
+  'settings',
+  'health',
+  // Content pages
+  'sections',
+  'blog',
+  'portfolios',
+  'team',
+  'testimonials',
+  'faq',
+  'clients',
+  'pricing',
+  'features',
+  'contacts'
+] as const
+export type AdminPageId = (typeof ADMIN_PAGE_IDS)[number]
+export type RolePermissions = Partial<Record<AdminPageId, boolean>>
+
+/**
+ * Badge color options for roles
+ */
+export const ROLE_COLORS = ['primary', 'secondary', 'warning', 'success', 'danger'] as const
+export type RoleColor = (typeof ROLE_COLORS)[number]
+
+/**
+ * Roles - Dynamic role management
+ */
+export const roles = sqliteTable('roles', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  permissions: text('permissions').notNull(), // JSON of RolePermissions
+  level: integer('level').notNull().default(0), // Higher = more authority
+  isBuiltIn: integer('is_built_in', { mode: 'boolean' }).default(false),
+  color: text('color').default('secondary'),
+  icon: text('icon').default('pencil'), // Icon name for custom roles
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
 
 /**
  * Admin users
@@ -30,9 +79,12 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name'),
+  // Legacy role column (for backward compatibility during migration)
   role: text('role', { enum: ['master', 'admin', 'editor'] })
     .default('editor')
     .notNull(),
+  // New dynamic role reference
+  roleId: integer('role_id').references(() => roles.id, { onDelete: 'set null' }),
   // Account lockout fields (CRIT-04)
   failedLoginAttempts: integer('failed_login_attempts').default(0),
   lockedUntil: integer('locked_until', { mode: 'timestamp' }),
@@ -642,7 +694,11 @@ export const AUDIT_ACTIONS = [
   'user_delete',
   'account_locked',
   'account_unlocked',
-  'session_expired'
+  'session_expired',
+  // Role management
+  'role_create',
+  'role_update',
+  'role_delete'
 ] as const
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]
 
@@ -674,6 +730,8 @@ export const auditLogs = sqliteTable(
 
 export type AuditLog = typeof auditLogs.$inferSelect
 export type NewAuditLog = typeof auditLogs.$inferInsert
+export type Role = typeof roles.$inferSelect
+export type NewRole = typeof roles.$inferInsert
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Session = typeof sessions.$inferSelect

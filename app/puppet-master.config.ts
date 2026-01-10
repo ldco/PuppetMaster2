@@ -79,7 +79,7 @@ const config = {
       | '',
 
     // App/Admin features (only apply when entities.app: true or admin.enabled: true)
-    appVerticalNav: true, // App UX: true = vertical sidebar, false = horizontal nav
+    appVerticalNav: false, // App UX: true = vertical sidebar, false = horizontal nav
 
     // PWA (Progressive Web App) support
     // Enables: installable app, offline support, service worker caching

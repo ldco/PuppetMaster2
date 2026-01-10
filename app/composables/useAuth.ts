@@ -2,38 +2,74 @@
  * Auth Composable
  *
  * Client-side authentication state management.
- * Provides login, logout, session checking, and role-based access control.
+ * Provides login, logout, session checking, and page-based access control.
  * Integrates with CSRF protection via useCsrf composable.
  */
-import type { UserRole, User, LoginCredentials } from '~/types'
+import type { UserRole, User, LoginCredentials, RolePermissions, AdminPageId } from '~/types'
+import { ADMIN_PAGE_IDS } from '~/types'
 
 // Re-export for backward compatibility
 export type { UserRole } from '~/types'
 
-const ROLE_HIERARCHY: Record<UserRole, number> = {
-  editor: 0,
-  admin: 1,
-  master: 2
+/**
+ * Get default permissions (no access to any page)
+ */
+function getDefaultPermissions(): RolePermissions {
+  const perms: RolePermissions = {}
+  for (const pageId of ADMIN_PAGE_IDS) {
+    perms[pageId] = false
+  }
+  return perms
+}
+
+const ROLE_HIERARCHY: Record<string, number> = {
+  user: 0,
+  editor: 1,
+  admin: 2,
+  master: 3
 }
 
 export function useAuth() {
   const user = useState<User | null>('auth-user', () => null)
+  const permissions = useState<RolePermissions>('auth-permissions', getDefaultPermissions)
   const isLoading = useState<boolean>('auth-loading', () => false)
 
   const isAuthenticated = computed(() => !!user.value)
 
-  // Role-based computed properties
+  // Role-based computed properties (legacy - for backward compatibility)
   const isMaster = computed(() => user.value?.role === 'master')
   const isAdmin = computed(() => hasRole('admin'))
   const isEditor = computed(() => hasRole('editor'))
-  const canManageUsers = computed(() => hasRole('admin'))
+
+  // Page-based access computed properties
+  // Convenience shortcuts for commonly checked pages
+  const canManageUsers = computed(() => permissions.value.users === true)
+  const canManageRoles = computed(() => permissions.value.roles === true)
+  const canManageSettings = computed(() => permissions.value.settings === true)
+  const canViewHealth = computed(() => permissions.value.health === true)
+
+  /**
+   * Check if current user can access a specific admin page
+   */
+  function canAccessPage(pageId: AdminPageId): boolean {
+    return permissions.value[pageId] === true
+  }
+
+  /**
+   * Get list of page IDs the current user can access
+   */
+  function getAccessiblePages(): AdminPageId[] {
+    return ADMIN_PAGE_IDS.filter(pageId => permissions.value[pageId] === true)
+  }
 
   /**
    * Check if current user has at least the minimum required role
    */
   function hasRole(minRole: UserRole): boolean {
     if (!user.value?.role) return false
-    return ROLE_HIERARCHY[user.value.role] >= ROLE_HIERARCHY[minRole]
+    const userLevel = ROLE_HIERARCHY[user.value.role] ?? 0
+    const minLevel = ROLE_HIERARCHY[minRole] ?? 0
+    return userLevel >= minLevel
   }
 
   /**
@@ -48,16 +84,20 @@ export function useAuth() {
 
   /**
    * Check current session on app load
-   * Also restores CSRF token from server
+   * Also restores CSRF token and permissions from server
    */
   async function checkSession(): Promise<User | null> {
     const { setToken, clearToken } = useCsrf()
     isLoading.value = true
     try {
-      const { data } = await useFetch<{ user: User | null; csrfToken: string | null }>(
-        '/api/auth/session'
-      )
+      const { data } = await useFetch<{
+        user: User | null
+        permissions?: RolePermissions
+        csrfToken: string | null
+      }>('/api/auth/session')
+
       user.value = data.value?.user ?? null
+      permissions.value = data.value?.permissions ?? getDefaultPermissions()
 
       // Restore CSRF token
       if (data.value?.csrfToken) {
@@ -69,6 +109,7 @@ export function useAuth() {
       return user.value
     } catch {
       user.value = null
+      permissions.value = getDefaultPermissions()
       clearToken()
       return null
     } finally {
@@ -112,7 +153,7 @@ export function useAuth() {
 
   /**
    * Logout current user
-   * Clears CSRF token
+   * Clears CSRF token and permissions
    */
   async function logout(): Promise<void> {
     const { clearToken } = useCsrf()
@@ -121,11 +162,20 @@ export function useAuth() {
       await $fetch('/api/auth/logout', { method: 'POST' })
     } finally {
       user.value = null
+      permissions.value = getDefaultPermissions()
       clearToken()
       isLoading.value = false
       // Redirect to login
       navigateTo('/admin/login')
     }
+  }
+
+  /**
+   * Check if current user has access to a specific page
+   * (alias for canAccessPage for backward compatibility)
+   */
+  function hasPermission(pageId: AdminPageId): boolean {
+    return permissions.value[pageId] === true
   }
 
   /**
@@ -147,14 +197,20 @@ export function useAuth() {
   return {
     // State
     user: readonly(user),
+    permissions: readonly(permissions),
     isLoading: readonly(isLoading),
     isAuthenticated,
 
-    // Role-based state
+    // Role-based state (legacy - for backward compatibility)
     isMaster,
     isAdmin,
     isEditor,
+
+    // Page access computed properties (convenience shortcuts)
     canManageUsers,
+    canManageRoles,
+    canManageSettings,
+    canViewHealth,
 
     // Actions
     checkSession,
@@ -162,6 +218,9 @@ export function useAuth() {
     logout,
     requireAuth,
     hasRole,
+    hasPermission,
+    canAccessPage,
+    getAccessiblePages,
     getAssignableRoles
   }
 }

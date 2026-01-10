@@ -215,5 +215,52 @@ export const audit = {
     await logAudit(event, 'session_expired', {
       targetUserId: userId
     })
+  },
+
+  /**
+   * Log role creation
+   */
+  async roleCreate(
+    event: H3Event,
+    actorId: number,
+    roleId: number,
+    roleName: string,
+    roleSlug: string
+  ): Promise<void> {
+    await logAudit(event, 'role_create', {
+      userId: actorId,
+      details: { roleId, roleName, roleSlug }
+    })
+  },
+
+  /**
+   * Log role update
+   */
+  async roleUpdate(
+    event: H3Event,
+    actorId: number,
+    roleId: number,
+    roleName: string,
+    changes: Record<string, unknown>
+  ): Promise<void> {
+    await logAudit(event, 'role_update', {
+      userId: actorId,
+      details: { roleId, roleName, changes }
+    })
+  },
+
+  /**
+   * Log role deletion
+   */
+  async roleDelete(
+    event: H3Event,
+    actorId: number,
+    roleId: number,
+    roleName: string
+  ): Promise<void> {
+    await logAudit(event, 'role_delete', {
+      userId: actorId,
+      details: { roleId, roleName }
+    })
   }
 }

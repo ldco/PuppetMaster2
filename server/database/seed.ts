@@ -111,6 +111,135 @@ async function seed() {
     console.log(`👤 ${existingUsers.length} users exist, skipping user creation.\n`)
   }
 
+  // Seed built-in roles - ONLY if none exist
+  console.log('🎭 Checking roles...')
+  const existingRoles = db.select().from(schema.roles).all()
+
+  // Built-in role definitions with page-based permissions
+  // Each key is an admin page ID, true = role can access this page
+  const builtInRoles = [
+    {
+      name: 'Master',
+      slug: 'master',
+      description: 'Full system access - developers and agency',
+      permissions: JSON.stringify({
+        // System pages
+        users: true,
+        roles: true,
+        translations: true,
+        settings: true,
+        health: true,
+        // Content pages
+        sections: true,
+        blog: true,
+        portfolios: true,
+        team: true,
+        testimonials: true,
+        faq: true,
+        clients: true,
+        pricing: true,
+        features: true,
+        contacts: true
+      }),
+      level: 100,
+      isBuiltIn: true,
+      color: 'warning'
+    },
+    {
+      name: 'Admin',
+      slug: 'admin',
+      description: 'Client owner - manage content and users',
+      permissions: JSON.stringify({
+        // System pages (limited)
+        users: true,
+        roles: false,
+        translations: true,
+        settings: true,
+        health: false,
+        // Content pages (all)
+        sections: true,
+        blog: true,
+        portfolios: true,
+        team: true,
+        testimonials: true,
+        faq: true,
+        clients: true,
+        pricing: true,
+        features: true,
+        contacts: true
+      }),
+      level: 50,
+      isBuiltIn: true,
+      color: 'primary'
+    },
+    {
+      name: 'Editor',
+      slug: 'editor',
+      description: 'Content editor - manage content only',
+      permissions: JSON.stringify({
+        // System pages (none)
+        users: false,
+        roles: false,
+        translations: true,
+        settings: false,
+        health: false,
+        // Content pages (editorial)
+        sections: true,
+        blog: true,
+        portfolios: false,
+        team: false,
+        testimonials: true,
+        faq: true,
+        clients: false,
+        pricing: false,
+        features: true,
+        contacts: false
+      }),
+      level: 25,
+      isBuiltIn: true,
+      color: 'secondary'
+    }
+  ]
+
+  if (existingRoles.length === 0) {
+    console.log('   Creating built-in roles...')
+    for (const role of builtInRoles) {
+      db.insert(schema.roles).values(role).run()
+      console.log(`   ✓ ${role.name} (level ${role.level})`)
+    }
+    console.log('')
+  } else {
+    console.log(`   ${existingRoles.length} roles exist, skipping role creation.\n`)
+  }
+
+  // Migrate users to use roleId if not set
+  console.log('🔄 Checking user role migration...')
+  const usersWithoutRoleId = sqlite.prepare(
+    `SELECT id, role FROM users WHERE role_id IS NULL`
+  ).all() as Array<{ id: number; role: string }>
+
+  if (usersWithoutRoleId.length > 0) {
+    console.log(`   Migrating ${usersWithoutRoleId.length} users to roleId...`)
+    const roleMap = new Map<string, number>()
+
+    // Get role IDs by slug
+    const allRoles = db.select().from(schema.roles).all()
+    for (const role of allRoles) {
+      roleMap.set(role.slug, role.id)
+    }
+
+    for (const user of usersWithoutRoleId) {
+      const roleId = roleMap.get(user.role)
+      if (roleId) {
+        sqlite.prepare(`UPDATE users SET role_id = ? WHERE id = ?`).run(roleId, user.id)
+        console.log(`   ✓ User ${user.id} -> ${user.role} (roleId: ${roleId})`)
+      }
+    }
+    console.log('')
+  } else {
+    console.log('   All users have roleId set, skipping migration.\n')
+  }
+
   // Create settings from config schema - ONLY if they don't exist
   // Uses raw SQL with INSERT OR IGNORE to preserve existing values
   console.log('⚙️  Syncing settings from config schema...')

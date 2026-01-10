@@ -116,14 +116,30 @@ form.modal-body {
   align-items: start;
 }
 
-/* When form-row is combined with 2col, remove the margin (parent gap handles it) */
-.form-row.form-row--2col {
+/* Three-column grid for compact fields */
+.form-row--3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* When form-row is combined with grid classes, remove the margin (parent gap handles it) */
+.form-row.form-row--2col,
+.form-row.form-row--3col {
   margin-block-start: 0;
 }
 
-/* Single column on small screens */
+/* Responsive: collapse to fewer columns on smaller screens */
+@media (max-width: 640px) {
+  .form-row--3col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 480px) {
-  .form-row--2col {
+  .form-row--2col,
+  .form-row--3col {
     grid-template-columns: 1fr;
   }
 }
@@ -137,8 +153,9 @@ form.modal-body > .form-row {
   margin-block-start: 0;
 }
 
-/* Reset margins inside 2-column grids - grid gap handles spacing */
-form.modal-body .form-row--2col > .form-group {
+/* Reset margins inside grid layouts - grid gap handles spacing */
+form.modal-body .form-row--2col > .form-group,
+form.modal-body .form-row--3col > .form-group {
   margin-block-start: 0;
 }
 

@@ -5,7 +5,7 @@
  * Keep validation logic in one place for consistency and testability.
  */
 import { z } from 'zod'
-import { USER_ROLES } from '../database/schema'
+import { USER_ROLES, ADMIN_PAGE_IDS, ROLE_COLORS } from '../database/schema'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AUTH SCHEMAS
@@ -57,6 +57,76 @@ export const updateUserSchema = z.object({
 })
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ROLE MANAGEMENT SCHEMAS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Page-based permissions schema - map of pageId -> boolean
+ * Each key is an admin page ID, value is whether role can access it
+ */
+const pagePermissionsShape: Record<string, z.ZodOptional<z.ZodBoolean>> = {}
+for (const pageId of ADMIN_PAGE_IDS) {
+  pagePermissionsShape[pageId] = z.boolean().optional()
+}
+export const permissionsSchema = z.object(pagePermissionsShape)
+
+export type PermissionsInput = z.infer<typeof permissionsSchema>
+
+/**
+ * Create role schema
+ * Note: level is auto-calculated from permissions on the server
+ */
+export const createRoleSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be 50 characters or less'),
+  slug: z
+    .string()
+    .min(2, 'Slug must be at least 2 characters')
+    .max(50, 'Slug must be 50 characters or less')
+    .regex(/^[a-z][a-z0-9-]*$/, 'Slug must start with a letter and contain only lowercase letters, numbers, and hyphens'),
+  description: z
+    .string()
+    .max(200, 'Description must be 200 characters or less')
+    .optional()
+    .nullable(),
+  permissions: permissionsSchema,
+  color: z.enum(ROLE_COLORS).optional().default('secondary'),
+  icon: z.string().max(50).optional().default('pencil')
+})
+
+export type CreateRoleInput = z.infer<typeof createRoleSchema>
+
+/**
+ * Update role schema (all fields optional)
+ * Note: level is auto-calculated from permissions on the server
+ */
+export const updateRoleSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be 50 characters or less')
+    .optional(),
+  slug: z
+    .string()
+    .min(2, 'Slug must be at least 2 characters')
+    .max(50, 'Slug must be 50 characters or less')
+    .regex(/^[a-z][a-z0-9-]*$/, 'Slug must start with a letter and contain only lowercase letters, numbers, and hyphens')
+    .optional(),
+  description: z
+    .string()
+    .max(200, 'Description must be 200 characters or less')
+    .optional()
+    .nullable(),
+  permissions: permissionsSchema.optional(),
+  color: z.enum(ROLE_COLORS).optional(),
+  icon: z.string().max(50).optional()
+})
+
+export type UpdateRoleInput = z.infer<typeof updateRoleSchema>
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PORTFOLIO SCHEMAS

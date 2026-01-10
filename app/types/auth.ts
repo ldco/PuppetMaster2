@@ -23,3 +23,52 @@ export interface LoginCredentials {
   password: string
   rememberMe?: boolean
 }
+
+/**
+ * Admin page IDs - each admin page is a permission
+ * Simple model: if page is true, user sees it in nav
+ */
+export const ADMIN_PAGE_IDS = [
+  // System pages
+  'users',
+  'roles',
+  'translations',
+  'settings',
+  'health',
+  // Content pages
+  'sections',
+  'blog',
+  'portfolios',
+  'team',
+  'testimonials',
+  'faq',
+  'clients',
+  'pricing',
+  'features',
+  'contacts'
+] as const
+
+export type AdminPageId = (typeof ADMIN_PAGE_IDS)[number]
+
+/**
+ * Role permissions - map of page ID to access boolean
+ * Simple: true = page visible in nav, false/missing = hidden
+ */
+export type RolePermissions = Partial<Record<AdminPageId, boolean>>
+
+/**
+ * Role definition for dynamic roles
+ */
+export interface Role {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  permissions: RolePermissions
+  level: number
+  isBuiltIn: boolean
+  color: string
+  userCount?: number
+  createdAt?: Date
+  updatedAt?: Date
+}

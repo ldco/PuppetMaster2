@@ -6,7 +6,8 @@
  */
 
 // Auth types
-export type { UserRole, User, LoginCredentials } from './auth'
+export { ADMIN_PAGE_IDS } from './auth'
+export type { UserRole, User, LoginCredentials, AdminPageId, RolePermissions, Role } from './auth'
 
 // UI types
 export type { ToastType, Toast, ToastOptions } from './toast'

@@ -4,10 +4,12 @@
  * GET /api/auth/session
  * Returns current user session if valid, null otherwise.
  * Also returns CSRF token for client-side storage.
+ * Also returns user permissions for role-based UI.
  */
 import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { getCsrfToken, generateCsrfToken, setCsrfCookie, deleteCsrfCookie } from '../../utils/csrf'
+import { getUserPermissions } from '../../utils/permissions'
 
 export default defineEventHandler(async event => {
   const sessionId = getCookie(event, 'pm-session')
@@ -34,13 +36,14 @@ export default defineEventHandler(async event => {
     return { user: null, csrfToken: null }
   }
 
-  // Get user
+  // Get user with roleId for permission lookup
   const user = db
     .select({
       id: schema.users.id,
       email: schema.users.email,
       name: schema.users.name,
-      role: schema.users.role
+      role: schema.users.role,
+      roleId: schema.users.roleId
     })
     .from(schema.users)
     .where(eq(schema.users.id, session.userId))
@@ -62,5 +65,11 @@ export default defineEventHandler(async event => {
     setCsrfCookie(event, csrfToken)
   }
 
-  return { user, csrfToken }
+  // Get user permissions from their role
+  const permissions = await getUserPermissions(user)
+
+  // Return user without roleId (internal only) but with permissions
+  const { roleId, ...userWithoutRoleId } = user
+
+  return { user: userWithoutRoleId, permissions, csrfToken }
 })

@@ -61,13 +61,14 @@ export default defineEventHandler(async event => {
     return
   }
 
-  // Get user
+  // Get user (including roleId for permission checks)
   const user = db
     .select({
       id: schema.users.id,
       email: schema.users.email,
       name: schema.users.name,
-      role: schema.users.role
+      role: schema.users.role,
+      roleId: schema.users.roleId
     })
     .from(schema.users)
     .where(eq(schema.users.id, session.userId))
@@ -91,7 +92,7 @@ export default defineEventHandler(async event => {
   // All admin routes require at least editor role, but most require admin+
   if (isAdminRoute) {
     // Routes requiring MASTER role (security-sensitive)
-    const masterOnlyRoutes = ['/api/admin/audit-logs', '/api/admin/logs']
+    const masterOnlyRoutes = ['/api/admin/audit-logs', '/api/admin/logs', '/api/admin/roles']
 
     // Routes requiring ADMIN+ role
     const adminRoutes = [

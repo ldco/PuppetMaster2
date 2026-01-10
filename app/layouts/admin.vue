@@ -154,9 +154,15 @@ function openChangePasswordModal() {
 // Close panels on click outside
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as HTMLElement
-  if (!target.closest('.sidebar-user-wrapper')) {
+
+  // Close user menu if click is outside ANY user wrapper (sidebar OR horizontal header)
+  const inSidebarUser = target.closest('.sidebar-user-wrapper')
+  const inHeaderUser = target.closest('.admin-header-user-wrapper')
+  if (!inSidebarUser && !inHeaderUser) {
     userMenuOpen.value = false
   }
+
+  // Close mobile user menu
   if (!target.closest('.mobile-user-wrapper')) {
     mobileUserMenuOpen.value = false
   }
@@ -172,8 +178,91 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="layout-admin">
-    <!-- Sidebar (visible on tablet+ via CSS, hidden on phones) -->
+  <div class="layout-admin" :class="{ 'layout-admin--horizontal': !config.features.appVerticalNav }">
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         HORIZONTAL HEADER (when appVerticalNav: false)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <header v-if="!config.features.appVerticalNav" class="admin-header-horizontal">
+      <div class="admin-header-inner">
+        <!-- Logo -->
+        <NuxtLink :to="localePath('/admin')" class="admin-header-logo">
+          <ClientOnly>
+            <img :src="shortLogo" alt="Logo" class="logo-img" width="36" height="36" />
+            <template #fallback>
+              <img
+                :src="`${config.logo.basePath}/circle_${config.defaultTheme === 'dark' ? 'light' : 'dark'}_${config.defaultLocale}.svg`"
+                alt="Logo"
+                class="logo-img"
+                width="36"
+                height="36"
+              />
+            </template>
+          </ClientOnly>
+        </NuxtLink>
+
+        <!-- Navigation links (icon-only with tooltips) -->
+        <nav class="admin-header-nav">
+          <NuxtLink
+            v-for="link in adminLinks"
+            :key="link.to"
+            :to="link.to"
+            class="admin-header-link"
+          >
+            <span class="relative">
+              <component :is="link.icon" class="admin-header-link-icon" />
+              <span v-if="link.badge && unreadCount > 0" class="badge-dot">
+                {{ unreadCount > 9 ? '9+' : unreadCount }}
+              </span>
+            </span>
+            <span class="admin-header-tooltip">{{ t(link.label) }}</span>
+          </NuxtLink>
+        </nav>
+
+        <!-- Actions (theme, lang, user) -->
+        <div class="admin-header-actions">
+          <AtomsThemeToggle class="admin-header-btn" />
+          <AtomsLangSwitcher direction="down" />
+
+          <!-- User avatar with dropdown -->
+          <div class="admin-header-user-wrapper">
+            <button
+              type="button"
+              class="admin-header-user-avatar"
+              @click="toggleUserMenu"
+              :aria-label="t('admin.userMenu')"
+            >
+              <span class="avatar-initials">{{ userInitials }}</span>
+            </button>
+
+            <!-- User dropdown menu -->
+            <div v-if="userMenuOpen" class="admin-header-user-menu">
+              <div class="user-menu-info">
+                <span v-if="user?.name" class="user-menu-name">{{ user.name }}</span>
+                <span class="user-menu-email">{{ user?.email }}</span>
+                <span class="user-menu-role">{{ user?.role }}</span>
+              </div>
+              <button type="button" class="user-menu-action" @click="openChangePasswordModal">
+                <IconKey />
+                <span>{{ t('auth.changePassword') }}</span>
+              </button>
+              <button
+                type="button"
+                class="user-menu-logout"
+                @click="handleLogout"
+                :disabled="isLoading"
+              >
+                <IconLogout />
+                <span>{{ t('auth.logout') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VERTICAL SIDEBAR (when appVerticalNav: true)
+         ═══════════════════════════════════════════════════════════════════════════ -->
     <aside v-if="config.features.appVerticalNav" class="admin-sidebar">
       <!-- Logo (short/circle version) - ClientOnly to avoid SSR hydration mismatch -->
       <div class="sidebar-header">
@@ -255,8 +344,9 @@ onUnmounted(() => {
 
     <!-- Main Content -->
     <main class="admin-main">
-      <!-- Mobile header (phones only) - shows page title + user avatar -->
-      <header v-if="config.features.appVerticalNav" class="admin-header mobile-only">
+      <!-- Mobile header (phones only < 600px) - shows page title + user avatar -->
+      <!-- Shown for BOTH vertical nav and horizontal header modes on phones (CSS handles visibility) -->
+      <header class="admin-header mobile-only">
         <span class="admin-title">{{ currentPageTitle }}</span>
 
         <!-- Mobile user avatar with menu -->
@@ -315,9 +405,10 @@ onUnmounted(() => {
     </main>
 
     <!-- Bottom Navigation (phones only < 600px) -->
+    <!-- Shown for BOTH vertical nav and horizontal header modes on phones (CSS handles visibility) -->
     <!-- ClientOnly to avoid hydration mismatch: canManageUsers is false on server, true on client -->
     <ClientOnly>
-      <MoleculesAppBottomNav v-if="config.features.appVerticalNav" />
+      <MoleculesAppBottomNav />
     </ClientOnly>
   </div>
 </template>
@@ -325,6 +416,7 @@ onUnmounted(() => {
 <!--
   Uses global CSS classes:
   - layout/page.css: .layout-admin responsive styles (phone/tablet/desktop)
+  - layout/admin-header.css: .admin-header-horizontal (horizontal nav mode)
   - skeleton/nav.css: .sidebar-nav, .sidebar-nav-link, .sidebar-icon-btn, .sidebar-tooltip
   - skeleton/bottom-nav.css: .bottom-nav, .bottom-nav-item (phone only)
   - skeleton/mobile-nav.css: .mobile-nav-backdrop
