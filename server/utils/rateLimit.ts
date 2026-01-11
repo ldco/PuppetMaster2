@@ -1,27 +1,128 @@
 /**
  * Rate Limiting Utility
  *
- * Simple in-memory rate limiting for API endpoints.
- * For production at scale, consider Redis-based rate limiting.
+ * Provides rate limiting for API endpoints with two storage backends:
+ * - In-memory (default): Simple Map-based storage for single-instance deployments
+ * - Redis (optional): For multi-instance deployments behind a load balancer
+ *
+ * To enable Redis rate limiting:
+ * 1. Install ioredis: npm install ioredis
+ * 2. Set REDIS_URL environment variable
+ *
+ * Usage:
+ *   import { loginRateLimiter, getClientIp } from '../utils/rateLimit'
+ *
+ *   const ip = getClientIp(event)
+ *   if (!loginRateLimiter.checkRateLimit(ip)) {
+ *     throw createError({ statusCode: 429, message: 'Too many requests' })
+ *   }
  */
+import { logger } from './logger'
 
 interface RateLimitEntry {
   count: number
   resetAt: number
 }
 
+// Redis client (lazy-loaded if REDIS_URL is set)
+let redisClient: {
+  get: (key: string) => Promise<string | null>
+  setex: (key: string, seconds: number, value: string) => Promise<void>
+  del: (key: string) => Promise<void>
+} | null = null
+
+let redisInitialized = false
+
+/**
+ * Initialize Redis client if REDIS_URL is available
+ * Returns true if Redis is available, false if using in-memory fallback
+ */
+async function initRedis(): Promise<boolean> {
+  if (redisInitialized) return redisClient !== null
+
+  redisInitialized = true
+
+  try {
+    const redisUrl = process.env.REDIS_URL
+
+    if (!redisUrl) {
+      logger.debug('REDIS_URL not set - using in-memory rate limiting')
+      return false
+    }
+
+    // Dynamic import ioredis (may not be installed)
+    const Redis = await import('ioredis').then(m => m.default).catch(() => null)
+
+    if (!Redis) {
+      logger.warn('ioredis not installed - using in-memory rate limiting. Run: npm install ioredis')
+      return false
+    }
+
+    const client = new Redis(redisUrl)
+
+    // Test connection
+    await client.ping()
+
+    redisClient = {
+      get: async (key: string) => client.get(key),
+      setex: async (key: string, seconds: number, value: string) => {
+        await client.setex(key, seconds, value)
+      },
+      del: async (key: string) => {
+        await client.del(key)
+      }
+    }
+
+    logger.info('Rate limiting using Redis')
+    return true
+  } catch (error) {
+    logger.warn({ error }, 'Redis connection failed - using in-memory rate limiting')
+    return false
+  }
+}
+
 /**
  * Create a rate limiter with configurable limits
+ * Supports both in-memory and Redis storage
  */
-export function createRateLimiter(limit: number, windowMs: number) {
+export function createRateLimiter(limit: number, windowMs: number, prefix: string = 'rl') {
   const rateLimitMap = new Map<string, RateLimitEntry>()
+  const windowSec = Math.ceil(windowMs / 1000)
 
   /**
    * Check if request is within rate limit
    * @param key - Unique identifier (e.g., IP address)
    * @returns true if request is allowed, false if rate limited
    */
+  async function checkRateLimitAsync(key: string): Promise<boolean> {
+    // Try Redis first
+    if (redisClient) {
+      return checkRateLimitRedis(key)
+    }
+
+    // Initialize Redis if not done yet
+    await initRedis()
+
+    if (redisClient) {
+      return checkRateLimitRedis(key)
+    }
+
+    // Fallback to in-memory
+    return checkRateLimitMemory(key)
+  }
+
+  /**
+   * Synchronous rate limit check (in-memory only)
+   * Use this for performance-critical paths where Redis isn't needed
+   */
   function checkRateLimit(key: string): boolean {
+    return checkRateLimitMemory(key)
+  }
+
+  /**
+   * In-memory rate limit check
+   */
+  function checkRateLimitMemory(key: string): boolean {
     const now = Date.now()
     const entry = rateLimitMap.get(key)
 
@@ -42,6 +143,38 @@ export function createRateLimiter(limit: number, windowMs: number) {
   }
 
   /**
+   * Redis rate limit check using sliding window counter
+   */
+  async function checkRateLimitRedis(key: string): Promise<boolean> {
+    if (!redisClient) return checkRateLimitMemory(key)
+
+    const redisKey = `${prefix}:${key}`
+
+    try {
+      const current = await redisClient.get(redisKey)
+
+      if (!current) {
+        // First request in window
+        await redisClient.setex(redisKey, windowSec, '1')
+        return true
+      }
+
+      const count = parseInt(current, 10)
+
+      if (count >= limit) {
+        return false
+      }
+
+      // Increment (note: not atomic, but acceptable for rate limiting)
+      await redisClient.setex(redisKey, windowSec, String(count + 1))
+      return true
+    } catch (error) {
+      logger.warn({ error, key }, 'Redis rate limit check failed, falling back to memory')
+      return checkRateLimitMemory(key)
+    }
+  }
+
+  /**
    * Get remaining requests for a key
    */
   function getRemaining(key: string): number {
@@ -58,8 +191,16 @@ export function createRateLimiter(limit: number, windowMs: number) {
   /**
    * Reset rate limit for a key (e.g., after successful captcha)
    */
-  function reset(key: string): void {
+  async function reset(key: string): Promise<void> {
     rateLimitMap.delete(key)
+
+    if (redisClient) {
+      try {
+        await redisClient.del(`${prefix}:${key}`)
+      } catch {
+        // Ignore Redis errors on reset
+      }
+    }
   }
 
   /**
@@ -71,6 +212,7 @@ export function createRateLimiter(limit: number, windowMs: number) {
 
   return {
     checkRateLimit,
+    checkRateLimitAsync,
     getRemaining,
     reset,
     clear
@@ -78,11 +220,11 @@ export function createRateLimiter(limit: number, windowMs: number) {
 }
 
 // Default contact form rate limiter (5 per hour)
-export const contactRateLimiter = createRateLimiter(5, 60 * 60 * 1000)
+export const contactRateLimiter = createRateLimiter(5, 60 * 60 * 1000, 'contact')
 
 // Login rate limiter (5 attempts per 15 minutes per IP)
 // Stricter than contact form to prevent brute force
-export const loginRateLimiter = createRateLimiter(5, 15 * 60 * 1000)
+export const loginRateLimiter = createRateLimiter(5, 15 * 60 * 1000, 'login')
 
 /**
  * Get client IP from H3 event

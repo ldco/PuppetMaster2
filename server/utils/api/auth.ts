@@ -3,6 +3,7 @@
  * Handles token acquisition, refresh, and validation
  */
 import type { AuthConfig, TokenResponse } from './types'
+import { logger } from '../logger'
 
 export function useAuthManager(config: AuthConfig) {
   let currentToken: string | null = null
@@ -76,10 +77,10 @@ export function useAuthManager(config: AuthConfig) {
       currentToken = data.access_token
       tokenExpiresAt = new Date(Date.now() + data.expires_in * 1000)
 
-      console.log(`[AuthManager] Token refreshed, expires at: ${tokenExpiresAt.toISOString()}`)
+      logger.debug({ expiresAt: tokenExpiresAt.toISOString() }, 'AuthManager: Token refreshed')
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error)
-      console.error('[AuthManager] Token refresh error:', message)
+      logger.error({ error: message }, 'AuthManager: Token refresh failed')
       throw error
     }
   }
@@ -91,7 +92,7 @@ export function useAuthManager(config: AuthConfig) {
     currentToken = null
     tokenExpiresAt = null
     refreshPromise = null
-    console.log('[AuthManager] Token invalidated')
+    logger.debug('AuthManager: Token invalidated')
   }
 
   /**

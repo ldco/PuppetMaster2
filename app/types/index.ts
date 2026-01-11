@@ -46,7 +46,9 @@ export type {
 // Config types (modular entity architecture)
 export {
   ROLE_HIERARCHY,
+  ROLE_LEVELS,
   canAccess,
+  hasRoleLevel,
   defaultSystemModules,
   defaultWebsiteModules,
   defaultAdminConfig,

@@ -11,6 +11,7 @@
  */
 import { eq, asc, and, like } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
+import { safeJsonParseOrNull } from '../../utils/json'
 import config from '~~/app/puppet-master.config'
 
 export default defineEventHandler(async event => {
@@ -68,7 +69,7 @@ export default defineEventHandler(async event => {
       ...member,
       position: positionTrans?.value || null,
       bio: bioTrans?.value || null,
-      socialLinks: member.socialLinks ? JSON.parse(member.socialLinks) : null
+      socialLinks: safeJsonParseOrNull(member.socialLinks)
     }
   })
 })

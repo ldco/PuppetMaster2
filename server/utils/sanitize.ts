@@ -1,82 +1,37 @@
 /**
- * HTML Sanitization Utility (HIGH-09)
+ * HTML Sanitization Utility
  *
  * Server-side HTML sanitization to prevent XSS attacks.
- * Removes dangerous tags, event handlers, and javascript: URLs.
+ * Supports two modes:
+ * - sanitize-html library (recommended for production)
+ * - Regex-based fallback (used when library not installed)
+ *
+ * To enable library-based sanitization:
+ * npm install sanitize-html @types/sanitize-html
  *
  * Usage:
- * import { sanitizeHtml } from '../utils/sanitize'
- * const cleanContent = sanitizeHtml(userContent)
- *
- * Note: For production with rich content, consider using:
- * - sanitize-html (npm install sanitize-html)
- * - isomorphic-dompurify (npm install isomorphic-dompurify jsdom)
+ *   import { sanitizeHtml, escapeHtml } from '../utils/sanitize'
+ *   const cleanContent = sanitizeHtml(userContent)
+ *   const safeText = escapeHtml(userText)
  */
+import { logger } from './logger'
 
-// Tags that should be completely removed (including content)
-const DANGEROUS_TAGS = [
-  'script',
-  'style',
-  'iframe',
-  'frame',
-  'frameset',
-  'object',
-  'embed',
-  'applet',
-  'form',
-  'input',
-  'button',
-  'select',
-  'textarea',
-  'meta',
-  'link',
-  'base',
-  'noscript',
-  'template'
-]
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════════
 
 // Tags that are safe for rich text content
 const ALLOWED_TAGS = [
-  'p',
-  'br',
-  'hr',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'ul',
-  'ol',
-  'li',
-  'blockquote',
-  'pre',
-  'code',
-  'strong',
-  'b',
-  'em',
-  'i',
-  'u',
-  's',
-  'strike',
-  'del',
-  'ins',
-  'a',
-  'img',
-  'table',
-  'thead',
-  'tbody',
-  'tr',
-  'th',
-  'td',
-  'div',
-  'span',
-  'figure',
-  'figcaption',
-  'sup',
-  'sub',
-  'mark',
-  'small'
+  'p', 'br', 'hr',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'ul', 'ol', 'li',
+  'blockquote', 'pre', 'code',
+  'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'del', 'ins',
+  'a', 'img',
+  'table', 'thead', 'tbody', 'tr', 'th', 'td',
+  'div', 'span',
+  'figure', 'figcaption',
+  'sup', 'sub', 'mark', 'small'
 ]
 
 // Attributes that are safe (exported for use in advanced sanitization)
@@ -88,6 +43,82 @@ export const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   th: ['colspan', 'rowspan', 'scope']
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// LIBRARY-BASED SANITIZATION (PREFERRED)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Lazy-loaded sanitize-html library
+let sanitizeHtmlLib: ((dirty: string, options: object) => string) | null = null
+let libInitialized = false
+
+/**
+ * Initialize sanitize-html library if available
+ */
+async function initSanitizeLib(): Promise<boolean> {
+  if (libInitialized) return sanitizeHtmlLib !== null
+
+  libInitialized = true
+
+  try {
+    const lib = await import('sanitize-html').then(m => m.default).catch(() => null)
+
+    if (!lib) {
+      logger.debug('sanitize-html not installed - using regex-based sanitization')
+      return false
+    }
+
+    sanitizeHtmlLib = lib
+    logger.info('HTML sanitization using sanitize-html library')
+    return true
+  } catch {
+    return false
+  }
+}
+
+// Try to initialize on module load (non-blocking)
+initSanitizeLib()
+
+/**
+ * Sanitize HTML using sanitize-html library
+ */
+function sanitizeWithLibrary(html: string): string {
+  if (!sanitizeHtmlLib) return sanitizeWithRegex(html)
+
+  return sanitizeHtmlLib(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: {
+      '*': ['class', 'id', 'title'],
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'width', 'height', 'loading']
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data']
+    },
+    transformTags: {
+      a: (tagName: string, attribs: Record<string, string>) => {
+        // Add rel="noopener noreferrer" to external links
+        if (attribs.target === '_blank') {
+          attribs.rel = 'noopener noreferrer'
+        }
+        return { tagName, attribs }
+      }
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REGEX-BASED SANITIZATION (FALLBACK)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Tags that should be completely removed (including content)
+const DANGEROUS_TAGS = [
+  'script', 'style', 'iframe', 'frame', 'frameset',
+  'object', 'embed', 'applet',
+  'form', 'input', 'button', 'select', 'textarea',
+  'meta', 'link', 'base', 'noscript', 'template'
+]
+
 // Event handler pattern (on*)
 const EVENT_HANDLER_REGEX = /\s+on\w+\s*=/gi
 
@@ -95,19 +126,15 @@ const EVENT_HANDLER_REGEX = /\s+on\w+\s*=/gi
 const DANGEROUS_URL_REGEX = /^\s*(javascript|data|vbscript):/i
 
 /**
- * Sanitize HTML content to prevent XSS
+ * Sanitize HTML using regex (fallback when library not available)
  */
-export function sanitizeHtml(html: string | null | undefined): string {
-  if (!html) return ''
-
+function sanitizeWithRegex(html: string): string {
   let result = html
 
   // 1. Remove dangerous tags with their content
   for (const tag of DANGEROUS_TAGS) {
-    // Remove opening and closing tags with content between them
     const regex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi')
     result = result.replace(regex, '')
-    // Remove self-closing versions
     const selfClosing = new RegExp(`<${tag}[^>]*\\/?>`, 'gi')
     result = result.replace(selfClosing, '')
   }
@@ -118,7 +145,7 @@ export function sanitizeHtml(html: string | null | undefined): string {
   // 3. Sanitize href and src attributes
   result = result.replace(/(href|src)\s*=\s*["']([^"']*)["']/gi, (match, attr, url) => {
     if (DANGEROUS_URL_REGEX.test(url)) {
-      return `${attr}="#"` // Replace with safe URL
+      return `${attr}="#"`
     }
     return match
   })
@@ -134,7 +161,6 @@ export function sanitizeHtml(html: string | null | undefined): string {
   for (const tagMatch of allTags) {
     const tagName = tagMatch.match(/<\/?([a-z][a-z0-9]*)/i)?.[1]?.toLowerCase()
     if (tagName && !ALLOWED_TAGS.includes(tagName)) {
-      // Remove the tag but keep content
       result = result.replace(tagMatch, '')
     }
   }
@@ -143,6 +169,35 @@ export function sanitizeHtml(html: string | null | undefined): string {
   result = result.replace(/\n\s*\n\s*\n/g, '\n\n')
 
   return result.trim()
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PUBLIC API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Sanitize HTML content to prevent XSS
+ * Uses sanitize-html library if available, regex fallback otherwise
+ */
+export function sanitizeHtml(html: string | null | undefined): string {
+  if (!html) return ''
+
+  // Use library if available, otherwise regex fallback
+  if (sanitizeHtmlLib) {
+    return sanitizeWithLibrary(html)
+  }
+
+  return sanitizeWithRegex(html)
+}
+
+/**
+ * Async version that ensures library is loaded if available
+ */
+export async function sanitizeHtmlAsync(html: string | null | undefined): Promise<string> {
+  if (!html) return ''
+
+  await initSanitizeLib()
+  return sanitizeHtml(html)
 }
 
 /**
@@ -185,4 +240,11 @@ export function containsUnsafeHtml(html: string): boolean {
   }
 
   return false
+}
+
+/**
+ * Check if sanitize-html library is available
+ */
+export function isLibrarySanitizationAvailable(): boolean {
+  return sanitizeHtmlLib !== null
 }

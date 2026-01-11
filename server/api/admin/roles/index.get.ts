@@ -9,6 +9,7 @@
 import { eq, sql } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 import { requirePermission } from '../../../utils/permissions'
+import { safeJsonParse } from '../../../utils/json'
 
 export default defineEventHandler(async event => {
   const currentUser = event.context.user
@@ -52,7 +53,7 @@ export default defineEventHandler(async event => {
   // Parse permissions and add user counts
   const roles = rolesData.map(role => ({
     ...role,
-    permissions: JSON.parse(role.permissions),
+    permissions: safeJsonParse(role.permissions, {}),
     userCount: countMap.get(role.id) || 0
   }))
 

@@ -1,58 +1,64 @@
 # Session Context
 
 ## Meta
-- **Last Updated**: 2026-01-05T14:30:00Z
-- **Project**: PuppetMaster2
+- **Last Updated**: 2026-01-11T16:49:09+03:00
+- **Project**: Puppet Master Framework
 - **Branch**: master
 
 ## Current Task
-Fixed adaptive navigation oscillation bug and unified card placeholder styling.
+PM Team System implementation completed. Created 42 AI expert personas (7 specialties x 6 countries) with comprehensive PM framework knowledge base.
 
-All implementation complete and pushed to origin/master.
+## Accomplished This Session
+1. Created PM Team System with 42 specialists
+2. Created `_knowledge.md` - 750+ line framework knowledge base
+3. Created 8 team commands: `/pm-team`, `/pm-il`, `/pm-ru`, `/pm-us`, `/pm-fr`, `/pm-jp`, `/pm-ch`, `/pm-team-all`
+4. Renamed `/pm-team-ultra` to `/pm-team-all` (clearer naming)
+5. Added `--deep` flag to all team commands for `/ultra` deep thinking mode
 
 ## Active Role
 - **ID**: none
-- **Name**: none
+- **Name**: Puppet Master Architect
 
 ## Todo List
-- [x] Fix adaptive nav oscillation bug (nav collapse/uncollapse loop)
-- [x] Cache nav width to prevent re-measurement when hidden
-- [x] Cache actions width for same reason
-- [x] Add item count tracking to invalidate cache on nav changes
-- [x] Add MIN_DESKTOP_NAV_SPACE threshold for standard breakpoint fallback
-- [x] Fix red placeholder icon in blog cards (link color inheritance)
-- [x] Unify placeholder styling using content-card-placeholder class
-- [x] Add case_study type conditional for portfolio cards
-- [x] Commit and push changes
+- [x] Create 42 PM specialist role files
+- [x] Create PM framework knowledge base (_knowledge.md)
+- [x] Create team command files
+- [x] Rename /pm-team-ultra to /pm-team-all
+- [x] Add --deep flag support to all PM team commands
 
 ## Working Files
-- app/composables/useAdaptiveNav.ts
-- app/assets/css/skeleton/header.css
-- app/assets/css/skeleton/nav.css
-- app/assets/css/ui/content/blog.css
-- app/assets/css/ui/content/content-card.css
-- app/assets/css/ui/content/portfolio-card.css
-- app/assets/css/ui/content/team.css
-- app/components/molecules/BlogPostCard.vue
-- app/components/molecules/TeamMemberCard.vue
-- app/components/sections/SectionPortfolio.vue
+- `.claude/roles/pm/_knowledge.md` - Framework knowledge (750+ lines)
+- `.claude/roles/pm/_base.md` - Team structure docs
+- `.claude/roles/pm/{specialty}-{country}.md` - 42 role files
+- `.claude/commands/pm-team.md` - Random 7 experts
+- `.claude/commands/pm-team-all.md` - All 42 experts
+- `.claude/commands/pm-{il,ru,us,fr,jp,ch}.md` - Country teams
 
-## Last Actions
-1. Debugged adaptive nav showing oscillation in console logs
-2. Fixed actions width caching (was already done but needed nav caching too)
-3. Added nav width caching to prevent oscillation when nav hidden
-4. Added item count tracking for cache invalidation
-5. Added MIN_DESKTOP_NAV_SPACE (500px) threshold - standard breakpoint for small navs
-6. Fixed red placeholder icon by overriding link color inheritance
-7. Committed: f7f686e - "fix: Resolve adaptive nav oscillation and unify card placeholders"
-8. Pushed to origin/master
+## PM Team System Structure
+
+### 7 Specialties
+UX, Fullstack, Frontend, Backend, FastAPI, DevOps, Security
+
+### 6 Countries
+| Code | Country | Search | Special |
+|------|---------|--------|---------|
+| il | Israel | Google.il | RTL, Unit 8200 |
+| ru | Russia | Yandex | RuNet, Cyrillic |
+| us | USA | Google | Silicon Valley |
+| fr | France | Google.fr | GDPR, EU |
+| jp | Japan | Qiita | CJK, Kaizen |
+| ch | China | Baidu | WeChat, MLPS |
+
+### Commands
+- `/pm-team` - 7 random (one per specialty)
+- `/pm-team-all` - All 42 experts
+- `/pm-{country}` - 7 from specific country
+- All support `--deep` flag for ultra thinking mode
 
 ## Notes
-- Adaptive nav now uses width caching to prevent oscillation loop
-- When nav is hidden (display:none), items have ~0 width causing oscillation
-- Cache is invalidated when nav item count changes
-- If nav <= 500px, uses standard CSS breakpoint (no adaptive collapse)
-- Placeholder icons in links inherit brand color - need explicit override
+- All role files reference `_knowledge.md` before reviewing
+- Knowledge base covers: CSS system, component architecture, composables, database schema, API patterns, configuration, RBAC
+- Previous commits pending push (setup wizard, security fix)
 
 ## Blockers
-- None - all tasks complete
+None - implementation complete

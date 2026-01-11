@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { useDatabase, schema } from '../../../database/client'
 import { escapeHtml } from '../../../utils/sanitize'
+import { safeJsonParseOrNull } from '../../../utils/json'
 
 const createMemberSchema = z.object({
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/),
@@ -110,7 +111,7 @@ export default defineEventHandler(async event => {
     success: true,
     member: {
       ...member,
-      socialLinks: member.socialLinks ? JSON.parse(member.socialLinks) : null
+      socialLinks: safeJsonParseOrNull(member.socialLinks)
     }
   }
 })

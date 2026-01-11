@@ -3,6 +3,7 @@
  * Prevents cascading failures and provides resilience for external API calls
  */
 import type { RetryConfig, CircuitBreakerConfig } from './types'
+import { logger } from '../logger'
 
 enum CircuitState {
   CLOSED = 'CLOSED', // Normal operation
@@ -42,21 +43,21 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
 
         // Don't retry if not retryable
         if (!isRetryable(error)) {
-          console.warn('[Retry] Non-retryable error:', message)
+          logger.warn({ error: message }, 'Non-retryable error')
           throw error
         }
 
         // Don't retry on last attempt
         if (attempt === config.maxAttempts - 1) {
-          console.error(`[Retry] All ${config.maxAttempts} attempts failed for:`, message)
+          logger.error({ attempts: config.maxAttempts, error: message }, 'All retry attempts failed')
           break
         }
 
         // Wait before retry (exponential backoff)
         const delay = calculateDelay(attempt)
-        console.warn(
-          `[Retry] Attempt ${attempt + 1}/${config.maxAttempts} failed, retrying in ${delay}ms...`,
-          message
+        logger.warn(
+          { attempt: attempt + 1, maxAttempts: config.maxAttempts, delay, error: message },
+          'Retry attempt failed, retrying...'
         )
         await sleep(delay)
       }
@@ -79,7 +80,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
     if (circuitState === CircuitState.OPEN) {
       // Check if we can attempt half-open (recovery test)
       if (nextAttemptAt && now >= nextAttemptAt) {
-        console.log('[CircuitBreaker] Attempting recovery (HALF_OPEN)')
+        logger.info('CircuitBreaker: Attempting recovery (HALF_OPEN)')
         circuitState = CircuitState.HALF_OPEN
         failureCount = 0
       } else {
@@ -96,7 +97,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
    */
   function onSuccess(): void {
     if (circuitState === CircuitState.HALF_OPEN) {
-      console.log('[CircuitBreaker] Recovery successful - circuit CLOSED')
+      logger.info('CircuitBreaker: Recovery successful - circuit CLOSED')
     }
     circuitState = CircuitState.CLOSED
     failureCount = 0
@@ -112,8 +113,9 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
     failureCount++
 
     if (failureCount >= config.circuitBreaker.failureThreshold) {
-      console.error(
-        `[CircuitBreaker] Failure threshold reached (${failureCount}/${config.circuitBreaker.failureThreshold}) - opening circuit`
+      logger.error(
+        { failureCount, threshold: config.circuitBreaker.failureThreshold },
+        'CircuitBreaker: Failure threshold reached - opening circuit'
       )
       circuitState = CircuitState.OPEN
       nextAttemptAt = Date.now() + config.circuitBreaker.resetTimeout
@@ -184,7 +186,7 @@ export function useRetry(config: RetryConfig & { circuitBreaker?: CircuitBreaker
     circuitState = CircuitState.CLOSED
     failureCount = 0
     nextAttemptAt = null
-    console.log('[CircuitBreaker] Manual reset - circuit CLOSED')
+    logger.info('CircuitBreaker: Manual reset - circuit CLOSED')
   }
 
   return {

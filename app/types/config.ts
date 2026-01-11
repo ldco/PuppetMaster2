@@ -40,6 +40,25 @@ export const ROLE_HIERARCHY: Record<UserRole, UserRole[]> = {
 }
 
 /**
+ * Role hierarchy as numeric levels - higher number = more permissions
+ * Used for simple comparisons: hasRole(userRole, minRole)
+ */
+export const ROLE_LEVELS: Record<UserRole, number> = {
+  user: 0,
+  editor: 1,
+  admin: 2,
+  master: 3
+}
+
+/**
+ * Check if a role has at least the minimum required level
+ */
+export function hasRoleLevel(userRole: UserRole | undefined, minRole: UserRole): boolean {
+  if (!userRole) return false
+  return ROLE_LEVELS[userRole] >= ROLE_LEVELS[minRole]
+}
+
+/**
  * Check if a role can access a resource requiring specific roles
  */
 export function canAccess(userRole: UserRole, requiredRoles: UserRole[]): boolean {

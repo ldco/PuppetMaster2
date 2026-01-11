@@ -3,6 +3,7 @@
  * In-memory cache with optional Redis support for multi-instance deployments
  */
 import type { CacheConfig, CacheEntry } from './types'
+import { logger } from '../logger'
 
 export function useCache(config: CacheConfig) {
   // In-memory cache (Map for single-instance deployments)
@@ -30,7 +31,7 @@ export function useCache(config: CacheConfig) {
       }
 
       if (expiredCount > 0) {
-        console.log(`[Cache] Cleaned up ${expiredCount} expired entries`)
+        logger.debug({ expiredCount }, 'Cache cleanup: removed expired entries')
       }
     }, cleanupInterval)
   }
@@ -116,7 +117,7 @@ export function useCache(config: CacheConfig) {
   async function clear(): Promise<void> {
     const count = memoryCache.size
     memoryCache.clear()
-    console.log(`[Cache] Cleared ${count} entries`)
+    logger.info({ count }, 'Cache cleared')
 
     // TODO: Add Redis support
     // const runtimeConfig = useRuntimeConfig()
@@ -141,7 +142,7 @@ export function useCache(config: CacheConfig) {
     }
 
     if (count > 0) {
-      console.log(`[Cache] Cleared ${count} entries with prefix "${prefix}"`)
+      logger.debug({ count, prefix }, 'Cache prefix cleared')
     }
 
     // TODO: Add Redis support with SCAN pattern

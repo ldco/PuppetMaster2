@@ -6,6 +6,7 @@ import type { APIClientConfig, APIRequestOptions, APIError } from './types'
 import { useAuthManager } from './auth'
 import { useCache } from './cache'
 import { useRetry } from './retry'
+import { logger } from '../logger'
 import config from '~/puppet-master.config'
 
 export class APIClient {
@@ -260,7 +261,7 @@ export function useAPIClient(): APIClient {
       cache: config.dataSource.api.cache
     })
 
-    console.log(`[APIClient] Initialized with baseUrl: ${runtimeConfig.apiBaseUrl}`)
+    logger.info({ baseUrl: runtimeConfig.apiBaseUrl }, 'APIClient initialized')
     return apiClient
   } finally {
     isInitializing = false

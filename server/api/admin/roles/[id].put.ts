@@ -18,6 +18,7 @@ import { useDatabase, schema } from '../../../database/client'
 import { requirePermission, clearRolePermissionsCache, calculateLevel } from '../../../utils/permissions'
 import { updateRoleSchema } from '../../../utils/validation'
 import { audit } from '../../../utils/audit'
+import { safeJsonParse } from '../../../utils/json'
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')
@@ -133,7 +134,7 @@ export default defineEventHandler(async event => {
     success: true,
     role: {
       ...updatedRole,
-      permissions: JSON.parse(updatedRole!.permissions)
+      permissions: safeJsonParse(updatedRole!.permissions, {})
     }
   }
 })

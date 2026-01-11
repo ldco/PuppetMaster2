@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { eq, and, ne } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../../database/client'
 import { sanitizeHtml, escapeHtml } from '../../../../utils/sanitize'
+import { safeJsonParse } from '../../../../utils/json'
 
 // Translation schema for case study items
 const itemTranslationSchema = z.object({
@@ -258,7 +259,7 @@ export default defineEventHandler(async event => {
     success: true,
     item: {
       ...updated,
-      tags: updated.tags ? JSON.parse(updated.tags) : []
+      tags: safeJsonParse(updated.tags, [])
     }
   }
 })

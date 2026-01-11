@@ -14,6 +14,7 @@
  */
 import { eq, desc, and, like, or } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
+import { safeJsonParse } from '../../utils/json'
 import config from '~~/app/puppet-master.config'
 
 export default defineEventHandler(async event => {
@@ -161,7 +162,7 @@ export default defineEventHandler(async event => {
         // Parse tags JSON and add translations
         const parsedItem = {
           ...item,
-          tags: item.tags ? JSON.parse(item.tags) : [],
+          tags: safeJsonParse(item.tags, []),
           // For public: return translated values, for admin: return translations map
           ...(includeAll
             ? { translations: itemTrans }

@@ -15,6 +15,7 @@
  */
 import { eq, desc, and } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../../database/client'
+import { safeJsonParse } from '../../../../utils/json'
 
 export default defineEventHandler(async event => {
   const db = useDatabase()
@@ -93,6 +94,6 @@ export default defineEventHandler(async event => {
   // Parse tags JSON for case study items
   return items.map(item => ({
     ...item,
-    tags: item.tags ? JSON.parse(item.tags) : []
+    tags: safeJsonParse(item.tags, [])
   }))
 })

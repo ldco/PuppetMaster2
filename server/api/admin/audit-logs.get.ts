@@ -15,6 +15,7 @@
 import { desc, eq, count } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { requireMaster } from '../../utils/roles'
+import { safeJsonParseOrNull } from '../../utils/json'
 import type { UserRole, AuditAction } from '../../database/schema'
 
 export default defineEventHandler(async event => {
@@ -90,7 +91,7 @@ export default defineEventHandler(async event => {
     actorEmail: log.actorEmail,
     ipAddress: log.ipAddress,
     userAgent: log.userAgent,
-    details: log.details ? JSON.parse(log.details) : null,
+    details: safeJsonParseOrNull(log.details),
     success: log.success,
     createdAt: log.createdAt?.toISOString()
   }))

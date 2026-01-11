@@ -16,6 +16,7 @@ import { eq, and } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../../database/client'
 import type { NewPortfolioItem } from '../../../../database/schema'
 import { sanitizeHtml, escapeHtml } from '../../../../utils/sanitize'
+import { safeJsonParse } from '../../../../utils/json'
 import { logger } from '../../../../utils/logger'
 
 // Translation schema for case study items
@@ -231,7 +232,7 @@ export default defineEventHandler(async event => {
       success: true,
       item: {
         ...newItem,
-        tags: newItem?.tags ? JSON.parse(newItem.tags) : []
+        tags: safeJsonParse(newItem?.tags, [])
       }
     }
   } catch (dbError) {

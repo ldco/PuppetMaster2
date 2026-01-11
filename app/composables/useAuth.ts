@@ -6,7 +6,7 @@
  * Integrates with CSRF protection via useCsrf composable.
  */
 import type { UserRole, User, LoginCredentials, RolePermissions, AdminPageId } from '~/types'
-import { ADMIN_PAGE_IDS } from '~/types'
+import { ADMIN_PAGE_IDS, ROLE_LEVELS } from '~/types'
 
 // Re-export for backward compatibility
 export type { UserRole } from '~/types'
@@ -20,13 +20,6 @@ function getDefaultPermissions(): RolePermissions {
     perms[pageId] = false
   }
   return perms
-}
-
-const ROLE_HIERARCHY: Record<string, number> = {
-  user: 0,
-  editor: 1,
-  admin: 2,
-  master: 3
 }
 
 export function useAuth() {
@@ -67,8 +60,8 @@ export function useAuth() {
    */
   function hasRole(minRole: UserRole): boolean {
     if (!user.value?.role) return false
-    const userLevel = ROLE_HIERARCHY[user.value.role] ?? 0
-    const minLevel = ROLE_HIERARCHY[minRole] ?? 0
+    const userLevel = ROLE_LEVELS[user.value.role] ?? 0
+    const minLevel = ROLE_LEVELS[minRole] ?? 0
     return userLevel >= minLevel
   }
 

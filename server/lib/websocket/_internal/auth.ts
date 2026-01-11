@@ -17,6 +17,7 @@ import { eq, and, gt } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 import type { WSUserContext } from './types'
 import { logger } from '../../../utils/logger'
+import { ROLE_HIERARCHY } from '../../../utils/roles'
 
 /**
  * Parse cookies from request headers
@@ -116,14 +117,8 @@ export function requireWSRole(
 ): boolean {
   if (!user) return false
 
-  const roleHierarchy: Record<string, number> = {
-    editor: 0,
-    admin: 1,
-    master: 2
-  }
-
-  const userLevel = roleHierarchy[user.role] ?? -1
-  const requiredLevel = roleHierarchy[minRole] ?? 999
+  const userLevel = ROLE_HIERARCHY[user.role] ?? -1
+  const requiredLevel = ROLE_HIERARCHY[minRole] ?? 999
 
   return userLevel >= requiredLevel
 }

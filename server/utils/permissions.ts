@@ -16,6 +16,7 @@ import {
   roles
 } from '../database/schema'
 import { useDatabase } from '../database/client'
+import { safeJsonParse } from './json'
 
 /**
  * Legacy role permissions (used when roleId is not set)
@@ -119,7 +120,7 @@ async function getRoleById(
   if (!role) return null
 
   const parsed = {
-    permissions: JSON.parse(role.permissions) as RolePermissions,
+    permissions: safeJsonParse<RolePermissions>(role.permissions, {}),
     level: role.level
   }
 

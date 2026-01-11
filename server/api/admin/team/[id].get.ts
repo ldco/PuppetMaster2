@@ -5,6 +5,7 @@
  */
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
+import { safeJsonParseOrNull } from '../../../utils/json'
 
 export default defineEventHandler(async event => {
   const db = useDatabase()
@@ -51,7 +52,7 @@ export default defineEventHandler(async event => {
 
   return {
     ...member,
-    socialLinks: member.socialLinks ? JSON.parse(member.socialLinks) : null,
+    socialLinks: safeJsonParseOrNull(member.socialLinks),
     translations: translationsByLocale
   }
 })

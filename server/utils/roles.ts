@@ -5,16 +5,20 @@
  * - master: Developer/agency who builds the site (full access)
  * - admin: Client who owns the site (can manage content + users except master)
  * - editor: Client's employees (can only edit content)
+ * - user: End users of the app (app features only, no admin access)
  */
 import { type UserRole, USER_ROLES } from '../database/schema'
 
 /**
  * Role hierarchy - higher index = more permissions
+ * Canonical definition is in app/types/config.ts (ROLE_LEVELS)
+ * This is kept for backward compatibility with server code
  */
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
-  editor: 0,
-  admin: 1,
-  master: 2
+  user: 0,
+  editor: 1,
+  admin: 2,
+  master: 3
 }
 
 /**

@@ -9,6 +9,7 @@ import { join } from 'path'
 import { useDatabase, schema } from '../database/client'
 import { asc } from 'drizzle-orm'
 import { isSystemKey } from '../../i18n/system'
+import { logger } from './logger'
 
 /**
  * Export all system translations from DB to JSON file
@@ -42,8 +43,8 @@ export function syncSystemTranslationsToFile(): void {
     const seedPath = join(process.cwd(), 'i18n/system-seed.json')
     writeFileSync(seedPath, JSON.stringify(systemRows, null, 2), 'utf-8')
 
-    console.log(`[i18n] Synced ${systemRows.length} system translations to system-seed.json`)
+    logger.info({ count: systemRows.length }, 'Synced system translations to system-seed.json')
   } catch (error) {
-    console.error('[i18n] Failed to sync system translations:', error)
+    logger.error({ error }, 'Failed to sync system translations')
   }
 }

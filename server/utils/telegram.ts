@@ -7,6 +7,7 @@
  * - TELEGRAM_CHAT_ID: Chat/group ID to send messages to
  */
 import { escapeHtml } from './sanitize'
+import { logger } from './logger'
 
 interface TelegramConfig {
   botToken: string
@@ -18,7 +19,7 @@ function getConfig(): TelegramConfig | null {
   const { telegramBotToken, telegramChatId } = config
 
   if (!telegramBotToken || !telegramChatId) {
-    console.warn('[Telegram] Bot not configured - notifications will be skipped')
+    logger.debug('Telegram bot not configured - notifications will be skipped')
     return null
   }
 
@@ -55,14 +56,14 @@ export async function sendTelegramMessage(
     const result = await response.json()
 
     if (!result.ok) {
-      console.error('[Telegram] API error:', result.description)
+      logger.error({ description: result.description }, 'Telegram API error')
       return false
     }
 
-    console.log('[Telegram] Message sent successfully')
+    logger.info('Telegram message sent successfully')
     return true
   } catch (error) {
-    console.error('[Telegram] Failed to send:', error)
+    logger.error({ error }, 'Failed to send Telegram message')
     return false
   }
 }

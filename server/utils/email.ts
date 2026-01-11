@@ -6,6 +6,7 @@
  * - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
  */
 import nodemailer from 'nodemailer'
+import { logger } from './logger'
 
 // Lazy-initialized transporter
 let transporter: nodemailer.Transporter | null = null
@@ -17,7 +18,7 @@ function getTransporter(): nodemailer.Transporter | null {
   const { smtpHost, smtpPort, smtpUser, smtpPass } = config
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    console.warn('[Email] SMTP not configured - emails will be skipped')
+    logger.debug('SMTP not configured - emails will be skipped')
     return null
   }
 
@@ -60,10 +61,10 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
       text: options.text,
       html: options.html
     })
-    console.log(`[Email] Sent to ${options.to}: ${options.subject}`)
+    logger.info({ to: options.to, subject: options.subject }, 'Email sent')
     return true
   } catch (error) {
-    console.error('[Email] Failed to send:', error)
+    logger.error({ error, to: options.to }, 'Failed to send email')
     return false
   }
 }
