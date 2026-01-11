@@ -1,19 +1,18 @@
 #!/usr/bin/env npx tsx
 /**
- * Puppet Master CLI Setup
+ * Puppet Master CLI Init
  *
- * Interactive command-line setup wizard.
+ * Interactive command-line initialization.
  * Alternative to browser wizard for terminal-only environments.
  *
  * Usage:
- *   npx tsx scripts/setup-cli.ts
- *   # or
- *   npm run setup:cli
+ *   npm run init
  */
 
 import * as readline from 'readline'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
+import { execSync } from 'child_process'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -189,9 +188,16 @@ function writeConfig(config: SetupConfig): void {
 async function main() {
   console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         🎭 PUPPET MASTER CLI SETUP
+                         PUPPET MASTER INIT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `)
+
+  // Step 0: Install dependencies if needed
+  if (!existsSync('node_modules/.bin/nuxt')) {
+    console.log('Installing dependencies...\n')
+    execSync('npm install', { stdio: 'inherit' })
+    console.log('')
+  }
 
   const config: SetupConfig = {
     pmMode: 'build',

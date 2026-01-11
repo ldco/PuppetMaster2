@@ -1,13 +1,13 @@
 #!/usr/bin/env npx tsx
 /**
- * Puppet Master Headless Setup
+ * Puppet Master Headless Init
  *
- * Non-interactive setup for CI/CD pipelines and automated deployments.
+ * Non-interactive init for CI/CD pipelines and automated deployments.
  * Accepts configuration via command-line arguments or environment variables.
  *
  * Usage:
- *   npx tsx scripts/setup-headless.ts --mode=build --type=website
- *   npx tsx scripts/setup-headless.ts --mode=develop
+ *   npm run init:headless -- --mode=build --type=website
+ *   npm run init:headless -- --mode=develop
  *
  * Environment variables (alternative to CLI args):
  *   PM_MODE=build|develop

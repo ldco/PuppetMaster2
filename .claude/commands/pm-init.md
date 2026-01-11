@@ -13,15 +13,29 @@
 
 ## EXECUTE These Steps
 
-### Step 1: Check Current Configuration
+### Step 1: Install Dependencies
 
-Read `puppet-master.config.ts` and check `pmMode`:
-- `'unconfigured'` → Step 2
-- `'build'` or `'develop'` → Step 3
+Check if node_modules exists:
+```bash
+ls node_modules/.bin/nuxt 2>/dev/null
+```
+
+If NOT found, run:
+```bash
+npm install
+```
 
 ---
 
-### Step 2: If Unconfigured — Ask ONE Question
+### Step 2: Check Current Configuration
+
+Read `puppet-master.config.ts` and check `pmMode`:
+- `'unconfigured'` → Step 3
+- `'build'` or `'develop'` → Step 4
+
+---
+
+### Step 3: If Unconfigured — Ask ONE Question
 
 **Use AskUserQuestion:**
 
@@ -67,7 +81,7 @@ Options:
 
 ---
 
-### Step 3: If Already Configured — Show Status
+### Step 4: If Already Configured — Show Status
 
 Use AskUserQuestion:
 
