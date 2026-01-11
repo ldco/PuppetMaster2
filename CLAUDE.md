@@ -37,10 +37,11 @@ Project-specific commands in `.claude/commands/`:
 | `/pm-init` | Main entry point — starts wizard if unconfigured, shows options if configured |
 | `/pm-dev` | Start/restart dev server (kills existing first) |
 | `/pm-status` | Show current config — pmMode, modules, features, database state |
+| `/pm-migrate` | AI-powered migration — analyzes ./import/ folder and creates migration plan |
 | `/pm-contribute` | Export fix/feature as contribution doc (for client projects) |
 | `/pm-apply` | Apply contribution doc to PM framework |
 
-**Deprecated:** `/pm-migrate` (merged into wizard), `/pm-start` (replaced by `/pm-dev`)
+**Deprecated:** `/pm-start` (replaced by `/pm-dev`)
 
 ### Workflows
 
@@ -49,7 +50,7 @@ Project-specific commands in `.claude/commands/`:
 git clone puppet-master my-project
 cd my-project/app
 npm install
-/pm-init                 # Starts wizard at /setup
+/pm-init                 # Starts wizard at /init
 # Complete wizard in browser
 # Project is configured!
 ```
@@ -58,12 +59,12 @@ npm install
 ```
 git clone puppet-master my-project
 cd my-project/app
-cp -r ~/old-project/* ./import/
 npm install
 /pm-init                 # Starts wizard
-# In wizard: "Do you have existing code?" → Yes
-# Wizard analyzes import folder
-# Complete wizard in browser
+# In wizard: upload your project as zip
+# Complete wizard configuration
+/pm-migrate              # AI analyzes code and creates migration plan
+# Follow the plan to migrate each piece
 ```
 
 **Quick Start:**

@@ -1,43 +1,37 @@
 <script setup lang="ts">
 /**
- * Setup Page
+ * Build Configuration Wizard
  *
- * Two-phase setup:
- * 1. Mode Selection (BUILD vs DEVELOP)
- * 2. BUILD: Single-page configuration form
- *    DEVELOP: One-click apply
+ * Configures project settings for BUILD mode.
+ * User reaches this page after running `npm run init` and selecting BUILD.
  */
-import IconRocket from '~icons/tabler/rocket'
-import IconCode from '~icons/tabler/code'
 import IconWorld from '~icons/tabler/world'
 import IconApps from '~icons/tabler/apps'
 import IconCheck from '~icons/tabler/check'
-import IconChevronLeft from '~icons/tabler/chevron-left'
 import IconLoader from '~icons/tabler/loader-2'
-import IconPackageImport from '~icons/tabler/package-import'
-import IconSparkles from '~icons/tabler/sparkles'
-import IconFolder from '~icons/tabler/folder'
+import IconUpload from '~icons/tabler/upload'
+import IconFileZip from '~icons/tabler/file-zip'
+import IconX from '~icons/tabler/x'
 
 definePageMeta({
   layout: 'blank'
 })
 
 useHead({
-  title: 'Setup | Puppet Master'
+  title: 'Configure Project | Puppet Master'
 })
 
-// Phase state
-const phase = ref<'mode-select' | 'configure'>('mode-select')
+// Phase state - complete-greenfield for new projects, complete-brownfield for imports
+const phase = ref<'configure' | 'complete-greenfield' | 'complete-brownfield'>('configure')
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
+const validationErrors = ref<string[]>([])
 
 // Configuration
 const config = reactive({
-  pmMode: 'build' as 'build' | 'develop',
   projectType: 'website' as 'website' | 'app',
   adminEnabled: true,
-  importMode: 'fresh' as 'fresh' | 'import',
   modules: ['contact'] as string[],
   features: {
     multiLangs: false,
@@ -53,9 +47,11 @@ const config = reactive({
   defaultLocale: 'en'
 })
 
-// Brownfield detection
-const hasBrownfieldContent = ref(false)
+// Import zip upload
+const importZipFile = ref<File | null>(null)
+const uploadingZip = ref(false)
 const importFolderFiles = ref<string[]>([])
+const hasBrownfieldContent = ref(false)
 
 // Current config from server
 const currentConfig = ref<any>(null)
@@ -72,15 +68,14 @@ onMounted(async () => {
       importFolderFiles.value = data.importFolderFiles || []
     }
 
-    // If already configured, show different starting point
+    // Load existing config values if available
     if (data.pmMode !== 'unconfigured') {
-      config.pmMode = data.pmMode
       config.projectType = data.projectType || 'website'
       config.adminEnabled = data.adminEnabled
-      config.modules = data.enabledModules
-      config.features = data.features
-      config.locales = data.locales
-      config.defaultLocale = data.defaultLocale
+      config.modules = data.enabledModules || ['contact']
+      config.features = data.features || config.features
+      config.locales = data.locales || config.locales
+      config.defaultLocale = data.defaultLocale || 'en'
     }
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to load configuration'
@@ -113,45 +108,6 @@ const availableLocales = [
   { code: 'zh', iso: 'zh-CN', name: 'Chinese' },
   { code: 'ja', iso: 'ja-JP', name: 'Japanese' }
 ]
-
-// Start BUILD configuration
-function startBuildConfig() {
-  config.pmMode = 'build'
-  phase.value = 'configure'
-}
-
-// Back to mode selection
-function backToModeSelect() {
-  phase.value = 'mode-select'
-}
-
-// Apply DEVELOP mode immediately
-async function applyDevelopMode() {
-  saving.value = true
-  error.value = ''
-
-  try {
-    await $fetch('/api/setup/config', {
-      method: 'POST',
-      body: {
-        pmMode: 'develop',
-        projectType: 'website',
-        adminEnabled: true,
-        modules: availableModules.map(m => m.id),
-        features: {
-          multiLangs: true,
-          doubleTheme: true,
-          onepager: false,
-          pwa: false
-        }
-      }
-    })
-    window.location.href = '/'
-  } catch (e: any) {
-    error.value = e.data?.message || 'Failed to apply configuration'
-    saving.value = false
-  }
-}
 
 // Retry loading config
 async function retryLoad() {
@@ -197,8 +153,69 @@ function toggleLocale(locale: (typeof availableLocales)[0]) {
   }
 }
 
+// Zip file upload handler
+async function handleZipUpload(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  if (!file.name.endsWith('.zip')) {
+    error.value = 'Please upload a .zip file'
+    return
+  }
+
+  uploadingZip.value = true
+  error.value = ''
+
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const result = await $fetch('/api/setup/import-zip', {
+      method: 'POST',
+      body: formData
+    }) as { files: string[] }
+
+    importZipFile.value = file
+    importFolderFiles.value = result.files
+    hasBrownfieldContent.value = result.files.length > 0
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to upload zip file'
+    importZipFile.value = null
+  } finally {
+    uploadingZip.value = false
+  }
+}
+
+// Remove uploaded zip
+async function removeImportZip() {
+  try {
+    await $fetch('/api/setup/import-zip', { method: 'DELETE' })
+    importZipFile.value = null
+    importFolderFiles.value = []
+    hasBrownfieldContent.value = false
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to remove import files'
+  }
+}
+
+// Validation
+function validate(): boolean {
+  validationErrors.value = []
+
+  if (config.locales.length === 0) {
+    validationErrors.value.push('At least one language is required')
+  }
+
+  return validationErrors.value.length === 0
+}
+
 // Apply configuration
 async function applyConfig() {
+  if (!validate()) {
+    return
+  }
+
   saving.value = true
   error.value = ''
 
@@ -216,17 +233,19 @@ async function applyConfig() {
       }
     })
 
-    // Redirect based on settings
-    if (config.adminEnabled) {
-      window.location.href = '/admin'
+    // Always show completion screen - developer needs to start coding
+    saving.value = false
+    if (hasBrownfieldContent.value) {
+      phase.value = 'complete-brownfield'
     } else {
-      window.location.href = '/'
+      phase.value = 'complete-greenfield'
     }
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to save configuration'
     saving.value = false
   }
 }
+
 </script>
 
 <template>
@@ -237,9 +256,7 @@ async function applyConfig() {
         <span class="logo-icon">🎭</span>
         <span class="logo-text">Puppet Master</span>
       </div>
-      <div class="setup-label">
-        {{ phase === 'mode-select' ? 'Setup' : 'Configure Build' }}
-      </div>
+      <div class="setup-label">Configure Project</div>
     </header>
 
     <!-- Loading -->
@@ -248,63 +265,18 @@ async function applyConfig() {
       <p>Loading configuration...</p>
     </div>
 
-    <!-- Error -->
-    <div v-else-if="error && phase === 'mode-select'" class="setup-error">
-      <p>{{ error }}</p>
-      <button class="btn btn-primary" @click="retryLoad">
-        Try Again
-      </button>
-    </div>
-
-    <!-- Mode Selection -->
-    <main v-else-if="phase === 'mode-select'" class="setup-content">
-      <section class="setup-section">
-        <h1 class="section-title">Choose Your Mode</h1>
-        <p class="section-desc">How will you use Puppet Master?</p>
-
-        <div class="mode-cards">
-          <button
-            class="mode-card"
-            @click="startBuildConfig"
-          >
-            <IconRocket class="mode-icon" />
-            <h2>BUILD</h2>
-            <p>Create a client project</p>
-            <ul>
-              <li>Website or App</li>
-              <li>Select specific modules</li>
-              <li>Customize for client needs</li>
-            </ul>
-            <span class="mode-action">Configure →</span>
-          </button>
-
-          <button
-            class="mode-card"
-            :disabled="saving"
-            @click="applyDevelopMode"
-          >
-            <IconCode class="mode-icon" />
-            <h2>DEVELOP</h2>
-            <p>Work on the framework</p>
-            <ul>
-              <li>Enable all features</li>
-              <li>Showcase mode</li>
-              <li>Test & develop PM itself</li>
-            </ul>
-            <span class="mode-action">
-              <IconLoader v-if="saving" class="spinner" />
-              {{ saving ? 'Applying...' : 'Start Now →' }}
-            </span>
-          </button>
-        </div>
-      </section>
-    </main>
-
-    <!-- BUILD Configuration Form -->
-    <main v-else class="setup-content setup-form">
+    <!-- Configuration Form -->
+    <main v-else-if="phase === 'configure'" class="setup-content setup-form">
       <!-- Error Banner -->
       <div v-if="error" class="error-banner">
         {{ error }}
+      </div>
+
+      <!-- Validation Errors -->
+      <div v-if="validationErrors.length > 0" class="error-banner">
+        <ul class="validation-errors">
+          <li v-for="err in validationErrors" :key="err">{{ err }}</li>
+        </ul>
       </div>
 
       <!-- Project Type -->
@@ -346,51 +318,40 @@ async function applyConfig() {
         </label>
       </section>
 
-      <!-- Import Mode -->
+      <!-- Import Existing Code (Optional) -->
       <section class="setup-section">
-        <h2 class="section-title">Setup Source</h2>
-        <p class="section-desc">Are you starting fresh or importing existing code?</p>
+        <h2 class="section-title">Import Existing Code <span class="optional-badge">Optional</span></h2>
+        <p class="section-desc">Have an existing project to migrate? Upload a zip file.</p>
 
-        <div class="type-cards">
-          <button
-            class="type-card"
-            :class="{ active: config.importMode === 'fresh' }"
-            @click="config.importMode = 'fresh'"
-          >
-            <IconSparkles class="type-icon" />
-            <div class="type-info">
-              <h3>Fresh Start</h3>
-              <p>Clean slate with default configs</p>
-            </div>
-            <IconCheck v-if="config.importMode === 'fresh'" class="check-icon" />
-          </button>
-
-          <button
-            class="type-card"
-            :class="{ active: config.importMode === 'import', disabled: !hasBrownfieldContent }"
-            :disabled="!hasBrownfieldContent"
-            @click="hasBrownfieldContent && (config.importMode = 'import')"
-          >
-            <IconPackageImport class="type-icon" />
-            <div class="type-info">
-              <h3>Import Existing</h3>
-              <p>Migrate from ./import/ folder</p>
-            </div>
-            <IconCheck v-if="config.importMode === 'import'" class="check-icon" />
-          </button>
+        <div v-if="!importZipFile" class="upload-zone">
+          <input
+            type="file"
+            accept=".zip"
+            id="zip-upload"
+            class="upload-input"
+            :disabled="uploadingZip"
+            @change="handleZipUpload"
+          />
+          <label for="zip-upload" class="upload-label">
+            <IconUpload v-if="!uploadingZip" class="upload-icon" />
+            <IconLoader v-else class="upload-icon spinner" />
+            <span>{{ uploadingZip ? 'Uploading...' : 'Drop zip file or click to upload' }}</span>
+            <span class="upload-hint">Your existing code will be analyzed after setup</span>
+          </label>
         </div>
 
-        <div v-if="!hasBrownfieldContent" class="info-box">
-          <IconFolder class="info-icon" />
-          <div>
-            <strong>No import content detected</strong>
-            <p>Place files in <code>./import/</code> folder to enable import mode.</p>
+        <div v-else class="import-detected">
+          <div class="import-header">
+            <IconFileZip class="zip-icon" />
+            <div class="import-info">
+              <strong>{{ importZipFile.name }}</strong>
+              <span>{{ importFolderFiles.length }} files extracted</span>
+            </div>
+            <button class="btn-icon" @click="removeImportZip" title="Remove">
+              <IconX />
+            </button>
           </div>
-        </div>
-
-        <div v-else-if="config.importMode === 'import'" class="import-detected">
-          <strong>Found {{ importFolderFiles.length }} items in ./import/</strong>
-          <ul class="import-files">
+          <ul v-if="importFolderFiles.length > 0" class="import-files">
             <li v-for="file in importFolderFiles.slice(0, 5)" :key="file">{{ file }}</li>
             <li v-if="importFolderFiles.length > 5" class="more-files">
               +{{ importFolderFiles.length - 5 }} more
@@ -422,8 +383,8 @@ async function applyConfig() {
 
       <!-- Languages -->
       <section class="setup-section">
-        <h2 class="section-title">Languages</h2>
-        <p class="section-desc">Select supported languages</p>
+        <h2 class="section-title">Languages <span class="required-badge">Required</span></h2>
+        <p class="section-desc">Select at least one language</p>
 
         <div class="locales-grid">
           <button
@@ -478,16 +439,7 @@ async function applyConfig() {
       </div>
 
       <!-- Actions -->
-      <div class="form-actions">
-        <button
-          class="btn btn-secondary"
-          @click="backToModeSelect"
-          :disabled="saving"
-        >
-          <IconChevronLeft />
-          Back
-        </button>
-
+      <div class="form-actions form-actions-end">
         <button
           class="btn btn-primary btn-success"
           @click="applyConfig"
@@ -497,6 +449,103 @@ async function applyConfig() {
           <IconCheck v-else />
           {{ saving ? 'Applying...' : 'Apply & Start' }}
         </button>
+      </div>
+    </main>
+
+    <!-- Complete Phase: Greenfield (new project) -->
+    <main v-else-if="phase === 'complete-greenfield'" class="setup-content">
+      <div class="complete-phase">
+        <div class="complete-icon">
+          <IconCheck />
+        </div>
+        <h1 class="complete-title">Ready to Code</h1>
+        <p class="complete-desc">
+          Your project is configured. Dev server is running.<br />
+          Start building your {{ config.projectType }} from scratch.
+        </p>
+
+        <div class="complete-info">
+          <div class="info-item">
+            <strong>Dev Server</strong>
+            <a href="http://localhost:3000" target="_blank" class="dev-link">http://localhost:3000</a>
+          </div>
+          <div class="info-item">
+            <strong>Configuration</strong>
+            <code>app/puppet-master.config.ts</code>
+          </div>
+        </div>
+
+        <div class="complete-dirs">
+          <strong>Key Directories</strong>
+          <div class="dir-grid">
+            <div class="dir-item">
+              <code>app/pages/</code>
+              <span>Route pages</span>
+            </div>
+            <div class="dir-item">
+              <code>app/components/</code>
+              <span>Vue components</span>
+            </div>
+            <div class="dir-item">
+              <code>server/api/</code>
+              <span>API endpoints</span>
+            </div>
+            <div class="dir-item">
+              <code>app/assets/css/</code>
+              <span>Styles</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="config.adminEnabled" class="complete-hint">
+          Admin panel available at <a href="/admin">/admin</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Complete Phase: Brownfield (imported code) -->
+    <main v-else-if="phase === 'complete-brownfield'" class="setup-content">
+      <div class="complete-phase">
+        <div class="complete-icon">
+          <IconCheck />
+        </div>
+        <h1 class="complete-title">Configuration Complete</h1>
+        <p class="complete-desc">
+          Your project is configured. Since you uploaded existing code,
+          the next step is to migrate it to Puppet Master.
+        </p>
+
+        <div class="complete-steps">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-content">
+              <strong>With Claude Code (Recommended)</strong>
+              <p>Run AI-powered migration analysis:</p>
+              <code>/pm-migrate</code>
+              <p class="step-note">Claude analyzes your code and creates a migration plan, mapping each piece to PM equivalents.</p>
+            </div>
+          </div>
+          <div class="step step-alt">
+            <span class="step-num">or</span>
+            <div class="step-content">
+              <strong>Without Claude Code</strong>
+              <p>Your files are in <code>./import/</code></p>
+              <p class="step-note">Reference them manually as you build your PM project. Check package.json for dependencies, browse components and pages for logic to port.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="complete-files">
+          <strong>Uploaded files:</strong>
+          <div class="file-count">{{ importFolderFiles.length }} files in ./import/</div>
+        </div>
+
+        <div class="complete-info">
+          <div class="info-item">
+            <strong>Dev Server</strong>
+            <a href="http://localhost:3000" target="_blank" class="dev-link">http://localhost:3000</a>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -946,6 +995,10 @@ async function applyConfig() {
   border-top: 1px solid var(--border);
 }
 
+.form-actions-end {
+  justify-content: flex-end;
+}
+
 .form-actions .btn {
   display: flex;
   align-items: center;
@@ -958,5 +1011,351 @@ async function applyConfig() {
 
 .btn-success:hover {
   background: color-mix(in oklch, var(--success) 85%, var(--black));
+}
+
+/* Required/Optional Badges */
+.required-badge,
+.optional-badge {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+.required-badge {
+  background: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
+  color: var(--danger);
+}
+
+.optional-badge {
+  background: var(--surface-3);
+  color: var(--text-2);
+}
+
+/* Upload Zone */
+.upload-zone {
+  position: relative;
+}
+
+.upload-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label:hover {
+  border-color: var(--brand);
+  background: var(--surface-3);
+}
+
+.upload-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-2);
+}
+
+.upload-hint {
+  font-size: var(--text-xs);
+  color: var(--text-3);
+}
+
+/* Import Header */
+.import-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.zip-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.import-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.import-info span {
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.btn-icon {
+  padding: var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.btn-icon:hover {
+  background: var(--surface-3);
+  color: var(--danger);
+}
+
+/* Validation Errors */
+.validation-errors {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.validation-errors li {
+  padding: 2px 0;
+}
+
+/* Completion Phase */
+.complete-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.complete-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--success);
+  border-radius: 50%;
+  margin-bottom: var(--space-6);
+}
+
+.complete-icon svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.complete-title {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.complete-desc {
+  color: var(--text-2);
+  margin-bottom: var(--space-8);
+  line-height: 1.6;
+}
+
+.complete-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  text-align: left;
+  width: 100%;
+  margin-bottom: var(--space-8);
+}
+
+.step {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-alt {
+  border-style: dashed;
+  border-color: var(--border);
+  background: transparent;
+}
+
+.step-alt .step-num {
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: var(--text-xs);
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content strong {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.step-content p {
+  color: var(--text-2);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.step-content code {
+  display: inline-block;
+  background: var(--surface-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  margin: var(--space-2) 0;
+}
+
+.step-note {
+  margin-top: var(--space-2) !important;
+  font-size: var(--text-xs) !important;
+  color: var(--text-3) !important;
+}
+
+.complete-files {
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+
+.file-count {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.complete-actions {
+  padding-top: var(--space-4);
+}
+
+/* Greenfield Completion */
+.complete-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+}
+
+.info-item strong {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.info-item code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--surface-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.dev-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.dev-link:hover {
+  text-decoration: underline;
+}
+
+.complete-dirs {
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+}
+
+.complete-dirs > strong {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.dir-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.dir-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dir-item code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--brand);
+}
+
+.dir-item span {
+  font-size: var(--text-xs);
+  color: var(--text-3);
+}
+
+.complete-hint {
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.complete-hint a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.complete-hint a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .dir-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

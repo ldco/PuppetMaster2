@@ -1,178 +1,127 @@
 #!/usr/bin/env npx tsx
 /**
- * Puppet Master CLI Init
+ * Puppet Master Init
  *
- * Interactive command-line initialization.
- * Alternative to browser wizard for terminal-only environments.
- *
- * Usage:
+ * Interactive mode (default):
  *   npm run init
+ *
+ * Headless mode (for CI/CD):
+ *   npm run init -- --headless --mode=build --type=website
+ *   npm run init -- --headless --mode=develop
  */
 
 import * as readline from 'readline'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
-import { execSync } from 'child_process'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-type PmMode = 'build' | 'develop'
-type ProjectType = 'website' | 'app'
-
-interface SetupConfig {
-  pmMode: PmMode
-  projectType: ProjectType
-  adminEnabled: boolean
-  modules: string[]
-  features: {
-    multiLangs: boolean
-    doubleTheme: boolean
-    onepager: boolean
-    pwa: boolean
-  }
-  locales: Array<{ code: string; iso: string; name: string }>
-  defaultLocale: string
-}
+import { execSync, spawn } from 'child_process'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const AVAILABLE_MODULES = [
-  { id: 'blog', name: 'Blog' },
-  { id: 'portfolio', name: 'Portfolio' },
-  { id: 'team', name: 'Team' },
-  { id: 'testimonials', name: 'Testimonials' },
-  { id: 'faq', name: 'FAQ' },
-  { id: 'pricing', name: 'Pricing' },
-  { id: 'clients', name: 'Clients' },
-  { id: 'features', name: 'Features' },
-  { id: 'contact', name: 'Contact' }
-]
-
-const AVAILABLE_LOCALES = [
-  { code: 'en', iso: 'en-US', name: 'English' },
-  { code: 'ru', iso: 'ru-RU', name: 'Russian' },
-  { code: 'he', iso: 'he-IL', name: 'Hebrew' },
-  { code: 'es', iso: 'es-ES', name: 'Spanish' },
-  { code: 'fr', iso: 'fr-FR', name: 'French' },
-  { code: 'de', iso: 'de-DE', name: 'German' }
-]
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// READLINE HELPERS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
-
-function ask(question: string): Promise<string> {
-  return new Promise(resolve => {
-    rl.question(question, answer => resolve(answer.trim()))
-  })
+const LOCALE_MAP: Record<string, { code: string; iso: string; name: string }> = {
+  en: { code: 'en', iso: 'en-US', name: 'English' },
+  ru: { code: 'ru', iso: 'ru-RU', name: 'Russian' },
+  he: { code: 'he', iso: 'he-IL', name: 'Hebrew' },
+  es: { code: 'es', iso: 'es-ES', name: 'Spanish' },
+  fr: { code: 'fr', iso: 'fr-FR', name: 'French' },
+  de: { code: 'de', iso: 'de-DE', name: 'German' },
+  zh: { code: 'zh', iso: 'zh-CN', name: 'Chinese' },
+  ja: { code: 'ja', iso: 'ja-JP', name: 'Japanese' }
 }
 
-async function askChoice(question: string, options: string[]): Promise<number> {
-  console.log(`\n${question}`)
-  options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}`))
+const ALL_MODULES = ['blog', 'portfolio', 'team', 'testimonials', 'faq', 'pricing', 'clients', 'features', 'contact']
 
-  while (true) {
-    const answer = await ask('Enter number: ')
-    const num = parseInt(answer)
-    if (num >= 1 && num <= options.length) {
-      return num - 1
+// ═══════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function parseArgs(): Record<string, string> {
+  const args: Record<string, string> = {}
+  for (const arg of process.argv.slice(2)) {
+    if (arg.startsWith('--')) {
+      const [key, value] = arg.slice(2).split('=')
+      args[key] = value ?? 'true'
     }
-    console.log('Invalid choice, please try again.')
   }
+  return args
 }
 
-async function askYesNo(question: string, defaultYes = true): Promise<boolean> {
-  const hint = defaultYes ? '[Y/n]' : '[y/N]'
-  const answer = await ask(`${question} ${hint} `)
-
-  if (!answer) return defaultYes
-  return answer.toLowerCase().startsWith('y')
-}
-
-async function askMultiSelect(question: string, options: Array<{ id: string; name: string }>): Promise<string[]> {
-  console.log(`\n${question}`)
-  console.log('Enter numbers separated by commas (e.g., 1,3,5) or "all" for all:')
-  options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt.name}`))
-
-  const answer = await ask('Selection: ')
-
-  if (answer.toLowerCase() === 'all') {
-    return options.map(o => o.id)
-  }
-
-  if (!answer) return []
-
-  const nums = answer.split(',').map(s => parseInt(s.trim()))
-  return nums
-    .filter(n => n >= 1 && n <= options.length)
-    .map(n => options[n - 1].id)
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// CONFIG WRITER
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function writeConfig(config: SetupConfig): void {
+function readCurrentMode(): string {
   const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
+  if (!existsSync(configPath)) return 'unconfigured'
+  const content = readFileSync(configPath, 'utf-8')
+  const match = content.match(/pmMode:\s*['"](\w+)['"]/)
+  return match ? match[1] : 'unconfigured'
+}
 
-  if (!existsSync(configPath)) {
-    throw new Error('Config file not found: ' + configPath)
+function setConfigMode(mode: 'build' | 'develop' | 'unconfigured'): void {
+  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
+  if (!existsSync(configPath)) throw new Error('Config file not found')
+
+  let content = readFileSync(configPath, 'utf-8')
+  content = content.replace(
+    /pmMode:\s*['"]?\w+['"]?\s*as\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]/,
+    `pmMode: '${mode}' as 'unconfigured' | 'build' | 'develop'`
+  )
+
+  if (mode === 'develop') {
+    for (const mod of ALL_MODULES) {
+      content = content.replace(
+        new RegExp(`(${mod}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's'),
+        '$1$2true'
+      )
+    }
+    content = content.replace(/(multiLangs:\s*)(true|false)/g, '$1true')
+    content = content.replace(/(doubleTheme:\s*)(true|false)/g, '$1true')
   }
+
+  writeFileSync(configPath, content, 'utf-8')
+}
+
+function writeFullConfig(config: {
+  pmMode: string
+  projectType: string
+  adminEnabled: boolean
+  modules: string[]
+  features: { multiLangs: boolean; doubleTheme: boolean; onepager: boolean; pwa: boolean }
+  locales: Array<{ code: string; iso: string; name: string }>
+  defaultLocale: string
+}): void {
+  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
+  if (!existsSync(configPath)) throw new Error('Config file not found')
 
   let content = readFileSync(configPath, 'utf-8')
 
-  // Helper functions
   const replaceBoolean = (str: string, key: string, value: boolean): string => {
-    const pattern = new RegExp(`(${key}:\\s*)(true|false)`, 'g')
-    return str.replace(pattern, `$1${value}`)
+    return str.replace(new RegExp(`(${key}:\\s*)(true|false)`, 'g'), `$1${value}`)
   }
 
-  const replaceString = (str: string, key: string, value: string): string => {
-    const pattern = new RegExp(`(${key}:\\s*)['"][^'"]*['"]`, 'g')
-    return str.replace(pattern, `$1'${value}'`)
-  }
-
-  // Update pmMode
+  // pmMode
   content = content.replace(
     /pmMode:\s*['"]?\w+['"]?\s*as\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]/,
     `pmMode: '${config.pmMode}' as 'unconfigured' | 'build' | 'develop'`
   )
 
-  // Update entities
+  // entities
   content = replaceBoolean(content, 'website', config.projectType === 'website')
   content = replaceBoolean(content, 'app', config.projectType === 'app')
 
-  // Update admin.enabled
-  const adminPattern = /(admin:\s*\{[\s\S]*?)(enabled:\s*)(true|false)/
-  content = content.replace(adminPattern, `$1$2${config.adminEnabled}`)
+  // admin
+  content = content.replace(/(admin:\s*\{[\s\S]*?)(enabled:\s*)(true|false)/, `$1$2${config.adminEnabled}`)
 
-  // Update locales
-  const localesStr = config.locales
-    .map(l => `    { code: '${l.code}', iso: '${l.iso}', name: '${l.name}' }`)
-    .join(',\n')
+  // locales
+  const localesStr = config.locales.map(l => `    { code: '${l.code}', iso: '${l.iso}', name: '${l.name}' }`).join(',\n')
   content = content.replace(/locales:\s*\[[\s\S]*?\]/, `locales: [\n${localesStr}\n  ]`)
+  content = content.replace(/(defaultLocale:\s*)['"][^'"]*['"]/, `$1'${config.defaultLocale}'`)
 
-  // Update defaultLocale
-  content = replaceString(content, 'defaultLocale', config.defaultLocale)
-
-  // Update modules
-  const allModules = AVAILABLE_MODULES.map(m => m.id)
-  for (const moduleId of allModules) {
-    const enabled = config.modules.includes(moduleId)
-    const modulePattern = new RegExp(`(${moduleId}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's')
-    content = content.replace(modulePattern, `$1$2${enabled}`)
+  // modules
+  for (const mod of ALL_MODULES) {
+    const enabled = config.modules.includes(mod)
+    content = content.replace(new RegExp(`(${mod}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's'), `$1$2${enabled}`)
   }
 
-  // Update features
+  // features
   content = replaceBoolean(content, 'multiLangs', config.features.multiLangs)
   content = replaceBoolean(content, 'doubleTheme', config.features.doubleTheme)
   content = replaceBoolean(content, 'onepager', config.features.onepager)
@@ -181,154 +130,183 @@ function writeConfig(config: SetupConfig): void {
   writeFileSync(configPath, content, 'utf-8')
 }
 
+function runCommand(cmd: string, desc: string): void {
+  console.log(`\n${desc}...`)
+  execSync(cmd, { stdio: 'inherit', cwd: process.cwd() })
+}
+
+function startDevServer(): void {
+  console.log('\nStarting dev server...\n')
+  spawn('npm', ['run', 'dev'], { cwd: process.cwd(), stdio: 'inherit', shell: true })
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// MAIN WIZARD
+// HEADLESS MODE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-async function main() {
-  console.log(`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         PUPPET MASTER INIT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function runHeadless(args: Record<string, string>) {
+  // Help
+  if (args.help || args.h) {
+    console.log(`
+Puppet Master Init (Headless)
+
+Usage:
+  npm run init -- --headless --mode=build --type=website [options]
+
+Options:
+  --mode=<build|develop>     Required. Project mode
+  --type=<website|app>       Project type (default: website)
+  --admin=<true|false>       Enable admin panel (default: true)
+  --modules=<list>           Comma-separated: blog,portfolio,team,testimonials,
+                             faq,pricing,clients,features,contact (or "all")
+  --locales=<list>           Comma-separated: en,ru,he,es,fr,de,zh,ja
+  --default-locale=<code>    Default locale (default: first in list)
+  --dark-mode=<true|false>   Dark mode toggle (default: true)
+  --onepager=<true|false>    One-page layout (default: false)
+  --pwa=<true|false>         Progressive Web App (default: false)
+
+Examples:
+  npm run init -- --headless --mode=build --type=website
+  npm run init -- --headless --mode=build --modules=blog,contact --locales=en,es
+  npm run init -- --headless --mode=develop
 `)
-
-  // Step 0: Install dependencies if needed
-  if (!existsSync('node_modules/.bin/nuxt')) {
-    console.log('Installing dependencies...\n')
-    execSync('npm install', { stdio: 'inherit' })
-    console.log('')
-  }
-
-  const config: SetupConfig = {
-    pmMode: 'build',
-    projectType: 'website',
-    adminEnabled: true,
-    modules: ['contact'],
-    features: {
-      multiLangs: false,
-      doubleTheme: true,
-      onepager: false,
-      pwa: false
-    },
-    locales: [{ code: 'en', iso: 'en-US', name: 'English' }],
-    defaultLocale: 'en'
-  }
-
-  // Step 1: Mode
-  const modeChoice = await askChoice('Choose your mode:', [
-    'BUILD - Create a client project',
-    'DEVELOP - Work on the PM framework'
-  ])
-  config.pmMode = modeChoice === 0 ? 'build' : 'develop'
-
-  if (config.pmMode === 'develop') {
-    // DEVELOP mode - enable everything
-    config.modules = AVAILABLE_MODULES.map(m => m.id)
-    config.features.multiLangs = true
-    config.features.doubleTheme = true
-  } else {
-    // BUILD mode - ask for details
-
-    // Step 2: Project Type
-    const typeChoice = await askChoice('What are you building?', [
-      'Website - Marketing site, landing pages',
-      'App - Dashboard, user features'
-    ])
-    config.projectType = typeChoice === 0 ? 'website' : 'app'
-
-    // Step 3: Admin Panel
-    config.adminEnabled = await askYesNo('\nEnable admin panel?', true)
-
-    // Step 4: Modules
-    config.modules = await askMultiSelect('Select modules to enable:', AVAILABLE_MODULES)
-
-    // Step 5: Languages
-    console.log('\n--- Languages ---')
-    const selectedLocales = await askMultiSelect('Select languages:', AVAILABLE_LOCALES)
-    config.locales = AVAILABLE_LOCALES.filter(l => selectedLocales.includes(l.code))
-
-    if (config.locales.length === 0) {
-      config.locales = [AVAILABLE_LOCALES[0]] // Default to English
-    }
-
-    config.features.multiLangs = config.locales.length > 1
-
-    if (config.locales.length > 1) {
-      const defaultChoice = await askChoice(
-        'Select default language:',
-        config.locales.map(l => l.name)
-      )
-      config.defaultLocale = config.locales[defaultChoice].code
-    } else {
-      config.defaultLocale = config.locales[0].code
-    }
-
-    // Step 6: Features
-    console.log('\n--- Additional Features ---')
-    config.features.doubleTheme = await askYesNo('Enable dark/light mode toggle?', true)
-    config.features.onepager = await askYesNo('Use one-page layout (scroll navigation)?', false)
-    config.features.pwa = await askYesNo('Enable Progressive Web App (PWA)?', false)
-  }
-
-  // Review
-  console.log(`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                              📋 REVIEW
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Mode:         ${config.pmMode.toUpperCase()}
-  Type:         ${config.projectType === 'website' ? 'Website' : 'App'}
-  Admin:        ${config.adminEnabled ? 'Enabled' : 'Disabled'}
-  Modules:      ${config.modules.length > 0 ? config.modules.join(', ') : 'None'}
-  Languages:    ${config.locales.map(l => l.name).join(', ')}
-  Features:     ${[
-    config.features.doubleTheme && 'Dark Mode',
-    config.features.onepager && 'One-page',
-    config.features.pwa && 'PWA'
-  ].filter(Boolean).join(', ') || 'Default'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`)
-
-  const confirm = await askYesNo('Apply this configuration?', true)
-
-  if (!confirm) {
-    console.log('\nSetup cancelled.')
-    rl.close()
     process.exit(0)
   }
 
-  // Apply configuration
-  console.log('\n⏳ Applying configuration...')
-
-  try {
-    writeConfig(config)
-    console.log('✅ Configuration saved!')
-
-    console.log(`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ✅ SETUP COMPLETE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Next steps:
-    1. npm run db:push    - Apply database migrations
-    2. npm run db:seed    - Seed sample data (optional)
-    3. npm run dev        - Start development server
-
-  Or run:
-    npm run dev
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`)
-  } catch (error) {
-    console.error('❌ Failed to save configuration:', error)
+  const mode = args.mode || process.env.PM_MODE || ''
+  if (!['build', 'develop'].includes(mode)) {
+    console.error('Error: --mode must be "build" or "develop"')
     process.exit(1)
   }
 
-  rl.close()
+  console.log('🎭 Puppet Master Init (Headless)')
+  console.log('━'.repeat(50))
+
+  if (mode === 'develop') {
+    const config = {
+      pmMode: 'develop',
+      projectType: 'website',
+      adminEnabled: true,
+      modules: ALL_MODULES,
+      features: { multiLangs: true, doubleTheme: true, onepager: false, pwa: false },
+      locales: [LOCALE_MAP.en, LOCALE_MAP.ru, LOCALE_MAP.he],
+      defaultLocale: 'en'
+    }
+    writeFullConfig(config)
+    console.log('\n✅ DEVELOP mode configured')
+    runCommand('npm run db:push', 'Database schema')
+    runCommand('npm run db:seed', 'Seeding data')
+    console.log('\n✅ Ready! Run: npm run dev')
+  } else {
+    const projectType = args.type || process.env.PM_TYPE || 'website'
+    const adminEnabled = (args.admin || process.env.PM_ADMIN || 'true') === 'true'
+    const modulesStr = args.modules || process.env.PM_MODULES || 'contact'
+    const modules = modulesStr === 'all' ? ALL_MODULES : modulesStr.split(',').filter(m => ALL_MODULES.includes(m.trim()))
+    const localesStr = args.locales || process.env.PM_LOCALES || 'en'
+    const locales = localesStr.split(',').map(c => LOCALE_MAP[c.trim()]).filter(Boolean)
+    if (locales.length === 0) locales.push(LOCALE_MAP.en)
+    const defaultLocale = args['default-locale'] || process.env.PM_DEFAULT_LOCALE || locales[0].code
+    const darkMode = (args['dark-mode'] || process.env.PM_DARK_MODE || 'true') === 'true'
+    const onepager = (args.onepager || process.env.PM_ONEPAGER || 'false') === 'true'
+    const pwa = (args.pwa || process.env.PM_PWA || 'false') === 'true'
+
+    const config = {
+      pmMode: 'build',
+      projectType,
+      adminEnabled,
+      modules,
+      features: { multiLangs: locales.length > 1, doubleTheme: darkMode, onepager, pwa },
+      locales,
+      defaultLocale
+    }
+
+    console.log(`\nConfiguration:`)
+    console.log(`  Mode:     BUILD`)
+    console.log(`  Type:     ${projectType}`)
+    console.log(`  Admin:    ${adminEnabled}`)
+    console.log(`  Modules:  ${modules.join(', ')}`)
+    console.log(`  Locales:  ${locales.map(l => l.code).join(', ')}`)
+
+    writeFullConfig(config)
+    console.log('\n✅ Configuration saved')
+    runCommand('npm run db:push', 'Database schema')
+    console.log('\n✅ Ready! Run: npm run dev')
+  }
 }
 
-main().catch(err => {
-  console.error('Error:', err)
-  process.exit(1)
-})
+// ═══════════════════════════════════════════════════════════════════════════════
+// INTERACTIVE MODE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function runInteractive() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  const ask = (q: string): Promise<string> => new Promise(res => rl.question(q, a => res(a.trim())))
+
+  console.log(`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         PUPPET MASTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`)
+
+  // Check if already configured
+  const currentMode = readCurrentMode()
+  if (currentMode !== 'unconfigured') {
+    console.log(`Already configured: ${currentMode.toUpperCase()} mode\n`)
+    console.log('1. Start dev server')
+    console.log('2. Reconfigure')
+    const choice = await ask('\nEnter number: ')
+
+    if (choice === '1') {
+      rl.close()
+      startDevServer()
+      return
+    }
+    setConfigMode('unconfigured')
+    console.log('\nReset. Continuing...\n')
+  }
+
+  // THE ONLY QUESTION: BUILD or DEVELOP?
+  console.log('1. BUILD — Client project')
+  console.log('2. DEVELOP — PM framework')
+  const mode = await ask('\nEnter number: ')
+  rl.close()
+
+  if (mode === '2') {
+    console.log('\n━━━ DEVELOP MODE ━━━\n')
+    setConfigMode('develop')
+    runCommand('npm run db:push', 'Database schema')
+    runCommand('npm run db:seed', 'Seeding data')
+    console.log(`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  READY — http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`)
+    startDevServer()
+  } else {
+    console.log('\n━━━ BUILD MODE ━━━\n')
+    setConfigMode('build')
+    runCommand('npm run db:push', 'Database schema')
+    console.log(`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Complete setup in browser: http://localhost:3000/init
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`)
+    startDevServer()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const args = parseArgs()
+
+// Headless if --headless flag OR --mode is specified
+if (args.headless || args.mode) {
+  runHeadless(args)
+} else {
+  runInteractive().catch(err => {
+    console.error('Error:', err)
+    process.exit(1)
+  })
+}

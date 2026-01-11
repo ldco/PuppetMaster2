@@ -99,58 +99,64 @@ Perfect for:
 ### Prerequisites
 
 - Node.js 20+
-- pnpm (recommended) or npm
+- npm (or pnpm)
 
 ### Installation
 
 ```bash
-# Clone and install
+# Clone the repo
 git clone <repository-url>
 cd puppet-master/app
-npm install
 
-# Start development (opens setup wizard)
-npm run dev
+# Run init (installs dependencies automatically)
+npm run init
 ```
 
-On first run, you'll be redirected to the **Setup Wizard** at `/setup`.
+### What Happens
 
-### Setup Wizard
+`npm run init` does everything:
 
-On first run, choose your mode:
-- **DEVELOP** — One-click start with all features (for framework work)
-- **BUILD** — Opens configuration wizard (for client projects)
+1. **Installs dependencies** (if needed)
+2. **Asks: BUILD or DEVELOP?**
+   - **BUILD** → Runs database setup, starts dev server, opens wizard at `/init`
+   - **DEVELOP** → Enables all features, seeds sample data, starts dev server
 
-**BUILD Wizard Steps:**
-1. **Project Type** - Website or App
-2. **Import Detection** - Fresh start or import existing code
-3. **Features** - Select modules, languages, theme options
-4. **Review** - Confirm and apply configuration
+3. **BUILD mode wizard** (in browser):
+   - Project Type — Website or App
+   - Admin Panel — Enable/disable
+   - Import Code — Optional: upload zip of existing project
+   - Modules — Blog, Portfolio, Team, etc.
+   - Languages — Select supported locales
+   - Features — Dark mode, PWA, etc.
 
-After completing the wizard:
-
-```bash
-npm run db:push    # Apply database schema
-npm run db:seed    # Seed sample data
-```
+4. **After wizard**:
+   - **Greenfield** (no import): Shows "Ready to Code" screen with key directories → start coding
+   - **Brownfield** (with import): Shows migration steps (use `/pm-migrate` with Claude Code)
 
 ### Two Modes
 
-| Mode | Purpose |
-|------|---------|
-| **BUILD** | Creating client projects - select only needed features |
-| **DEVELOP** | Working on PM framework - all features enabled |
+| Mode | Purpose | What Happens |
+|------|---------|--------------|
+| **BUILD** | Client projects | Opens configuration wizard |
+| **DEVELOP** | PM framework work | All features enabled, sample data seeded |
 
-### Greenfield vs Brownfield
+### Brownfield Migration (Importing Existing Code)
 
-- **Greenfield** (Fresh Start): Start with default configurations
-- **Brownfield** (Import Existing): Place files in `./import/` folder before setup, then run `/pm-migrate` in Claude Code
+If you have an existing project to migrate:
 
-### Alternative Setup Methods
+1. Run `npm run init`
+2. In wizard, upload your project as a **zip file**
+3. Complete the configuration
+4. After wizard:
+   - **With Claude Code**: Type `/pm-migrate` to run AI-powered migration analysis
+   - **Without Claude Code**: Reference files in `./import/` folder manually
+
+### Headless Mode (CI/CD)
 
 ```bash
-npm run setup:cli       # Interactive terminal wizard
-npm run setup:headless  # Non-interactive (CI/CD)
+# Non-interactive - pass all config via flags
+npm run init -- --headless --mode=build --type=website
+npm run init -- --headless --mode=develop
 ```
 
 See [docs/SETUP-WORKFLOWS.md](docs/SETUP-WORKFLOWS.md) for detailed workflows.

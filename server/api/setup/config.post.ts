@@ -146,5 +146,19 @@ export default defineEventHandler(async (event) => {
   // Write updated config
   writeFileSync(configPath, content, 'utf-8')
 
+  // Run db:push to create/update database schema
+  try {
+    const { execSync } = await import('child_process')
+    execSync('npm run db:push', {
+      cwd: process.cwd(),
+      stdio: 'pipe',
+      env: { ...process.env, FORCE_COLOR: '0' },
+      input: 'y\n' // Auto-confirm drizzle prompts
+    })
+  } catch (e: any) {
+    // Log but don't fail - database might already be set up
+    console.warn('db:push warning:', e.message)
+  }
+
   return { success: true }
 })

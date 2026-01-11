@@ -65,8 +65,9 @@ Options:
 #### If BUILD selected:
 
 1. Update config: `pmMode: 'build'`
-2. Start dev server: `npm run dev &`
-3. Display:
+2. Run `npm run db:push` (empty tables, no seed data)
+3. Start dev server: `npm run dev &`
+4. Display:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                          BUILD MODE

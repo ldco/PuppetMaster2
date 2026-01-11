@@ -1,18 +1,4 @@
-# /pm-migrate — DEPRECATED
-
-> **⚠️ DEPRECATED:** This command has been merged into the setup wizard.
->
-> Use `/pm-init` instead. The wizard at `/setup` now handles brownfield (existing code) detection automatically:
->
-> 1. Run `/pm-init` to start the wizard
-> 2. In the wizard, select "Yes" when asked "Do you have existing code?"
-> 3. The wizard will analyze your `./import/` folder and create a migration plan
->
-> For the historical documentation of the standalone migration command, see below.
-
----
-
-# (Historical) /pm-migrate — Import Existing Code into Puppet Master
+# /pm-migrate — Import Existing Code into Puppet Master
 
 **You are the migration tool.** Follow these instructions to:
 1. DECOMPOSE the entire imported project into pieces
