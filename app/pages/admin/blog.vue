@@ -561,7 +561,7 @@ async function uploadCoverImage(event: Event) {
                 <p v-if="getPostExcerpt(post)" class="blog-admin-item__excerpt">{{ getPostExcerpt(post) }}</p>
                 <div class="blog-admin-item__meta">
                   <span :class="['badge', getStatusBadgeClass(post.status)]">
-                    {{ t(`admin.${post.status}`) }}
+                    {{ t(`admin.${post.status || 'draft'}`) }}
                   </span>
                   <span v-if="post.category" class="blog-admin-item__category">
                     <IconFolder class="icon-sm" />

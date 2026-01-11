@@ -1,4 +1,4 @@
-# /pm status — Show Puppet Master Configuration Status
+# /pm-status — Show Puppet Master Configuration Status
 
 **ACTION REQUIRED: Read configuration and display current state clearly.**
 
@@ -7,10 +7,10 @@ Quick overview of current Puppet Master configuration and project state.
 ## Usage
 
 ```
-/pm status              # Full status overview
-/pm status --config     # Show raw config values
-/pm status --modules    # Show module details only
-/pm status --db         # Show database status
+/pm-status              # Full status overview
+/pm-status --config     # Show raw config values
+/pm-status --modules    # Show module details only
+/pm-status --db         # Show database status
 ```
 
 ---
@@ -21,17 +21,19 @@ Quick overview of current Puppet Master configuration and project state.
 
 Read the main config file:
 
-```bash
-cat app/puppet-master.config.ts
+```
+Read: app/puppet-master.config.ts
 ```
 
 Parse and extract:
-- `mode` — Current application mode
+- `pmMode` — 'unconfigured' | 'build' | 'develop'
+- `projectType` — 'website' | 'app' (if BUILD mode)
+- `admin.enabled` — Admin panel status
 - `features` — Enabled features
 - `modules` — Enabled modules
 - `locales` — Configured languages
 - `dataSource.provider` — Data source type
-- `sections` — Configured sections
+- `design` — Color and font settings
 
 ---
 
@@ -41,8 +43,8 @@ Parse and extract:
 # Check if database exists
 ls data/sqlite.db 2>/dev/null
 
-# Check migration status
-ls server/database/migrations/*.sql 2>/dev/null | wc -l
+# Get file size if exists
+du -h data/sqlite.db 2>/dev/null
 ```
 
 ---
@@ -56,91 +58,80 @@ lsof -i :3000 2>/dev/null | grep LISTEN
 
 ---
 
-### Step 4: Check Migration Status
+### Step 4: Display Status
 
-```bash
-# Check if migration is in progress
-cat .claude-data/migration.json 2>/dev/null
-```
-
----
-
-### Step 5: Display Status
+#### If Unconfigured
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                          📊 PUPPET MASTER STATUS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Mode:           website-admin
-Data Source:    database (SQLite)
-Dev Server:     ● Running on :3000
+Mode:           ⚠️  UNCONFIGURED
+Dev Server:     {● Running | ○ Stopped}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This project needs to be configured.
+
+Run /pm-init to start the setup wizard.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+#### If Configured (BUILD or DEVELOP mode)
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         📊 PUPPET MASTER STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mode:           {🏗️ BUILD | 🔧 DEVELOP}
+Type:           {Website | App | —}
+Admin:          {✅ Enabled | ❌ Disabled}
+Data Source:    {database | api | hybrid}
+Dev Server:     {● Running on :3000 | ○ Stopped}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Features:
-  ✅ Multilingual     3 locales (en, ru, he)
-  ✅ Dark Mode        Enabled
-  ❌ PWA              Disabled
-  ✅ Contact Notify   Email + Telegram
+  {✅ | ❌} Multilingual     {count} locales ({list})
+  {✅ | ❌} Dark Mode        {Enabled | Disabled}
+  {✅ | ❌} PWA              {Enabled | Disabled}
+  {✅ | ❌} Contact Notify   {Methods or Disabled}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Modules:
-  ✅ portfolio        Gallery + Case Studies
-  ✅ blog             Posts, Categories, Tags
-  ✅ team             Member Profiles
-  ✅ pricing          Tiers + Comparison
-  ✅ testimonials     Customer Reviews
-  ✅ faq              Accordion FAQ
-  ✅ clients          Logo Showcase
-  ✅ features         Feature Cards
-  ✅ contact          Form + Notifications
+  {✅ | ❌} blog             Blog posts
+  {✅ | ❌} portfolio        Projects/gallery
+  {✅ | ❌} team             Team members
+  {✅ | ❌} pricing          Pricing tiers
+  {✅ | ❌} testimonials     Customer reviews
+  {✅ | ❌} faq              FAQ section
+  {✅ | ❌} clients          Logo showcase
+  {✅ | ❌} features         Feature cards
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Sections (Navigation Order):
-  1. hero
-  2. portfolio
-  3. features
-  4. team
-  5. testimonials
-  6. pricing
-  7. faq
-  8. contact
+Design:
+  Primary:      {color}
+  Accent:       {color}
+  Fonts:        {accent} / {text}
+  Icons:        {library}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Database:
-  ✅ SQLite exists    data/sqlite.db (2.4 MB)
-  ✅ Migrations       12 applied
-  ✅ Seeded           Sample data present
+  {✅ SQLite exists | ❌ No database}   {path} ({size})
+  {✅ Seeded | ⚠️ Empty}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Commands:
-  /pm init            Reconfigure project
-  /pm start           Restart dev environment
-  /pm migrate         Import existing project
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
----
-
-### If Migration In Progress
-
-Add migration section:
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔄 Migration In Progress:
-  Source:         ./import/ (Next.js 14)
-  Phase:          3/7 — Core Pages
-  Tasks Done:     8/23
-
-  Run /pm migrate --resume to continue
+  /pm-init      Reconfigure project (opens wizard)
+  /pm-dev       Start/restart dev server
+  /closedev     Stop dev server
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -154,6 +145,23 @@ Add migration section:
 Show raw configuration values in a table format.
 Useful for debugging.
 
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         📄 RAW CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+| Key                      | Value                              |
+|--------------------------|-----------------------------------|
+| pmMode                   | build                              |
+| projectType              | website                            |
+| admin.enabled            | true                               |
+| features.multilingual    | true                               |
+| features.darkMode        | true                               |
+| ...                      | ...                                |
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
 ### --modules
 
 Show detailed module configuration:
@@ -164,10 +172,10 @@ Show detailed module configuration:
 ### --db
 
 Show database details:
-- Table counts
+- File path and size
+- Table list
 - Row counts per table
-- Last migration applied
-- Database file size
+- Last seeded date (if tracked)
 
 ---
 

@@ -1,130 +1,107 @@
 # Puppet Master Context
 
 ## State
-Branch: master | Updated: 2026-01-09
+Branch: master | Updated: 2026-01-11
 
 ## Active Tasks
-- PM Claude System implementation complete
-- Modular entity architecture IMPLEMENTED (entities + admin modules with per-model RBAC)
-- Ready for testing from fresh git clone
+- Setup wizard converted to single-page form - READY FOR TESTING
+- Two-mode system (BUILD vs DEVELOP) implemented
 
 ## Completed (This Session)
-- Implemented modular entity configuration (replaces fixed modes)
-- Created config.ts types with EntitiesConfig, AdminConfig, RBAC helpers
-- Updated puppet-master.config.ts with entities + admin structure
-- Updated useConfig composable with new entity-based helpers
-- Updated admin layout and bottom nav to use getAdminSectionsForRole()
-- Updated app-mode middleware for entity-based routing
-- Added 'user' role to UserRole type for app users
-- Architecture redesign: modular entities + flexible RBAC (docs/PM-ARCHITECTURE.md)
-- Documented three-category admin module system (System, Website Content, App Data)
-- Documented per-model role configuration with master-only role assignment
-- Created PM Claude command system (`.claude/commands/pm-*.md`)
-- Implemented `/pm-init` — Greenfield setup wizard
-- Implemented `/pm-migrate` — Brownfield import with full project decomposition
-- Implemented `/pm-status` — Configuration overview
-- Implemented `/pm-start` — Database + dev server
-- Created `./import/` folder for Brownfield imports
-- Updated CLAUDE.md with PM commands documentation
-- Created comprehensive mapping system for migrations
+- Converted 4-step wizard to single-page form (`app/pages/setup.vue`)
+- Setup page flow:
+  1. Mode Selection: BUILD (configure) vs DEVELOP (one-click)
+  2. BUILD shows single-page form with all options visible
+  3. DEVELOP applies all features immediately, redirects to homepage
+- Form sections (all on one page):
+  - Project Type (Website/App) + Admin toggle
+  - Setup Source (Fresh/Import with brownfield detection)
+  - Modules grid (9 modules)
+  - Languages selection (8 locales)
+  - Features checkboxes (theme, one-pager, PWA)
+- API: `/api/setup/config` (GET) returns current config + brownfield detection
+- API: `/api/setup/config` (POST) saves configuration
+- Middleware: `00.setup.global.ts` redirects unconfigured projects to `/setup`
+- Brownfield detection scans `./import/` folder for existing code
 
-## Recent Sessions
-- 2026-01-09: PM Claude System implementation
-- 2026-01-02: Code review, fixes, and commit
-- 2025-12-29: ESLint warnings fixed
-- 2025-12-28: Full Codebase Audit - Grade: A
+## Previous Session Work
+- Implemented two-mode system (BUILD vs DEVELOP)
+- Added pmMode to config: 'unconfigured' | 'build' | 'develop'
+- Created setup wizard page with mode selection
+- Added brownfield/greenfield detection step
+- Created SETUP-WORKFLOWS.md documentation
+- Updated README with new Quick Start workflow
+
+## Key Files Modified
+- `app/pages/setup.vue` - Single-page setup form
+- `app/middleware/00.setup.global.ts` - Redirect to /setup when unconfigured
+- `server/api/setup/config.get.ts` - Get config + brownfield detection
+- `server/api/setup/config.post.ts` - Save configuration
+- `app/puppet-master.config.ts` - Added pmMode field
+- `docs/SETUP-WORKFLOWS.md` - Workflow documentation
+
+## Setup Flow Summary
+
+### Workflow
+```
+npm install → npm run dev → /setup opens
+   ├─ BUILD → Single-page form → Apply → /admin
+   └─ DEVELOP → One-click → Homepage
+```
+
+### Claude Workflow
+```
+/pm-init → Checks pmMode
+   ├─ unconfigured → npm install + npm run dev + opens /setup
+   └─ configured → Shows current status
+```
 
 ## Architecture Notes
 
-See `docs/PM-ARCHITECTURE.md` for full details.
+### pmMode Values
+| Value | Description |
+|-------|-------------|
+| `'unconfigured'` | Fresh clone, needs setup → wizard shown |
+| `'build'` | Client project (website or app) |
+| `'develop'` | Framework development (showcase) |
 
-### Two-Level Architecture
-- **Level 1: System Entities** — Website, App (what exists) + Admin (management layer)
-- **Level 2: UX Paradigms** — Website UX, App UX (how things look)
+### Brownfield Detection
+- Scans `./import/` folder for files
+- Checks PROJECT.md for filled content (not template)
+- If content found, enables "Import Existing" option
+- After setup, user runs `/pm-migrate` to process imported code
 
-### Key Insight
-Admin panel is NOT a third UX paradigm — it's App UX with admin sections visible!
-
-| Concept | Definition |
-|---------|------------|
-| **Website UX** | Horizontal header, page-based (for visitors) |
-| **App UX** | Sidebar/bottom nav, feature-based (for ALL logged-in users) |
-| **Layout** | Visual style within a UX paradigm |
-| **Role** | What navigation sections user sees |
-
-### Modular Entity Configuration (replaces fixed modes)
-```typescript
-entities: { website: boolean, app: boolean }
-admin: { enabled: boolean, system: {...}, websiteModules: {...}, appModules: {...} }
-```
-
-### Admin Module Categories
-1. **System** (PM provides, universal): users, roles, translations, settings, health, logs
-2. **Website Content** (PM provides): sections, blog, portfolio, team, testimonials, faq, clients, pricing
-3. **App Data** (custom per project): developer builds
-
-### RBAC
-- Role hierarchy: master → admin → editor → user
-- Role assignment is ALWAYS master-only (hardcoded)
-- Each module has configurable roles array
-- Master configures per-model role access
-
-### Other Architecture
-- **Dual Data Source**: SQLite OR external REST API (hybrid mode available)
-- **RBAC**: Master (developer), Admin (client), Editor (employee)
-- **Pure CSS**: 5-layer system with OKLCH colors, light-dark() function
-- **i18n**: Database-driven translations with RTL support
+## Recent Sessions
+- 2026-01-11: Setup wizard → single-page form conversion
+- 2026-01-10: Two-mode system (BUILD/DEVELOP) implementation
+- 2026-01-09: PM Claude System implementation
+- 2026-01-02: Code review, fixes, and commit
 
 ## PM Claude System
 
 ### Commands (in `.claude/commands/`)
-| File | Command | Purpose |
-|------|---------|---------|
-| pm-init.md | `/pm-init` | Greenfield wizard — mode, features, modules |
-| pm-migrate.md | `/pm-migrate` | Brownfield — decompose, map, plan |
-| pm-status.md | `/pm-status` | Show current config state |
-| pm-start.md | `/pm-start` | db:push + db:seed + rundev |
-| pm-contribute.md | `/pm-contribute` | Export fix/feature as contribution doc |
-| pm-apply.md | `/pm-apply` | Apply contribution doc to PM framework |
+| Command | Purpose |
+|---------|---------|
+| `/pm-init` | Main entry — starts wizard if unconfigured |
+| `/pm-dev` | Start dev server (kills existing first) |
+| `/pm-status` | Show current config state |
+| `/pm-migrate` | Brownfield — decompose, map, plan |
+| `/pm-contribute` | Export fix/feature as contribution doc |
+| `/pm-apply` | Apply contribution doc to PM framework |
 
-### Migration System
-`/pm-migrate` decomposes imported projects into 7 domains:
-1. FRONTEND (Pages, Components, Layouts, Composables)
-2. BACKEND (API routes, Middleware, Utilities)
-3. DATABASE (Schema, Migrations, Seeds)
-4. STYLES (Colors, Typography, Spacing)
-5. AUTH (Users, Sessions, Roles)
-6. I18N (Locales, Translations, RTL)
-7. ASSETS (Images, Fonts, Icons)
-
-Each item gets an action: PM_EXISTS, PM_NATIVE, CREATE, REWRITE, PROXY, KEEP, COPY, CONVERT, MERGE, SKIP
-
-### Workflows
-- **Greenfield (with spec)**: `/init` → fill `./import/PROJECT.md` → `/pm-init` → `/pm-start`
-- **Greenfield (quick)**: `/init` → `/pm-init` (wizard) → `/pm-start`
-- **Brownfield**: `/init` → copy code to `./import/` → `/pm-migrate` → `/pm-start`
-- **Contributing**: (client) `/pm-contribute` → copy `.pm-contribution.md` to PM → (PM) `/pm-apply`
-
-### Command Routing
-- `/pm-init` — Smart entry for NEW projects (checks import folder):
-  - Code found → redirects to `/pm-migrate`
-  - PROJECT.md filled → analyzes and creates plan
-  - Nothing/empty → runs wizard
-  - Both code + PROJECT.md → shows conflict error
-- `/pm-migrate` — ONLY for Brownfield (code imports)
+### Deprecated
+- `/pm-start` → replaced by `/pm-dev`
 
 ## Key Decisions
-- Using SQLite with Drizzle ORM for simplicity
-- Pure CSS approach (no Tailwind/frameworks)
-- Atomic Design for component structure
-- Config-driven architecture via puppet-master.config.ts
-- Claude commands are project-specific (ship with framework)
+- Single-page form instead of multi-step wizard (user preference)
+- Mode selection (BUILD/DEVELOP) comes before config form
+- DEVELOP mode = one-click apply with all features enabled
+- BUILD mode = customize via form
+- Brownfield detection automatic via ./import/ folder scan
 
 ## Blockers
 (none)
 
 ## Notes
 - Default accounts in dev: master@example.com / master123
-- Deployment: Docker + Kamal + Traefik
-- Documentation in docs/ folder
-- PM Claude docs in docs/PM-CLAUDE-SYSTEM.md
+- Test the setup flow: delete data/sqlite.db, set pmMode to 'unconfigured'

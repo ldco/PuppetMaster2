@@ -4,7 +4,7 @@
  * DELETE /api/admin/roles/:id
  * Returns: { success: true }
  *
- * Requires: manageRoles permission (master only)
+ * Requires: roles page access (master only)
  * Cannot delete built-in roles
  * Cannot delete roles with assigned users
  */
@@ -25,8 +25,8 @@ export default defineEventHandler(async event => {
   const roleId = parseInt(id)
   const currentUser = event.context.user
 
-  // Require manageRoles permission
-  await requirePermission(currentUser, 'manageRoles')
+  // Require roles page access (master only)
+  await requirePermission(currentUser, 'roles')
 
   const db = useDatabase()
 

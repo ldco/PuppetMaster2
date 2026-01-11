@@ -12,40 +12,46 @@ import type { UserRole } from './types/auth'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * ENTITIES - What exists in your project (modular architecture)
+ * PROJECT TYPE - PM builds ONE thing at a time
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * Two UX paradigms exist:
- *   - Website UX: Horizontal header, page-based (for public visitors)
- *   - App UX: Sidebar/bottom nav, feature-based (for ALL logged-in users)
+ * Choose ONE:
+ *   - Website: Marketing site, landing pages, company info (Website UX)
+ *   - App: Product, dashboard, user features (App UX)
  *
- * Admin panel uses App UX - it's NOT a third paradigm!
- * Layout = where nav goes, Role = what nav shows.
+ * These are MUTUALLY EXCLUSIVE. If you need both a marketing site AND an app,
+ * deploy them as separate PM instances:
+ *   - marketing.example.com → Website
+ *   - app.example.com → App
  *
  * ┌──────────────┬──────────────────┬─────────────────────────────────────────┐
- * │ Entity       │ UX Paradigm      │ Purpose                                 │
+ * │ Type         │ UX Paradigm      │ Purpose                                 │
  * ├──────────────┼──────────────────┼─────────────────────────────────────────┤
  * │ Website      │ Website UX       │ Public marketing, landing, info pages   │
- * │ App          │ App UX           │ User-facing features (dashboard, etc.)  │
- * │ Admin        │ App UX           │ Content management (role-based access)  │
+ * │ App          │ App UX           │ User-facing product (/ → /login)        │
  * └──────────────┴──────────────────┴─────────────────────────────────────────┘
  *
- * Derived behaviors:
- *   website: false, app: true  → / redirects to /login (app-only)
- *   website: true, app: true   → public site + user app
- *   website: true, app: false  → public site only
- *
- * Admin is always available when admin.enabled: true (accessed at /admin)
+ * Admin panel (admin.enabled) adds management interface to either type.
+ * Admin uses App UX - it's the same paradigm as App.
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 const config = {
   // ═══════════════════════════════════════════════════════════════════════════
-  // ENTITIES - What exists in your project
+  // PM MODE - Setup state (set by wizard or /pm-init command)
+  // ═══════════════════════════════════════════════════════════════════════════
+  // - 'unconfigured': Fresh clone, needs wizard setup
+  // - 'build': Configured for client project (website or app)
+  // - 'develop': PM framework development mode (shows showcase)
+  // ═══════════════════════════════════════════════════════════════════════════
+  pmMode: 'unconfigured' as 'unconfigured' | 'build' | 'develop',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PROJECT TYPE - Choose ONE: Website OR App (mutually exclusive)
   // ═══════════════════════════════════════════════════════════════════════════
   entities: {
-    website: true, // Public marketing pages (Website UX)
-    app: false // User-facing application (App UX)
+    website: true, // TRUE = Building a Website (marketing, landing pages)
+    app: false // TRUE = Building an App (product, dashboard) - / → /login
   } as EntitiesConfig,
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -510,7 +516,7 @@ const config = {
 
     // Website content modules (PM provides)
     websiteModules: {
-      sections: { enabled: true, roles: ['master', 'admin', 'editor'] },
+      sections: { enabled: false, roles: ['master', 'admin', 'editor'] },
       blog: { enabled: true, roles: ['master', 'admin', 'editor'] },
       portfolio: { enabled: true, roles: ['master', 'admin'] },
       team: { enabled: true, roles: ['master', 'admin'] },

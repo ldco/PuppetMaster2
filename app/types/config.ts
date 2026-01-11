@@ -8,6 +8,24 @@
 import type { UserRole } from './auth'
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// PM MODE - Setup State
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Project setup state
+ *
+ * - unconfigured: Fresh clone, needs wizard setup
+ * - build: Configured for client project (website or app)
+ * - develop: Configured for PM framework development (showcase mode)
+ */
+export type PmMode = 'unconfigured' | 'build' | 'develop'
+
+/**
+ * Project type when in BUILD mode
+ */
+export type ProjectType = 'website' | 'app'
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ROLE SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════════
 

@@ -1,18 +1,31 @@
 <script setup lang="ts">
 /**
- * Admin Index - Redirects to Portfolio
+ * Admin Index - Redirects to first available page
  *
- * The admin panel doesn't need a dashboard page.
- * Users should land directly on actionable content.
+ * Dynamically redirects to the first section the user has access to,
+ * based on their role and enabled modules.
  */
+import config from '~/puppet-master.config'
+
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
   pageTransition: false
 })
 
-// Redirect to settings on mount
-navigateTo('/admin/settings', { replace: true })
+const { user } = useAuth()
+const localePath = useLocalePath()
+
+// Get first available section for user's role and redirect
+watchEffect(() => {
+  if (user.value?.role) {
+    const sections = config.getAdminSectionsForRole(user.value.role)
+    const firstSection = sections[0]
+    if (firstSection) {
+      navigateTo(localePath(`/admin/${firstSection.id}`), { replace: true })
+    }
+  }
+})
 </script>
 
 <template>

@@ -1,4 +1,18 @@
-# /pm-migrate — Import Existing Code into Puppet Master
+# /pm-migrate — DEPRECATED
+
+> **⚠️ DEPRECATED:** This command has been merged into the setup wizard.
+>
+> Use `/pm-init` instead. The wizard at `/setup` now handles brownfield (existing code) detection automatically:
+>
+> 1. Run `/pm-init` to start the wizard
+> 2. In the wizard, select "Yes" when asked "Do you have existing code?"
+> 3. The wizard will analyze your `./import/` folder and create a migration plan
+>
+> For the historical documentation of the standalone migration command, see below.
+
+---
+
+# (Historical) /pm-migrate — Import Existing Code into Puppet Master
 
 **You are the migration tool.** Follow these instructions to:
 1. DECOMPOSE the entire imported project into pieces
@@ -73,7 +87,7 @@ The project being migrated may have:
 |--------|---------|---------------|
 | **Website** | Public pages | Website UX (default layout) |
 | **App** | User features | App UX (sidebar/minimal layout) |
-| **Admin** | Content management | App UX with admin sections |
+| **Admin** | Management interface | App UX with admin sections |
 
 **Identify which entities the import has!**
 
@@ -857,40 +871,51 @@ Data strategy:
   - Most complex option
 ```
 
-### Question 5: Project Entities
+### Question 5: Project Type
 
-**Ask about entities, not just mode:**
+**PM builds ONE thing at a time. Determine what the import is:**
 
 ```
-Your project appears to have:
-- Public website: {yes/no}
-- User application: {yes/no}
-- Admin/content management: {detected/unknown}
+Your project appears to be:
+- Public marketing site: {yes/no}
+- User-facing application: {yes/no}
+- Has admin/CMS: {yes/no}
 
-Confirm which entities you need:
+PM builds ONE thing. Which describes this project better?
 
-☐ Public Website
-  Marketing pages, landing page, info pages
-  → Visitors see without logging in
+○ Website
+  Marketing site, landing pages, company info
+  → Public pages for visitors (Website UX)
 
-☐ User Application
-  Features users log in to use (dashboard, tracker, etc.)
-  → Authenticated user experience
+○ App
+  Product, dashboard, user features
+  → Application for logged-in users (App UX)
+  → Root (/) redirects to /login
 
-☐ Content Management
-  Admin panel to manage website/app content
-  → Editors and admins manage content
+NOTE: If the import has BOTH a marketing site AND an app product,
+      you'll need to split them into separate PM instances.
 ```
 
-**Derive mode from selection:**
+**Then ask about admin panel:**
 
-| Selection | PM Mode |
-|-----------|---------|
-| App only | `app-only` |
-| Website + App | `website-app` |
-| Website + Admin | `website-admin` |
-| Website only | `website-only` |
-| Website + App + Admin | `website-app` (with /admin/*) |
+```
+Enable Admin Panel?
+
+○ Yes — Management interface at /admin (Recommended)
+○ No — No management interface needed
+```
+
+**Map selection to config:**
+
+```typescript
+// Website with Admin:
+entities: { website: true, app: false },
+admin: { enabled: true }
+
+// App with Admin:
+entities: { website: false, app: true },
+admin: { enabled: true }
+```
 
 ### Question 6: App UX Preferences
 
@@ -927,9 +952,16 @@ NOTE: Both regular users AND admins use the same UX paradigm.
 
 Generated: {date}
 Source: ./import/ ({framework})
-Target: Puppet Master ({mode})
+Target: Puppet Master
 
 ---
+
+## Project Configuration
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| Type    | {Website / App} | What PM is building |
+| Admin   | {Enabled / Disabled} | Content management at /admin |
 
 ## Strategy Summary
 
@@ -978,7 +1010,7 @@ Target: Puppet Master ({mode})
 ### Phase 1: Configuration
 1. Update puppet-master.config.ts
 2. Set environment variables
-3. Configure PM mode and features
+3. Set project type (website OR app) and admin.enabled
 
 ### Phase 2: Assets
 1. Copy static files
@@ -1041,12 +1073,14 @@ Import files to reference during migration:
 **Based on decisions, update `puppet-master.config.ts`:**
 
 Use Edit tool to set:
-- `mode`
-- `features` (multilingual, darkMode, etc.)
-- `modules` (based on what import has)
+- `entities.website` / `entities.app` (boolean flags for what exists)
+- `admin.enabled` (boolean for content management)
+- `admin.system` / `admin.websiteModules` / `admin.appModules` (enabled modules + roles)
+- `features` (multilingual, darkMode, onepager, etc.)
+- `modules` (based on what import has - portfolio, blog, team, etc.)
 - `dataSource.provider`
 - `locales`
-- `brand` colors (if provided mapping)
+- `colors` (brand colors if provided mapping)
 
 ---
 
@@ -1069,7 +1103,10 @@ Use Edit tool to set:
                     ✅ MIGRATION ANALYSIS COMPLETE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Project: {name} → Puppet Master ({mode})
+Project: {name} → Puppet Master
+
+  Type:   {Website / App}
+  Admin:  {Enabled / Disabled}
 
 MAPPING SUMMARY
 ─────────────────────────────────────────────────────────────────────────────
@@ -1101,7 +1138,9 @@ Plan saved to: .claude-data/migration-plan.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Project: {name}
-Mode:    {mode}
+
+  Type:   {Website / App}
+  Admin:  {Enabled / Disabled}
 
 CAPABILITY SUMMARY
 ─────────────────────────────────────────────────────────────────────────────

@@ -54,6 +54,8 @@ export {
   filterSectionsByRole
 } from './config'
 export type {
+  PmMode,
+  ProjectType,
   EntitiesConfig,
   AdminModuleConfig,
   SystemModulesConfig,

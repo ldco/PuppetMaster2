@@ -41,16 +41,10 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { canManageRoles } = useAuth()
 
 useHead({
   title: () => `${t('admin.navRoles')} | Admin`
 })
-
-// Redirect if no permission
-if (!canManageRoles.value) {
-  navigateTo('/admin')
-}
 
 const { confirm } = useConfirm()
 const { toast } = useToast()

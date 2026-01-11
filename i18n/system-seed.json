@@ -879,4 +879,13 @@
 {"locale":"he","key":"admin.navClients","value":"לקוחות"},
 {"locale":"en","key":"admin.navFeatures","value":"Features"},
 {"locale":"ru","key":"admin.navFeatures","value":"Возможности"},
-{"locale":"he","key":"admin.navFeatures","value":"תכונות"}]
+{"locale":"he","key":"admin.navFeatures","value":"תכונות"},
+{"locale":"en","key":"admin.missingTranslations","value":"Missing translations"},
+{"locale":"ru","key":"admin.missingTranslations","value":"Отсутствуют переводы"},
+{"locale":"he","key":"admin.missingTranslations","value":"חסרים תרגומים"},
+{"locale":"en","key":"admin.draft","value":"Draft"},
+{"locale":"ru","key":"admin.draft","value":"Черновик"},
+{"locale":"he","key":"admin.draft","value":"טיוטה"},
+{"locale":"en","key":"admin.noImage","value":"No image"},
+{"locale":"ru","key":"admin.noImage","value":"Нет изображения"},
+{"locale":"he","key":"admin.noImage","value":"אין תמונה"}]

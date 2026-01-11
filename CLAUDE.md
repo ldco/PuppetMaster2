@@ -34,38 +34,48 @@ Project-specific commands in `.claude/commands/`:
 
 | Command | Purpose |
 |---------|---------|
-| `/pm-init` | Guided setup wizard — asks about mode, features, modules, locales |
-| `/pm-migrate` | Import existing project — analyzes, maps, creates migration plan |
-| `/pm-status` | Show current config — mode, modules, features, database state |
-| `/pm-start` | Initialize database + start dev server |
+| `/pm-init` | Main entry point — starts wizard if unconfigured, shows options if configured |
+| `/pm-dev` | Start/restart dev server (kills existing first) |
+| `/pm-status` | Show current config — pmMode, modules, features, database state |
 | `/pm-contribute` | Export fix/feature as contribution doc (for client projects) |
 | `/pm-apply` | Apply contribution doc to PM framework |
+
+**Deprecated:** `/pm-migrate` (merged into wizard), `/pm-start` (replaced by `/pm-dev`)
 
 ### Workflows
 
 **Greenfield (New Project):**
 ```
 git clone puppet-master my-project
-cd my-project
-/init                    # General Claude setup
-# Edit ./import/PROJECT.md with requirements
-/pm-migrate              # Analyze requirements + plan
-# /pm-start offered automatically
+cd my-project/app
+npm install
+/pm-init                 # Starts wizard at /setup
+# Complete wizard in browser
+# Project is configured!
 ```
 
 **Brownfield (Import Existing):**
 ```
 git clone puppet-master my-project
-cd my-project
+cd my-project/app
 cp -r ~/old-project/* ./import/
-/init                    # General Claude setup
-/pm-migrate              # Analyze + map + plan
-# /pm-start offered automatically
+npm install
+/pm-init                 # Starts wizard
+# In wizard: "Do you have existing code?" → Yes
+# Wizard analyzes import folder
+# Complete wizard in browser
 ```
 
-**Quick Start (defaults):**
+**Quick Start:**
 ```
-/init → /pm-init → /pm-start
+/pm-init                 # Opens wizard → configure → done
+```
+
+**Daily Development:**
+```
+/pm-dev                  # Start dev server
+/pm-status               # Check configuration
+/pm-init --reset         # Reset to reconfigure
 ```
 
 **Contributing Back to PM** (from client project):
@@ -78,19 +88,15 @@ cp .pm-contribution.md ~/puppet-master/
 /pm-apply                # Reads and implements the contribution
 ```
 
-### Migration System
+### pmMode Configuration
 
-`/pm-migrate` decomposes projects into 7 domains and maps EVERY item:
+The `pmMode` field in `puppet-master.config.ts` controls project state:
 
-1. **FRONTEND** — Pages, Components, Layouts, Composables
-2. **BACKEND** — API routes, Middleware, Server utilities
-3. **DATABASE** — Schema, Models, Migrations, Seed data
-4. **STYLES** — Colors, Typography, Spacing, Component styles
-5. **AUTH** — Users, Sessions, Roles, Protected routes
-6. **I18N** — Locales, Translations, RTL support
-7. **ASSETS** — Images, Fonts, Icons, Documents
-
-Each item gets an action: `PM_EXISTS`, `PM_NATIVE`, `CREATE`, `REWRITE`, `PROXY`, `KEEP`, `COPY`, `CONVERT`, `MERGE`, `SKIP`
+| Value | Description |
+|-------|-------------|
+| `'unconfigured'` | Fresh clone, needs setup → wizard shown |
+| `'build'` | Client project (website or app) |
+| `'develop'` | Framework development (showcase) |
 
 ## Patterns
 

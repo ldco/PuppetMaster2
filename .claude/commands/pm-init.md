@@ -1,573 +1,275 @@
 # /pm-init — Initialize Puppet Master Project
 
-**ACTION REQUIRED: Execute all steps below. Do NOT just describe — actually run commands, read files, and update configurations.**
+**ACTION REQUIRED: Execute all steps below. Do NOT just describe — actually run commands and guide the user.**
 
-Guided setup wizard for new Puppet Master projects. Analyzes requirements or asks questions to configure `puppet-master.config.ts`.
+Main entry point for Puppet Master projects. Detects current state and routes to appropriate action.
 
 ## Usage
 
 ```
-/pm-init                # Smart setup (detects PROJECT.md or asks questions)
-/pm-init --minimal      # Quick setup with defaults
-/pm-init --reset        # Reset config to defaults
+/pm-init              # Smart routing based on current state
+/pm-init --reset      # Reset config to unconfigured state
+```
+
+---
+
+## How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           /pm-init Flow                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   Read puppet-master.config.ts                                               │
+│              │                                                               │
+│              ▼                                                               │
+│   ┌──────────────────────┐                                                   │
+│   │  pmMode value?       │                                                   │
+│   └──────────────────────┘                                                   │
+│          │       │       │                                                   │
+│    unconfigured  │     build/develop                                         │
+│          │       │       │                                                   │
+│          ▼       │       ▼                                                   │
+│    Start dev     │    Show status                                            │
+│    + open wizard │    + ask what to do                                       │
+│                  │                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## EXECUTE These Steps
 
-### Step 0: Check Import Folder State
+### Step 1: Check Current Configuration
 
-**First, check what's in the `./import/` folder:**
+Read the config file to determine current state:
 
 ```
-Glob: import/**/*
+Read: app/puppet-master.config.ts
 ```
 
-**Determine the state:**
-
-1. **Has code files** (package.json, src/, pages/, components/, etc.):
-   ```
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         📦 CODE DETECTED IN IMPORT FOLDER
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-   You have existing code in ./import/. This looks like a Brownfield migration.
-
-   Run /pm-migrate instead to:
-     • Decompose the existing project
-     • Map to PM capabilities
-     • Create a migration plan
-
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ```
-   **Stop here — user should run `/pm-migrate`.**
-
-2. **Has code AND PROJECT.md filled**:
-   ```
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ⚠️  CONFLICTING STATE
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-   The import folder contains BOTH code and a PROJECT.md specification.
-   Please choose one approach:
-
-   OPTION A: Migrate existing code (Brownfield)
-   ────────────────────────────────────────────
-   Remove or rename PROJECT.md, then run /pm-migrate
-
-   OPTION B: Build new project from spec (Greenfield)
-   ──────────────────────────────────────────────────
-   Remove the code files, keep PROJECT.md, then run /pm-init again
-
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ```
-   **Stop here — user needs to resolve the conflict.**
-
-3. **Has PROJECT.md with content** (sections filled out):
-   → **GREENFIELD WITH ANALYSIS** — Skip to Step 0G
-
-4. **Has empty PROJECT.md or nothing** (just template/gitkeep):
-   → **GREENFIELD WITH WIZARD** — Continue to Step 1
+Look for the `pmMode` field:
+- `'unconfigured'` → Project needs setup (Step 2)
+- `'build'` → Already configured for client project (Step 3)
+- `'develop'` → Already configured for framework development (Step 3)
 
 ---
 
-## Step 0G: Greenfield with PROJECT.md Analysis
+### Step 2: If Unconfigured — Start Wizard
 
-**If PROJECT.md exists and is filled out, analyze requirements instead of asking questions.**
-
-### 0G.1 Read and Parse PROJECT.md
-
-Read `import/PROJECT.md` completely. Extract:
-
-- Project name and description
-- Target users
-- Application type (app-only, website-app, website-admin, website-only)
-- Pages/sections needed (checked items)
-- Features requested (checked items)
-- Content modules needed (checked items)
-- Design preferences (colors, typography, style)
-- Data requirements
-- External integrations
-- Technical requirements
-- Special requirements
-
-### 0G.2 Display Requirements Summary
+Display welcome message:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    🌱 GREENFIELD PROJECT ANALYSIS
+                         🎭 PUPPET MASTER SETUP
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Project: {name}
-Client:  {client}
-Type:    {mode}
+Welcome! This project needs to be configured.
 
-REQUIREMENTS DETECTED
-─────────────────────────────────────────────────────────────────────────────
-  Pages/Sections: {list}
-  Features:       {list}
-  Modules:        {list}
-  Languages:      {list or "English only"}
-  Integrations:   {list or "None"}
+I'll start the development server and open the setup wizard in your browser.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### 0G.3 Map Requirements to PM Capabilities
+#### 2.1 Install Dependencies
 
-Create a mapping table showing what PM provides vs what needs to be built:
-
-```
-CAPABILITY MAPPING
-─────────────────────────────────────────────────────────────────────────────
-| Requirement          | PM Status     | Action       | Notes              |
-|─────────────────────|───────────────|──────────────|────────────────────|
-| Hero section        | PM_EXISTS     | Configure    | SectionHero        |
-| About page          | PM_EXISTS     | Configure    | SectionAbout       |
-| Blog                | PM_EXISTS     | Enable       | Blog module        |
-| Custom booking      | NOT_IN_PM     | CREATE       | New feature        |
-| Stripe payments     | NOT_IN_PM     | INTEGRATE    | Add library        |
-| Dark mode           | PM_EXISTS     | Enable       | Built-in           |
-| German language     | PM_EXISTS     | Configure    | Add locale         |
-...
-```
-
-**Status values:**
-- `PM_EXISTS` — PM has this, just configure/enable
-- `PM_NATIVE` — Use PM's showcase implementation
-- `NOT_IN_PM` — Needs to be built or integrated
-- `PARTIAL` — PM has basics, needs extension
-
-**Action values:**
-- `Configure` — Just update config
-- `Enable` — Turn on existing module
-- `CREATE` — Build new component/feature
-- `INTEGRATE` — Add external library/service
-- `EXTEND` — Extend existing PM feature
-
-### 0G.4 Identify Gaps and Suggest Solutions
-
-For each `NOT_IN_PM` or `PARTIAL` item, suggest:
-
-```
-IMPLEMENTATION PLAN
-─────────────────────────────────────────────────────────────────────────────
-
-1. CUSTOM BOOKING SYSTEM (CREATE)
-   Approach: Create new module with calendar component
-   Effort: Medium
-   Libraries: @fullcalendar/vue3 or build custom
-   Files to create:
-   - app/components/organisms/BookingCalendar.vue
-   - server/api/bookings/[...].ts
-   - server/database/schema additions
-
-2. STRIPE PAYMENTS (INTEGRATE)
-   Approach: Add Stripe SDK, create checkout flow
-   Effort: Medium
-   Libraries: @stripe/stripe-js, stripe (server)
-   Files to create:
-   - server/api/payments/create-session.ts
-   - app/components/molecules/PaymentButton.vue
-...
-```
-
-### 0G.5 Ask Clarifying Questions
-
-Use AskUserQuestion for any unclear requirements:
-
-```
-I have some questions about your project:
-
-1. For the booking system, do you need:
-   ○ Simple date picker (select available dates)
-   ○ Full calendar with time slots
-   ○ Integration with external calendar (Google, etc.)
-
-2. For payments, which provider?
-   ○ Stripe (Recommended)
-   ○ PayPal
-   ○ Both
-   ○ Other
-```
-
-### 0G.6 Generate Implementation Plan
-
-Create `.claude-data/implementation-plan.md` with:
-
-```markdown
-# Implementation Plan: {Project Name}
-
-## Overview
-- Type: {mode}
-- Generated: {date}
-
-## Phase 1: Configuration
-1. Set application mode to {mode}
-2. Enable features: {list}
-3. Enable modules: {list}
-4. Configure languages: {list}
-5. Set color palette
-
-## Phase 2: PM Native Setup
-{List of sections/pages that just need configuration}
-
-## Phase 3: Custom Development
-{List of features to build, with detailed steps}
-
-## Phase 4: Integrations
-{External services to connect}
-
-## Phase 5: Content & Launch
-{Data seeding, testing, deployment}
-
-## Checklist
-- [ ] Phase 1 complete
-- [ ] Phase 2 complete
-...
-```
-
-### 0G.7 Update Configuration
-
-Based on analysis, update `puppet-master.config.ts`:
-- Set mode
-- Enable detected features
-- Enable detected modules
-- Set locales if multilingual
-- Set color tokens if provided
-
-**Skip to Step 7 (Summary).**
-
----
-
-## Step 0W: Check Current Config State
-
-**For wizard mode, check existing config:**
-
-Read current config to understand existing setup:
+First, check if dependencies are installed:
 
 ```bash
-cat app/puppet-master.config.ts 2>/dev/null | head -50
+ls node_modules/.bin/nuxt 2>/dev/null
 ```
 
-If config exists and has customizations, warn:
+If `node_modules/.bin/nuxt` does NOT exist, run:
+
 ```
-⚠️  Existing configuration detected.
-    Running /pm-init will modify your puppet-master.config.ts
-
-    Current mode: {detected_mode}
-    Modules enabled: {count}
-
-    Continue? [y/N]
+📦 Installing dependencies...
 ```
 
----
+```bash
+npm install
+```
 
-## Step 1: Project Entities
+Wait for install to complete before proceeding.
 
-**First, understand WHAT the project needs (entities), then derive the mode.**
+#### 2.2 Check for Running Server
 
-Display architecture overview:
+```bash
+lsof -i :3000 2>/dev/null | grep LISTEN
+```
+
+If server already running, kill it:
+```bash
+pkill -f "nuxt" || true
+sleep 1
+```
+
+#### 2.3 Start Development Server
+
+```bash
+npm run dev &
+```
+
+Wait for server to be ready:
+```bash
+sleep 5
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/setup
+```
+
+#### 2.4 Display Wizard Instructions
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         PUPPET MASTER SETUP
+                         🌐 WIZARD READY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Step 1/6: Project Entities
+  Open in browser:  http://localhost:3000/setup
 
-PM projects can have THREE entities:
+  The wizard will guide you through:
+    1. Mode Selection — BUILD (client project) or DEVELOP (framework)
+    2. Project Type — Website or App (if BUILD mode)
+    3. Import Check — Do you have existing code?
+    4. Features — Select modules (blog, portfolio, team, etc.)
+    5. Design — Colors, fonts, icon library
+    6. Review — Summary and generate
 
-  WEBSITE    Public pages (marketing, landing, info)
-             → Visitors see this without logging in
+  After completion, your puppet-master.config.ts will be updated
+  and you'll be redirected to your configured site.
 
-  APP        User features (dashboard, tracker, tools)
-             → Users log in to access their features
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  ADMIN      Content management layer
-             → Editors/admins manage website and/or app content
+  Commands while wizard is running:
+    /pm-status    Check current configuration
+    /pm-dev       Restart dev server
+    /closedev     Stop dev server
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Ask about each entity:**
-
-Use AskUserQuestion with multiSelect: true:
-- **Public Website** — Marketing pages, landing page, about, contact
-- **User Application** — Features users log in to use (dashboard, tracker, etc.)
-- **Content Management** — Admin panel to manage content (Recommended)
-
-**Derive mode from selection:**
-
-| Selection | Mode |
-|-----------|------|
-| App only | `app-only` |
-| Website + App | `website-app` |
-| Website + Admin | `website-admin` |
-| Website only | `website-only` |
-| Website + App + Admin | `website-app` (admin at /admin/*) |
-| App + Admin | `app-only` (admin sections integrated) |
-
-**If Website + App selected, ask follow-up:**
-
-```
-You have both a public website AND a user application.
-
-How should the login button appear?
-
-  1. Visible — Login button in website header
-     → Users see and click to access app
-
-  2. Hidden — No login button, users access /login directly
-     → For apps where users already know the URL
-```
-
-Store selection for config generation.
+**Stop here — user completes wizard in browser.**
 
 ---
 
-### Step 2: Features
+### Step 3: If Already Configured — Show Status and Options
 
-Based on mode, ask about features:
-
-```
-Step 2/7: Features
-
-Enable features for your project:
-
-  ☐ Multilingual (i18n)
-    Multiple language support with database-driven translations
-
-  ☐ Dark Mode
-    Light/dark theme toggle with system preference detection
-
-  ☐ PWA
-    Progressive Web App with offline support
-
-  ☐ Contact Notifications
-    Email and/or Telegram notifications for contact form
-```
-
-Use AskUserQuestion with multiSelect: true for:
-- Multilingual (i18n)
-- Dark Mode
-- PWA
-- Contact Notifications (email/Telegram)
-
----
-
-### Step 3: Content Modules
-
-Ask which content modules to enable:
+If `pmMode` is `'build'` or `'develop'`, display current status:
 
 ```
-Step 3/7: Content Modules
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         📊 PROJECT ALREADY CONFIGURED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Which content sections do you need?
+  Mode:        {BUILD | DEVELOP}
+  Type:        {Website | App}
+  Admin:       {Enabled | Disabled}
+  Features:    {count} enabled
+  Modules:     {list}
 
-  ☐ Portfolio / Gallery
-    Project showcase with images, videos, case studies
-
-  ☐ Blog
-    Articles with categories, tags, markdown support
-
-  ☐ Team
-    Team member profiles with photos and social links
-
-  ☐ Pricing
-    Pricing tiers with feature comparison
-
-  ☐ Testimonials
-    Customer reviews with ratings
-
-  ☐ FAQ
-    Frequently asked questions (accordion style)
-
-  ☐ Clients / Partners
-    Logo showcase for clients, sponsors, partners
-
-  ☐ Features
-    Feature cards highlighting capabilities
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Use AskUserQuestion with multiSelect: true.
-
----
-
-### Step 4: Locales (if multilingual enabled)
-
-If user selected multilingual in Step 2:
-
-```
-Step 4/7: Languages
-
-Which languages do you need?
-
-  ☐ English (en)
-  ☐ Russian (ru)
-  ☐ Hebrew (he) — RTL supported
-  ☐ Spanish (es)
-  ☐ French (fr)
-  ☐ German (de)
-  ☐ Arabic (ar) — RTL supported
-  ☐ Chinese (zh)
-
-  Default language: [en]
-```
-
-Use AskUserQuestion with multiSelect: true.
-Ask follow-up for default locale.
-
-If multilingual NOT enabled, skip to Step 5.
-
----
-
-### Step 5: App UX Preferences (if App or Admin enabled)
-
-**Only ask if user selected User Application or Content Management.**
-
-```
-Step 5/7: App UX Preferences
-
-How should the authenticated area look?
-
-PM has TWO UX paradigms:
-- Website UX: Horizontal header, page-based (for public pages)
-- App UX: Sidebar/bottom nav, feature-based (for logged-in users)
-
-For your APP features, which visual style?
-
-  1. Sidebar (Recommended for many features)
-     Desktop: Vertical sidebar | Mobile: Bottom navigation
-     → Best for 3+ features, admin panels
-
-  2. Minimal Header
-     Horizontal header with minimal nav
-     → Best for single-feature apps, simple dashboards
-
-  3. Full Header
-     Horizontal header with dropdown menus
-     → Best for apps with grouped features
-```
+Ask what the user wants to do:
 
 Use AskUserQuestion with options:
-- Sidebar — Vertical sidebar (desktop) + bottom nav (mobile)
-- Minimal Header — Simple horizontal header
-- Full Header — Horizontal with dropdowns
+- **Start dev server** — Run `npm run dev` (Recommended)
+- **Reconfigure** — Open wizard at /setup
+- **View full status** — Run /pm-status
+- **Reset to unconfigured** — Clear config and start over
 
-**Important clarification:**
-```
-NOTE: Both regular users AND admins use App UX.
-The layout defines WHERE navigation goes.
-User ROLE defines WHAT navigation shows.
-
-Example with Sidebar layout:
-- Regular user sees: Dashboard, Settings
-- Admin sees: Dashboard, Settings, Content, Users
-```
-
-Store selection for layout configuration.
+**Handle selection:**
+- Start dev server → Run `/pm-dev` steps
+- Reconfigure → Start server and direct to `/setup`
+- View full status → Run `/pm-status` steps
+- Reset → Confirm, then set `pmMode: 'unconfigured'` and re-run `/pm-init`
 
 ---
 
-### Step 6: Data Source
+## The --reset Flag
 
-Ask about data source strategy:
+Resets the project to unconfigured state:
 
 ```
-Step 6/7: Data Source
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         ⚠️  RESET CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Where will your content come from?
+This will reset puppet-master.config.ts to unconfigured state.
 
-  1. database (Recommended)
-     SQLite with Drizzle ORM — zero config, everything local
+Your database and content will NOT be affected.
 
-  2. api
-     External REST API — for existing backend integration
-
-  3. hybrid
-     Mix of both — auth local, content from API
+Continue? [y/N]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Use AskUserQuestion with options.
+If confirmed:
+1. Edit `puppet-master.config.ts` to set `pmMode: 'unconfigured'`
+2. Re-run `/pm-init` flow
 
 ---
 
-### Step 7: Generate Configuration
+## Wizard Steps (What Happens in Browser)
 
-Based on collected answers, update `puppet-master.config.ts`:
+The browser wizard at `/setup` handles:
 
-**Read current config:**
-```typescript
-// Read app/puppet-master.config.ts
-```
+### Step 1: Mode Selection
+- **BUILD** — Creating a client project (website or app)
+- **DEVELOP** — Working on the PM framework itself
 
-**Update these sections:**
+### Step 2: Project Type (if BUILD)
+- **Website** — Marketing site, landing pages
+- **App** — Dashboard, user features
 
-1. `mode` — Set to selected mode
-2. `features` — Enable selected features
-3. `modules` — Enable selected modules with `enabled: true`
-4. `locales` — Set locale array and default
-5. `dataSource.provider` — Set data source
+### Step 3: Import Check (Brownfield Detection)
+- **Fresh start** — No existing code
+- **Import existing** — Analyze `./import/` folder
 
-**Use Edit tool** to update the config file with user selections.
+If importing, the wizard:
+- Scans the import folder
+- Shows found files (components, pages, API routes)
+- Creates a migration plan
+- Applies configuration based on detected features
 
----
+### Step 4: Feature Selection
+Multi-select checkboxes for:
+- Blog, Portfolio, Team, Testimonials, FAQ
+- Pricing, Clients, Features, Contact
+- Multilingual, Dark Mode, PWA
 
-### Step 7: Summary & Next Steps
+### Step 5: Design
+- Primary brand color
+- Accent color
+- Font selections
+- Icon library
 
-Display summary:
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                      ✅ PUPPET MASTER CONFIGURED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Configuration saved to puppet-master.config.ts
-
-  Mode:       {mode}
-  Features:   {feature_list}
-  Modules:    {module_list}
-  Languages:  {locale_list}
-  Data:       {data_source}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Next steps:
-  /pm start     Initialize database and start dev server
-  /pm status    Review current configuration
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-Ask if user wants to run `/pm start` now.
+### Step 6: Review & Generate
+- Summary of all selections
+- Generate button updates config
+- Database migrations run
+- Redirect to configured site
 
 ---
 
-## Flags
+## After Wizard Completes
 
-### --minimal
+Once the wizard finishes:
 
-Skip questions, use smart defaults:
-- Mode: `website-admin`
-- Features: multilingual, darkMode
-- Modules: portfolio, blog, contact
-- Locales: en (default)
-- Data: database
+1. `puppet-master.config.ts` is updated with:
+   - `pmMode: 'build'` or `'develop'`
+   - All feature/module selections
+   - Design tokens
 
-Just confirm and apply.
+2. Database is initialized:
+   - Schema applied (`db:push`)
+   - Sample data seeded (`db:seed`)
 
-### --reset
-
-Reset `puppet-master.config.ts` to factory defaults.
-Confirm before proceeding.
+3. User is redirected to:
+   - BUILD mode → Site homepage or `/admin`
+   - DEVELOP mode → Showcase site
 
 ---
 
 ## Notes
 
-- Always read existing config before modifying
-- Use Edit tool for surgical updates, not full file rewrites
-- Validate module dependencies (e.g., blog needs categories)
-- After config changes, remind user to run `/pm start`
+- The wizard is the PRIMARY setup method
+- `/pm-init` just routes to the wizard
+- Wizard handles both greenfield AND brownfield in same flow
+- After setup, use `/pm-dev` to start server, `/pm-status` to check config

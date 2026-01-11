@@ -1,4 +1,19 @@
-# /pm start — Start Puppet Master Development Environment
+# /pm-start — DEPRECATED
+
+> **⚠️ DEPRECATED:** This command has been replaced by `/pm-dev`.
+>
+> Use `/pm-dev` for running the development server:
+> - `/pm-dev` — Start dev server (kills existing first)
+> - `/pm-dev --fresh` — Reset database + seed + start
+> - `/pm-dev --setup` — Start and open /setup route
+>
+> For initial project setup, use `/pm-init` which handles the wizard.
+>
+> For the historical documentation of the standalone start command, see below.
+
+---
+
+# (Historical) /pm start — Start Puppet Master Development Environment
 
 **ACTION REQUIRED: Execute database setup and start dev server.**
 

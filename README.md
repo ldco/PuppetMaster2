@@ -107,17 +107,53 @@ Perfect for:
 # Clone and install
 git clone <repository-url>
 cd puppet-master/app
-pnpm install
+npm install
 
-# Initialize database
-pnpm db:push    # Apply schema
-pnpm db:seed    # Seed initial data
-
-# Start development
-pnpm dev
+# Start development (opens setup wizard)
+npm run dev
 ```
 
-Open `http://localhost:3000`
+On first run, you'll be redirected to the **Setup Wizard** at `/setup`.
+
+### Setup Wizard
+
+On first run, choose your mode:
+- **DEVELOP** — One-click start with all features (for framework work)
+- **BUILD** — Opens configuration wizard (for client projects)
+
+**BUILD Wizard Steps:**
+1. **Project Type** - Website or App
+2. **Import Detection** - Fresh start or import existing code
+3. **Features** - Select modules, languages, theme options
+4. **Review** - Confirm and apply configuration
+
+After completing the wizard:
+
+```bash
+npm run db:push    # Apply database schema
+npm run db:seed    # Seed sample data
+```
+
+### Two Modes
+
+| Mode | Purpose |
+|------|---------|
+| **BUILD** | Creating client projects - select only needed features |
+| **DEVELOP** | Working on PM framework - all features enabled |
+
+### Greenfield vs Brownfield
+
+- **Greenfield** (Fresh Start): Start with default configurations
+- **Brownfield** (Import Existing): Place files in `./import/` folder before setup, then run `/pm-migrate` in Claude Code
+
+### Alternative Setup Methods
+
+```bash
+npm run setup:cli       # Interactive terminal wizard
+npm run setup:headless  # Non-interactive (CI/CD)
+```
+
+See [docs/SETUP-WORKFLOWS.md](docs/SETUP-WORKFLOWS.md) for detailed workflows.
 
 ### Default Accounts
 
@@ -137,8 +173,14 @@ All build-time configuration is in `app/puppet-master.config.ts`:
 
 ```typescript
 export default {
-  // Application mode
-  mode: 'website-admin', // 'app-only' | 'website-app' | 'website-admin' | 'website-only'
+  // Project mode (set by setup wizard)
+  pmMode: 'build', // 'unconfigured' | 'build' | 'develop'
+
+  // Entity type
+  entities: {
+    website: true,   // Website mode (public-facing)
+    app: false,      // App mode (login required)
+  },
 
   // Feature toggles
   features: {

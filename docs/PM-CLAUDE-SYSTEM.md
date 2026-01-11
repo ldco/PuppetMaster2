@@ -4,7 +4,7 @@ This document describes the Claude AI integration for Puppet Master — a config
 
 ## Overview
 
-Puppet Master includes a set of Claude commands (`/pm-*`) that guide developers through project setup and migration. These commands are NOT automated scripts — Claude itself performs the analysis, asks questions, and creates files by following detailed instructions.
+Puppet Master includes a set of Claude commands (`/pm-*`) that guide developers through project setup. These commands work with a browser-based wizard to configure projects.
 
 ## The Puppet Master Architect Role
 
@@ -13,414 +13,255 @@ When working on PM projects, Claude acts as **Puppet Master Architect** — a sp
 1. **Understands PM deeply** — knows the config system, modules, atomic design, CSS layers
 2. **Guides workflows** — Greenfield (new projects) and Brownfield (imports)
 3. **Uses expert personas** — via `/as` command (nuxt, vue, node, security, ux, devops)
-4. **Executes PM commands** — `/pm-init`, `/pm-migrate`, `/pm-status`, `/pm-start`
+4. **Executes PM commands** — `/pm-init`, `/pm-dev`, `/pm-status`
 
 ## Commands
 
 All PM commands are defined in `.claude/commands/` and ship with the framework.
 
-### `/pm-init` — Smart Project Setup
+### Active Commands
 
-**Purpose**: Smart entry point for new Puppet Master projects. Checks import folder and routes accordingly.
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/pm-init` | Main entry point | First-time setup, reconfiguration |
+| `/pm-dev` | Run dev server | Starting/restarting development |
+| `/pm-status` | Show configuration | Check current state |
+| `/pm-contribute` | Export contribution | After fixing/adding PM feature in client project |
+| `/pm-apply` | Apply contribution | In PM repo, to apply contributed fix/feature |
 
-**Import Folder Detection**:
-1. **Code files found** → Tells user to run `/pm-migrate` instead
-2. **PROJECT.md filled** → Analyzes spec, maps to PM capabilities, creates plan
-3. **Empty/nothing** → Runs interactive wizard
-4. **Both code + PROJECT.md** → Shows conflict error
+### Deprecated Commands
 
-**Wizard Steps** (when no PROJECT.md):
-1. Check current config state
-2. Ask: Application mode (app-only, website-app, website-admin, website-only)
-3. Ask: Features (multilingual, darkMode, PWA, contact notifications)
-4. Ask: Content modules (portfolio, blog, team, pricing, testimonials, FAQ, clients, features)
-5. Ask: Languages (if multilingual enabled)
-6. Ask: Data source (database, api, hybrid)
-7. Update `puppet-master.config.ts`
-8. Offer to run `/pm-start`
+| Command | Replacement | Notes |
+|---------|-------------|-------|
+| `/pm-migrate` | `/pm-init` | Brownfield detection now in wizard |
+| `/pm-start` | `/pm-dev` | Simplified to just run dev server |
 
-**Analysis Steps** (when PROJECT.md filled):
-1. Parse PROJECT.md requirements
-2. Map to PM capabilities (PM_EXISTS, PM_NATIVE, NOT_IN_PM, PARTIAL)
-3. Identify gaps and suggest solutions
-4. Ask clarifying questions
-5. Generate implementation plan (`.claude-data/implementation-plan.md`)
-6. Update configuration
-7. Offer to run `/pm-start`
+---
 
-**Flags**:
-- `--minimal` — Use smart defaults, skip questions
-- `--reset` — Reset config to factory defaults
+## `/pm-init` — Main Entry Point
 
-### `/pm-migrate` — Brownfield Import
+**Purpose**: Smart entry point that routes based on current project state.
 
-**Purpose**: Import and migrate existing **code** into Puppet Master. For new projects, use `/pm-init`.
+**Behavior based on `pmMode` config value:**
 
-**Prerequisites**: Copy existing project code to `./import/` folder.
+| pmMode | Action |
+|--------|--------|
+| `'unconfigured'` | Start dev server, open wizard at `/setup` |
+| `'build'` | Show status, ask what user wants to do |
+| `'develop'` | Show status, ask what user wants to do |
 
-**Routing**:
-- No code found → Redirects to `/pm-init`
-- Only PROJECT.md (no code) → Redirects to `/pm-init`
-- Code exists → Proceeds with migration
+**Flags:**
+- `--reset` — Reset config to unconfigured state
 
-**Steps**:
-1. Verify `./import/` has code (package.json, src/, etc.)
-2. Deep analysis — decompose entire project into 7 domains
-3. Create mapping tables for all domains
-4. Ask strategy questions
-5. Generate migration plan (`.claude-data/migration-plan.md`)
-6. Update configuration
-7. Copy assets
-8. Summary and next steps
+---
 
-**Flags**:
-- `--analyze` — Analysis + mapping only, no changes
-- `--resume` — Continue from saved state
+## `/pm-dev` — Run Development Server
 
-### `/pm-status` — Configuration Overview
+**Purpose**: Simple command to start the dev server. Kills any existing server first.
+
+**Steps:**
+1. Kill existing server on :3000
+2. Install dependencies if needed
+3. Start `npm run dev`
+4. Display URLs
+
+**Flags:**
+- `--fresh` — Reset database, seed, then start
+- `--setup` — Start and indicate to open `/setup`
+
+---
+
+## `/pm-status` — Configuration Overview
 
 **Purpose**: Display current Puppet Master configuration state.
 
-**Shows**:
-- Mode (app-only, website-app, etc.)
-- Data source (database, api, hybrid)
-- Dev server status
-- Enabled features
-- Enabled modules
-- Sections (navigation order)
+**Shows:**
+- Mode (unconfigured, build, develop)
+- Project type (website, app)
+- Admin enabled/disabled
+- Features and modules
 - Database status
-- Migration status (if in progress)
+- Dev server status
 
-**Flags**:
+**Flags:**
 - `--config` — Show raw config values
 - `--modules` — Show module details only
 - `--db` — Show database details
 
-### `/pm-start` — Initialize & Start
+---
 
-**Purpose**: Set up database and start development server.
+## The Two-Mode System
 
-**Steps**:
-1. Check node_modules (install if needed)
-2. Check configuration exists
-3. Check for running server
-4. Run database migrations (`db:push`)
-5. Seed data (unless `--no-seed`)
-6. Start dev server (background)
-7. Verify server is running
-8. Display URLs and credentials
+PM uses a `pmMode` configuration value to determine behavior:
 
-**Flags**:
-- `--fresh` — Reset database completely, then start
-- `--no-seed` — Skip seeding (empty database)
-- `--build` — Build for production instead of dev
+### `pmMode: 'unconfigured'`
 
-## Migration System
+Fresh clone state. Running `/pm-init` starts the wizard.
 
-The `/pm-migrate` command implements a comprehensive project decomposition and mapping system.
+### `pmMode: 'build'`
 
-### Project Decomposition
+Client project mode. The wizard configured this as a client project (website or app).
 
-Every imported project is broken into 7 domains:
+### `pmMode: 'develop'`
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        PROJECT DECOMPOSITION                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  1. FRONTEND      Pages, Components, Layouts, Composables/Hooks             │
-│  2. BACKEND       API routes, Server logic, Middleware, Utilities           │
-│  3. DATABASE      Schema, Models, Migrations, Seed data                     │
-│  4. STYLES        Colors, Typography, Spacing, Component styles             │
-│  5. AUTH          Users, Sessions, Roles, Protected routes, Providers       │
-│  6. I18N          Locales, Translations, RTL, Date/Number formats           │
-│  7. ASSETS        Images, Fonts, Icons, Documents, Other files              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+Framework development mode. The wizard configured this to show the PM showcase.
 
-### Mapping Actions
+---
 
-For EVERY item in each domain, Claude determines an action:
+## The Setup Wizard
 
-| Action | Meaning |
-|--------|---------|
-| `PM_EXISTS` | Puppet Master already has this — use PM's version |
-| `PM_NATIVE` | Use PM's native/showcase implementation |
-| `CREATE` | Build new in PM based on import |
-| `REWRITE` | Port logic from import to PM patterns |
-| `PROXY` | Keep external, PM proxies to it |
-| `KEEP` | Keep original system running alongside |
-| `COPY` | Direct copy (assets, static files) |
-| `CONVERT` | Transform format (e.g., Tailwind → PM CSS) |
-| `MERGE` | Combine with existing PM component |
-| `SKIP` | Not needed, PM handles differently |
+The browser wizard at `/setup` is the PRIMARY setup method. It handles:
 
-### Mapping Tables
+### Step 1: Mode Selection
+- **BUILD** — Creating a client project
+- **DEVELOP** — Working on the PM framework
 
-Claude creates comprehensive mapping tables for:
+### Step 2: Project Type (BUILD only)
+- **Website** — Marketing site, landing pages
+- **App** — Dashboard, user features
 
-- **Pages Mapping** — Import route → PM route + action
-- **Components Mapping** — Import component → PM equivalent + atomic level + action
-- **Composables Mapping** — Import hook → PM equivalent + action
-- **API Endpoints Mapping** — Import endpoint → PM endpoint + action
-- **Database Schema Mapping** — Import table → PM table + field mapping
-- **Color Mapping** — Import color → PM token
-- **Typography Mapping** — Import font → PM equivalent
-- **Style Class Mapping** — Tailwind/etc. → PM CSS
-- **Auth Mapping** — Import auth features → PM equivalent
-- **i18n Mapping** — Import locales → PM configuration
-- **Assets Mapping** — Import path → PM path + action
+### Step 3: Import Check (Brownfield Detection)
+- **Fresh start** — No existing code
+- **Import existing** — Analyze `./import/` folder
 
-### Strategy Questions
+### Step 4: Feature Selection
+- Modules: Blog, Portfolio, Team, etc.
+- Features: Multilingual, Dark Mode, PWA
 
-After analysis, Claude asks key decisions:
+### Step 5: Design
+- Colors, fonts, icon library
 
-1. **Overall Goal**: Full PM Native / PM Frontend + Keep Backend / Gradual / PM + Extensions
-2. **Backend**: Use PM Backend / Keep External / Hybrid / Different Backend
-3. **Styles**: Full PM Styles / Keep Original + Add PM / Convert to PM
-4. **Data**: Fresh Start / Migrate Data / Keep External Database
-5. **PM Mode**: website-admin / website-app / app-only / website-only
+### Step 6: Review & Generate
+- Summary and generate config
 
-### Migration Plan
-
-Output is saved to `.claude-data/migration-plan.md` containing:
-
-- Strategy summary
-- Complete mapping tables
-- Phase-by-phase migration steps
-- Validation checklist
-- Reference files list
+---
 
 ## Workflows
 
-### Greenfield (New Project with Spec)
-
-Use this when you want PM to analyze your requirements and create an implementation plan.
+### Greenfield (New Project)
 
 ```bash
-# 1. Clone Puppet Master
-git clone <puppet-master-repo> my-project
-cd my-project
+git clone puppet-master my-project
+cd my-project/app
+npm install
 
-# 2. Start Claude session
-claude
-
-# 3. General Claude setup
-/init
-
-# 4. Edit the project specification
-# Open ./import/PROJECT.md and fill in your requirements
-
-# 5. Analyze requirements and create plan
-/pm-init
-# Claude will:
-#   - Detect PROJECT.md is filled
-#   - Parse requirements
-#   - Map to PM capabilities
-#   - Identify gaps and suggest solutions
-#   - Ask clarifying questions
-#   - Generate implementation plan
-#   - Offer to run /pm-start
-
-# 6. Work through implementation plan
-# Ask Claude: "Help me build the booking feature"
-# Ask Claude: "Set up the Stripe integration"
+# Claude takes over
+/pm-init                   # Starts wizard
+# Complete wizard in browser
+# Project is configured
 ```
 
-### Greenfield (Quick Start)
-
-Use this for simple projects where you just want to configure and go.
+### Brownfield (Import Existing)
 
 ```bash
-git clone <puppet-master-repo> my-project
-cd my-project
-claude
-/init
-/pm-init      # Detects empty import, runs wizard
-/pm-start     # Database + dev server
+git clone puppet-master my-project
+cd my-project/app
+cp -r ~/old-project/* ./import/
+npm install
+
+# Claude takes over
+/pm-init                   # Starts wizard
+# In wizard, select "Yes" for existing code
+# Wizard analyzes import folder
+# Complete wizard in browser
 ```
 
-### Brownfield (Import Existing Code)
+### Quick Start (defaults)
 
 ```bash
-# 1. Clone Puppet Master
-git clone <puppet-master-repo> my-project
-cd my-project
-
-# 2. Copy existing project to import folder
-cp -r ~/existing-project/* ./import/
-
-# 3. Start Claude session
-claude
-
-# 4. General Claude setup
-/init
-
-# 5. Analyze and plan migration
-/pm-migrate
-# Claude will:
-#   - Detect code in import folder
-#   - Decompose into 7 domains
-#   - Create comprehensive mapping tables
-#   - Ask strategy questions
-#   - Generate migration plan
-#   - Offer to run /pm-start
-
-# 6. Work through migration plan
-# Ask Claude: "Help me migrate the Header component"
-# Ask Claude: "Set up the API proxy for /api/posts"
+/pm-init                   # Start wizard
+# Select BUILD → Website → defaults
+# Done in 1 minute
 ```
 
-### The `./import/` Folder
+---
 
-The import folder serves dual purposes:
+## Contributing Back to PM
 
-1. **Greenfield**: Contains `PROJECT.md` — a specification document describing what you want to build
-2. **Brownfield**: Contains actual code from an existing project to migrate
-
-**Command routing based on contents:**
-
-| Import Folder State | `/pm-init` | `/pm-migrate` |
-|---------------------|------------|---------------|
-| Empty/nothing | Runs wizard | Redirects to `/pm-init` |
-| PROJECT.md filled | Analyzes spec, creates plan | Redirects to `/pm-init` |
-| Code files | Redirects to `/pm-migrate` | Runs migration |
-| Code + PROJECT.md | Shows conflict error | — |
-
-### Contributing Back to PM
-
-When working on a client project and you fix a bug or add a feature that should be contributed back to the PM framework:
+When working on a client project and you fix a bug or add a feature:
 
 ```bash
-# In CLIENT PROJECT (after fixing/improving PM base code)
+# In CLIENT PROJECT
 
 # 1. Export the contribution
 /pm-contribute
 
-# 2. Answer questions about the fix/feature
-#    - Type (bugfix, feature, enhancement)
-#    - Priority
-#    - Files changed
-#    - Testing instructions
-
-# 3. Copy generated file to PM framework
+# 2. Copy to PM framework
 cp .pm-contribution.md ~/puppet-master/
 
 # In PM FRAMEWORK REPO
 
-# 4. Apply the contribution
+# 3. Apply the contribution
 /pm-apply
 
-# 5. Review changes, test, then commit
-/commit "feat: description from contribution"
+# 4. Review, test, commit
 ```
 
-### `/pm-contribute` — Export Contribution
+---
 
-**Purpose**: Generate a contribution document from client project fixes/features.
+## Configuration System
 
-**Output**: `.pm-contribution.md` containing:
-- Meta (ID, type, priority, date)
-- Summary and problem description
-- Solution description
-- Domains affected
-- Files changed (with diffs)
-- Dependencies and breaking changes
-- Testing instructions
+### pmMode Values
 
-### `/pm-apply` — Apply Contribution
+| Value | Description |
+|-------|-------------|
+| `'unconfigured'` | Fresh clone, needs setup |
+| `'build'` | Client project (website or app) |
+| `'develop'` | Framework development |
 
-**Purpose**: Read contribution document and implement changes in PM framework.
+### Config File
 
-**Steps**:
-1. Parse contribution file
-2. Display summary for review
-3. Check for conflicts
-4. Apply file changes (modify, create, delete)
-5. Install dependencies if needed
-6. Run lint/build verification
-7. Display testing instructions
-8. Suggest commit command
+Located at `app/puppet-master.config.ts`. Key fields:
 
-**Flags**:
-- `--review` — Review only, don't apply changes
+```typescript
+export default {
+  // Core mode
+  pmMode: 'unconfigured' | 'build' | 'develop',
 
-## Integration with PM Architecture
+  // Project info (BUILD mode)
+  projectName: 'My Project',
+  projectType: 'website' | 'app',
 
-### Application Modes
+  // Admin panel
+  admin: {
+    enabled: true,
+  },
 
-PM supports 4 modes (configured via `/pm-init` or `/pm-migrate`):
+  // Modules
+  modules: {
+    blog: true,
+    portfolio: true,
+    team: false,
+    // ...
+  },
 
-| Mode | Website | Login Button | Admin Access |
-|------|---------|--------------|--------------|
-| `app-only` | No | N/A | / → /login |
-| `website-app` | Yes | Visible | /login route |
-| `website-admin` | Yes | Hidden | /admin (secret) |
-| `website-only` | Yes | None | No admin |
+  // Features
+  features: {
+    multilingual: true,
+    darkMode: true,
+    pwa: false,
+  },
 
-### Content Modules
+  // Design
+  design: {
+    colors: {
+      primary: '#3B82F6',
+      accent: '#10B981',
+    },
+    fonts: {
+      accent: 'Inter',
+      text: 'Inter',
+    },
+    icons: 'tabler',
+  },
 
-PM has 9 built-in modules:
-
-1. **Portfolio** — Project showcase, galleries, case studies
-2. **Blog** — Posts, categories, tags
-3. **Team** — Member profiles
-4. **Pricing** — Tiers, comparison table
-5. **Testimonials** — Customer reviews
-6. **FAQ** — Accordion questions
-7. **Clients** — Logo showcase
-8. **Features** — Feature cards
-9. **Contact** — Forms, notifications
-
-### Component Architecture
-
-PM uses Atomic Design:
-
-```
-app/components/
-├── atoms/          # Button, Input, Icon, Badge
-├── molecules/      # Card, NavItem, FormField
-├── organisms/      # Header, Footer, Sidebar
-├── sections/       # SectionHero, SectionPricing
-└── templates/      # Layouts
+  // Locales
+  locales: ['en'],
+  defaultLocale: 'en',
+}
 ```
 
-### CSS System
-
-PM uses Pure CSS with 5-layer cascade:
-
-```css
-@layer reset, primitives, semantic, components, utilities
-```
-
-- OKLCH color system
-- `light-dark()` function for themes
-- No Tailwind/frameworks
-
-### Data Sources
-
-PM supports 3 data source modes:
-
-1. **database** — SQLite + Drizzle (default)
-2. **api** — External REST API
-3. **hybrid** — Per-resource configuration
-
-## Best Practices
-
-### For Claude Sessions
-
-1. **Always read CLAUDE.md first** — Contains critical rules
-2. **Check .claude-data/context.md** — Session state and history
-3. **Use /pm-* commands** — Don't manually edit config unless necessary
-4. **Follow atomic design** — Place components in correct folders
-5. **Use global CSS** — No scoped styles in components
-
-### For Migrations
-
-1. **Never modify ./import/** — Keep as reference
-2. **Map everything** — No item should be unmapped
-3. **Ask before assuming** — User decides strategy
-4. **PM patterns first** — Prefer PM solutions over porting
-5. **Phase by phase** — Work through migration plan sequentially
+---
 
 ## File Structure
 
@@ -428,21 +269,42 @@ PM supports 3 data source modes:
 .claude/
 ├── config.json              # Project Claude config
 ├── settings.local.json      # User settings (gitignored)
-├── context.md               # Session context
 └── commands/                # PM commands (ship with framework)
-    ├── pm-init.md
-    ├── pm-migrate.md
-    ├── pm-status.md
-    └── pm-start.md
+    ├── pm-init.md           # Main entry point
+    ├── pm-dev.md            # Run dev server
+    ├── pm-status.md         # Show configuration
+    ├── pm-contribute.md     # Export contribution
+    ├── pm-apply.md          # Apply contribution
+    ├── pm-migrate.md        # DEPRECATED
+    └── pm-start.md          # DEPRECATED
 
 .claude-data/
-├── context.md               # Persistent context
-├── migration-plan.md        # Generated migration plan
-└── migration.json           # Migration state (for resume)
+├── context.md               # Session context
+└── migration-plan.md        # Generated during brownfield import
 
 import/                      # Brownfield import folder
-└── .gitkeep                 # Placeholder (git-tracked)
+├── .gitkeep
+└── PROJECT.md               # Optional project spec template
 ```
+
+---
+
+## Best Practices
+
+### For Claude Sessions
+
+1. **Use /pm-init first** — It routes to the right action
+2. **Let the wizard handle setup** — Don't manually edit config
+3. **Follow atomic design** — Place components in correct folders
+4. **Use global CSS** — No scoped styles in components
+
+### For Development
+
+1. **Use /pm-dev** — Simple server start
+2. **Use /pm-status** — Check current state
+3. **Use /pm-init --reset** — When you need to reconfigure
+
+---
 
 ## Troubleshooting
 
@@ -450,14 +312,16 @@ import/                      # Brownfield import folder
 
 Ensure `.claude/commands/` exists and contains the pm-*.md files.
 
-### Migration stuck
-
-Use `/pm-migrate --resume` to continue from saved state.
-
 ### Config issues
 
 Use `/pm-status` to see current config, or check `puppet-master.config.ts` directly.
 
 ### Database issues
 
-Use `/pm-start --fresh` to reset database completely.
+Use `/pm-dev --fresh` to reset database completely.
+
+### Wizard not loading
+
+1. Check that pmMode is 'unconfigured' in config
+2. Ensure dev server is running
+3. Navigate to http://localhost:3000/setup

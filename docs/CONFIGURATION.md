@@ -16,30 +16,65 @@ Complete reference for all Puppet Master configuration options.
 
 Located at `app/puppet-master.config.ts`. This is the central configuration file.
 
-### Application Modes
+### PM Mode (Setup State)
 
-Controls the overall application structure and UX pattern.
+The `pmMode` field controls the project's setup state and determines behavior.
 
 ```typescript
-mode: 'website-admin' as AppMode
+pmMode: 'unconfigured' | 'build' | 'develop'
 ```
 
-| Mode | Website | Login Button | Admin Access | Visual Mode |
-|------|---------|--------------|--------------|-------------|
-| `app-only` | No | N/A | `/` redirects to `/login` | App |
-| `website-app` | Yes | Visible | `/login` route | App primary |
-| `website-admin` | Yes | Hidden | `/admin` (secret path) | Website |
-| `website-only` | Yes | None | No admin | Website |
+| pmMode | Description | What Happens |
+|--------|-------------|--------------|
+| `'unconfigured'` | Fresh clone, needs setup | Wizard at `/setup` |
+| `'build'` | Client project (website or app) | Normal site operation |
+| `'develop'` | Framework development | Shows showcase site |
 
-**Visual modes explained:**
-- **Website mode**: Traditional site UX with hamburger menu on mobile
-- **App mode**: Application UX with bottom navigation on mobile
+**This is set by the setup wizard.** You typically don't edit this manually.
 
-**Use cases:**
-- `app-only` - SaaS dashboard, internal tools, no public landing page
-- `website-app` - Product with marketing site + user login (like Notion, Figma)
-- `website-admin` - Portfolio/agency site with hidden CMS (default)
-- `website-only` - Static marketing site, no admin needed
+---
+
+### Project Type (BUILD mode only)
+
+When `pmMode` is `'build'`, you also specify the project type:
+
+```typescript
+projectType: 'website' | 'app'
+```
+
+| Type | Description | UX Pattern |
+|------|-------------|------------|
+| `'website'` | Marketing site, landing pages | Horizontal header |
+| `'app'` | Dashboard, user features | Sidebar/bottom nav |
+
+---
+
+### Admin Panel
+
+Enable or disable the admin panel:
+
+```typescript
+admin: {
+  enabled: true
+}
+```
+
+When enabled, admin routes are available at `/admin/*`.
+
+---
+
+### Legacy Application Modes (Deprecated)
+
+> **Note:** The old `mode` field with values like `app-only`, `website-app`, etc. is being replaced by the combination of `pmMode`, `projectType`, and `admin.enabled`.
+
+For reference, the mapping is:
+
+| Old Mode | New Configuration |
+|----------|-------------------|
+| `app-only` | `projectType: 'app'`, `admin.enabled: false` |
+| `website-app` | `projectType: 'website'`, login button visible |
+| `website-admin` | `projectType: 'website'`, `admin.enabled: true`, login hidden |
+| `website-only` | `projectType: 'website'`, `admin.enabled: false` |
 
 ---
 

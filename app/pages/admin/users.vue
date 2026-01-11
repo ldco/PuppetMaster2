@@ -26,12 +26,7 @@ useHead({
 
 const { confirm } = useConfirm()
 const { toast } = useToast()
-const { user: currentUser, canManageUsers, getAssignableRoles, isMaster } = useAuth()
-
-// Redirect if user can't manage users
-if (!canManageUsers.value) {
-  navigateTo('/admin')
-}
+const { user: currentUser, getAssignableRoles, isMaster } = useAuth()
 
 // Fetch users
 const headers = useRequestHeaders(['cookie'])
@@ -182,7 +177,7 @@ const roleBadgeClass: Record<string, string> = {
           <tr>
             <th>{{ t('admin.name') }}</th>
             <th>{{ t('admin.email') }}</th>
-            <th>{{ t('admin.role') }}</th>
+            <th>{{ t('admin.roleColumn') }}</th>
             <th>{{ t('admin.created') }}</th>
             <th class="actions-col">{{ t('admin.actions') }}</th>
           </tr>
@@ -191,7 +186,7 @@ const roleBadgeClass: Record<string, string> = {
           <tr v-for="user in users" :key="user.id">
             <td :data-label="t('admin.name')">{{ user.name || '—' }}</td>
             <td :data-label="t('admin.email')">{{ user.email }}</td>
-            <td :data-label="t('admin.role')">
+            <td :data-label="t('admin.roleColumn')">
               <span class="badge" :class="roleBadgeClass[user.role]">
                 {{ roleLabels[user.role] }}
               </span>
@@ -262,7 +257,7 @@ const roleBadgeClass: Record<string, string> = {
             </div>
 
             <div class="form-group">
-              <label for="role" class="form-label">{{ t('admin.role') }} *</label>
+              <label for="role" class="form-label">{{ t('admin.roleColumn') }} *</label>
               <select id="role" v-model="form.role" class="input" required>
                 <option v-for="role in assignableRoles" :key="role" :value="role">
                   {{ roleLabels[role] }}

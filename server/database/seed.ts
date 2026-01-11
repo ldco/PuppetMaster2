@@ -883,28 +883,7 @@ async function seed() {
     console.log(`   ${existingTestimonials.length} testimonials exist, skipping.`)
   }
 
-  // Seed clients - ONLY if none exist
-  console.log('\n🏢 Checking clients...')
-  const existingClients = db.select().from(schema.clients).all()
-
-  if (existingClients.length === 0) {
-    console.log('   Creating clients...')
-
-    const clientData = [
-      { name: 'Acme Corp', logoUrl: '/images/clients/acme.svg', websiteUrl: 'https://acme.example.com', category: 'client' as const, featured: true, order: 0, published: true },
-      { name: 'TechGiant', logoUrl: '/images/clients/techgiant.svg', websiteUrl: 'https://techgiant.example.com', category: 'client' as const, featured: true, order: 1, published: true },
-      { name: 'StartupHub', logoUrl: '/images/clients/startuphub.svg', websiteUrl: 'https://startuphub.example.com', category: 'partner' as const, featured: true, order: 2, published: true },
-      { name: 'GlobalTrade', logoUrl: '/images/clients/globaltrade.svg', websiteUrl: 'https://globaltrade.example.com', category: 'client' as const, featured: false, order: 3, published: true },
-      { name: 'CloudFirst', logoUrl: '/images/clients/cloudfirst.svg', websiteUrl: 'https://cloudfirst.example.com', category: 'sponsor' as const, featured: false, order: 4, published: true }
-    ]
-
-    for (const client of clientData) {
-      db.insert(schema.clients).values(client).run()
-      console.log(`   ✓ ${client.name}`)
-    }
-  } else {
-    console.log(`   ${existingClients.length} clients exist, skipping.`)
-  }
+  // Clients - managed via admin panel (no demo data)
 
   // Seed FAQ items - ONLY if none exist
   console.log('\n❓ Checking FAQ items...')

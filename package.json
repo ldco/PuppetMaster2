@@ -18,6 +18,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx server/database/seed.ts",
     "db:reset": "rm -f data/sqlite.db && npm run db:migrate && npm run db:seed",
+    "setup:cli": "tsx scripts/setup-cli.ts",
+    "setup:headless": "tsx scripts/setup-headless.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "test:unit": "vitest run --dir tests/server tests/components",
