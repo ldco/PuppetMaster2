@@ -22,6 +22,7 @@ import {
   generateBackupCodes
 } from '../../../utils/totp'
 import { twoFactorSetupRateLimiter } from '../../../utils/rateLimit'
+import config from '../../../../app/puppet-master.config'
 
 // Store pending 2FA setups (in-memory for simplicity, cleared on server restart)
 // In production, consider using Redis or database with TTL
@@ -49,6 +50,14 @@ function cleanupPendingSetups() {
 export { pendingSetups }
 
 export default defineEventHandler(async event => {
+  // Check if 2FA is enabled in config
+  if (!config.has2FA) {
+    throw createError({
+      statusCode: 403,
+      message: 'Two-factor authentication is not enabled for this project'
+    })
+  }
+
   // Require authentication
   if (!event.context.session?.userId) {
     throw createError({

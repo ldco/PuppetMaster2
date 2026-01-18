@@ -11,8 +11,17 @@
  */
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
+import config from '../../../../app/puppet-master.config'
 
 export default defineEventHandler(async event => {
+  // Check if 2FA is enabled in config - if not, return disabled status
+  if (!config.has2FA) {
+    return {
+      enabled: false,
+      available: false
+    }
+  }
+
   // Require authentication
   if (!event.context.session?.userId) {
     throw createError({
@@ -40,10 +49,11 @@ export default defineEventHandler(async event => {
     })
   }
 
-  // If 2FA is not enabled, return simple response
+  // If 2FA is not enabled for user, return simple response
   if (!user.twoFactorEnabled) {
     return {
-      enabled: false
+      enabled: false,
+      available: true // 2FA is available but not enabled for this user
     }
   }
 
@@ -58,6 +68,7 @@ export default defineEventHandler(async event => {
 
   return {
     enabled: true,
+    available: true,
     backupCodesRemaining: user2fa?.backupCodesRemaining ?? 0
   }
 })

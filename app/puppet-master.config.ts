@@ -86,6 +86,7 @@ const config = {
 
     // App/Admin features (only apply when entities.app: true or admin.enabled: true)
     appVerticalNav: false, // App UX: true = vertical sidebar, false = horizontal nav
+    twoFactorAuth: false, // Enable two-factor authentication (TOTP) for admin/app login
 
     // PWA (Progressive Web App) support
     // Enables: installable app, offline support, service worker caching
@@ -850,6 +851,10 @@ const config = {
 
   get hasThemeToggle(): boolean {
     return this.features.doubleTheme
+  },
+
+  get has2FA(): boolean {
+    return this.features.twoFactorAuth
   },
 
   // Combined helpers (entities + features)

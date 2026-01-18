@@ -37,7 +37,8 @@ const config = reactive({
     multiLangs: false,
     doubleTheme: true,
     onepager: false,
-    pwa: false
+    pwa: false,
+    twoFactorAuth: false
   },
   locales: [{ code: 'en', iso: 'en-US', name: 'English' }] as Array<{
     code: string
@@ -429,6 +430,10 @@ async function applyConfig() {
           <label class="checkbox-label">
             <input v-model="config.features.pwa" type="checkbox" />
             <span>Progressive Web App (PWA)</span>
+          </label>
+          <label v-if="config.adminEnabled || config.projectType === 'app'" class="checkbox-label">
+            <input v-model="config.features.twoFactorAuth" type="checkbox" />
+            <span>Two-Factor Authentication (TOTP)</span>
           </label>
         </div>
       </section>

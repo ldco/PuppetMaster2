@@ -28,6 +28,7 @@ import {
 import { audit } from '../../utils/audit'
 import { loginSchema } from '../../utils/validation'
 import { pending2faVerifications } from '../user/2fa/verify.post'
+import config from '../../../app/puppet-master.config'
 
 export default defineEventHandler(async event => {
   // Rate limit check - 5 attempts per 15 minutes per IP
@@ -120,8 +121,8 @@ export default defineEventHandler(async event => {
   // Password verified - reset failed attempts
   await resetFailedAttempts(user.id)
 
-  // Check if 2FA is enabled
-  if (user.twoFactorEnabled) {
+  // Check if 2FA is enabled (both globally in config AND for this user)
+  if (config.has2FA && user.twoFactorEnabled) {
     // Create a pending 2FA verification session
     const pendingToken = randomBytes(32).toString('hex')
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes

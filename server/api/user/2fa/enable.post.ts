@@ -20,8 +20,17 @@ import { twoFactorEnableSchema } from '../../../utils/validation'
 import { audit } from '../../../utils/audit'
 import { twoFactorEnableRateLimiter } from '../../../utils/rateLimit'
 import { pendingSetups } from './setup.post'
+import config from '../../../../app/puppet-master.config'
 
 export default defineEventHandler(async event => {
+  // Check if 2FA is enabled in config
+  if (!config.has2FA) {
+    throw createError({
+      statusCode: 403,
+      message: 'Two-factor authentication is not enabled for this project'
+    })
+  }
+
   // Require authentication
   if (!event.context.session?.userId) {
     throw createError({

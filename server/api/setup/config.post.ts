@@ -125,6 +125,7 @@ interface SetupConfig {
     doubleTheme?: boolean
     onepager?: boolean
     pwa?: boolean
+    twoFactorAuth?: boolean
   }
 }
 
@@ -196,6 +197,9 @@ function applyConfig(appDir: string, config: SetupConfig): void {
     if (config.features.pwa !== undefined) {
       content = replaceBoolean(content, 'pwa', config.features.pwa)
     }
+    if (config.features.twoFactorAuth !== undefined) {
+      content = replaceBoolean(content, 'twoFactorAuth', config.features.twoFactorAuth)
+    }
   }
 
   writeFileSync(configPath, content, 'utf-8')
@@ -220,7 +224,8 @@ const setupConfigSchema = z.object({
     multiLangs: z.boolean().optional(),
     doubleTheme: z.boolean().optional(),
     onepager: z.boolean().optional(),
-    pwa: z.boolean().optional()
+    pwa: z.boolean().optional(),
+    twoFactorAuth: z.boolean().optional()
   }).optional()
 })
 

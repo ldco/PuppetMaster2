@@ -24,6 +24,7 @@ import { generateCsrfToken, setCsrfCookie } from '../../../utils/csrf'
 import { twoFactorVerifySchema } from '../../../utils/validation'
 import { audit } from '../../../utils/audit'
 import { twoFactorVerifyRateLimiter, getClientIp } from '../../../utils/rateLimit'
+import config from '../../../../app/puppet-master.config'
 
 // Store pending 2FA verifications (userId -> { expiresAt, attempts })
 // In production, consider using Redis with TTL
@@ -56,6 +57,14 @@ function cleanupExpiredSessions() {
 }
 
 export default defineEventHandler(async event => {
+  // Check if 2FA is enabled in config
+  if (!config.has2FA) {
+    throw createError({
+      statusCode: 403,
+      message: 'Two-factor authentication is not enabled for this project'
+    })
+  }
+
   // Rate limit by client IP to prevent distributed attacks
   const clientIp = getClientIp(event)
   if (!twoFactorVerifyRateLimiter.checkRateLimit(clientIp)) {
