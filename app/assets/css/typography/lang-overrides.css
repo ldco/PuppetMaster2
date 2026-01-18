@@ -136,3 +136,24 @@
   --font-brand-primary: 'Noto Sans Thai', var(--fallback-sans);
 }
 */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * CJK LAYOUT OPTIMIZATION
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * These are LAYOUT rules, not font rules. They improve text handling for
+ * Chinese, Japanese, and Korean scripts without changing fonts.
+ *
+ * NOTE: Fonts are a designer decision - configure in puppet-master.config.ts
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+:lang(ja),
+:lang(zh),
+:lang(zh-CN),
+:lang(zh-TW),
+:lang(ko) {
+  /* Better line breaking for CJK text */
+  line-break: strict;
+  /* Don't break within CJK words/characters inappropriately */
+  word-break: keep-all;
+}

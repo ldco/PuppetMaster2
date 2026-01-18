@@ -79,3 +79,12 @@
 .gap-8 {
   gap: var(--space-8);
 }
+
+/* ══════════════════════════════════════════════════════════
+ * OVERFLOW PREVENTION
+ * Flex children default to min-width: auto which can cause overflow.
+ * Setting min-width: 0 allows children to shrink below content size.
+ * ══════════════════════════════════════════════════════════ */
+.flex > * {
+  min-width: 0;
+}

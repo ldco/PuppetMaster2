@@ -62,9 +62,10 @@
   align-items: stretch;
 }
 
-/* Ensure direct children take full width */
+/* Ensure direct children take full width and can't overflow */
 .section-body > * {
   width: 100%;
+  min-width: 0; /* Prevent flex children from overflowing */
 }
 
 /* ==========================================================================

@@ -12,8 +12,10 @@
 /* Base - desktop first */
 .admin-content {
   padding: var(--space-10);
-  max-width: 62.5rem; /* 1000px, scales with font-size */
+  width: 100%; /* Explicit width for containment */
+  max-width: min(62.5rem, 100%); /* Bulletproof: never exceeds viewport */
   margin-inline: auto;
+  contain: layout style; /* Architectural containment */
 }
 
 /* Phone (< 600px) */

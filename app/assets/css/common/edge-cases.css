@@ -17,6 +17,9 @@
   height: 100dvh;
 }
 .min-h-dvh {
+  /* Progressive enhancement: fallback → WebKit → modern */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   min-height: 100dvh;
 }
 
@@ -80,6 +83,9 @@
 .scroll-container {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
+  overflow-x: hidden;
+  /* Prevent scroll chaining (bouncing) at boundaries */
+  overscroll-behavior: contain;
 }
 
 /* ══════════════════════════════════════════════════════════

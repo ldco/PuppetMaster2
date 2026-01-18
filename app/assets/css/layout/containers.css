@@ -37,6 +37,8 @@
   width: 100%;
   margin-inline: auto;
   padding-inline: var(--container-padding);
+  /* Architectural containment - content stays within bounds */
+  contain: layout style;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -76,14 +78,13 @@
 }
 
 /* ══════════════════════════════════════════════════════════
- * LEGACY ALIAS (for compatibility)
- * .container without modifier = default width
+ * DEFAULT CONTAINER WIDTH
+ * .container without modifier = default width (bulletproof)
  * ══════════════════════════════════════════════════════════ */
 
-/* If you want constrained by default, uncomment: */
-/* .container:not([class*="container-"]) {
+.container:not([class*="container-"]) {
   max-width: var(--content-default);
-} */
+}
 
 /* ══════════════════════════════════════════════════════════
  * CONTAINER QUERIES

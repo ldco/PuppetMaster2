@@ -53,3 +53,57 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * FORCED COLORS MODE (Windows High Contrast)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * When users enable high contrast mode, the browser strips most colors.
+ * We need to ensure interactive elements remain visible with borders.
+ *
+ * WCAG 2.1 Success Criterion 1.4.11: Non-text Contrast
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (forced-colors: active) {
+  /* Buttons need visible borders */
+  .btn,
+  button {
+    border: 1px solid currentColor;
+  }
+
+  /* Cards and panels need visible boundaries */
+  .card,
+  .panel,
+  .modal,
+  .dropdown,
+  .toast {
+    border: 1px solid currentColor;
+  }
+
+  /* Form inputs need visible borders */
+  .input,
+  input,
+  select,
+  textarea {
+    border: 1px solid currentColor;
+  }
+
+  /* Links need underlines when colors are forced */
+  a:not([class]),
+  a:not(.btn) {
+    text-decoration: underline;
+  }
+
+  /* Focus states need to be extra visible */
+  :focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Disabled states should be distinguishable */
+  :disabled,
+  [disabled],
+  .disabled {
+    opacity: 0.5;
+    border-style: dashed;
+  }
+}

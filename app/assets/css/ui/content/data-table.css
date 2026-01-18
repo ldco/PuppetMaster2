@@ -14,12 +14,15 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  /* Fixed layout prevents columns from expanding beyond container */
+  table-layout: fixed;
 }
 
 /* When data-table is a wrapper div */
 .data-table table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 /* Table cells - handle both patterns */

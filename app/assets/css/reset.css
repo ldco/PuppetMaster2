@@ -24,10 +24,13 @@ html {
    * other sections get header-height offset. scroll-padding would add to ALL anchors. */
 }
 
-/* Remove default margin and padding */
+/* Remove default margin and padding + word-break safety */
 * {
   margin: 0;
   padding: 0;
+  /* Prevent long words/URLs from causing horizontal overflow */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Remove list styles */

@@ -232,6 +232,8 @@ export default defineNuxtConfig({
                   /-active/,
                   /data-/
                 ],
+                // Preserve :lang() selectors for multi-language CSS rules
+                deep: [/:lang/],
                 // Keep CSS custom properties
                 variables: [/^--/]
               },
