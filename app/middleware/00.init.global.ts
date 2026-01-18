@@ -7,12 +7,12 @@
  *
  * Note: Mode selection (build/develop) happens in CLI or Claude chat,
  * NOT in the browser. The /init page is only for BUILD mode configuration.
+ *
+ * pmMode priority: PM_MODE env var > puppet-master.config.ts > 'unconfigured'
  */
-import config from '~/puppet-master.config'
-
 export default defineNuxtRouteMiddleware(to => {
-  // Get pmMode from config (defaults to 'unconfigured' if not set)
-  const pmMode = (config as any).pmMode || 'unconfigured'
+  // Get pmMode from runtimeConfig (which reads PM_MODE env var first, then config)
+  const { pmMode } = useRuntimeConfig().public
 
   // When CONFIGURED: block /init route
   if (pmMode !== 'unconfigured' && to.path === '/init') {

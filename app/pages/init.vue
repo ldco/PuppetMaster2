@@ -4,6 +4,8 @@
  *
  * Configures project settings for BUILD mode.
  * User reaches this page after running `npm run init` and selecting BUILD.
+ *
+ * Styles: app/assets/css/ui/content/init.css
  */
 import IconWorld from '~icons/tabler/world'
 import IconApps from '~icons/tabler/apps'
@@ -12,9 +14,10 @@ import IconLoader from '~icons/tabler/loader-2'
 import IconUpload from '~icons/tabler/upload'
 import IconFileZip from '~icons/tabler/file-zip'
 import IconX from '~icons/tabler/x'
+import Logo from '~/components/atoms/Logo.vue'
 
 definePageMeta({
-  layout: 'blank'
+  layout: false // Using <NuxtLayout> explicitly for named slots
 })
 
 useHead({
@@ -30,9 +33,17 @@ const validationErrors = ref<string[]>([])
 
 // Configuration
 const config = reactive({
+  // Project info - gathered for Claude context
+  projectName: '',
+  projectDescription: '',
+  targetAudience: '',
+  // Project type
   projectType: 'website' as 'website' | 'app',
   adminEnabled: true,
+  // Modules
   modules: ['contact'] as string[],
+  customModules: '', // Free text for other modules needed
+  // Features
   features: {
     multiLangs: false,
     doubleTheme: true,
@@ -40,12 +51,14 @@ const config = reactive({
     pwa: false,
     twoFactorAuth: false
   },
+  // Locales
   locales: [{ code: 'en', iso: 'en-US', name: 'English' }] as Array<{
     code: string
     iso: string
     name: string
   }>,
-  defaultLocale: 'en'
+  defaultLocale: 'en',
+  customLocale: { code: '', name: '' } // For "Other" language
 })
 
 // Import zip upload
@@ -154,6 +167,30 @@ function toggleLocale(locale: (typeof availableLocales)[0]) {
   }
 }
 
+// Add custom locale
+function addCustomLocale() {
+  if (!config.customLocale.code || !config.customLocale.name) return
+
+  // Check if already exists
+  if (config.locales.some(l => l.code === config.customLocale.code)) {
+    error.value = 'This language code already exists'
+    return
+  }
+
+  config.locales.push({
+    code: config.customLocale.code.toLowerCase(),
+    iso: `${config.customLocale.code.toLowerCase()}-${config.customLocale.code.toUpperCase()}`,
+    name: config.customLocale.name
+  })
+
+  if (config.locales.length === 1) {
+    config.defaultLocale = config.customLocale.code.toLowerCase()
+  }
+
+  // Clear the input
+  config.customLocale = { code: '', name: '' }
+}
+
 // Zip file upload handler
 async function handleZipUpload(event: Event) {
   const input = event.target as HTMLInputElement
@@ -225,9 +262,16 @@ async function applyConfig() {
       method: 'POST',
       body: {
         pmMode: 'build',
+        // Project info (for Claude context)
+        projectName: config.projectName,
+        projectDescription: config.projectDescription,
+        targetAudience: config.targetAudience,
+        // Type and modules
         projectType: config.projectType,
         adminEnabled: config.adminEnabled,
         modules: config.modules,
+        customModules: config.customModules,
+        // Features and locales
         features: config.features,
         locales: config.locales,
         defaultLocale: config.defaultLocale
@@ -250,17 +294,22 @@ async function applyConfig() {
 </script>
 
 <template>
-  <div class="setup-page">
-    <!-- Header -->
-    <header class="setup-header">
-      <div class="setup-logo">
-        <span class="logo-icon">🎭</span>
-        <span class="logo-text">Puppet Master</span>
-      </div>
-      <div class="setup-label">Configure Project</div>
-    </header>
+  <NuxtLayout name="blank">
+    <!-- Header in named slot - OUTSIDE .main so position:fixed works -->
+    <template #header>
+      <header class="header">
+        <div class="header-inner">
+          <div class="header-logo">
+            <Logo to="/" alt="Puppet Master" />
+          </div>
+          <span class="text-sm text-secondary">Configure Project</span>
+        </div>
+      </header>
+    </template>
 
-    <!-- Loading -->
+    <!-- Default slot content goes inside .main -->
+    <div class="setup-page">
+      <!-- Loading -->
     <div v-if="loading" class="setup-loading">
       <IconLoader class="spinner" />
       <p>Loading configuration...</p>
@@ -279,6 +328,42 @@ async function applyConfig() {
           <li v-for="err in validationErrors" :key="err">{{ err }}</li>
         </ul>
       </div>
+
+      <!-- Project Info -->
+      <section class="setup-section">
+        <h2 class="section-title">Project Info</h2>
+        <p class="section-desc">Tell us about your project. This information helps Claude understand your needs.</p>
+
+        <div class="form-group">
+          <label class="form-label">Project Name</label>
+          <input
+            v-model="config.projectName"
+            type="text"
+            class="input"
+            placeholder="My Awesome Project"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Project Description</label>
+          <textarea
+            v-model="config.projectDescription"
+            class="input"
+            rows="3"
+            placeholder="What is this project about? What problem does it solve? What are its main features?"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Audience</label>
+          <input
+            v-model="config.targetAudience"
+            type="text"
+            class="input"
+            placeholder="Who will use this? (e.g., small businesses, developers, consumers)"
+          />
+        </div>
+      </section>
 
       <!-- Project Type -->
       <section class="setup-section">
@@ -365,9 +450,17 @@ async function applyConfig() {
       <!-- Modules -->
       <section class="setup-section">
         <h2 class="section-title">Modules</h2>
-        <p class="section-desc">Select the modules you need</p>
+        <p class="section-desc">
+          <template v-if="config.projectType === 'website'">
+            Select pre-built modules for your website. Each includes admin CRUD, database tables, and components.
+          </template>
+          <template v-else>
+            App-specific modules are coming soon. For now, describe what you need below and build custom modules.
+          </template>
+        </p>
 
-        <div class="modules-grid">
+        <!-- Pre-built modules (website only) -->
+        <div v-if="config.projectType === 'website'" class="modules-grid">
           <button
             v-for="mod in availableModules"
             :key="mod.id"
@@ -380,12 +473,34 @@ async function applyConfig() {
             <p>{{ mod.desc }}</p>
           </button>
         </div>
+
+        <!-- App modules notice -->
+        <div v-else class="info-box">
+          <p>
+            Pre-built app modules (Dashboard, User Profiles, Notifications, etc.) are planned for future releases.
+            Describe your requirements below and Claude will help you build custom modules.
+          </p>
+        </div>
+
+        <!-- Custom modules (always show) -->
+        <div class="form-group mt-4">
+          <label class="form-label">Other Modules Needed <span class="optional-badge">Optional</span></label>
+          <textarea
+            v-model="config.customModules"
+            class="input"
+            rows="3"
+            :placeholder="config.projectType === 'website'
+              ? 'Describe any custom modules you need that aren\'t listed above (e.g., Events calendar, Job board, E-commerce...)'
+              : 'Describe the modules/features your app needs (e.g., Dashboard with analytics, User profiles, Real-time notifications, Activity feed...)'"
+          ></textarea>
+          <p class="form-hint">Claude will use this to help you build custom modules during development.</p>
+        </div>
       </section>
 
       <!-- Languages -->
       <section class="setup-section">
         <h2 class="section-title">Languages <span class="required-badge">Required</span></h2>
-        <p class="section-desc">Select at least one language</p>
+        <p class="section-desc">Select at least one language. Add custom languages if yours isn't listed.</p>
 
         <div class="locales-grid">
           <button
@@ -401,6 +516,50 @@ async function applyConfig() {
             {{ locale.name }}
             <span v-if="config.defaultLocale === locale.code" class="default-badge">default</span>
           </button>
+        </div>
+
+        <!-- Custom Language Input -->
+        <div class="custom-locale-input">
+          <div class="custom-locale-fields">
+            <input
+              v-model="config.customLocale.code"
+              type="text"
+              class="input"
+              placeholder="Code (e.g., pt, ar, ko)"
+              maxlength="5"
+            />
+            <input
+              v-model="config.customLocale.name"
+              type="text"
+              class="input"
+              placeholder="Language name (e.g., Portuguese)"
+            />
+            <button
+              type="button"
+              class="btn btn-secondary"
+              :disabled="!config.customLocale.code || !config.customLocale.name"
+              @click="addCustomLocale"
+            >
+              Add
+            </button>
+          </div>
+          <p class="form-hint">Need a language not in the list? Add it here.</p>
+        </div>
+
+        <!-- Selected languages (if any custom added) -->
+        <div v-if="config.locales.some(l => !availableLocales.find(a => a.code === l.code))" class="selected-locales">
+          <p class="form-label">Custom languages added:</p>
+          <div class="locales-grid">
+            <button
+              v-for="locale in config.locales.filter(l => !availableLocales.find(a => a.code === l.code))"
+              :key="locale.code"
+              class="locale-chip active"
+              @click="toggleLocale(locale)"
+            >
+              {{ locale.name }} ({{ locale.code }})
+              <span v-if="config.defaultLocale === locale.code" class="default-badge">default</span>
+            </button>
+          </div>
         </div>
 
         <div v-if="config.locales.length > 1" class="form-group">
@@ -444,15 +603,15 @@ async function applyConfig() {
       </div>
 
       <!-- Actions -->
-      <div class="form-actions form-actions-end">
+      <div class="form-actions form-actions-center">
         <button
-          class="btn btn-primary btn-success"
+          class="btn btn-primary btn-lg"
           @click="applyConfig"
           :disabled="saving"
         >
           <IconLoader v-if="saving" class="spinner" />
           <IconCheck v-else />
-          {{ saving ? 'Applying...' : 'Apply & Start' }}
+          {{ saving ? 'Applying...' : 'Apply & Start Building' }}
         </button>
       </div>
     </main>
@@ -553,814 +712,8 @@ async function applyConfig() {
         </div>
       </div>
     </main>
-  </div>
+    </div>
+  </NuxtLayout>
 </template>
 
-<style>
-/* Setup Page */
-.setup-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface-1);
-}
-
-.setup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-}
-
-.setup-logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-lg);
-  font-weight: 600;
-}
-
-.logo-icon {
-  font-size: var(--text-2xl);
-}
-
-.setup-label {
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.setup-loading,
-.setup-error {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.setup-content {
-  flex: 1;
-  padding: var(--space-8) var(--space-6);
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.setup-form {
-  padding-bottom: var(--space-16);
-}
-
-.setup-section {
-  margin-bottom: var(--space-8);
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.section-title {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  margin-bottom: var(--space-1);
-}
-
-.section-desc {
-  color: var(--text-2);
-  margin-bottom: var(--space-4);
-  font-size: var(--text-sm);
-}
-
-/* Mode Cards (Mode Selection) */
-.mode-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
-}
-
-.mode-card {
-  padding: var(--space-6);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.mode-card:hover {
-  border-color: var(--brand);
-  background: var(--surface-3);
-}
-
-.mode-card.active {
-  border-color: var(--brand);
-  background: color-mix(in oklch, var(--brand) 10%, var(--surface-2));
-}
-
-.mode-icon {
-  width: 48px;
-  height: 48px;
-  color: var(--brand);
-  margin-bottom: var(--space-3);
-}
-
-.mode-card h2 {
-  font-size: var(--text-xl);
-  margin-bottom: var(--space-1);
-}
-
-.mode-card p {
-  color: var(--text-2);
-  margin-bottom: var(--space-3);
-}
-
-.mode-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.mode-card li {
-  padding: var(--space-1) 0;
-  padding-left: var(--space-4);
-  position: relative;
-  color: var(--text-2);
-  font-size: var(--text-sm);
-}
-
-.mode-card li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--success);
-}
-
-.mode-action {
-  display: block;
-  margin-top: var(--space-4);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
-  color: var(--brand);
-  font-weight: 600;
-  font-size: var(--text-sm);
-}
-
-/* Type Cards (inline selection) */
-.type-cards {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.type-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.type-card:hover {
-  border-color: var(--brand);
-}
-
-.type-card.active {
-  border-color: var(--brand);
-  background: color-mix(in oklch, var(--brand) 8%, var(--surface-2));
-}
-
-.type-card.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.type-card.disabled:hover {
-  border-color: var(--border);
-}
-
-.type-icon {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  color: var(--brand);
-}
-
-.type-info {
-  flex: 1;
-}
-
-.type-info h3 {
-  font-size: var(--text-base);
-  margin-bottom: 2px;
-}
-
-.type-info p {
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.type-card .check-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--brand);
-  flex-shrink: 0;
-}
-
-/* Modules Grid */
-.modules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--space-3);
-}
-
-.module-card {
-  padding: var(--space-3);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.module-card:hover {
-  border-color: var(--brand);
-}
-
-.module-card.active {
-  border-color: var(--brand);
-  background: color-mix(in oklch, var(--brand) 10%, var(--surface-2));
-}
-
-.module-card .check-icon {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  color: var(--brand);
-  width: 18px;
-  height: 18px;
-}
-
-.module-card h3 {
-  font-size: var(--text-sm);
-  margin-bottom: 2px;
-}
-
-.module-card p {
-  font-size: var(--text-xs);
-  color: var(--text-2);
-}
-
-/* Locales */
-.locales-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-
-.locale-chip {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  background: var(--surface-2);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.locale-chip:hover {
-  border-color: var(--brand);
-}
-
-.locale-chip.active {
-  border-color: var(--brand);
-  background: color-mix(in oklch, var(--brand) 15%, var(--surface-2));
-}
-
-.locale-chip .default-badge {
-  font-size: var(--text-xs);
-  background: var(--brand);
-  color: var(--brand-contrast);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-}
-
-/* Features */
-.features-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  cursor: pointer;
-}
-
-.checkbox-label input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--brand);
-}
-
-/* Form Group */
-.form-group {
-  margin-top: var(--space-4);
-}
-
-.form-label {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: 500;
-}
-
-/* Info/Warning Boxes */
-.info-box {
-  display: flex;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.info-box .info-icon {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  color: var(--text-2);
-}
-
-.info-box p {
-  margin-top: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.info-box code {
-  background: var(--surface-1);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-}
-
-.import-detected {
-  padding: var(--space-3);
-  background: color-mix(in oklch, var(--success) 10%, var(--surface-2));
-  border: 1px solid var(--success);
-  border-radius: var(--radius-md);
-}
-
-.import-files {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-2) 0;
-  font-family: monospace;
-  font-size: var(--text-sm);
-}
-
-.import-files li {
-  padding: 2px var(--space-2);
-  background: var(--surface-1);
-  border-radius: var(--radius-sm);
-  margin-bottom: 2px;
-  display: inline-block;
-  margin-right: var(--space-1);
-}
-
-.import-files .more-files {
-  font-style: italic;
-  color: var(--text-2);
-  background: transparent;
-}
-
-.import-note {
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.import-note code {
-  background: var(--surface-1);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-}
-
-.warning-box {
-  padding: var(--space-3) var(--space-4);
-  background: color-mix(in oklch, var(--warning) 15%, var(--surface-2));
-  border: 1px solid var(--warning);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  margin-bottom: var(--space-6);
-}
-
-.error-banner {
-  padding: var(--space-3) var(--space-4);
-  background: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
-  border: 1px solid var(--danger);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-6);
-  color: var(--danger);
-}
-
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
-}
-
-.form-actions-end {
-  justify-content: flex-end;
-}
-
-.form-actions .btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.btn-success {
-  background: var(--success);
-}
-
-.btn-success:hover {
-  background: color-mix(in oklch, var(--success) 85%, var(--black));
-}
-
-/* Required/Optional Badges */
-.required-badge,
-.optional-badge {
-  font-size: var(--text-xs);
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  margin-left: var(--space-2);
-  vertical-align: middle;
-}
-
-.required-badge {
-  background: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
-  color: var(--danger);
-}
-
-.optional-badge {
-  background: var(--surface-3);
-  color: var(--text-2);
-}
-
-/* Upload Zone */
-.upload-zone {
-  position: relative;
-}
-
-.upload-input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.upload-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-6);
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upload-label:hover {
-  border-color: var(--brand);
-  background: var(--surface-3);
-}
-
-.upload-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--text-2);
-}
-
-.upload-hint {
-  font-size: var(--text-xs);
-  color: var(--text-3);
-}
-
-/* Import Header */
-.import-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.zip-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--brand);
-  flex-shrink: 0;
-}
-
-.import-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.import-info span {
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.btn-icon {
-  padding: var(--space-2);
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-}
-
-.btn-icon:hover {
-  background: var(--surface-3);
-  color: var(--danger);
-}
-
-/* Validation Errors */
-.validation-errors {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.validation-errors li {
-  padding: 2px 0;
-}
-
-/* Completion Phase */
-.complete-phase {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--space-8) var(--space-4);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.complete-icon {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--success);
-  border-radius: 50%;
-  margin-bottom: var(--space-6);
-}
-
-.complete-icon svg {
-  width: 40px;
-  height: 40px;
-  color: white;
-}
-
-.complete-title {
-  font-size: var(--text-2xl);
-  font-weight: 600;
-  margin-bottom: var(--space-4);
-}
-
-.complete-desc {
-  color: var(--text-2);
-  margin-bottom: var(--space-8);
-  line-height: 1.6;
-}
-
-.complete-steps {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  text-align: left;
-  width: 100%;
-  margin-bottom: var(--space-8);
-}
-
-.step {
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
-}
-
-.step-num {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand);
-  color: white;
-  border-radius: 50%;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.step-alt {
-  border-style: dashed;
-  border-color: var(--border);
-  background: transparent;
-}
-
-.step-alt .step-num {
-  background: var(--surface-3);
-  color: var(--text-2);
-  font-size: var(--text-xs);
-}
-
-.step-content {
-  flex: 1;
-}
-
-.step-content strong {
-  display: block;
-  margin-bottom: var(--space-2);
-}
-
-.step-content p {
-  color: var(--text-2);
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.step-content code {
-  display: inline-block;
-  background: var(--surface-3);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  margin: var(--space-2) 0;
-}
-
-.step-note {
-  margin-top: var(--space-2) !important;
-  font-size: var(--text-xs) !important;
-  color: var(--text-3) !important;
-}
-
-.complete-files {
-  padding: var(--space-4);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  margin-bottom: var(--space-6);
-}
-
-.file-count {
-  margin-top: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.complete-actions {
-  padding-top: var(--space-4);
-}
-
-/* Greenfield Completion */
-.complete-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: 100%;
-  margin-bottom: var(--space-6);
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
-}
-
-.info-item strong {
-  color: var(--text-2);
-  font-size: var(--text-sm);
-}
-
-.info-item code {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  background: var(--surface-3);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-}
-
-.dev-link {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--brand);
-  text-decoration: none;
-}
-
-.dev-link:hover {
-  text-decoration: underline;
-}
-
-.complete-dirs {
-  width: 100%;
-  padding: var(--space-4);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--space-6);
-}
-
-.complete-dirs > strong {
-  display: block;
-  margin-bottom: var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.dir-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
-}
-
-.dir-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.dir-item code {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--brand);
-}
-
-.dir-item span {
-  font-size: var(--text-xs);
-  color: var(--text-3);
-}
-
-.complete-hint {
-  font-size: var(--text-sm);
-  color: var(--text-2);
-}
-
-.complete-hint a {
-  color: var(--brand);
-  text-decoration: none;
-}
-
-.complete-hint a:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-  .dir-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
+<!-- Styles in: app/assets/css/ui/content/init.css -->

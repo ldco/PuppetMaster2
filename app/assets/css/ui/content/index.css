@@ -43,3 +43,6 @@
 
 /* Empty states */
 @import './empty-states.css';
+
+/* Page-specific styles */
+@import './init.css';

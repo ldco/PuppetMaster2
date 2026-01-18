@@ -36,8 +36,7 @@
  * ───────────────────────────────────────────────────────────────────────────
  * CLASS             | PURPOSE
  * ───────────────────────────────────────────────────────────────────────────
- * .layout           | Holy Grail grid container (Website mode)
- * .layout-blank     | Minimal layout (no header/footer)
+ * .layout           | Holy Grail grid (used by default.vue AND blank.vue)
  * .layout-admin     | Admin/App panel (App mode: sidebar + bottom nav)
  * .main             | Main content area (container query host)
  * ───────────────────────────────────────────────────────────────────────────
@@ -77,14 +76,33 @@
 }
 
 /* ==========================================================================
-   DEFAULT LAYOUT - Holy Grail (Header/Main/Footer)
+   BASE LAYOUT - Holy Grail Grid (Header/Main/Footer)
+   ==========================================================================
+
+   All page layouts share this grid structure:
+   ┌─────────────────────────────────────────┐
+   │               HEADER (auto)             │  ← position:fixed works here
+   ├─────────────────────────────────────────┤
+   │               MAIN (1fr)                │  ← container queries work here
+   ├─────────────────────────────────────────┤
+   │               FOOTER (auto)             │
+   └─────────────────────────────────────────┘
+
+   Vue layouts using this:
+   - default.vue (.layout)      → includes TheHeader/TheFooter components
+   - blank.vue   (.layout)      → provides slots for optional header/footer
+
+   IMPORTANT: Fixed elements (headers, modals) must be OUTSIDE .main!
+   The .main element has `container-type: inline-size` which creates a
+   containing block for position:fixed descendants.
+
    ========================================================================== */
 
 .layout {
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100dvh;
-  /* Architectural containment - prevents layout from affecting outside */
+  /* Architectural containment - isolates layout from affecting outside */
   contain: layout style;
 }
 
@@ -93,22 +111,15 @@
   container-type: inline-size;
   /* Architectural containment - content cannot overflow this boundary */
   contain: layout style;
-}
 
-/* ==========================================================================
-   BLANK LAYOUT - Minimal (just content)
-   ========================================================================== */
-
-.layout-blank {
-  display: grid;
-  grid-template-rows: 1fr;
-  min-height: 100dvh;
-  contain: layout style;
-}
-
-.layout-blank .main {
-  container-type: inline-size;
-  contain: layout style;
+  /*
+   * IMPORTANT: container-type creates a containing block for position:fixed!
+   * Any position:fixed element INSIDE .main will be fixed relative to .main,
+   * not the viewport. This is why headers/modals must be OUTSIDE .main.
+   *
+   * Correct:  .layout > .header + .main
+   * Wrong:    .layout > .main > .header
+   */
 }
 
 /* ==========================================================================

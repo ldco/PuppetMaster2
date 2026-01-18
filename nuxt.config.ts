@@ -331,6 +331,8 @@ export default defineNuxtConfig({
 
     public: {
       features: config.features,
+      // PM Mode - env var overrides config file (allows framework devs to set PM_MODE=develop)
+      pmMode: process.env.PM_MODE || config.pmMode || 'unconfigured',
       // External monitoring dashboard URL (constructed from subdomain + domain)
       uptimeKumaUrl:
         process.env.UPTIME_KUMA_SUBDOMAIN && process.env.SITE_DOMAIN
