@@ -1147,19 +1147,19 @@ Plan saved to: .claude-data/migration-plan.md
 ```
 Ready to initialize the project?
 
-○ Yes, run /pm-start now (Recommended)
+○ Yes, run /pm-dev now (Recommended)
   Set up database and start dev server
 
 ○ No, I want to review the plan first
-  You can run /pm-start later
+  You can run /pm-dev later
 
 ○ No, I need to make changes first
-  Edit config or plan, then run /pm-start
+  Edit config or plan, then run /pm-dev
 ```
 
 **If user selects "Yes":**
 - Inform them: "Starting project initialization..."
-- Run `/pm-start` logic (or instruct user to run it)
+- Run `/pm-dev` logic (or instruct user to run it)
 
 **If user selects "No":**
 - Display next steps:
@@ -1167,7 +1167,7 @@ Ready to initialize the project?
 Next Steps:
   1. Review: .claude-data/migration-plan.md
   2. Adjust: puppet-master.config.ts (if needed)
-  3. Start:  /pm-start
+  3. Start:  /pm-dev
 
 After starting, ask me:
   "Help me build the booking feature"

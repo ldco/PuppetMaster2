@@ -1,0 +1,63 @@
+/**
+ * 2FA Status Endpoint
+ *
+ * GET /api/user/2fa/status
+ * Returns the current 2FA status for the authenticated user.
+ *
+ * Returns: { enabled: boolean, backupCodesRemaining?: number }
+ *
+ * Security:
+ * - Requires authenticated session
+ */
+import { eq } from 'drizzle-orm'
+import { useDatabase, schema } from '../../../database/client'
+
+export default defineEventHandler(async event => {
+  // Require authentication
+  if (!event.context.session?.userId) {
+    throw createError({
+      statusCode: 401,
+      message: 'Authentication required'
+    })
+  }
+
+  const userId = event.context.session.userId
+  const db = useDatabase()
+
+  // Get user's 2FA status
+  const user = db
+    .select({
+      twoFactorEnabled: schema.users.twoFactorEnabled
+    })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId))
+    .get()
+
+  if (!user) {
+    throw createError({
+      statusCode: 404,
+      message: 'User not found'
+    })
+  }
+
+  // If 2FA is not enabled, return simple response
+  if (!user.twoFactorEnabled) {
+    return {
+      enabled: false
+    }
+  }
+
+  // Get backup codes remaining
+  const user2fa = db
+    .select({
+      backupCodesRemaining: schema.user2fa.backupCodesRemaining
+    })
+    .from(schema.user2fa)
+    .where(eq(schema.user2fa.userId, userId))
+    .get()
+
+  return {
+    enabled: true,
+    backupCodesRemaining: user2fa?.backupCodesRemaining ?? 0
+  }
+})

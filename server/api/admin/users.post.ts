@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../database/client'
 import { USER_ROLES, type UserRole } from '../../database/schema'
-import { hashPassword } from '../../utils/password'
+import { hashPassword, validatePassword } from '../../utils/password'
 import { getAssignableRoles } from '../../utils/roles'
 import { audit } from '../../utils/audit'
 
@@ -55,6 +55,16 @@ export default defineEventHandler(async event => {
     throw createError({
       statusCode: 409,
       message: 'A user with this email already exists'
+    })
+  }
+
+  // Enforce password policy before hashing
+  const validation = validatePassword(password)
+  if (!validation.valid) {
+    throw createError({
+      statusCode: 400,
+      message: validation.errors[0] || 'Password does not meet policy requirements',
+      data: { errors: validation.errors, strength: validation.strength }
     })
   }
 

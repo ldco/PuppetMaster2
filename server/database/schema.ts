@@ -89,6 +89,8 @@ export const users = sqliteTable('users', {
   failedLoginAttempts: integer('failed_login_attempts').default(0),
   lockedUntil: integer('locked_until', { mode: 'timestamp' }),
   lastFailedLogin: integer('last_failed_login', { mode: 'timestamp' }),
+  // Two-factor authentication
+  twoFactorEnabled: integer('two_factor_enabled', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -110,6 +112,31 @@ export const sessions = sqliteTable(
     index('sessions_user_expires_idx').on(table.userId, table.expiresAt),
     index('sessions_expires_idx').on(table.expiresAt)
   ]
+)
+
+/**
+ * Two-Factor Authentication secrets and backup codes
+ * Stores encrypted TOTP secret and one-time backup codes
+ */
+export const user2fa = sqliteTable(
+  'user_2fa',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .unique()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    // Encrypted TOTP secret (base32 encoded)
+    secret: text('secret').notNull(),
+    // JSON array of hashed backup codes (10 codes, each usable once)
+    backupCodes: text('backup_codes').notNull(),
+    // Number of backup codes remaining
+    backupCodesRemaining: integer('backup_codes_remaining').default(10),
+    // Timestamps
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  table => [index('user_2fa_user_idx').on(table.userId)]
 )
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -698,7 +725,12 @@ export const AUDIT_ACTIONS = [
   // Role management
   'role_create',
   'role_update',
-  'role_delete'
+  'role_delete',
+  // Two-Factor Authentication
+  '2fa_enabled',
+  '2fa_disabled',
+  '2fa_verified',
+  '2fa_failed'
 ] as const
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]
 
@@ -736,6 +768,8 @@ export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Session = typeof sessions.$inferSelect
 export type NewSession = typeof sessions.$inferInsert
+export type User2fa = typeof user2fa.$inferSelect
+export type NewUser2fa = typeof user2fa.$inferInsert
 export type Setting = typeof settings.$inferSelect
 export type NewSetting = typeof settings.$inferInsert
 export type Portfolio = typeof portfolios.$inferSelect

@@ -36,12 +36,13 @@ Perfect for:
 
 | Feature | Description |
 |---------|-------------|
-| **4 Application Modes** | `app-only`, `website-app`, `website-admin`, `website-only` - choose your UX |
+| **Entity-Based Architecture** | `entities.website` + `entities.app` + `admin.enabled` — compose your UX |
 | **Pure CSS Architecture** | 5-layer CSS system with OKLCH colors, `light-dark()`, no frameworks |
 | **Multi-language** | Database-driven i18n with automatic RTL support (Hebrew, Arabic) |
 | **Theme System** | Light/dark mode with automatic theme-aware logo switching |
 | **One-pager Toggle** | Switch between scroll-based anchors or route-based navigation |
 | **Admin Panel** | Built-in CMS for settings, portfolios, translations, users, contacts |
+| **Two-Factor Auth** | TOTP-based 2FA with backup codes |
 
 ### Backend
 
@@ -99,39 +100,104 @@ Perfect for:
 ### Prerequisites
 
 - Node.js 20+
-- npm (or pnpm)
+- npm
+- **Claude Code** (VS Code extension or CLI) — *recommended*
 
-### Installation
+---
+
+### With Claude Code (Recommended)
+
+Puppet Master is designed to work with **Claude Code** as your AI co-pilot. Claude understands the entire PM framework and guides you through setup, development, and migration.
+
+#### New Project Setup
 
 ```bash
-# Clone the repo
+# 1. Clone the repo
 git clone <repository-url>
 cd puppet-master/app
 
-# Run init (installs dependencies automatically)
+# 2. Open in VS Code with Claude Code extension (or use Claude CLI)
+code .
+
+# 3. In Claude Code, type:
+/pm-init
+```
+
+That's it! `/pm-init` handles everything:
+- Installs dependencies
+- Asks: **BUILD** (client project) or **DEVELOP** (framework work)
+- Sets up database
+- Starts dev server
+- Opens configuration wizard at `/init`
+
+#### PM Claude Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/pm-help` | **List all commands** — Shows this reference |
+| `/pm-init` | **Start here** — Initialize or reconfigure project |
+| `/pm-dev` | Start/restart development server |
+| `/pm-status` | Show current configuration state |
+| `/pm-migrate` | AI-powered migration for brownfield projects |
+| `/pm-team` | Multi-expert code review (7 specialists) |
+| `/pm-team-all` | Complete team review (42 experts) |
+| `/pm-contribute` | Export fix/feature as contribution doc |
+| `/pm-apply` | Apply contribution doc to PM framework |
+
+#### Team Review Commands
+
+**By Country** (7 specialists per country):
+| `/pm-il` | `/pm-ru` | `/pm-us` | `/pm-fr` | `/pm-jp` | `/pm-ch` |
+|----------|----------|----------|----------|----------|----------|
+
+**By Specialty** (6 country experts per specialty):
+| Command | Specialty | Focus |
+|---------|-----------|-------|
+| `/pm-ux` | UX/UI | User research, design systems, accessibility |
+| `/pm-frontend` | Frontend | Vue/Nuxt components, CSS, performance |
+| `/pm-backend` | Backend | API design, database, security |
+| `/pm-security` | Security | OWASP, compliance, penetration testing |
+| `/pm-devops` | DevOps | Docker, CI/CD, cloud infrastructure |
+| `/pm-fullstack` | Fullstack | Architecture, data flow, integration |
+| `/pm-fastapi` | FastAPI | External APIs, webhooks, integrations |
+
+#### Greenfield Workflow (New Project)
+
+```
+/pm-init
+  → Choose BUILD
+  → Complete wizard in browser
+  → "Ready to Code" screen appears
+  → Start building!
+```
+
+#### Brownfield Workflow (Migrate Existing Project)
+
+```
+/pm-init
+  → Choose BUILD
+  → Upload your project as ZIP in wizard
+  → Complete configuration
+  → Run /pm-migrate
+  → Claude analyzes your code and creates migration plan
+  → Follow the plan step by step
+```
+
+---
+
+### Without Claude Code (Fallback)
+
+If you don't have Claude Code, you can use the CLI directly:
+
+```bash
+git clone <repository-url>
+cd puppet-master/app
 npm run init
 ```
 
-### What Happens
+This runs the same setup flow, but you won't have AI assistance for migration or development.
 
-`npm run init` does everything:
-
-1. **Installs dependencies** (if needed)
-2. **Asks: BUILD or DEVELOP?**
-   - **BUILD** → Runs database setup, starts dev server, opens wizard at `/init`
-   - **DEVELOP** → Enables all features, seeds sample data, starts dev server
-
-3. **BUILD mode wizard** (in browser):
-   - Project Type — Website or App
-   - Admin Panel — Enable/disable
-   - Import Code — Optional: upload zip of existing project
-   - Modules — Blog, Portfolio, Team, etc.
-   - Languages — Select supported locales
-   - Features — Dark mode, PWA, etc.
-
-4. **After wizard**:
-   - **Greenfield** (no import): Shows "Ready to Code" screen with key directories → start coding
-   - **Brownfield** (with import): Shows migration steps (use `/pm-migrate` with Claude Code)
+---
 
 ### Two Modes
 
@@ -140,26 +206,14 @@ npm run init
 | **BUILD** | Client projects | Opens configuration wizard |
 | **DEVELOP** | PM framework work | All features enabled, sample data seeded |
 
-### Brownfield Migration (Importing Existing Code)
-
-If you have an existing project to migrate:
-
-1. Run `npm run init`
-2. In wizard, upload your project as a **zip file**
-3. Complete the configuration
-4. After wizard:
-   - **With Claude Code**: Type `/pm-migrate` to run AI-powered migration analysis
-   - **Without Claude Code**: Reference files in `./import/` folder manually
-
 ### Headless Mode (CI/CD)
 
 ```bash
-# Non-interactive - pass all config via flags
 npm run init -- --headless --mode=build --type=website
 npm run init -- --headless --mode=develop
 ```
 
-See [docs/SETUP-WORKFLOWS.md](docs/SETUP-WORKFLOWS.md) for detailed workflows.
+See [Setup Workflows](docs/guides/setup-workflows.md) for detailed workflows.
 
 ### Default Accounts
 
@@ -297,7 +351,7 @@ docker run -p 3000:3000 \
   puppet-master
 ```
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full deployment guide.
+See [docs/operations/deployment.md](docs/operations/deployment.md) for full deployment guide.
 
 ---
 
@@ -307,27 +361,27 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full deployment guide.
 
 | Document | Description |
 |----------|-------------|
-| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Step-by-step setup guide |
-| [CONFIGURATION.md](docs/CONFIGURATION.md) | Configuration reference |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment with Docker/Kamal |
-| [EXTERNAL_API.md](docs/EXTERNAL_API.md) | External API integration |
-| [WEBSOCKET.md](docs/WEBSOCKET.md) | WebSocket setup |
+| [Getting Started](docs/guides/getting-started.md) | Step-by-step setup guide |
+| [Configuration](docs/reference/configuration.md) | Configuration reference |
+| [Deployment](docs/operations/deployment.md) | Deployment with Docker/Kamal |
+| [External API](docs/reference/external-api.md) | External API integration |
+| [WebSocket](docs/reference/websocket.md) | WebSocket setup |
 
 ### Reference
 
 | Document | Description |
 |----------|-------------|
-| [API_REFERENCE.md](docs/API_REFERENCE.md) | API endpoints |
-| [CSS_ARCHITECTURE.md](docs/styles/CSS_ARCHITECTURE.md) | CSS system |
-| [CSS_QUICK_REFERENCE.md](docs/styles/CSS_QUICK_REFERENCE.md) | CSS classes lookup |
+| [API Reference](docs/reference/api-reference.md) | API endpoints |
+| [CSS Architecture](docs/styles/CSS_ARCHITECTURE.md) | CSS system |
+| [CSS Quick Reference](docs/styles/CSS_QUICK_REFERENCE.md) | CSS classes lookup |
 
 ### Operations
 
 | Document | Description |
 |----------|-------------|
-| [MONITORING.md](docs/MONITORING.md) | Health checks & logging |
-| [SECURITY.md](docs/SECURITY.md) | Security features & checklist |
-| [ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | Admin panel user guide |
+| [Monitoring](docs/operations/monitoring.md) | Health checks & logging |
+| [Security](docs/reference/security.md) | Security features & checklist |
+| [Admin Guide](docs/guides/admin-guide.md) | Admin panel user guide |
 
 ---
 

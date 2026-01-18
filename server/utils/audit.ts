@@ -262,5 +262,58 @@ export const audit = {
       userId: actorId,
       details: { roleId, roleName }
     })
+  },
+
+  /**
+   * Log 2FA enabled
+   */
+  async twoFactorEnabled(event: H3Event, userId: number): Promise<void> {
+    await logAudit(event, '2fa_enabled', {
+      userId,
+      targetUserId: userId,
+      details: { action: '2FA enabled for account' }
+    })
+  },
+
+  /**
+   * Log 2FA disabled
+   */
+  async twoFactorDisabled(
+    event: H3Event,
+    actorId: number,
+    targetUserId: number,
+    reason?: string
+  ): Promise<void> {
+    await logAudit(event, '2fa_disabled', {
+      userId: actorId,
+      targetUserId,
+      details: { reason: reason || 'User disabled 2FA', selfAction: actorId === targetUserId }
+    })
+  },
+
+  /**
+   * Log successful 2FA verification
+   */
+  async twoFactorVerified(
+    event: H3Event,
+    userId: number,
+    method: 'totp' | 'backup'
+  ): Promise<void> {
+    await logAudit(event, '2fa_verified', {
+      userId,
+      targetUserId: userId,
+      details: { method }
+    })
+  },
+
+  /**
+   * Log failed 2FA verification attempt
+   */
+  async twoFactorFailed(event: H3Event, userId: number, reason: string): Promise<void> {
+    await logAudit(event, '2fa_failed', {
+      targetUserId: userId,
+      details: { reason },
+      success: false
+    })
   }
 }

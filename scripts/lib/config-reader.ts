@@ -49,9 +49,16 @@ const CONFIG_FILENAME = 'puppet-master.config.ts'
 
 /**
  * Get the path to the config file
+ * @param appDir - The app directory containing puppet-master.config.ts
+ *                 If not provided, defaults to process.cwd() (for use from project root)
  */
 export function getConfigPath(appDir?: string): string {
   const dir = appDir || process.cwd()
+  // If appDir is provided, it should be the actual app directory
+  // If not provided (cwd), we're likely running from project root, so add 'app'
+  if (appDir) {
+    return resolve(dir, CONFIG_FILENAME)
+  }
   return resolve(dir, 'app', CONFIG_FILENAME)
 }
 
@@ -215,28 +222,154 @@ export function readFeatures(appDir?: string): PmConfigSummary['features'] {
 
 /**
  * Check if import folder has content (brownfield detection)
+ * Detects: PROJECT.md with content, package.json, common project structures
+ * Import folder is at project-root/import/ (sibling to app directory)
  */
 export function hasBrownfieldContent(appDir?: string): boolean {
   const dir = appDir || process.cwd()
-  const importPath = resolve(dir, 'import')
+  // If appDir is provided, go up one level to project root
+  const importPath = appDir ? resolve(dir, '..', 'import') : resolve(dir, 'import')
   if (!existsSync(importPath)) return false
 
-  // Check for PROJECT.md or any content files
+  // Check for PROJECT.md with filled content
   const projectMd = resolve(importPath, 'PROJECT.md')
   if (existsSync(projectMd)) {
     const content = readFileSync(projectMd, 'utf-8')
-    // Check if it has been filled out (not just template)
-    return content.includes('## Project Overview') && !content.includes('[Your project name]')
+    if (content.includes('## Project Overview') && !content.includes('[Your project name]')) {
+      return true
+    }
+  }
+
+  // Check for common project indicators
+  const projectIndicators = [
+    'package.json',
+    'composer.json',
+    'requirements.txt',
+    'Gemfile',
+    'pom.xml',
+    'build.gradle',
+    'Cargo.toml',
+    'go.mod'
+  ]
+
+  for (const indicator of projectIndicators) {
+    if (existsSync(resolve(importPath, indicator))) {
+      return true
+    }
+  }
+
+  // Check for common source directories
+  const sourceDirs = ['src', 'app', 'lib', 'components', 'pages']
+  for (const sourceDir of sourceDirs) {
+    if (existsSync(resolve(importPath, sourceDir))) {
+      return true
+    }
   }
 
   return false
 }
 
 /**
+ * Detect project framework from import folder
+ */
+export interface DetectedProject {
+  hasContent: boolean
+  framework?: 'react' | 'vue' | 'angular' | 'nuxt' | 'next' | 'svelte' | 'express' | 'unknown'
+  packageManager?: 'npm' | 'yarn' | 'pnpm'
+  typescript: boolean
+  fileCount: number
+}
+
+export function detectProjectInfo(appDir?: string): DetectedProject {
+  const dir = appDir || process.cwd()
+  // If appDir is provided, go up one level to project root
+  const importPath = appDir ? resolve(dir, '..', 'import') : resolve(dir, 'import')
+
+  const result: DetectedProject = {
+    hasContent: false,
+    typescript: false,
+    fileCount: 0
+  }
+
+  if (!existsSync(importPath)) return result
+
+  // Check for package.json
+  const packageJsonPath = resolve(importPath, 'package.json')
+  if (existsSync(packageJsonPath)) {
+    result.hasContent = true
+    try {
+      const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+
+      // Detect framework
+      if (deps.nuxt || deps['nuxt3']) result.framework = 'nuxt'
+      else if (deps.next) result.framework = 'next'
+      else if (deps.vue) result.framework = 'vue'
+      else if (deps.react) result.framework = 'react'
+      else if (deps['@angular/core']) result.framework = 'angular'
+      else if (deps.svelte) result.framework = 'svelte'
+      else if (deps.express) result.framework = 'express'
+      else result.framework = 'unknown'
+
+      // Detect TypeScript
+      result.typescript = !!deps.typescript
+
+      // Detect package manager from lock files
+      if (existsSync(resolve(importPath, 'pnpm-lock.yaml'))) result.packageManager = 'pnpm'
+      else if (existsSync(resolve(importPath, 'yarn.lock'))) result.packageManager = 'yarn'
+      else if (existsSync(resolve(importPath, 'package-lock.json'))) result.packageManager = 'npm'
+    } catch {
+      result.framework = 'unknown'
+    }
+  }
+
+  // Count files (quick scan)
+  try {
+    result.fileCount = countFilesShallow(importPath)
+    if (result.fileCount > 0) result.hasContent = true
+  } catch {
+    // Ignore errors
+  }
+
+  return result
+}
+
+/**
+ * Count files in directory (shallow, skips node_modules)
+ */
+function countFilesShallow(dir: string, depth = 0): number {
+  if (depth > 3) return 0 // Limit depth for performance
+
+  const { readdirSync, statSync } = require('fs')
+  let count = 0
+
+  try {
+    const entries = readdirSync(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue
+      if (entry.isFile()) count++
+      else if (entry.isDirectory()) {
+        count += countFilesShallow(resolve(dir, entry.name), depth + 1)
+      }
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  return count
+}
+
+/**
  * Check if database exists
+ * Database is at project-root/data/sqlite.db (sibling to app directory)
  */
 export function databaseExists(appDir?: string): boolean {
   const dir = appDir || process.cwd()
+  // If appDir is provided, go up one level to project root
+  // If not provided (cwd from project root), use directly
+  if (appDir) {
+    return existsSync(resolve(dir, '..', 'data', 'sqlite.db'))
+  }
   return existsSync(resolve(dir, 'data', 'sqlite.db'))
 }
 

@@ -2,7 +2,7 @@
  * Init Check Middleware
  *
  * Controls access to /init based on pmMode:
- * - unconfigured: Allow /init for BUILD mode configuration
+ * - unconfigured: Redirect to /init for configuration
  * - build/develop: Block /init, redirect to home
  *
  * Note: Mode selection (build/develop) happens in CLI or Claude chat,
@@ -20,6 +20,16 @@ export default defineNuxtRouteMiddleware(to => {
     return navigateTo('/', { replace: true })
   }
 
-  // When UNCONFIGURED: allow /init but don't force redirect
-  // Mode selection happens in CLI/Claude, not browser
+  // When UNCONFIGURED: redirect to /init
+  if (pmMode === 'unconfigured' && to.path !== '/init') {
+    // Skip API routes and assets
+    if (to.path.startsWith('/api') || to.path.startsWith('/_nuxt')) {
+      return
+    }
+    // Allow skip via query param (for CLI users who want to bypass)
+    if (to.query.skip === 'true') {
+      return
+    }
+    return navigateTo('/init', { replace: true })
+  }
 })

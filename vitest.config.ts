@@ -19,11 +19,44 @@ export default defineVitestConfig({
     testTimeout: 30000,
     // Hook timeout for setup/teardown
     hookTimeout: 30000,
-    // Coverage configuration (optional, run with --coverage)
+    // Coverage configuration
     coverage: {
       provider: 'v8',
-      include: ['server/utils/**', 'app/composables/**', 'app/components/**'],
-      exclude: ['node_modules', 'tests', 'e2e-playwright']
+      include: [
+        'server/utils/**',
+        'server/api/**',
+        'app/composables/**',
+        'app/components/**'
+      ],
+      exclude: [
+        'node_modules',
+        'tests',
+        'e2e-playwright',
+        '**/*.d.ts',
+        '**/*.test.ts',
+        '.nuxt',
+        '.output'
+      ],
+      // Coverage thresholds - enforced in CI
+      thresholds: {
+        statements: 80,
+        branches: 70,
+        functions: 75,
+        lines: 80
+      },
+      // Report formats
+      reporter: ['text', 'text-summary', 'json', 'html', 'lcov'],
+      // Output directory
+      reportsDirectory: './coverage',
+      // Enable all files tracking (shows 0% for untested files)
+      all: true
+    },
+    // Global setup/teardown
+    globalSetup: [],
+    // Reporters
+    reporters: ['default', 'html'],
+    outputFile: {
+      html: './test-results/index.html'
     }
   }
 })

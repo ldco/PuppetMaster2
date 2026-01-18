@@ -26,7 +26,7 @@ pmMode: 'unconfigured' | 'build' | 'develop'
 
 | pmMode | Description | What Happens |
 |--------|-------------|--------------|
-| `'unconfigured'` | Fresh clone, needs setup | Wizard at `/setup` |
+| `'unconfigured'` | Fresh clone, needs setup | Wizard at `/init` |
 | `'build'` | Client project (website or app) | Normal site operation |
 | `'develop'` | Framework development | Shows showcase site |
 
@@ -34,28 +34,52 @@ pmMode: 'unconfigured' | 'build' | 'develop'
 
 ---
 
-### Project Type (BUILD mode only)
+### Entity Type (BUILD mode)
 
-When `pmMode` is `'build'`, you also specify the project type:
+When `pmMode` is `'build'`, configure what you're building:
 
 ```typescript
-projectType: 'website' | 'app'
+entities: {
+  website: true,   // TRUE = Marketing site with public pages
+  app: false,      // TRUE = Login-required app (/ redirects to /login)
+}
 ```
 
-| Type | Description | UX Pattern |
-|------|-------------|------------|
-| `'website'` | Marketing site, landing pages | Horizontal header |
-| `'app'` | Dashboard, user features | Sidebar/bottom nav |
+| Entity Combo | UX Pattern |
+|--------------|------------|
+| `website: true, app: false` | Marketing site |
+| `website: false, app: true` | Login-required app |
+| `website: true, app: true` | Marketing site + app (login button visible) |
 
 ---
 
 ### Admin Panel
 
-Enable or disable the admin panel:
+Configure the admin panel with role-based access:
 
 ```typescript
 admin: {
-  enabled: true
+  enabled: true,
+
+  // System modules (PM core)
+  system: {
+    users: { enabled: true, roles: ['master', 'admin'] },
+    roles: { enabled: true, roles: ['master'] },
+    translations: { enabled: true, roles: ['master', 'admin', 'editor'] },
+    settings: { enabled: true, roles: ['master', 'admin'] },
+    health: { enabled: true, roles: ['master'] },
+  },
+
+  // Website content modules
+  websiteModules: {
+    blog: { enabled: true, roles: ['master', 'admin', 'editor'] },
+    portfolio: { enabled: true, roles: ['master', 'admin'] },
+    team: { enabled: true, roles: ['master', 'admin'] },
+    // ... testimonials, faq, clients, pricing, features, contacts
+  },
+
+  // Custom app modules (developer-defined)
+  appModules: {}
 }
 ```
 
@@ -63,18 +87,18 @@ When enabled, admin routes are available at `/admin/*`.
 
 ---
 
-### Legacy Application Modes (Deprecated)
+### Legacy Application Modes (Removed)
 
-> **Note:** The old `mode` field with values like `app-only`, `website-app`, etc. is being replaced by the combination of `pmMode`, `projectType`, and `admin.enabled`.
+> **Note:** The old `mode` field (`app-only`, `website-app`, etc.) and `projectType` field have been **removed**. Use the `entities` and `admin` configuration instead.
 
-For reference, the mapping is:
+Migration guide:
 
 | Old Mode | New Configuration |
 |----------|-------------------|
-| `app-only` | `projectType: 'app'`, `admin.enabled: false` |
-| `website-app` | `projectType: 'website'`, login button visible |
-| `website-admin` | `projectType: 'website'`, `admin.enabled: true`, login hidden |
-| `website-only` | `projectType: 'website'`, `admin.enabled: false` |
+| `app-only` | `entities: { website: false, app: true }, admin.enabled: false` |
+| `website-app` | `entities: { website: true, app: true }, admin.enabled: false` |
+| `website-admin` | `entities: { website: true, app: false }, admin.enabled: true` |
+| `website-only` | `entities: { website: true, app: false }, admin.enabled: false` |
 
 ---
 

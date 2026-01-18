@@ -45,7 +45,7 @@ PM uses a `pmMode` configuration value to determine its behavior:
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │   'unconfigured'  ──────►  Fresh clone, needs setup                         │
-│         │                  Wizard shown at /setup                            │
+│         │                  Wizard shown at /init                            │
 │         ▼                                                                    │
 │   ┌─────────────────────────────────────────────────────────────────┐       │
 │   │                    SETUP WIZARD                                   │       │
@@ -86,7 +86,7 @@ For working on the PM framework:
 
 ## The Setup Wizard
 
-PM includes a browser-based setup wizard at `/setup` that handles all configuration:
+PM includes a browser-based setup wizard at `/init` that handles all configuration:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -120,17 +120,18 @@ PM includes a browser-based setup wizard at `/setup` that handles all configurat
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Three Setup Methods
+### Setup Methods
 
-The wizard is the primary method, but PM supports multiple setup approaches:
+The wizard is the primary method, with headless support for automation:
 
 | Method | Best For | Command |
 |--------|----------|---------|
-| **Browser Wizard** | Visual configuration, first-time users | `/pm-init` or `npm run setup` |
-| **CLI Prompts** | Terminal lovers, SSH sessions | `npm run setup:cli` |
-| **Headless** | CI/CD, Docker, automation | `npm run setup:headless` |
+| **Interactive** | Visual configuration, first-time users | `npm run init` or `/pm-init` |
+| **Headless** | CI/CD, Docker, automation | `npm run init -- --headless` |
 
-All methods produce the same result: a configured `puppet-master.config.ts`.
+Both methods produce the same result: a configured `puppet-master.config.ts`.
+
+See [SETUP-WORKFLOWS.md](SETUP-WORKFLOWS.md) for detailed setup documentation.
 
 ---
 
@@ -213,8 +214,7 @@ npm install
 ```bash
 git clone puppet-master my-project
 cd my-project/app
-npm install
-npm run setup               # Opens wizard in browser
+npm run init                # Installs deps, prompts BUILD/DEVELOP, opens wizard
 ```
 
 ---
@@ -349,8 +349,8 @@ Dynamic roles with page-level permissions:
 | What is PM? | Config-driven framework + working showcase |
 | Framework or template? | Both — the showcase IS the framework |
 | pmMode values? | unconfigured, build, develop |
-| How to set up? | `/pm-init` → wizard at `/setup` |
-| Setup without Claude? | `npm run setup` |
+| How to set up? | `/pm-init` → wizard at `/init` |
+| Setup without Claude? | `npm run init` |
 | PM-Claude? | Specialized AI for PM (goes to Git) |
 | System Claude? | User's personal settings (NOT in Git) |
 | Brownfield support? | Yes, wizard handles import detection |

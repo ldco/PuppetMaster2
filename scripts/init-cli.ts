@@ -11,26 +11,20 @@
  */
 
 import * as readline from 'readline'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { existsSync } from 'fs'
 import { resolve } from 'path'
 import { execSync, spawn } from 'child_process'
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const LOCALE_MAP: Record<string, { code: string; iso: string; name: string }> = {
-  en: { code: 'en', iso: 'en-US', name: 'English' },
-  ru: { code: 'ru', iso: 'ru-RU', name: 'Russian' },
-  he: { code: 'he', iso: 'he-IL', name: 'Hebrew' },
-  es: { code: 'es', iso: 'es-ES', name: 'Spanish' },
-  fr: { code: 'fr', iso: 'fr-FR', name: 'French' },
-  de: { code: 'de', iso: 'de-DE', name: 'German' },
-  zh: { code: 'zh', iso: 'zh-CN', name: 'Chinese' },
-  ja: { code: 'ja', iso: 'ja-JP', name: 'Japanese' }
-}
-
-const ALL_MODULES = ['blog', 'portfolio', 'team', 'testimonials', 'faq', 'pricing', 'clients', 'features', 'contact']
+// Import from centralized libraries
+import { readPmMode } from './lib/config-reader'
+import {
+  writePmMode,
+  applySetupConfig,
+  createConfigBackup,
+  validateConfigAfterWrite
+} from './lib/config-writer'
+import { ALL_MODULES, LOCALE_MAP, parseLocales } from './lib/modules'
+import type { PmMode } from './lib/config-reader'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -47,38 +41,59 @@ function parseArgs(): Record<string, string> {
   return args
 }
 
+/**
+ * Read current mode using centralized library
+ */
 function readCurrentMode(): string {
-  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
-  if (!existsSync(configPath)) return 'unconfigured'
-  const content = readFileSync(configPath, 'utf-8')
-  const match = content.match(/pmMode:\s*['"](\w+)['"]/)
-  return match ? match[1] : 'unconfigured'
+  try {
+    // Use the app directory relative to scripts folder
+    return readPmMode(resolve(process.cwd(), 'app'))
+  } catch {
+    return 'unconfigured'
+  }
 }
 
-function setConfigMode(mode: 'build' | 'develop' | 'unconfigured'): void {
-  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
-  if (!existsSync(configPath)) throw new Error('Config file not found')
+/**
+ * Set config mode with backup and validation
+ */
+function setConfigMode(mode: PmMode): void {
+  const appDir = resolve(process.cwd(), 'app')
 
-  let content = readFileSync(configPath, 'utf-8')
-  content = content.replace(
-    /pmMode:\s*['"]?\w+['"]?\s*as\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]/,
-    `pmMode: '${mode}' as 'unconfigured' | 'build' | 'develop'`
-  )
-
-  if (mode === 'develop') {
-    for (const mod of ALL_MODULES) {
-      content = content.replace(
-        new RegExp(`(${mod}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's'),
-        '$1$2true'
-      )
-    }
-    content = content.replace(/(multiLangs:\s*)(true|false)/g, '$1true')
-    content = content.replace(/(doubleTheme:\s*)(true|false)/g, '$1true')
+  // Create backup before modification
+  try {
+    createConfigBackup(appDir)
+  } catch {
+    // Continue even if backup fails on first run
   }
 
-  writeFileSync(configPath, content, 'utf-8')
+  // Use centralized writePmMode
+  writePmMode(appDir, mode)
+
+  // If develop mode, enable all modules and features
+  if (mode === 'develop') {
+    applySetupConfig(appDir, {
+      pmMode: 'develop',
+      projectType: 'website',
+      adminEnabled: true,
+      modules: [...ALL_MODULES],
+      features: {
+        multiLangs: true,
+        doubleTheme: true,
+        onepager: false,
+        pwa: false
+      }
+    })
+  }
+
+  // Validate the write succeeded
+  if (!validateConfigAfterWrite(appDir, mode)) {
+    console.error('Warning: Config validation failed after write')
+  }
 }
 
+/**
+ * Write full config using centralized library
+ */
 function writeFullConfig(config: {
   pmMode: string
   projectType: string
@@ -88,46 +103,30 @@ function writeFullConfig(config: {
   locales: Array<{ code: string; iso: string; name: string }>
   defaultLocale: string
 }): void {
-  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
-  if (!existsSync(configPath)) throw new Error('Config file not found')
+  const appDir = resolve(process.cwd(), 'app')
 
-  let content = readFileSync(configPath, 'utf-8')
-
-  const replaceBoolean = (str: string, key: string, value: boolean): string => {
-    return str.replace(new RegExp(`(${key}:\\s*)(true|false)`, 'g'), `$1${value}`)
+  // Create backup before modification
+  try {
+    createConfigBackup(appDir)
+  } catch {
+    // Continue even if backup fails
   }
 
-  // pmMode
-  content = content.replace(
-    /pmMode:\s*['"]?\w+['"]?\s*as\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]/,
-    `pmMode: '${config.pmMode}' as 'unconfigured' | 'build' | 'develop'`
-  )
+  // Use centralized applySetupConfig
+  applySetupConfig(appDir, {
+    pmMode: config.pmMode as PmMode,
+    projectType: config.projectType as 'website' | 'app',
+    adminEnabled: config.adminEnabled,
+    locales: config.locales,
+    defaultLocale: config.defaultLocale,
+    modules: config.modules,
+    features: config.features
+  })
 
-  // entities
-  content = replaceBoolean(content, 'website', config.projectType === 'website')
-  content = replaceBoolean(content, 'app', config.projectType === 'app')
-
-  // admin
-  content = content.replace(/(admin:\s*\{[\s\S]*?)(enabled:\s*)(true|false)/, `$1$2${config.adminEnabled}`)
-
-  // locales
-  const localesStr = config.locales.map(l => `    { code: '${l.code}', iso: '${l.iso}', name: '${l.name}' }`).join(',\n')
-  content = content.replace(/locales:\s*\[[\s\S]*?\]/, `locales: [\n${localesStr}\n  ]`)
-  content = content.replace(/(defaultLocale:\s*)['"][^'"]*['"]/, `$1'${config.defaultLocale}'`)
-
-  // modules
-  for (const mod of ALL_MODULES) {
-    const enabled = config.modules.includes(mod)
-    content = content.replace(new RegExp(`(${mod}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's'), `$1$2${enabled}`)
+  // Validate the write succeeded
+  if (!validateConfigAfterWrite(appDir, config.pmMode as PmMode)) {
+    console.error('Warning: Config validation failed after write')
   }
-
-  // features
-  content = replaceBoolean(content, 'multiLangs', config.features.multiLangs)
-  content = replaceBoolean(content, 'doubleTheme', config.features.doubleTheme)
-  content = replaceBoolean(content, 'onepager', config.features.onepager)
-  content = replaceBoolean(content, 'pwa', config.features.pwa)
-
-  writeFileSync(configPath, content, 'utf-8')
 }
 
 function runCommand(cmd: string, desc: string): void {
@@ -187,9 +186,9 @@ Examples:
       pmMode: 'develop',
       projectType: 'website',
       adminEnabled: true,
-      modules: ALL_MODULES,
+      modules: [...ALL_MODULES],
       features: { multiLangs: true, doubleTheme: true, onepager: false, pwa: false },
-      locales: [LOCALE_MAP.en, LOCALE_MAP.ru, LOCALE_MAP.he],
+      locales: parseLocales(['en', 'ru', 'he']),
       defaultLocale: 'en'
     }
     writeFullConfig(config)
@@ -201,9 +200,12 @@ Examples:
     const projectType = args.type || process.env.PM_TYPE || 'website'
     const adminEnabled = (args.admin || process.env.PM_ADMIN || 'true') === 'true'
     const modulesStr = args.modules || process.env.PM_MODULES || 'contact'
-    const modules = modulesStr === 'all' ? ALL_MODULES : modulesStr.split(',').filter(m => ALL_MODULES.includes(m.trim()))
+    const allModulesArray = [...ALL_MODULES] as string[]
+    const modules = modulesStr === 'all'
+      ? allModulesArray
+      : modulesStr.split(',').map(m => m.trim()).filter(m => allModulesArray.includes(m))
     const localesStr = args.locales || process.env.PM_LOCALES || 'en'
-    const locales = localesStr.split(',').map(c => LOCALE_MAP[c.trim()]).filter(Boolean)
+    const locales = parseLocales(localesStr.split(','))
     if (locales.length === 0) locales.push(LOCALE_MAP.en)
     const defaultLocale = args['default-locale'] || process.env.PM_DEFAULT_LOCALE || locales[0].code
     const darkMode = (args['dark-mode'] || process.env.PM_DARK_MODE || 'true') === 'true'

@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { useDatabase, schema } from '../../../database/client'
 import { USER_ROLES, type UserRole } from '../../../database/schema'
-import { hashPassword } from '../../../utils/password'
+import { hashPassword, validatePassword } from '../../../utils/password'
 import { canManageUser, getAssignableRoles } from '../../../utils/roles'
 import { audit } from '../../../utils/audit'
 import { checkVersion, versionInfo } from '../../../utils/optimisticLock'
@@ -103,7 +103,18 @@ export default defineEventHandler(async event => {
   if (email !== undefined) updates.email = email
   if (name !== undefined) updates.name = name
   if (role !== undefined) updates.role = role
-  if (password) updates.passwordHash = hashPassword(password)
+  if (password) {
+    // Enforce password policy before hashing
+    const validation = validatePassword(password)
+    if (!validation.valid) {
+      throw createError({
+        statusCode: 400,
+        message: validation.errors[0] || 'Password does not meet policy requirements',
+        data: { errors: validation.errors, strength: validation.strength }
+      })
+    }
+    updates.passwordHash = hashPassword(password)
+  }
 
   // Update user
   db.update(schema.users).set(updates).where(eq(schema.users.id, userId)).run()

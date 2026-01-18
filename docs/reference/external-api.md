@@ -192,6 +192,8 @@ REDIS_PREFIX=pm-cache:
 
 ## Architecture
 
+> **Note:** The API client, authentication manager, cache layer, and retry logic are fully implemented. The Repository Factory Layer shown below is a **planned future enhancement** — currently, API routes interact directly with the database (Drizzle) or API client.
+
 ### System Diagram
 
 ```
@@ -598,14 +600,14 @@ For external APIs to work with Puppet Master, they must implement these endpoint
 ### Portfolio Resource
 
 ```
-GET    /portfolio              - List items
-GET    /portfolio/:id          - Get single item
-POST   /portfolio              - Create item
-PUT    /portfolio/:id          - Update item
-DELETE /portfolio/:id          - Delete item
+GET    /portfolios             - List portfolios
+GET    /portfolios/:id         - Get single portfolio
+POST   /portfolios             - Create portfolio
+PUT    /portfolios/:id         - Update portfolio
+DELETE /portfolios/:id         - Delete portfolio
 ```
 
-**Request/Response Formats:** See `server/repositories/portfolio/types.ts` for TypeScript interfaces.
+**Request/Response Formats:** See `server/repositories/types.ts` for base TypeScript interfaces. Full portfolio types are defined inline in `server/api/portfolios/*.ts`.
 
 ### Settings Resource
 

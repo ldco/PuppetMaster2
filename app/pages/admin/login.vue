@@ -7,6 +7,7 @@
  * - website-admin mode: Hidden admin access at /admin/login
  *
  * Reuses the same login form logic, different layout context.
+ * Supports two-factor authentication (2FA) flow.
  *
  * Uses ClientOnly for logo to avoid SSR hydration mismatch.
  */
@@ -28,7 +29,7 @@ useHead({
   title: () => `${t('auth.login')} | Admin`
 })
 
-const { login, isLoading, isAuthenticated } = useAuth()
+const { login, isLoading, isAuthenticated, requires2fa, cancel2fa } = useAuth()
 const { shortLogo } = useLogo()
 
 // SSR fallback: use the default theme logo
@@ -62,10 +63,28 @@ async function handleSubmit() {
   })
 
   if (result.success) {
+    // Check if 2FA is required
+    if (result.requires2fa) {
+      // Stay on page, TwoFactorVerify component will be shown
+      return
+    }
     navigateTo('/admin')
   } else {
     errorMessage.value = result.error || t('auth.loginFailed')
   }
+}
+
+// Handle 2FA verification success
+function on2faVerified() {
+  navigateTo('/admin')
+}
+
+// Handle 2FA cancellation
+function on2faCancelled() {
+  cancel2fa()
+  // Reset form
+  password.value = ''
+  errorMessage.value = ''
 }
 </script>
 
@@ -83,78 +102,89 @@ async function handleSubmit() {
         </ClientOnly>
       </div>
 
-      <!-- Title -->
-      <h1 class="auth-title">Admin {{ t('auth.login') }}</h1>
+      <!-- 2FA Verification -->
+      <template v-if="requires2fa">
+        <MoleculesTwoFactorVerify
+          @verified="on2faVerified"
+          @cancelled="on2faCancelled"
+        />
+      </template>
 
-      <!-- Error Message -->
-      <div
-        v-if="errorMessage"
-        class="form-error"
-        style="text-align: center; margin-block-end: var(--space-4)"
-      >
-        {{ errorMessage }}
-      </div>
+      <!-- Login Form -->
+      <template v-else>
+        <!-- Title -->
+        <h1 class="auth-title">Admin {{ t('auth.login') }}</h1>
 
-      <!-- Form -->
-      <form class="auth-form" @submit.prevent="handleSubmit">
-        <!-- Email -->
-        <div class="form-group">
-          <label class="form-label" for="email">{{ t('auth.email') }}</label>
-          <div class="input-with-icon">
-            <IconMail class="input-icon" aria-hidden="true" />
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              class="input"
-              autocomplete="email"
-              required
-            />
-          </div>
+        <!-- Error Message -->
+        <div
+          v-if="errorMessage"
+          class="form-error"
+          style="text-align: center; margin-block-end: var(--space-4)"
+        >
+          {{ errorMessage }}
         </div>
 
-        <!-- Password -->
-        <div class="form-group">
-          <label class="form-label" for="password">{{ t('auth.password') }}</label>
-          <div class="input-with-icon input-with-action">
-            <IconLock class="input-icon" aria-hidden="true" />
-            <input
-              id="password"
-              v-model="password"
-              :type="showPassword ? 'text' : 'password'"
-              class="input"
-              autocomplete="current-password"
-              required
-            />
-            <button
-              type="button"
-              class="input-action"
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
-              @click="showPassword = !showPassword"
-            >
-              <IconEyeOff v-if="showPassword" />
-              <IconEye v-else />
-            </button>
+        <!-- Form -->
+        <form class="auth-form" @submit.prevent="handleSubmit">
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label" for="email">{{ t('auth.email') }}</label>
+            <div class="input-with-icon">
+              <IconMail class="input-icon" aria-hidden="true" />
+              <input
+                id="email"
+                v-model="email"
+                type="email"
+                class="input"
+                autocomplete="email"
+                required
+              />
+            </div>
           </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="password">{{ t('auth.password') }}</label>
+            <div class="input-with-icon input-with-action">
+              <IconLock class="input-icon" aria-hidden="true" />
+              <input
+                id="password"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                class="input"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="input-action"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                @click="showPassword = !showPassword"
+              >
+                <IconEyeOff v-if="showPassword" />
+                <IconEye v-else />
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember me -->
+          <label class="checkbox">
+            <input v-model="rememberMe" type="checkbox" />
+            <span>{{ t('auth.rememberMe') }}</span>
+          </label>
+
+          <!-- Submit -->
+          <button type="submit" class="btn btn-primary btn-full" :disabled="isLoading">
+            <IconLogin v-if="!isLoading" aria-hidden="true" />
+            <span>{{ isLoading ? t('common.loading') : t('auth.login') }}</span>
+          </button>
+        </form>
+
+        <!-- Back to site link (only for website-admin mode) -->
+        <div class="auth-footer">
+          <NuxtLink to="/" class="auth-link">← Back to website</NuxtLink>
         </div>
-
-        <!-- Remember me -->
-        <label class="checkbox">
-          <input v-model="rememberMe" type="checkbox" />
-          <span>{{ t('auth.rememberMe') }}</span>
-        </label>
-
-        <!-- Submit -->
-        <button type="submit" class="btn btn-primary btn-full" :disabled="isLoading">
-          <IconLogin v-if="!isLoading" aria-hidden="true" />
-          <span>{{ isLoading ? t('common.loading') : t('auth.login') }}</span>
-        </button>
-      </form>
-
-      <!-- Back to site link (only for website-admin mode) -->
-      <div class="auth-footer">
-        <NuxtLink to="/" class="auth-link">← Back to website</NuxtLink>
-      </div>
+      </template>
     </div>
   </div>
 </template>

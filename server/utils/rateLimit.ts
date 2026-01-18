@@ -226,6 +226,26 @@ export const contactRateLimiter = createRateLimiter(5, 60 * 60 * 1000, 'contact'
 // Stricter than contact form to prevent brute force
 export const loginRateLimiter = createRateLimiter(5, 15 * 60 * 1000, 'login')
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Two-Factor Authentication Rate Limiters
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 2FA Setup rate limiter (10 attempts per hour per user)
+// Prevents abuse of QR code generation
+export const twoFactorSetupRateLimiter = createRateLimiter(10, 60 * 60 * 1000, '2fa-setup')
+
+// 2FA Enable rate limiter (5 attempts per 15 minutes per user)
+// Prevents brute-forcing the verification code
+export const twoFactorEnableRateLimiter = createRateLimiter(5, 15 * 60 * 1000, '2fa-enable')
+
+// 2FA Verify rate limiter (5 attempts per 15 minutes per IP)
+// Strict limit during login to prevent code brute-forcing
+export const twoFactorVerifyRateLimiter = createRateLimiter(5, 15 * 60 * 1000, '2fa-verify')
+
+// 2FA Disable rate limiter (3 attempts per 15 minutes per user)
+// Stricter since this is a sensitive operation
+export const twoFactorDisableRateLimiter = createRateLimiter(3, 15 * 60 * 1000, '2fa-disable')
+
 /**
  * Get client IP from H3 event
  * Handles proxies (X-Forwarded-For, X-Real-IP)

@@ -6,12 +6,18 @@
  *
  * Strategy: Regex-based replacement to preserve formatting and comments.
  * Falls back to full rewrite only when adding new fields.
+ *
+ * Features:
+ * - Backup before writes
+ * - Validation after writes
+ * - Rollback on failure
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, writeFileSync, existsSync, unlinkSync, readdirSync, statSync } from 'fs'
+import { resolve, dirname, basename } from 'path'
 import type { PmMode, ProjectType } from './config-reader'
-import { getConfigPath, readConfigRaw } from './config-reader'
+import { getConfigPath, readConfigRaw, readPmMode } from './config-reader'
+import { ALL_MODULES, type ModuleId } from './modules'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -32,15 +38,142 @@ export interface SetupConfig {
   }
 }
 
+export interface WriteResult {
+  success: boolean
+  backupPath?: string
+  error?: string
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// REPLACEMENT PATTERNS
+// BACKUP & ROLLBACK
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const MAX_BACKUPS = 3
+
+/**
+ * Create a backup of the config file before modification
+ * Returns the backup path or throws on failure
+ */
+export function createConfigBackup(appDir?: string): string {
+  const configPath = getConfigPath(appDir)
+  if (!existsSync(configPath)) {
+    throw new Error(`Config file not found: ${configPath}`)
+  }
+
+  const dir = dirname(configPath)
+  const timestamp = Date.now()
+  const backupPath = resolve(dir, `puppet-master.config.ts.backup.${timestamp}`)
+
+  const content = readFileSync(configPath, 'utf-8')
+  writeFileSync(backupPath, content, 'utf-8')
+
+  // Clean up old backups (keep only MAX_BACKUPS)
+  cleanupOldBackups(dir)
+
+  return backupPath
+}
+
+/**
+ * Rollback to a specific backup file
+ */
+export function rollbackConfig(backupPath: string, appDir?: string): void {
+  if (!existsSync(backupPath)) {
+    throw new Error(`Backup file not found: ${backupPath}`)
+  }
+
+  const configPath = getConfigPath(appDir)
+  const backupContent = readFileSync(backupPath, 'utf-8')
+  writeFileSync(configPath, backupContent, 'utf-8')
+}
+
+/**
+ * Rollback to the most recent backup
+ */
+export function rollbackToLatestBackup(appDir?: string): boolean {
+  const configPath = getConfigPath(appDir)
+  const dir = dirname(configPath)
+  const backups = getBackupFiles(dir)
+
+  if (backups.length === 0) {
+    return false
+  }
+
+  // Backups are sorted newest first
+  rollbackConfig(backups[0], appDir)
+  return true
+}
+
+/**
+ * Get list of backup files sorted by timestamp (newest first)
+ */
+function getBackupFiles(dir: string): string[] {
+  if (!existsSync(dir)) return []
+
+  const files = readdirSync(dir)
+    .filter(f => f.startsWith('puppet-master.config.ts.backup.'))
+    .map(f => ({
+      path: resolve(dir, f),
+      timestamp: parseInt(f.split('.').pop() || '0', 10)
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .map(f => f.path)
+
+  return files
+}
+
+/**
+ * Remove old backups, keeping only the most recent MAX_BACKUPS
+ */
+function cleanupOldBackups(dir: string): void {
+  const backups = getBackupFiles(dir)
+
+  // Remove backups beyond MAX_BACKUPS
+  for (const backup of backups.slice(MAX_BACKUPS)) {
+    try {
+      unlinkSync(backup)
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VALIDATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Validate that the config file is valid after modification
+ * Checks that pmMode can be read back correctly
+ */
+export function validateConfigAfterWrite(appDir?: string, expectedMode?: PmMode): boolean {
+  try {
+    const actualMode = readPmMode(appDir)
+
+    // If we expected a specific mode, verify it
+    if (expectedMode && actualMode !== expectedMode) {
+      return false
+    }
+
+    // Basic check - mode should be valid
+    if (!['unconfigured', 'build', 'develop'].includes(actualMode)) {
+      return false
+    }
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REPLACEMENT PATTERNS (exported for reuse)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
  * Replace a simple value in the config
  * Pattern: key: value or key: 'value'
  */
-function replaceValue(content: string, pattern: RegExp, newValue: string): string {
+export function replaceValue(content: string, pattern: RegExp, newValue: string): string {
   if (pattern.test(content)) {
     return content.replace(pattern, newValue)
   }
@@ -49,19 +182,21 @@ function replaceValue(content: string, pattern: RegExp, newValue: string): strin
 
 /**
  * Replace boolean value
+ * Matches: key: true or key: false
  */
-function replaceBoolean(content: string, key: string, value: boolean): string {
-  // Match: key: true or key: false (with optional spaces)
+export function replaceBoolean(content: string, key: string, value: boolean): string {
   const pattern = new RegExp(`(${key}:\\s*)(true|false)`, 'g')
   return content.replace(pattern, `$1${value}`)
 }
 
 /**
  * Replace string value
+ * Matches: key: 'value' or key: "value"
+ * Note: Handles values with hyphens (e.g., 'en-US')
  */
-function replaceString(content: string, key: string, value: string): string {
-  // Match: key: 'value' or key: "value"
-  const pattern = new RegExp(`(${key}:\\s*)['"]\\w+['"]`, 'g')
+export function replaceString(content: string, key: string, value: string): string {
+  // Updated pattern to handle values with hyphens and special chars
+  const pattern = new RegExp(`(${key}:\\s*)['"][^'"]*['"]`, 'g')
   return content.replace(pattern, `$1'${value}'`)
 }
 
@@ -192,14 +327,10 @@ export function writeModuleEnabled(appDir: string | undefined, moduleId: string,
 
 /**
  * Set multiple modules at once
+ * Uses centralized ALL_MODULES from modules.ts
  */
 export function writeModules(appDir: string | undefined, enabledModules: string[]): void {
-  const allModules = [
-    'portfolio', 'pricing', 'contact', 'blog', 'team',
-    'testimonials', 'features', 'clients', 'faq'
-  ]
-
-  for (const moduleId of allModules) {
+  for (const moduleId of ALL_MODULES) {
     writeModuleEnabled(appDir, moduleId, enabledModules.includes(moduleId))
   }
 }

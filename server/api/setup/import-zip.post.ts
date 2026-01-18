@@ -3,14 +3,14 @@
  *
  * POST /api/setup/import-zip
  * Body: FormData with 'file' field
- * Returns: { files: string[] }
+ * Returns: { files: string[], extractionMethod: 'system' | 'node' }
  *
- * Extracts zip to ./import/ folder for brownfield migration
+ * Extracts zip to ./import/ folder for brownfield migration.
+ * Cross-platform: uses system unzip first, falls back to adm-zip.
  */
-import { createReadStream, createWriteStream, existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs'
+import { createWriteStream, existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs'
 import { resolve, join } from 'path'
-import { createGunzip } from 'zlib'
-import { pipeline } from 'stream/promises'
+import AdmZip from 'adm-zip'
 
 export default defineEventHandler(async (event) => {
   const formData = await readMultipartFormData(event)
@@ -18,7 +18,8 @@ export default defineEventHandler(async (event) => {
   if (!formData || formData.length === 0) {
     throw createError({
       statusCode: 400,
-      message: 'No file uploaded'
+      statusMessage: 'PM_ZIP_001: No file uploaded',
+      message: 'No file uploaded. Please select a ZIP file to import.'
     })
   }
 
@@ -26,19 +27,22 @@ export default defineEventHandler(async (event) => {
   if (!file || !file.data) {
     throw createError({
       statusCode: 400,
-      message: 'No file data found'
+      statusMessage: 'PM_ZIP_002: No file data found',
+      message: 'No file data found. Please try uploading again.'
     })
   }
 
   if (!file.filename?.endsWith('.zip')) {
     throw createError({
       statusCode: 400,
-      message: 'Only .zip files are allowed'
+      statusMessage: 'PM_ZIP_003: Invalid file type',
+      message: 'Only .zip files are allowed. Please compress your project as a ZIP file.'
     })
   }
 
   const importDir = resolve(process.cwd(), 'import')
   const tempZipPath = resolve(process.cwd(), 'data', 'temp-import.zip')
+  let extractionMethod: 'system' | 'node' = 'system'
 
   try {
     // Ensure data directory exists
@@ -64,19 +68,34 @@ export default defineEventHandler(async (event) => {
       writeStream.on('error', reject)
     })
 
-    // Extract zip using unzip command (cross-platform alternative to native Node.js)
-    const { execSync } = await import('child_process')
+    // Try system unzip first (faster for large files)
+    let extracted = false
 
     try {
+      const { execSync } = await import('child_process')
       execSync(`unzip -o "${tempZipPath}" -d "${importDir}"`, {
         stdio: 'pipe'
       })
+      extracted = true
+      extractionMethod = 'system'
     } catch {
-      // Try with node-based extraction if unzip not available
-      throw createError({
-        statusCode: 500,
-        message: 'Failed to extract zip. Please ensure unzip is installed on the server.'
-      })
+      // System unzip not available, fall back to adm-zip
+    }
+
+    // Fallback to Node.js-based extraction
+    if (!extracted) {
+      try {
+        const zip = new AdmZip(tempZipPath)
+        zip.extractAllTo(importDir, true)
+        extracted = true
+        extractionMethod = 'node'
+      } catch (e: any) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'PM_ZIP_004: Extraction failed',
+          message: `Failed to extract ZIP file: ${e.message}. The file may be corrupted or use unsupported compression.`
+        })
+      }
     }
 
     // Clean up temp file
@@ -89,7 +108,9 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      files: files.map(f => f.replace(importDir + '/', ''))
+      files: files.map(f => f.replace(importDir + '/', '')),
+      extractionMethod,
+      fileCount: files.length
     }
   } catch (e: any) {
     // Clean up on error
@@ -97,8 +118,14 @@ export default defineEventHandler(async (event) => {
       try { unlinkSync(tempZipPath) } catch {}
     }
 
+    // Re-throw createError instances
+    if (e.statusCode) {
+      throw e
+    }
+
     throw createError({
       statusCode: 500,
+      statusMessage: 'PM_ZIP_005: Processing failed',
       message: e.message || 'Failed to process zip file'
     })
   }

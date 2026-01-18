@@ -3,87 +3,147 @@
  *
  * POST /api/setup/config
  * Body: SetupConfig
- * Returns: { success: true }
+ * Returns: { success: true, databaseStatus: 'created' | 'exists' | 'error' }
  *
- * Writes configuration to puppet-master.config.ts
- * No auth required - setup wizard runs before users exist
+ * Writes configuration to puppet-master.config.ts.
+ * No auth required - setup wizard runs before users exist.
  */
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'fs'
+import { resolve, dirname } from 'path'
 import { z } from 'zod'
 
-const setupConfigSchema = z.object({
-  pmMode: z.enum(['unconfigured', 'build', 'develop']),
-  projectType: z.enum(['website', 'app']).optional(),
-  adminEnabled: z.boolean().optional(),
-  locales: z.array(z.object({
-    code: z.string(),
-    iso: z.string(),
-    name: z.string()
-  })).optional(),
-  defaultLocale: z.string().optional(),
-  modules: z.array(z.string()).optional(),
-  features: z.object({
-    multiLangs: z.boolean().optional(),
-    doubleTheme: z.boolean().optional(),
-    onepager: z.boolean().optional(),
-    pwa: z.boolean().optional()
-  }).optional()
-})
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS (single source of truth for modules)
+// ═══════════════════════════════════════════════════════════════════════════════
 
-type SetupConfig = z.infer<typeof setupConfigSchema>
+const ALL_MODULES = [
+  'blog', 'portfolio', 'team', 'testimonials', 'faq',
+  'pricing', 'clients', 'features', 'contact'
+] as const
 
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+type PmMode = 'unconfigured' | 'build' | 'develop'
+type ProjectType = 'website' | 'app'
 
-  // Validate input
-  const result = setupConfigSchema.safeParse(body)
-  if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      message: result.error.issues[0]?.message || 'Invalid configuration'
-    })
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIG HELPERS (inline for server compatibility)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function getConfigPath(appDir: string): string {
+  return resolve(appDir, 'puppet-master.config.ts')
+}
+
+function readConfigRaw(appDir: string): string {
+  const configPath = getConfigPath(appDir)
+  return readFileSync(configPath, 'utf-8')
+}
+
+function replaceBoolean(content: string, key: string, value: boolean): string {
+  const pattern = new RegExp(`(${key}:\\s*)(true|false)`, 'g')
+  return content.replace(pattern, `$1${value}`)
+}
+
+function replaceString(content: string, key: string, value: string): string {
+  const pattern = new RegExp(`(${key}:\\s*)['"][^'"]*['"]`, 'g')
+  return content.replace(pattern, `$1'${value}'`)
+}
+
+function createBackup(appDir: string): string | undefined {
+  try {
+    const configPath = getConfigPath(appDir)
+    if (!existsSync(configPath)) return undefined
+
+    const dir = dirname(configPath)
+    const timestamp = Date.now()
+    const backupPath = resolve(dir, `puppet-master.config.ts.backup.${timestamp}`)
+
+    const content = readFileSync(configPath, 'utf-8')
+    writeFileSync(backupPath, content, 'utf-8')
+
+    // Clean up old backups (keep only 3)
+    const backups = readdirSync(dir)
+      .filter(f => f.startsWith('puppet-master.config.ts.backup.'))
+      .map(f => ({ path: resolve(dir, f), ts: parseInt(f.split('.').pop() || '0', 10) }))
+      .sort((a, b) => b.ts - a.ts)
+
+    for (const backup of backups.slice(3)) {
+      try { unlinkSync(backup.path) } catch {}
+    }
+
+    return backupPath
+  } catch {
+    return undefined
   }
+}
 
-  const config = result.data
-  const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
+function rollbackToBackup(appDir: string): boolean {
+  try {
+    const configPath = getConfigPath(appDir)
+    const dir = dirname(configPath)
 
-  if (!existsSync(configPath)) {
-    throw createError({
-      statusCode: 500,
-      message: 'Config file not found'
-    })
+    const backups = readdirSync(dir)
+      .filter(f => f.startsWith('puppet-master.config.ts.backup.'))
+      .map(f => ({ path: resolve(dir, f), ts: parseInt(f.split('.').pop() || '0', 10) }))
+      .sort((a, b) => b.ts - a.ts)
+
+    if (backups.length === 0) return false
+
+    const backupContent = readFileSync(backups[0].path, 'utf-8')
+    writeFileSync(configPath, backupContent, 'utf-8')
+    return true
+  } catch {
+    return false
   }
+}
 
-  let content = readFileSync(configPath, 'utf-8')
-
-  // Helper: Replace boolean value
-  const replaceBoolean = (str: string, key: string, value: boolean): string => {
-    const pattern = new RegExp(`(${key}:\\s*)(true|false)`, 'g')
-    return str.replace(pattern, `$1${value}`)
+function readPmMode(appDir: string): PmMode {
+  try {
+    const content = readConfigRaw(appDir)
+    // Match pmMode value regardless of type annotation style
+    const match = content.match(/pmMode:\s*['"](\w+)['"]/)
+    if (match && ['unconfigured', 'build', 'develop'].includes(match[1])) {
+      return match[1] as PmMode
+    }
+    return 'unconfigured'
+  } catch {
+    return 'unconfigured'
   }
+}
 
-  // Helper: Replace string value
-  const replaceString = (str: string, key: string, value: string): string => {
-    const pattern = new RegExp(`(${key}:\\s*)['"][^'"]*['"]`, 'g')
-    return str.replace(pattern, `$1'${value}'`)
+function databaseExists(appDir: string): boolean {
+  return existsSync(resolve(appDir, '..', 'data', 'sqlite.db'))
+}
+
+interface SetupConfig {
+  pmMode: PmMode
+  projectType?: ProjectType
+  adminEnabled?: boolean
+  locales?: Array<{ code: string; iso: string; name: string }>
+  defaultLocale?: string
+  modules?: string[]
+  features?: {
+    multiLangs?: boolean
+    doubleTheme?: boolean
+    onepager?: boolean
+    pwa?: boolean
   }
+}
+
+function applyConfig(appDir: string, config: SetupConfig): void {
+  const configPath = getConfigPath(appDir)
+  let content = readConfigRaw(appDir)
 
   // 1. Update pmMode
+  // Handle both formats:
+  //   - pmMode: 'value' as const
+  //   - pmMode: 'value' as 'unconfigured' | 'build' | 'develop'
   if (/pmMode:/.test(content)) {
-    content = content.replace(
-      /pmMode:\s*['"]?\w+['"]?\s*as\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]\s*\|\s*['"][^'"]*['"]/,
-      `pmMode: '${config.pmMode}' as 'unconfigured' | 'build' | 'develop'`
-    )
-  } else {
-    // Add pmMode field if missing
-    const configStart = content.indexOf('const config = {')
-    if (configStart !== -1) {
-      const insertPoint = content.indexOf('{', configStart) + 1
-      content = content.slice(0, insertPoint) + `
-  // PM MODE
-  pmMode: '${config.pmMode}' as 'unconfigured' | 'build' | 'develop',
-` + content.slice(insertPoint)
+    // Match pmMode with either 'as const' or union type annotation
+    const pmModePattern = /pmMode:\s*['"][^'"]+['"]\s*as\s*(?:const|'[^']+'\s*\|\s*'[^']+'\s*\|\s*'[^']+')/
+    if (pmModePattern.test(content)) {
+      content = content.replace(
+        pmModePattern,
+        `pmMode: '${config.pmMode}' as 'unconfigured' | 'build' | 'develop'`
+      )
     }
   }
 
@@ -115,13 +175,8 @@ export default defineEventHandler(async (event) => {
 
   // 6. Update modules
   if (config.modules) {
-    const allModules = [
-      'portfolio', 'pricing', 'contact', 'blog', 'team',
-      'testimonials', 'features', 'clients', 'faq'
-    ]
-    for (const moduleId of allModules) {
+    for (const moduleId of ALL_MODULES) {
       const enabled = config.modules.includes(moduleId)
-      // Match: moduleId: { ... enabled: true/false
       const modulePattern = new RegExp(`(${moduleId}:\\s*\\{[^}]*)(enabled:\\s*)(true|false)`, 's')
       content = content.replace(modulePattern, `$1$2${enabled}`)
     }
@@ -143,10 +198,106 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Write updated config
   writeFileSync(configPath, content, 'utf-8')
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SCHEMA & HANDLER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const setupConfigSchema = z.object({
+  pmMode: z.enum(['unconfigured', 'build', 'develop']),
+  projectType: z.enum(['website', 'app']).optional(),
+  adminEnabled: z.boolean().optional(),
+  locales: z.array(z.object({
+    code: z.string(),
+    iso: z.string(),
+    name: z.string()
+  })).optional(),
+  defaultLocale: z.string().optional(),
+  modules: z.array(z.string()).optional(),
+  features: z.object({
+    multiLangs: z.boolean().optional(),
+    doubleTheme: z.boolean().optional(),
+    onepager: z.boolean().optional(),
+    pwa: z.boolean().optional()
+  }).optional()
+})
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  // Validate input
+  const result = setupConfigSchema.safeParse(body)
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'PM_CONFIG_001: Invalid configuration',
+      message: result.error.issues[0]?.message || 'Invalid configuration'
+    })
+  }
+
+  const config = result.data
+  const appDir = resolve(process.cwd(), 'app')
+  const configPath = getConfigPath(appDir)
+
+  if (!existsSync(configPath)) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'PM_CONFIG_002: Config file not found',
+      message: 'Config file not found. Please ensure puppet-master.config.ts exists.'
+    })
+  }
+
+  // Create backup before modification
+  const backupPath = createBackup(appDir)
+
+  // Filter to valid modules only
+  const validModules = config.modules
+    ? config.modules.filter(m => (ALL_MODULES as readonly string[]).includes(m))
+    : undefined
+
+  try {
+    // Apply configuration
+    applyConfig(appDir, {
+      pmMode: config.pmMode as PmMode,
+      projectType: config.projectType as ProjectType | undefined,
+      adminEnabled: config.adminEnabled,
+      locales: config.locales,
+      defaultLocale: config.defaultLocale,
+      modules: validModules,
+      features: config.features
+    })
+
+    // Validate the write succeeded
+    const actualMode = readPmMode(appDir)
+    if (actualMode !== config.pmMode) {
+      // Try to rollback
+      if (backupPath) {
+        rollbackToBackup(appDir)
+      }
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'PM_CONFIG_003: Config validation failed',
+        message: 'Config was written but validation failed. Rolled back to previous state.'
+      })
+    }
+  } catch (e: any) {
+    // If not already a create error, wrap it
+    if (!e.statusCode) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'PM_CONFIG_004: Config write failed',
+        message: e.message || 'Failed to write configuration'
+      })
+    }
+    throw e
+  }
 
   // Run db:push to create/update database schema
+  let databaseStatus: 'created' | 'exists' | 'error' = 'exists'
+  const dbExisted = databaseExists(appDir)
+
   try {
     const { execSync } = await import('child_process')
     execSync('npm run db:push', {
@@ -155,10 +306,16 @@ export default defineEventHandler(async (event) => {
       env: { ...process.env, FORCE_COLOR: '0' },
       input: 'y\n' // Auto-confirm drizzle prompts
     })
+    databaseStatus = dbExisted ? 'exists' : 'created'
   } catch (e: any) {
-    // Log but don't fail - database might already be set up
-    console.warn('db:push warning:', e.message)
+    // Log the actual error for debugging
+    console.error('db:push error:', e.message)
+    databaseStatus = 'error'
   }
 
-  return { success: true }
+  return {
+    success: true,
+    databaseStatus,
+    backupPath
+  }
 })

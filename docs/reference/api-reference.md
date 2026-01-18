@@ -240,9 +240,10 @@ POST /api/auth/login
 }
 ```
 
-**Response:**
+**Response (2FA disabled):**
 ```json
 {
+  "success": true,
   "user": {
     "id": 1,
     "email": "user@example.com",
@@ -253,9 +254,22 @@ POST /api/auth/login
 }
 ```
 
+**Response (2FA enabled):**
+```json
+{
+  "success": true,
+  "requires2fa": true,
+  "message": "Two-factor authentication required",
+  "csrfToken": "abc123..."
+}
+```
+
+When 2FA is required, the user must call `/api/user/2fa/verify` with their TOTP code.
+
 **Cookies Set:**
-- `pm-session` - Session ID (httpOnly, secure)
+- `pm-session` - Session ID (httpOnly, secure) — only when 2FA disabled or after 2FA verification
 - `pm-csrf` - CSRF token (httpOnly, secure)
+- `pm-2fa-pending` - Pending 2FA token (httpOnly, secure) — only when 2FA required
 
 ---
 
@@ -326,6 +340,141 @@ PUT /api/user/change-password
 
 ---
 
+## Two-Factor Authentication Endpoints
+
+All 2FA endpoints require authentication except `/api/user/2fa/verify` (which requires a pending 2FA session).
+
+### 2FA Status
+
+```
+GET /api/user/2fa/status
+```
+
+**Requires:** Authentication
+
+**Response:**
+```json
+{
+  "enabled": false
+}
+```
+
+---
+
+### Setup 2FA
+
+```
+POST /api/user/2fa/setup
+```
+
+**Requires:** Authentication
+
+Generates a new TOTP secret and returns QR code for authenticator app setup. Does NOT enable 2FA — user must verify with `/enable` endpoint.
+
+**Response:**
+```json
+{
+  "qrCode": "data:image/png;base64,...",
+  "uri": "otpauth://totp/PuppetMaster:user@example.com?secret=...",
+  "backupCodes": ["ABC123", "DEF456", "..."]
+}
+```
+
+**Note:** Backup codes are only shown once during setup. Rate limited: 5 requests per 15 minutes.
+
+---
+
+### Enable 2FA
+
+```
+POST /api/user/2fa/enable
+```
+
+**Requires:** Authentication + pending setup
+
+**Body:**
+```json
+{
+  "code": "123456"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Two-factor authentication enabled"
+}
+```
+
+Verifies the TOTP code and enables 2FA for the user.
+
+---
+
+### Disable 2FA
+
+```
+POST /api/user/2fa/disable
+```
+
+**Requires:** Authentication
+
+**Body:**
+```json
+{
+  "code": "123456"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Two-factor authentication disabled"
+}
+```
+
+---
+
+### Verify 2FA (Login)
+
+```
+POST /api/user/2fa/verify
+```
+
+**Requires:** Pending 2FA session (after login with 2FA enabled)
+
+**Body:**
+```json
+{
+  "code": "123456"
+}
+```
+
+Or with backup code:
+```json
+{
+  "code": "ABC123",
+  "isBackupCode": true
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "role": "admin"
+  },
+  "csrfToken": "abc123..."
+}
+```
+
+---
+
 ## Admin Endpoints
 
 All admin endpoints require authentication and appropriate role.
@@ -341,12 +490,9 @@ GET /api/admin/stats
 **Response:**
 ```json
 {
-  "portfolios": 5,
-  "contacts": {
-    "total": 100,
-    "unread": 3
-  },
-  "users": 4
+  "portfolioItems": 5,
+  "contactSubmissions": 100,
+  "unreadMessages": 3
 }
 ```
 
@@ -768,18 +914,21 @@ Reorder portfolio items.
 POST /api/upload/image
 ```
 
-**Requires:** Editor+
+**Requires:** Authentication
 
 **Body:** `multipart/form-data`
-- `file` - Image file (max 10MB)
+- `image` - Image file (max 10MB, validated by magic bytes)
 
 **Response:**
 ```json
 {
+  "success": true,
   "url": "/uploads/image-1705315800.webp",
   "thumbnailUrl": "/uploads/image-1705315800-thumb.webp"
 }
 ```
+
+**Note:** Files are validated by magic bytes (not MIME type) and scanned for viruses.
 
 ---
 
@@ -810,7 +959,7 @@ POST /api/upload/video
 WS /api/ws
 ```
 
-WebSocket endpoint for real-time communication. See [WEBSOCKET.md](WEBSOCKET.md) for details.
+WebSocket endpoint for real-time communication. See [WebSocket Reference](websocket.md) for details.
 
 ---
 
@@ -843,3 +992,139 @@ Response includes:
 |----------|-------|--------|
 | `/api/auth/login` | 5 attempts | 15 minutes |
 | `/api/contact/submit` | 5 submissions | 60 minutes |
+| `/api/user/2fa/setup` | 5 requests | 15 minutes |
+
+---
+
+## Setup Endpoints
+
+Used by the configuration wizard at `/init`.
+
+### Get Config
+
+```
+GET /api/setup/config
+```
+
+Returns current configuration state.
+
+---
+
+### Save Config
+
+```
+POST /api/setup/config
+```
+
+Saves configuration from the wizard.
+
+---
+
+### Import ZIP (Brownfield)
+
+```
+POST /api/setup/import-zip
+```
+
+**Body:** `multipart/form-data`
+- `file` - ZIP file with existing project code
+
+Uploads and extracts existing project code for brownfield migration.
+
+---
+
+### Delete Import
+
+```
+DELETE /api/setup/import-zip
+```
+
+Removes previously uploaded import files.
+
+---
+
+## Analytics Endpoints
+
+### Performance Metrics
+
+```
+POST /api/analytics/performance
+```
+
+Records client-side performance metrics (Core Web Vitals).
+
+---
+
+## Role Management Endpoints
+
+### List Roles
+
+```
+GET /api/admin/roles
+```
+
+**Requires:** Master
+
+Returns custom role definitions.
+
+---
+
+### Create Role
+
+```
+POST /api/admin/roles
+```
+
+**Requires:** Master
+
+Creates a new custom role with page-level permissions.
+
+---
+
+### Update Role
+
+```
+PUT /api/admin/roles/{id}
+```
+
+**Requires:** Master
+
+---
+
+### Delete Role
+
+```
+DELETE /api/admin/roles/{id}
+```
+
+**Requires:** Master
+
+---
+
+## Additional Content Module Endpoints
+
+The following content modules have CRUD endpoints following the same pattern:
+
+| Module | Public Endpoint | Admin Endpoint |
+|--------|-----------------|----------------|
+| Blog Posts | `GET /api/blog/posts` | `POST/PUT/DELETE /api/admin/blog/posts/*` |
+| Blog Categories | `GET /api/blog/categories` | `POST/PUT/DELETE /api/admin/blog/categories/*` |
+| Blog Tags | — | `GET/POST/PUT/DELETE /api/admin/blog/tags/*` |
+| Team Members | `GET /api/team` | `POST/PUT/DELETE /api/admin/team/*` |
+| Testimonials | `GET /api/testimonials` | `POST/PUT/DELETE /api/admin/testimonials/*` |
+| Features | `GET /api/features` | `POST/PUT/DELETE /api/admin/features/*` |
+| Clients | `GET /api/clients` | `POST/PUT/DELETE /api/admin/clients/*` |
+| FAQ | `GET /api/faq` | `POST/PUT/DELETE /api/admin/faq/*` |
+| Pricing | `GET /api/pricing` | `POST/PUT/DELETE /api/admin/pricing/*` |
+
+Each module supports translations via `PUT /api/admin/{module}/{id}/translations`.
+
+---
+
+## OpenAPI Specification
+
+The canonical API documentation is available at:
+- **Swagger UI**: `/api/docs/swagger` (interactive)
+- **OpenAPI JSON**: `/api/docs/openapi.json` (machine-readable)
+
+The OpenAPI spec is defined in `server/openapi.ts`.

@@ -59,6 +59,28 @@ export const updateUserSchema = z.object({
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TWO-FACTOR AUTHENTICATION SCHEMAS
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const twoFactorEnableSchema = z.object({
+  code: z.string().length(6, 'Verification code must be 6 digits').regex(/^\d{6}$/, 'Code must be 6 digits')
+})
+
+export type TwoFactorEnableInput = z.infer<typeof twoFactorEnableSchema>
+
+export const twoFactorVerifySchema = z.object({
+  code: z.string().min(6, 'Code is required').max(10, 'Invalid code format')
+})
+
+export type TwoFactorVerifyInput = z.infer<typeof twoFactorVerifySchema>
+
+export const twoFactorDisableSchema = z.object({
+  password: z.string().min(1, 'Password is required')
+})
+
+export type TwoFactorDisableInput = z.infer<typeof twoFactorDisableSchema>
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ROLE MANAGEMENT SCHEMAS
 // ═══════════════════════════════════════════════════════════════════════════
 

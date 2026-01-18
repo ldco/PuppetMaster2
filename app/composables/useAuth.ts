@@ -4,12 +4,22 @@
  * Client-side authentication state management.
  * Provides login, logout, session checking, and page-based access control.
  * Integrates with CSRF protection via useCsrf composable.
+ * Supports two-factor authentication (2FA) flow.
  */
 import type { UserRole, User, LoginCredentials, RolePermissions, AdminPageId } from '~/types'
 import { ADMIN_PAGE_IDS, ROLE_LEVELS } from '~/types'
 
 // Re-export for backward compatibility
 export type { UserRole } from '~/types'
+
+/**
+ * Login result with 2FA support
+ */
+export interface LoginResult {
+  success: boolean
+  error?: string
+  requires2fa?: boolean
+}
 
 /**
  * Get default permissions (no access to any page)
@@ -26,6 +36,8 @@ export function useAuth() {
   const user = useState<User | null>('auth-user', () => null)
   const permissions = useState<RolePermissions>('auth-permissions', getDefaultPermissions)
   const isLoading = useState<boolean>('auth-loading', () => false)
+  // 2FA state
+  const requires2fa = useState<boolean>('auth-requires-2fa', () => false)
 
   const isAuthenticated = computed(() => !!user.value)
 
@@ -113,21 +125,38 @@ export function useAuth() {
   /**
    * Login with email and password
    * Sets CSRF token from response for subsequent requests
+   * Returns requires2fa: true if 2FA verification is needed
    */
-  async function login(
-    credentials: LoginCredentials
-  ): Promise<{ success: boolean; error?: string }> {
+  async function login(credentials: LoginCredentials): Promise<LoginResult> {
     const { setToken } = useCsrf()
     isLoading.value = true
+    requires2fa.value = false
+
     try {
-      const response = await $fetch<{ success: boolean; user: User; csrfToken: string }>(
-        '/api/auth/login',
-        {
-          method: 'POST',
-          body: credentials
+      const response = await $fetch<{
+        success: boolean
+        user?: User
+        csrfToken?: string
+        requires2fa?: boolean
+      }>('/api/auth/login', {
+        method: 'POST',
+        body: credentials
+      })
+
+      // Check if 2FA is required
+      if (response.requires2fa) {
+        requires2fa.value = true
+        // Store CSRF token for subsequent 2FA verification request
+        if (response.csrfToken) {
+          setToken(response.csrfToken)
         }
-      )
-      user.value = response.user
+        return { success: true, requires2fa: true }
+      }
+
+      // Normal login success
+      if (response.user) {
+        user.value = response.user
+      }
 
       // Store CSRF token for subsequent requests
       if (response.csrfToken) {
@@ -142,6 +171,50 @@ export function useAuth() {
     } finally {
       isLoading.value = false
     }
+  }
+
+  /**
+   * Verify 2FA code (TOTP or backup code)
+   * Called after login returns requires2fa: true
+   */
+  async function verify2fa(code: string): Promise<LoginResult> {
+    const { setToken } = useCsrf()
+    isLoading.value = true
+
+    try {
+      const response = await $fetch<{
+        success: boolean
+        user: User
+        csrfToken: string
+        backupCodesRemaining?: number
+      }>('/api/user/2fa/verify', {
+        method: 'POST',
+        body: { code }
+      })
+
+      user.value = response.user
+      requires2fa.value = false
+
+      // Store CSRF token for subsequent requests
+      if (response.csrfToken) {
+        setToken(response.csrfToken)
+      }
+
+      return { success: true }
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string; attemptsRemaining?: number }; message?: string }
+      const message = err?.data?.message || err?.message || '2FA verification failed'
+      return { success: false, error: message }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Cancel pending 2FA verification and return to login
+   */
+  function cancel2fa(): void {
+    requires2fa.value = false
   }
 
   /**
@@ -194,6 +267,9 @@ export function useAuth() {
     isLoading: readonly(isLoading),
     isAuthenticated,
 
+    // 2FA state
+    requires2fa: readonly(requires2fa),
+
     // Role-based state (legacy - for backward compatibility)
     isMaster,
     isAdmin,
@@ -214,6 +290,10 @@ export function useAuth() {
     hasPermission,
     canAccessPage,
     getAccessiblePages,
-    getAssignableRoles
+    getAssignableRoles,
+
+    // 2FA actions
+    verify2fa,
+    cancel2fa
   }
 }

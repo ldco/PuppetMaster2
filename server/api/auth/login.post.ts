@@ -3,15 +3,19 @@
  *
  * POST /api/auth/login
  * Body: { email: string, password: string, rememberMe?: boolean }
- * Returns: { success: true, user: { id, email, name, role }, csrfToken: string }
+ * Returns:
+ *   - If 2FA disabled: { success: true, user: { id, email, name, role }, csrfToken: string }
+ *   - If 2FA enabled: { success: true, requires2fa: true, message: string }
  *
  * Security:
  * - Rate limited: 5 attempts per 15 minutes per IP
  * - Account lockout: 5 failed attempts = 30 min lockout
  * - Password hashed with scrypt
  * - CSRF token generated on success
+ * - 2FA support with TOTP and backup codes
  */
 import { eq } from 'drizzle-orm'
+import { randomBytes } from 'crypto'
 import { useDatabase, schema } from '../../database/client'
 import { verifyPassword, generateSessionId } from '../../utils/password'
 import { generateCsrfToken, setCsrfCookie } from '../../utils/csrf'
@@ -23,6 +27,7 @@ import {
 } from '../../utils/accountLockout'
 import { audit } from '../../utils/audit'
 import { loginSchema } from '../../utils/validation'
+import { pending2faVerifications } from '../user/2fa/verify.post'
 
 export default defineEventHandler(async event => {
   // Rate limit check - 5 attempts per 15 minutes per IP
@@ -58,7 +63,7 @@ export default defineEventHandler(async event => {
   const { email, password, rememberMe } = result.data
   const db = useDatabase()
 
-  // Find user by email
+  // Find user by email (include 2FA status)
   const user = db.select().from(schema.users).where(eq(schema.users.email, email)).get()
 
   if (!user) {
@@ -112,8 +117,46 @@ export default defineEventHandler(async event => {
     })
   }
 
-  // Successful login - reset failed attempts and log
+  // Password verified - reset failed attempts
   await resetFailedAttempts(user.id)
+
+  // Check if 2FA is enabled
+  if (user.twoFactorEnabled) {
+    // Create a pending 2FA verification session
+    const pendingToken = randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+
+    pending2faVerifications.set(pendingToken, {
+      userId: user.id,
+      email: user.email,
+      rememberMe,
+      expiresAt,
+      attempts: 0
+    })
+
+    // Set pending 2FA cookie
+    setCookie(event, 'pm-2fa-pending', pendingToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: expiresAt
+    })
+
+    // Generate CSRF token for the 2FA verification request
+    // This is required because /api/user/2fa/verify is protected by CSRF middleware
+    const csrfToken = generateCsrfToken()
+    setCsrfCookie(event, csrfToken)
+
+    return {
+      success: true,
+      requires2fa: true,
+      message: 'Two-factor authentication required',
+      csrfToken
+    }
+  }
+
+  // No 2FA - complete login
   await audit.login(event, user.id)
 
   // Delete any existing session (session fixation prevention)

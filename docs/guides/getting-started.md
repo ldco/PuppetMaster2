@@ -307,7 +307,7 @@ pnpm nuxi prepare
 
 ## Next Steps
 
-1. **[Configuration Guide](CONFIGURATION.md)** - Full config reference
-2. **[CSS Architecture](styles/CSS_ARCHITECTURE.md)** - Understand the CSS system
-3. **[API Reference](API_REFERENCE.md)** - All API endpoints
-4. **[Deployment](DEPLOYMENT.md)** - Deploy to production
+1. **[Configuration Guide](../reference/configuration.md)** - Full config reference
+2. **[CSS Architecture](../styles/CSS_ARCHITECTURE.md)** - Understand the CSS system
+3. **[API Reference](../reference/api-reference.md)** - All API endpoints
+4. **[Deployment](../operations/deployment.md)** - Deploy to production

@@ -26,6 +26,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 | `/pm-init` | Main entry point | First-time setup, reconfiguration |
 | `/pm-dev` | Run dev server | Starting/restarting development |
 | `/pm-status` | Show configuration | Check current state |
+| `/pm-migrate` | Brownfield migration | After importing code via wizard (analyze and create migration plan) |
 | `/pm-contribute` | Export contribution | After fixing/adding PM feature in client project |
 | `/pm-apply` | Apply contribution | In PM repo, to apply contributed fix/feature |
 
@@ -33,8 +34,21 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 
 | Command | Replacement | Notes |
 |---------|-------------|-------|
-| `/pm-migrate` | `/pm-init` | Brownfield detection now in wizard |
 | `/pm-start` | `/pm-dev` | Simplified to just run dev server |
+
+### Command Workflow: Greenfield vs Brownfield
+
+**Greenfield (new project):**
+1. Run `/pm-init` → wizard opens
+2. Configure project in browser
+3. Start building
+
+**Brownfield (importing existing code):**
+1. Run `/pm-init` → wizard opens
+2. Upload ZIP with existing code in wizard
+3. Configure project in browser
+4. Run `/pm-migrate` → analyzes imported code and creates migration plan
+5. Follow the plan to migrate components
 
 ---
 
@@ -46,7 +60,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 
 | pmMode | Action |
 |--------|--------|
-| `'unconfigured'` | Start dev server, open wizard at `/setup` |
+| `'unconfigured'` | Start dev server, open wizard at `/init` |
 | `'build'` | Show status, ask what user wants to do |
 | `'develop'` | Show status, ask what user wants to do |
 
@@ -67,7 +81,7 @@ All PM commands are defined in `.claude/commands/` and ship with the framework.
 
 **Flags:**
 - `--fresh` — Reset database, seed, then start
-- `--setup` — Start and indicate to open `/setup`
+- `--setup` — Start and indicate to open `/init`
 
 ---
 
@@ -110,7 +124,7 @@ Framework development mode. The wizard configured this to show the PM showcase.
 
 ## The Setup Wizard
 
-The browser wizard at `/setup` is the PRIMARY setup method. It handles:
+The browser wizard at `/init` is the PRIMARY setup method. It handles:
 
 ### Step 1: Mode Selection
 - **BUILD** — Creating a client project
@@ -215,51 +229,57 @@ Located at `app/puppet-master.config.ts`. Key fields:
 
 ```typescript
 export default {
-  // Core mode
+  // Core mode (set by wizard)
   pmMode: 'unconfigured' | 'build' | 'develop',
 
-  // Project info (BUILD mode)
-  projectName: 'My Project',
-  projectType: 'website' | 'app',
+  // Entity type (what you're building)
+  entities: {
+    website: true,   // Marketing site with public pages
+    app: false,      // Login-required app (/ → /login)
+  },
 
   // Admin panel
   admin: {
     enabled: true,
+    system: { users: { enabled: true, roles: ['master', 'admin'] }, ... },
+    websiteModules: { blog: { enabled: true, roles: [...] }, ... },
   },
 
-  // Modules
+  // Content modules (each has enabled + config)
   modules: {
-    blog: true,
-    portfolio: true,
-    team: false,
-    // ...
+    blog: { enabled: true, config: { postsPerPage: 10, ... } },
+    portfolio: { enabled: true, config: { layout: 'grid', ... } },
+    team: { enabled: true, config: { showSocial: true, ... } },
+    // ... testimonials, faq, pricing, clients, features, contact
   },
 
-  // Features
+  // Feature toggles
   features: {
-    multilingual: true,
-    darkMode: true,
-    pwa: false,
+    multiLangs: true,      // Multiple languages
+    doubleTheme: true,     // Light/dark mode
+    onepager: false,       // Scroll-based vs route-based nav
+    pwa: false,            // Progressive Web App
+    verticalNav: false,    // Sidebar vs horizontal nav
   },
 
-  // Design
-  design: {
-    colors: {
-      primary: '#3B82F6',
-      accent: '#10B981',
-    },
-    fonts: {
-      accent: 'Inter',
-      text: 'Inter',
-    },
-    icons: 'tabler',
+  // Brand colors (4 primitives, rest auto-calculated)
+  colors: {
+    black: '#2f2f2f',
+    white: '#f0f0f0',
+    brand: '#aa0000',
+    accent: '#0f172a',
   },
 
-  // Locales
-  locales: ['en'],
+  // Supported locales
+  locales: [
+    { code: 'en', iso: 'en-US', name: 'English' },
+    { code: 'ru', iso: 'ru-RU', name: 'Русский' },
+  ],
   defaultLocale: 'en',
 }
 ```
+
+See [Configuration Reference](../reference/configuration.md) for complete reference.
 
 ---
 
@@ -324,4 +344,4 @@ Use `/pm-dev --fresh` to reset database completely.
 
 1. Check that pmMode is 'unconfigured' in config
 2. Ensure dev server is running
-3. Navigate to http://localhost:3000/setup
+3. Navigate to http://localhost:3000/init
