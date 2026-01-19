@@ -35,6 +35,7 @@ Project-specific commands in `.claude/commands/`:
 | Command | Purpose |
 |---------|---------|
 | `/pm-init` | Main entry point — starts wizard if unconfigured, shows options if configured |
+| `/pm-plan` | Create development plan from technical brief (run after init) |
 | `/pm-dev` | Start/restart dev server (kills existing first) |
 | `/pm-status` | Show current config — pmMode, modules, features, database state |
 | `/pm-migrate` | AI-powered migration — analyzes ./import/ folder and creates migration plan |
@@ -51,8 +52,9 @@ git clone puppet-master my-project
 cd my-project/app
 npm install
 /pm-init                 # Starts wizard at /init
-# Complete wizard in browser
-# Project is configured!
+# Complete wizard in browser (add technical brief!)
+/pm-plan                 # Creates development plan from brief
+# Pick a task and start building
 ```
 
 **Brownfield (Import Existing):**

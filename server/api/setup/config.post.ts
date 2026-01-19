@@ -8,7 +8,7 @@
  * Writes configuration to puppet-master.config.ts.
  * Security: Only accessible when pmMode is 'unconfigured'
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync, mkdirSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { z } from 'zod'
 import { requireSetupAccess } from '../../utils/setup-guard'
@@ -108,6 +108,13 @@ function databaseExists(appDir: string): boolean {
 
 interface SetupConfig {
   pmMode: PmMode
+  // Project info (for Claude context)
+  projectName?: string
+  projectDescription?: string
+  targetAudience?: string
+  technicalBrief?: string
+  customModules?: string
+  // Core config
   projectType?: ProjectType
   adminEnabled?: boolean
   locales?: Array<{ code: string; iso: string; name: string }>
@@ -204,6 +211,13 @@ function applyConfig(appDir: string, config: SetupConfig): void {
 
 const setupConfigSchema = z.object({
   pmMode: z.enum(['unconfigured', 'build', 'develop']),
+  // Project info (for Claude context)
+  projectName: z.string().optional(),
+  projectDescription: z.string().optional(),
+  targetAudience: z.string().optional(),
+  technicalBrief: z.string().max(500000).optional(), // Max 500KB text
+  customModules: z.string().optional(),
+  // Core config
   projectType: z.enum(['website', 'app']).optional(),
   adminEnabled: z.boolean().optional(),
   locales: z.array(z.object({
@@ -293,6 +307,33 @@ export default defineEventHandler(async (event) => {
       })
     }
     throw e
+  }
+
+  // Save project brief and context for Claude planning
+  const claudeDataDir = resolve(appDir, '.claude-data')
+  if (!existsSync(claudeDataDir)) {
+    mkdirSync(claudeDataDir, { recursive: true })
+  }
+
+  // Write project brief if provided
+  if (config.technicalBrief) {
+    const briefPath = resolve(claudeDataDir, 'project-brief.md')
+    const briefContent = `# Project Brief
+
+> Auto-generated from setup wizard on ${new Date().toISOString().split('T')[0]}
+
+${config.projectName ? `## Project: ${config.projectName}\n` : ''}
+${config.projectDescription ? `**Description:** ${config.projectDescription}\n` : ''}
+${config.targetAudience ? `**Target Audience:** ${config.targetAudience}\n` : ''}
+${config.customModules ? `**Custom Modules Requested:** ${config.customModules}\n` : ''}
+
+---
+
+## Technical Brief
+
+${config.technicalBrief}
+`
+    writeFileSync(briefPath, briefContent, 'utf-8')
   }
 
   // Run db:push to create/update database schema

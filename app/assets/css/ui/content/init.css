@@ -413,6 +413,42 @@
   font-size: var(--text-xs);
 }
 
+/* Brief Input (Technical Brief with file upload) */
+.brief-input-wrapper {
+  position: relative;
+}
+
+.brief-input-wrapper textarea {
+  padding-block-end: var(--space-10);
+}
+
+.brief-upload {
+  position: absolute;
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.brief-upload .upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.brief-upload .btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.brief-upload .icon-sm {
+  width: 14px;
+  height: 14px;
+}
+
 /* ══════════════════════════════════════════════════════════
  * BADGES
  * ══════════════════════════════════════════════════════════ */

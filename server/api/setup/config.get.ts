@@ -26,6 +26,12 @@ interface ConfigSummary {
   hasBrownfieldContent: boolean
   importFolderFiles: string[]
   databaseExists: boolean
+  // Project info (for Claude context)
+  projectName?: string
+  projectDescription?: string
+  targetAudience?: string
+  technicalBrief?: string
+  customModules?: string
 }
 
 export default defineEventHandler(async (event): Promise<ConfigSummary> => {
@@ -180,6 +186,44 @@ export default defineEventHandler(async (event): Promise<ConfigSummary> => {
   const dbPath = resolve(process.cwd(), 'data', 'sqlite.db')
   const databaseExists = existsSync(dbPath)
 
+  // Read project brief and info from .claude-data/project-brief.md
+  let projectName: string | undefined
+  let projectDescription: string | undefined
+  let targetAudience: string | undefined
+  let technicalBrief: string | undefined
+  let customModules: string | undefined
+
+  const briefPath = resolve(process.cwd(), 'app', '.claude-data', 'project-brief.md')
+  if (existsSync(briefPath)) {
+    try {
+      const briefContent = readFileSync(briefPath, 'utf-8')
+
+      // Parse project name from "## Project: Name"
+      const nameMatch = briefContent.match(/## Project:\s*(.+)/)
+      if (nameMatch) projectName = nameMatch[1].trim()
+
+      // Parse description from "**Description:** text"
+      const descMatch = briefContent.match(/\*\*Description:\*\*\s*(.+)/)
+      if (descMatch) projectDescription = descMatch[1].trim()
+
+      // Parse target audience from "**Target Audience:** text"
+      const audienceMatch = briefContent.match(/\*\*Target Audience:\*\*\s*(.+)/)
+      if (audienceMatch) targetAudience = audienceMatch[1].trim()
+
+      // Parse custom modules from "**Custom Modules Requested:** text"
+      const modulesMatch = briefContent.match(/\*\*Custom Modules Requested:\*\*\s*(.+)/)
+      if (modulesMatch) customModules = modulesMatch[1].trim()
+
+      // Extract technical brief (everything after "## Technical Brief")
+      const briefSection = briefContent.split('## Technical Brief')
+      if (briefSection.length > 1) {
+        technicalBrief = briefSection[1].trim()
+      }
+    } catch {
+      // Ignore read errors
+    }
+  }
+
   return {
     pmMode,
     projectType,
@@ -190,6 +234,12 @@ export default defineEventHandler(async (event): Promise<ConfigSummary> => {
     features,
     hasBrownfieldContent,
     importFolderFiles,
-    databaseExists
+    databaseExists,
+    // Project info
+    projectName,
+    projectDescription,
+    targetAudience,
+    technicalBrief,
+    customModules
   }
 })

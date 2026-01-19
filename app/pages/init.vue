@@ -14,6 +14,7 @@ import IconLoader from '~icons/tabler/loader-2'
 import IconUpload from '~icons/tabler/upload'
 import IconFileZip from '~icons/tabler/file-zip'
 import IconX from '~icons/tabler/x'
+import IconFile from '~icons/tabler/file-text'
 import Logo from '~/components/atoms/Logo.vue'
 import { getModulesForWizard, getLocalesForWizard } from '~~/shared/modules'
 
@@ -38,6 +39,7 @@ const config = reactive({
   projectName: '',
   projectDescription: '',
   targetAudience: '',
+  technicalBrief: '', // Technical brief for Claude planning
   // Project type
   projectType: 'website' as 'website' | 'app',
   adminEnabled: true,
@@ -91,6 +93,12 @@ onMounted(async () => {
       config.features = data.features || config.features
       config.locales = data.locales || config.locales
       config.defaultLocale = data.defaultLocale || 'en'
+      // Load project info if previously saved
+      if (data.projectName) config.projectName = data.projectName
+      if (data.projectDescription) config.projectDescription = data.projectDescription
+      if (data.targetAudience) config.targetAudience = data.targetAudience
+      if (data.technicalBrief) config.technicalBrief = data.technicalBrief
+      if (data.customModules) config.customModules = data.customModules
     }
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to load configuration'
@@ -217,6 +225,44 @@ async function removeImportZip() {
   }
 }
 
+// Technical brief file upload handler
+function handleBriefUpload(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  // Validate file extension
+  const validExtensions = ['.md', '.txt', '.markdown']
+  const hasValidExt = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+  if (!hasValidExt) {
+    error.value = 'Please upload a .md or .txt file'
+    input.value = ''
+    return
+  }
+
+  // Validate file size (max 500KB)
+  if (file.size > 500 * 1024) {
+    error.value = 'File too large. Maximum size is 500KB.'
+    input.value = ''
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const content = e.target?.result as string
+    if (content) {
+      config.technicalBrief = content
+    }
+  }
+  reader.onerror = () => {
+    error.value = 'Failed to read file'
+  }
+  reader.readAsText(file)
+
+  // Reset input so same file can be re-uploaded
+  input.value = ''
+}
+
 // Validation
 function validate(): boolean {
   validationErrors.value = []
@@ -246,6 +292,7 @@ async function applyConfig() {
         projectName: config.projectName,
         projectDescription: config.projectDescription,
         targetAudience: config.targetAudience,
+        technicalBrief: config.technicalBrief,
         // Type and modules
         projectType: config.projectType,
         adminEnabled: config.adminEnabled,
@@ -342,6 +389,32 @@ async function applyConfig() {
             class="input"
             placeholder="Who will use this? (e.g., small businesses, developers, consumers)"
           />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Technical Brief <span class="optional-badge">Optional</span></label>
+          <div class="brief-input-wrapper">
+            <textarea
+              v-model="config.technicalBrief"
+              class="input"
+              rows="6"
+              placeholder="Paste or upload a technical brief, PRD, or feature spec. Claude will use this to understand requirements and generate better plans."
+            ></textarea>
+            <div class="brief-upload">
+              <input
+                type="file"
+                accept=".md,.txt,.markdown"
+                id="brief-upload"
+                class="upload-input"
+                @change="handleBriefUpload"
+              />
+              <label for="brief-upload" class="btn btn-secondary btn-sm">
+                <IconFile class="icon-sm" />
+                Upload .md/.txt
+              </label>
+            </div>
+          </div>
+          <p class="form-hint">Include PRDs, technical specs, or feature lists. This helps Claude generate accurate implementation plans.</p>
         </div>
       </section>
 
@@ -605,8 +678,19 @@ async function applyConfig() {
         <h1 class="complete-title">Ready to Code</h1>
         <p class="complete-desc">
           Your project is configured. Dev server is running.<br />
-          Start building your {{ config.projectType }} from scratch.
+          Start building your {{ config.projectType }} with Claude.
         </p>
+
+        <div v-if="config.technicalBrief" class="complete-steps">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-content">
+              <strong>Generate Development Plan</strong>
+              <p>Claude will analyze your technical brief and create a roadmap:</p>
+              <code>/pm-plan</code>
+            </div>
+          </div>
+        </div>
 
         <div class="complete-info">
           <div class="info-item">
