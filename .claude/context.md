@@ -1,64 +1,72 @@
 # Session Context
 
 ## Meta
-- **Last Updated**: 2026-01-18T00:00:00Z
+- **Last Updated**: 2026-01-19T10:33:57+03:00
 - **Project**: Puppet Master Framework
 - **Branch**: master
 
 ## Current Task
-Completed: Layout system unification and init page CSS refactoring.
-All changes committed (2220b47). Git working tree is clean.
+Completed: Security hardening for setup APIs and ZIP import system.
+All changes committed (09c197d) and pushed to origin/master. Git working tree is clean.
 
 ## Accomplished This Session
 
-### Layout System Unification
-1. **Unified .layout-blank into .layout** - One CSS class, two Vue layouts
-2. **Added header/footer slots to blank.vue** - OUTSIDE .main for fixed positioning
-3. **Documented critical CSS containment issue** - container-type creates containing block
+### Security Improvements (3 batches of comments implemented)
 
-### Init Page Refactoring
-1. **Extracted ~800 lines of inline CSS** to `app/assets/css/ui/content/init.css`
-2. **Fixed incorrect variable names** - Now uses proper system variables
-3. **Improved UX**:
-   - Added project info section (name, description, audience)
-   - Added custom locale input for unlisted languages
-   - Added custom modules textarea
-   - Conditional modules display (website vs app)
-   - Centered, prominent apply button
+**Batch 1 - Core Security:**
+1. Created `server/utils/setup-guard.ts` - Centralized access control for setup APIs
+2. Added fail-closed security pattern - Denies access when config cannot be read
+3. All 4 setup API routes now use `requireSetupAccess()` guard
 
-### Root Cause Analysis
-- **Problem**: Header not fixed on init page
-- **Cause**: `container-type: inline-size` on `.main` creates containing block for `position: fixed`
-- **Solution**: Place fixed elements (headers, modals) OUTSIDE `.main` using layout slots
+**Batch 2 - ZIP Hardening:**
+1. Zip-slip path traversal protection with `isSafePath()` validation
+2. Size limits: 100MB compressed, 500MB uncompressed, 50MB per file, 10K files max
+3. Required Content-Length header (blocks chunked transfer bypass)
+4. Double-validation: before extraction and during extraction
+
+**Batch 3 - Config & Database:**
+1. Fixed pmMode regex to handle union type annotations
+2. Added brace-balanced parsing (`extractBraceBlock()`) for module configs
+3. Made db:push non-blocking with `spawn` and 60s timeout
+4. Timeout now maps to 'timeout' status (not misleading 'pending')
+
+**Code Consolidation:**
+1. Created `shared/modules.ts` - Single source of truth for module/locale registries
+2. Scripts, server, and frontend all import from shared location
 
 ## Active Role
 - **ID**: none
 - **Name**: Puppet Master Architect
 
 ## Todo List
-- [x] Refactor init.vue to use system CSS variables
-- [x] Add project info section (name, description, audience)
-- [x] Add custom locale input field
-- [x] Add custom modules textarea
-- [x] Conditional modules display for website vs app
-- [x] Fix centered, prominent apply button
-- [x] Investigate why header not fixed
-- [x] Fix layout system (not bandaid)
-- [x] Unify .layout-blank into .layout
-- [x] Commit changes (2220b47)
+- [x] Create setup-guard.ts with fail-closed pattern
+- [x] Add guard to all 4 setup API endpoints
+- [x] Fix pmMode regex for union types
+- [x] Add brace-balanced parsing for modules
+- [x] Add ZIP security (zip-slip, size limits, file count)
+- [x] Make db:push non-blocking with timeout
+- [x] Consolidate module registries to shared/modules.ts
+- [x] Require Content-Length header for uploads
+- [x] Commit and push (09c197d)
 
 ## Working Files
-- `app/assets/css/layout/page.css` - Unified layout, documented containment
-- `app/layouts/blank.vue` - Header/footer slots, uses .layout
-- `app/layouts/default.vue` - Reference for layout pattern
-- `app/pages/init.vue` - Refactored, uses NuxtLayout with slots
-- `app/assets/css/ui/content/init.css` - NEW: Extracted init page styles
+- `server/utils/setup-guard.ts` - NEW: Access control guard
+- `shared/modules.ts` - NEW: Module/locale registry
+- `server/api/setup/config.get.ts` - Added guard
+- `server/api/setup/config.post.ts` - Added guard, non-blocking db:push
+- `server/api/setup/import-zip.post.ts` - Full security hardening
+- `server/api/setup/import-zip.delete.ts` - Added guard
+- `scripts/lib/config-reader.ts` - Brace-balanced parsing
+- `scripts/lib/config-writer.ts` - Fixed pmMode regex
+- `scripts/lib/modules.ts` - Re-exports from shared
+- `app/pages/init.vue` - Uses shared module registry
+- `nuxt.config.ts` - Body size limit comment
 
 ## Notes
-- **Critical CSS discovery**: `container-type: inline-size` creates containing block for `position: fixed`. Fixed elements inside `.main` are positioned relative to `.main`, not viewport.
-- blank.vue now has header/footer named slots for this purpose
-- Both default.vue and blank.vue use the same `.layout` class
-- Init page uses `<NuxtLayout name="blank">` with `layout: false`
+- **Fail-closed pattern**: If config cannot be read, access is DENIED (not allowed)
+- **Content-Length required**: HTTP 411 if missing, blocks chunked transfer attacks
+- **Timeout behavior**: db:push timeout returns 'timeout' status with actionable message
+- **Module registry**: `shared/modules.ts` is the single source of truth
 
 ## Blockers
 None - session completed successfully
