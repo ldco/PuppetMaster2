@@ -15,7 +15,7 @@ import type { H3Event } from 'h3'
 type PmMode = 'unconfigured' | 'build' | 'develop'
 
 // Result type for config read operation
-interface ConfigReadResult {
+type ConfigReadResult = {
   success: true
   mode: PmMode
 } | {
