@@ -4,10 +4,11 @@
  * GET /api/setup/config
  * Returns: Current configuration summary for wizard
  *
- * No auth required - setup wizard is accessible before any users exist
+ * Security: Only accessible when pmMode is 'unconfigured'
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs'
 import { resolve, join } from 'path'
+import { requireSetupAccess } from '../../utils/setup-guard'
 
 interface ConfigSummary {
   pmMode: 'unconfigured' | 'build' | 'develop'
@@ -28,6 +29,10 @@ interface ConfigSummary {
 }
 
 export default defineEventHandler(async (event): Promise<ConfigSummary> => {
+  // Security: Allow read-only access to check current state
+  // This lets the wizard display current config even if already configured
+  requireSetupAccess(event, { allowReadOnly: true })
+
   // Path to config file (relative to project root)
   const configPath = resolve(process.cwd(), 'app', 'puppet-master.config.ts')
 
@@ -77,16 +82,47 @@ export default defineEventHandler(async (event): Promise<ConfigSummary> => {
   const defaultLocaleMatch = content.match(/defaultLocale:\s*['"](\w+)['"]/)
   const defaultLocale = defaultLocaleMatch?.[1] || 'en'
 
-  // Parse enabled modules
-  const modulesStart = content.indexOf('modules:')
+  // Parse enabled modules using brace-balanced extraction
   const enabledModules: string[] = []
+  const modulesStart = content.indexOf('modules:')
   if (modulesStart !== -1) {
-    const modulesSection = content.slice(modulesStart, modulesStart + 3000)
-    const modulePattern = /(\w+):\s*\{[^{}]*enabled:\s*(true)/g
-    let match
-    while ((match = modulePattern.exec(modulesSection)) !== null) {
-      if (!['config', 'system', 'websiteModules', 'appModules'].includes(match[1])) {
-        enabledModules.push(match[1])
+    // Extract complete modules block using brace balancing
+    const openBrace = content.indexOf('{', modulesStart)
+    if (openBrace !== -1) {
+      let depth = 1
+      let i = openBrace + 1
+      while (i < content.length && depth > 0) {
+        if (content[i] === '{') depth++
+        else if (content[i] === '}') depth--
+        i++
+      }
+      const modulesBlock = content.slice(modulesStart, i)
+
+      // List of known non-module keys to skip
+      const skipKeys = ['config', 'system', 'websiteModules', 'appModules']
+
+      // Parse each module entry with brace balancing
+      const moduleEntryPattern = /(\w+):\s*\{/g
+      let match
+      while ((match = moduleEntryPattern.exec(modulesBlock)) !== null) {
+        const moduleName = match[1]
+        if (skipKeys.includes(moduleName)) continue
+
+        // Extract this module's config block
+        const startIdx = match.index + match[0].length - 1
+        let d = 1
+        let endIdx = startIdx + 1
+        while (endIdx < modulesBlock.length && d > 0) {
+          if (modulesBlock[endIdx] === '{') d++
+          else if (modulesBlock[endIdx] === '}') d--
+          endIdx++
+        }
+        const moduleConfig = modulesBlock.slice(startIdx, endIdx)
+
+        // Check if enabled: true exists in this module's config
+        if (/enabled:\s*true/.test(moduleConfig)) {
+          enabledModules.push(moduleName)
+        }
       }
     }
   }

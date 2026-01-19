@@ -275,7 +275,7 @@ export default defineNuxtConfig({
     experimental: {
       tasks: true
     },
-    // Route rules for caching static assets
+    // Route rules for caching static assets and security limits
     routeRules: {
       // Static assets - long cache (1 year, immutable since they have hashed names)
       '/_nuxt/**': {
@@ -294,6 +294,8 @@ export default defineNuxtConfig({
           'Cache-Control': 'public, max-age=86400'
         }
       }
+      // Note: Body size limits for /api/setup/import-zip are enforced at the handler level
+      // via Content-Length header check (first line of defense before body parsing)
     }
   },
 

@@ -234,6 +234,9 @@ ${after}`
 
 /**
  * Set pmMode value
+ * Handles both type annotation forms:
+ *   - pmMode: 'value' as const
+ *   - pmMode: 'value' as 'unconfigured' | 'build' | 'develop'
  */
 export function writePmMode(appDir: string | undefined, mode: PmMode): void {
   let content = readConfigRaw(appDir)
@@ -241,11 +244,36 @@ export function writePmMode(appDir: string | undefined, mode: PmMode): void {
   // Ensure field exists
   content = ensurePmModeField(content)
 
-  // Replace value
-  content = content.replace(
-    /pmMode:\s*['"]?\w+['"]?\s*as const/,
-    `pmMode: '${mode}' as const`
-  )
+  // Replace value - handle both annotation styles:
+  // 1. pmMode: 'value' as const
+  // 2. pmMode: 'value' as 'unconfigured' | 'build' | 'develop'
+  const pmModePatterns = [
+    // Match: pmMode: 'value' as const
+    /pmMode:\s*['"][^'"]+['"]\s*as\s+const/,
+    // Match: pmMode: 'value' as 'unconfigured' | 'build' | 'develop' (with any whitespace)
+    /pmMode:\s*['"][^'"]+['"]\s*as\s+['"][^'"]+['"]\s*\|\s*['"][^'"]+['"]\s*\|\s*['"][^'"]+['"]/
+  ]
+
+  let replaced = false
+  for (const pattern of pmModePatterns) {
+    if (pattern.test(content)) {
+      // Use the union type form as the canonical output
+      content = content.replace(
+        pattern,
+        `pmMode: '${mode}' as 'unconfigured' | 'build' | 'develop'`
+      )
+      replaced = true
+      break
+    }
+  }
+
+  // Fallback: if no pattern matched but pmMode exists, try simple replacement
+  if (!replaced && /pmMode:\s*['"][^'"]+['"]/.test(content)) {
+    content = content.replace(
+      /pmMode:\s*['"][^'"]+['"]/,
+      `pmMode: '${mode}' as 'unconfigured' | 'build' | 'develop'`
+    )
+  }
 
   const configPath = getConfigPath(appDir)
   writeFileSync(configPath, content, 'utf-8')

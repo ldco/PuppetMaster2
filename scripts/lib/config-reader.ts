@@ -102,6 +102,45 @@ const PATTERNS = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Extract a complete brace-balanced block starting at a given position
+ * Returns the full content between the opening { and closing }
+ */
+function extractBraceBlock(content: string, startKeyword: string): string | null {
+  const keywordIndex = content.indexOf(startKeyword)
+  if (keywordIndex === -1) return null
+
+  // Find the opening brace after the keyword
+  let openBraceIndex = content.indexOf('{', keywordIndex)
+  if (openBraceIndex === -1) return null
+
+  // Use brace balancing to find the matching closing brace
+  let depth = 1
+  let i = openBraceIndex + 1
+
+  while (i < content.length && depth > 0) {
+    const char = content[i]
+    if (char === '{') {
+      depth++
+    } else if (char === '}') {
+      depth--
+    }
+    i++
+  }
+
+  if (depth !== 0) {
+    // Unbalanced braces, return what we have
+    return null
+  }
+
+  // Return the full block including the keyword
+  return content.slice(keywordIndex, i)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // READER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -183,27 +222,55 @@ export function readDefaultLocale(appDir?: string): string {
 }
 
 /**
- * Extract enabled modules
+ * Extract enabled modules using brace-balanced parsing
+ * This ensures we capture all modules regardless of config size
  */
 export function readEnabledModules(appDir?: string): string[] {
   const content = readConfigRaw(appDir)
 
-  // Find the modules section
-  const modulesStart = content.indexOf('modules:')
-  if (modulesStart === -1) return []
-
-  // Find the end of modules section (next major section or end)
-  const modulesSection = content.slice(modulesStart, modulesStart + 3000)
+  // Extract the complete modules block using brace balancing
+  const modulesBlock = extractBraceBlock(content, 'modules:')
+  if (!modulesBlock) return []
 
   const enabled: string[] = []
-  const modulePattern = /(\w+):\s*\{[^{}]*enabled:\s*(true)/g
+
+  // List of known non-module keys to skip
+  const skipKeys = ['config', 'system', 'websiteModules', 'appModules']
+
+  // Parse each module entry
+  // Pattern: moduleName: { ... enabled: true ... }
+  // We need to handle nested braces within module configs
+  const moduleEntryPattern = /(\w+):\s*\{/g
   let match
-  while ((match = modulePattern.exec(modulesSection)) !== null) {
-    // Skip if it's a nested config property
-    if (!['config', 'system', 'websiteModules', 'appModules'].includes(match[1])) {
-      enabled.push(match[1])
+
+  while ((match = moduleEntryPattern.exec(modulesBlock)) !== null) {
+    const moduleName = match[1]
+
+    // Skip non-module keys
+    if (skipKeys.includes(moduleName)) continue
+
+    // Extract this module's config block
+    const startIndex = match.index + match[0].length - 1 // Position of opening {
+    let depth = 1
+    let endIndex = startIndex + 1
+
+    while (endIndex < modulesBlock.length && depth > 0) {
+      const char = modulesBlock[endIndex]
+      if (char === '{') depth++
+      else if (char === '}') depth--
+      endIndex++
+    }
+
+    // Extract the module's config content
+    const moduleConfig = modulesBlock.slice(startIndex, endIndex)
+
+    // Check if enabled: true exists in this module's config
+    // Only match at the module level, not in nested config objects
+    if (/enabled:\s*true/.test(moduleConfig)) {
+      enabled.push(moduleName)
     }
   }
+
   return enabled
 }
 

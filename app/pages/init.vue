@@ -15,6 +15,7 @@ import IconUpload from '~icons/tabler/upload'
 import IconFileZip from '~icons/tabler/file-zip'
 import IconX from '~icons/tabler/x'
 import Logo from '~/components/atoms/Logo.vue'
+import { getModulesForWizard, getLocalesForWizard } from '~~/shared/modules'
 
 definePageMeta({
   layout: false // Using <NuxtLayout> explicitly for named slots
@@ -98,30 +99,9 @@ onMounted(async () => {
   }
 })
 
-// Available modules
-const availableModules = [
-  { id: 'blog', name: 'Blog', desc: 'Posts, categories, tags' },
-  { id: 'portfolio', name: 'Portfolio', desc: 'Project showcase' },
-  { id: 'team', name: 'Team', desc: 'Team member profiles' },
-  { id: 'testimonials', name: 'Testimonials', desc: 'Customer reviews' },
-  { id: 'faq', name: 'FAQ', desc: 'Questions & answers' },
-  { id: 'pricing', name: 'Pricing', desc: 'Pricing tables' },
-  { id: 'clients', name: 'Clients', desc: 'Client logos' },
-  { id: 'features', name: 'Features', desc: 'Feature cards' },
-  { id: 'contact', name: 'Contact', desc: 'Contact form' }
-]
-
-// Available locales
-const availableLocales = [
-  { code: 'en', iso: 'en-US', name: 'English' },
-  { code: 'ru', iso: 'ru-RU', name: 'Russian' },
-  { code: 'he', iso: 'he-IL', name: 'Hebrew' },
-  { code: 'es', iso: 'es-ES', name: 'Spanish' },
-  { code: 'fr', iso: 'fr-FR', name: 'French' },
-  { code: 'de', iso: 'de-DE', name: 'German' },
-  { code: 'zh', iso: 'zh-CN', name: 'Chinese' },
-  { code: 'ja', iso: 'ja-JP', name: 'Japanese' }
-]
+// Available modules and locales from shared registry (single source of truth)
+const availableModules = getModulesForWizard()
+const availableLocales = getLocalesForWizard()
 
 // Retry loading config
 async function retryLoad() {

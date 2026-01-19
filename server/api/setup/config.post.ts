@@ -6,20 +6,13 @@
  * Returns: { success: true, databaseStatus: 'created' | 'exists' | 'error' }
  *
  * Writes configuration to puppet-master.config.ts.
- * No auth required - setup wizard runs before users exist.
+ * Security: Only accessible when pmMode is 'unconfigured'
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { z } from 'zod'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// CONSTANTS (single source of truth for modules)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const ALL_MODULES = [
-  'blog', 'portfolio', 'team', 'testimonials', 'faq',
-  'pricing', 'clients', 'features', 'contact'
-] as const
+import { requireSetupAccess } from '../../utils/setup-guard'
+import { ALL_MODULES, type ModuleId } from '~~/shared/modules'
 
 type PmMode = 'unconfigured' | 'build' | 'develop'
 type ProjectType = 'website' | 'app'
@@ -230,6 +223,9 @@ const setupConfigSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  // Security: Only allow configuration when project is unconfigured
+  requireSetupAccess(event)
+
   const body = await readBody(event)
 
   // Validate input
@@ -257,9 +253,9 @@ export default defineEventHandler(async (event) => {
   // Create backup before modification
   const backupPath = createBackup(appDir)
 
-  // Filter to valid modules only
+  // Filter to valid modules only (using shared registry)
   const validModules = config.modules
-    ? config.modules.filter(m => (ALL_MODULES as readonly string[]).includes(m))
+    ? config.modules.filter((m): m is ModuleId => (ALL_MODULES as readonly string[]).includes(m))
     : undefined
 
   try {
@@ -300,27 +296,93 @@ export default defineEventHandler(async (event) => {
   }
 
   // Run db:push to create/update database schema
-  let databaseStatus: 'created' | 'exists' | 'error' = 'exists'
+  // Use spawn for non-blocking execution with timeout
+  let databaseStatus: 'created' | 'exists' | 'error' | 'timeout' = 'exists'
+  let databaseMessage: string | undefined
   const dbExisted = databaseExists(appDir)
 
   try {
-    const { execSync } = await import('child_process')
-    execSync('npm run db:push', {
-      cwd: process.cwd(),
-      stdio: 'pipe',
-      env: { ...process.env, FORCE_COLOR: '0' },
-      input: 'y\n' // Auto-confirm drizzle prompts
+    const { spawn } = await import('child_process')
+
+    // Create a promise that resolves when db:push completes or times out
+    const dbPushResult = await new Promise<{ status: 'success' | 'error' | 'timeout'; message?: string }>((resolve) => {
+      const timeout = 60000 // 60 second timeout
+
+      const child = spawn('npm', ['run', 'db:push'], {
+        cwd: process.cwd(),
+        env: { ...process.env, FORCE_COLOR: '0' },
+        stdio: ['pipe', 'pipe', 'pipe']
+      })
+
+      let stdout = ''
+      let stderr = ''
+
+      child.stdout?.on('data', (data) => {
+        stdout += data.toString()
+      })
+
+      child.stderr?.on('data', (data) => {
+        stderr += data.toString()
+      })
+
+      // Auto-confirm drizzle prompts
+      child.stdin?.write('y\n')
+      child.stdin?.end()
+
+      // Set timeout - kills process and returns error (not pending)
+      const timeoutId = setTimeout(() => {
+        child.kill('SIGTERM')
+        console.warn('db:push timed out after 60 seconds')
+        resolve({
+          status: 'timeout',
+          message: 'Database schema update timed out after 60 seconds. The operation was cancelled. Please try running "npm run db:push" manually.'
+        })
+      }, timeout)
+
+      child.on('close', (code) => {
+        clearTimeout(timeoutId)
+        if (code === 0) {
+          resolve({ status: 'success' })
+        } else {
+          console.error('db:push failed:', { code, stdout, stderr })
+          resolve({
+            status: 'error',
+            message: `Database schema update failed (exit code ${code}). Try running "npm run db:push" manually.`
+          })
+        }
+      })
+
+      child.on('error', (err) => {
+        clearTimeout(timeoutId)
+        console.error('db:push spawn error:', err.message)
+        resolve({
+          status: 'error',
+          message: `Failed to start database update: ${err.message}`
+        })
+      })
     })
-    databaseStatus = dbExisted ? 'exists' : 'created'
+
+    if (dbPushResult.status === 'success') {
+      databaseStatus = dbExisted ? 'exists' : 'created'
+    } else if (dbPushResult.status === 'timeout') {
+      // Timeout kills the process, so this is an error condition
+      // User needs to retry manually
+      databaseStatus = 'timeout'
+      databaseMessage = dbPushResult.message
+    } else {
+      databaseStatus = 'error'
+      databaseMessage = dbPushResult.message
+    }
   } catch (e: any) {
-    // Log the actual error for debugging
     console.error('db:push error:', e.message)
     databaseStatus = 'error'
+    databaseMessage = `Unexpected error during database update: ${e.message}`
   }
 
   return {
     success: true,
     databaseStatus,
+    databaseMessage,
     backupPath
   }
 })
